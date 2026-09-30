@@ -8,33 +8,76 @@
 
 ## Authority
 
-GDD = design authority; Analysis = simulation/quyết định mở; Technical = implementation contract.
+GDD = design authority; Analysis = simulation / quyết định mở; Technical = implementation contract.
 
-Nếu Analysis/Technical mâu thuẫn GDD, GDD thắng. Deterministic defect đã xác minh phải sửa đồng bộ; proposal không tự đổi luật.
+Nếu Analysis / Technical mâu thuẫn GDD, GDD thắng. Deterministic defect đã xác minh phải sửa đồng bộ; proposal không tự đổi luật.
 
 User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
 
 ## Quick Routing
 
-| Tôi đang làm | Đọc |
+| Tôi đang làm | Authority / evidence / contract |
 | --- | --- |
-| Combat / attributes | [GDD §4](1_HUYEN_LO_GDD.md#gdd-4) + [Analysis §2](3_HUYEN_LO_DESIGN_ANALYSIS.md#combat-analysis) |
-| Mob / Linh Biến / Boss | [GDD §5](1_HUYEN_LO_GDD.md#gdd-5) + [Technical §7](2_HUYEN_LO_TECHNICAL.md#timers) |
-| EXP / economy / enhance | [GDD §3](1_HUYEN_LO_GDD.md#gdd-3), [§7](1_HUYEN_LO_GDD.md#gdd-7) + [Analysis §3](3_HUYEN_LO_DESIGN_ANALYSIS.md#economy-analysis) |
-| Quest / decisions | [GDD §6](1_HUYEN_LO_GDD.md#gdd-6) + [Analysis §5](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
-| Network / profiles | [Technical §4](2_HUYEN_LO_TECHNICAL.md#network-authority), [§5](2_HUYEN_LO_TECHNICAL.md#profile-authority) |
-| Save | [Technical §6](2_HUYEN_LO_TECHNICAL.md#persistence) |
-| Art / UI | [GDD §11](1_HUYEN_LO_GDD.md#gdd-11) + [Technical §8](2_HUYEN_LO_TECHNICAL.md#art-contract), [§9](2_HUYEN_LO_TECHNICAL.md#ui-notes) |
-| Scope / demo / QA | [GDD §12](1_HUYEN_LO_GDD.md#gdd-12) + [Technical §10](2_HUYEN_LO_TECHNICAL.md#roadmap), [§12](2_HUYEN_LO_TECHNICAL.md#qa) |
+| Character / attributes / EXP | [GDD §2](1_HUYEN_LO_GDD.md#character-power) + [Analysis §2](3_HUYEN_LO_DESIGN_ANALYSIS.md#character-evidence) |
+| Skills / nội tại / bí kíp / status / cast | [GDD §3](1_HUYEN_LO_GDD.md#class-combat) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
+| World / mob / Linh / Boss | [GDD §4](1_HUYEN_LO_GDD.md#world-farm) + [Technical §7](2_HUYEN_LO_TECHNICAL.md#timers) |
+| Farm Lv 1 → 20 / density | [Analysis §3 matrix / model](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression) từ GDD §4 |
+| Story / Q1–Q12 | [GDD §5](1_HUYEN_LO_GDD.md#quests-story) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
+| Gear / cường hóa / chuyển giao / loot / economy | [GDD §6](1_HUYEN_LO_GDD.md#gear-economy) + [Analysis §4](3_HUYEN_LO_DESIGN_ANALYSIS.md#economy-analysis) |
+| Food / Potion / death | [GDD §7](1_HUYEN_LO_GDD.md#consumables-death) + [Analysis gates](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
+| Online / PvP / chat / profiles | [GDD §8](1_HUYEN_LO_GDD.md#online-social) + [Technical §4–5](2_HUYEN_LO_TECHNICAL.md#network-authority) |
+| Save / recovery | [Technical §6](2_HUYEN_LO_TECHNICAL.md#persistence) |
+| UX / controls / art | [GDD §9](1_HUYEN_LO_GDD.md#ux-art) + [Technical §8–9](2_HUYEN_LO_TECHNICAL.md#art-contract) |
+| Acceptance / demo / QA | [GDD §10](1_HUYEN_LO_GDD.md#acceptance-routing) + [Technical §12](2_HUYEN_LO_TECHNICAL.md#qa) |
+| Quyết định và phần cần kiểm khi chơi thử | [Analysis §5](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
 
 ## Quy ước cập nhật
 
-Giữ bốn file trong bộ active docs; tiền tố 1/2/3 biểu thị thứ tự đọc, README là điểm vào. Version chỉ nằm trong GDD; không tạo GDD versioned, audit, archive hay Open Questions riêng.
+Giữ bốn file trong bộ active docs; tiền tố 1 / 2 / 3 biểu thị thứ tự đọc, README là điểm vào. GDD là nguồn xác định version hiện hành; không tạo GDD versioned, audit, archive hay Open Questions riêng.
 
-Trạng thái/version và DoD hiện hành xem GDD; bằng chứng nghiệm thu xem Technical.
+Trạng thái / version và DoD hiện hành xem GDD; bằng chứng nghiệm thu xem Technical.
 
-Giữ số BASELINE khi chưa chốt; TUNABLE cần playtest; P1/P2 không thành requirement P0. Quyết định mở chỉ nằm trong một bảng ở Analysis.
+BASELINE là số đang dùng để triển khai; TUNABLE chỉ chỉnh sau khi đo; P1 / P2 không thành yêu cầu P0. Quyết định còn cần đo chỉ nằm trong một bảng ở Analysis.
+
+Khi gộp nội dung, giữ mỗi luật tại một domain authority và chuyển evidence/proposal sang đúng nơi; không xóa chi tiết chỉ để giảm độ dài. P1 chưa duyệt vẫn được giữ rõ trạng thái tại [Analysis — candidates](3_HUYEN_LO_DESIGN_ANALYSIS.md#research-ideas).
+
+Bảng số ở Analysis phục vụ tra cứu combat, density và economy; không nhúng JSON/chart dài. JSON persistence vẫn là hợp đồng P0 tại Technical §6. Objectives/reward/unlock Q1–Q12 nằm trong **một bảng** GDD §5, recovery đặc biệt ngay sau bảng; luật bí kíp và nội tại tập trung ở GDD §3.
 
 Lịch sử thay đổi nằm trong Git.
 
-Tra cứu chi tiết hơn qua Full Routing Index ở cuối GDD.
+Tra cứu chi tiết hơn qua Routing ở cuối GDD.
+
+## Thuật ngữ dùng chung
+
+GDD ưu tiên tiếng Việt; Technical giữ identifier tiếng Anh khi cần code/API. Đây là bảng tra từ thường dùng, không thêm hệ thống gameplay.
+
+| Cách gọi | Identifier | Nghĩa trong dự án |
+| --- | --- | --- |
+| Máu / Linh lực | HP / MP | Tài nguyên sống sót / dùng kỹ năng. |
+| Tấn công / Phòng thủ | ATK / DEF | Chỉ số gây sát thương / giảm sát thương nhận. |
+| Chính xác / Né tránh | ACC / EVA | Hai chỉ số dùng tính xác suất đánh trượt. |
+| Đấu người / đánh quái | PvP / PvE | Người chơi đấu người chơi / chiến đấu với quái và thế giới. |
+| Thời gian hạ mục tiêu | TTK | Từ lúc bắt đầu đánh tới khi mục tiêu chết. |
+| Hiệu ứng hình ảnh / giao diện chơi | VFX / HUD | Hình chém, trạng thái… / thanh máu, kỹ năng, nhiệm vụ khi chơi. |
+| Pixel trên một đơn vị Unity | PPU | Tỷ lệ nhập sprite để kích thước trong cảnh nhất quán. |
+| Lời gọi qua mạng | RPC | Lệnh gửi giữa client và Host. |
+| Đối tượng dữ liệu lưu/truyền | DTO | Bản dữ liệu không chứa tham chiếu Unity runtime. |
+| Hàng đợi vào trước xử lý trước | FIFO | Lệnh tới trước được ghi/lưu trước. |
+| Ưu tiên triển khai | P0 / P1 / P2 | P0 bắt buộc bản đầu; P1 sau core; P2 hoàn thiện thêm. |
+| Mốc dùng để triển khai / số cần đo lại | BASELINE / TUNABLE | BASELINE là số hiện hành; TUNABLE chỉ đổi sau kiểm chứng. |
+| Cụm quái | SpawnGroup | Bố trí một bãi quái do designer author; **không phải Party**. |
+| Điểm sinh quái | SpawnSlot | Vị trí có ID cố định, tham chiếu mob identity; hồi sinh đúng loài / level đó. |
+| Loại quái cố định | Mob identity | Tên, palette và level nhận diện nội dung; có thể dùng chung rig / AI. |
+| Mức đóng góp sát thương | Contribution | HP thực lấy đi / MaxHP của life quái; không tính overkill. |
+| Điều kiện nhận thưởng | Eligibility | Kiểm từng người: level, map, vị trí, sống / kết nối và tham gia; quest / Boss có predicate riêng. |
+| Người gây sát thương cao nhất | TopDamage | Chọn từ ledger toàn life, tie theo characterId; dùng cho shared loot priority / suppression. |
+| Mức đe dọa | Threat | Điểm quái dùng chọn mục tiêu; mỗi quái / mỗi player riêng, không phải contribution reward. |
+| Bản chụp trạng thái | Snapshot | Giá trị được giữ ở một thời điểm xác định: cast, death hoặc save. |
+| Dấu xác nhận | Receipt | Bằng chứng event / transaction đã commit, chặn grant / claim / reward lặp khi retry / reconnect. |
+| Gói lưu của Host | HostSaveEnvelope | Một snapshot persisted chứa characters và world records cùng revision. |
+| Trạng thái đang chạy | Runtime | State đang hoạt động trên Host, phân biệt static definition và persisted save. |
+| Cửa bảo vệ sau tan băng | Refractory | Deadline chung của target chặn Freeze mới; không kháng nhiều tầng. |
+| Đồng hồ chờ hành động của Boss | ActionClockSpeed | Tốc độ đếm phần thời gian còn lại trước action tiếp theo; Băng Hàn giảm còn 75%, không đặt lại timer. |
+| Bậc trang bị | Gear band | Ba chặng I / II / III; khác rarity và enhancement của từng instance. |
+
+Art đọc [GDD §9](1_HUYEN_LO_GDD.md#ux-art) → [Technical §8](2_HUYEN_LO_TECHNICAL.md#art-contract); layout/anchors đọc GDD §4. Co-farm không cần Party; world support N players, **P0 acceptance: tối thiểu 2 concurrent players**, chưa công bố capacity.

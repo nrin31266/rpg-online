@@ -1,394 +1,370 @@
 # Huyền Lộ — Phân tích thiết kế
 
-**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-09-29 · **Vai trò:** evidence, simulation, review và quyết định mở.
+**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-09-30 · **Vai trò:** evidence, simulation và quyết định mở.
 
-[GDD](1_HUYEN_LO_GDD.md) là nguồn design authority; [Technical](2_HUYEN_LO_TECHNICAL.md) là implementation contract. FACT ở đây là dữ kiện tài liệu hoặc phép tính kiểm lại; SIMULATION là kết quả phụ thuộc giả định; PROPOSAL không tự thành luật game.
+GDD là design authority; Technical là implementation contract. **DERIVED** là phép tính từ GDD; **SIMULATION** phụ thuộc giả định; **PROPOSAL** chưa thành luật. Bảng chỉ số trang bị và hồ sơ xác định đã tính lại với Chí mạng Kiếm, Chính xác Cung và tốc chạy Giày. Các mô phỏng giao tranh, hành trình và Boss còn dùng hồ sơ trước thay đổi này; xem là mốc đối chiếu, cần chạy lại khi có harness/runtime. Chưa có Unity/runtime acceptance.
 
 <a id="balance-baselines"></a>
 
-# 1. Balance Baselines
+# 1. Phương pháp, đối chiếu và giới hạn
 
-## S01 — EXP và onboarding
+Bộ số trong GDD V5.7.2 là luật; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. Chưa chạy Unity hoặc nghiệm thu game thật.
 
-**Question:** cumulative và kill budget có thực sự suy ra từ bảng? **Evidence:** cộng 19 giá trị GDD cho 53.100; Lv20 bắt đầu tại 53.100, không có requirement lên Lv21.
+**Nguồn đầu vào:** [nhân vật](1_HUYEN_LO_GDD.md#character-power), [kỹ năng/trạng thái](1_HUYEN_LO_GDD.md#class-combat), [quái và bãi](1_HUYEN_LO_GDD.md#world-farm), [trang bị/thưởng](1_HUYEN_LO_GDD.md#gear-economy), [Food/Bình](1_HUYEN_LO_GDD.md#consumables-death). Analysis không giữ catalog thứ hai.
 
-Bảng Need/cumulative do [GDD §3](1_HUYEN_LO_GDD.md#gdd-3) sở hữu. Kiểm toàn bộ 20 mốc: tổng 19 requirement = **53.100**; Lv5=790, Lv12=9.100, Lv17=29.600, Lv20=53.100.
+**Phép tính chiến đấu:** Python 3 tạm trong `/tmp`, 24 hạt giống 0–23; HP/sát thương/EXP làm tròn half-up, thưởng từng người làm tròn xuống. Phân điểm cân bằng có bảng số thật tại §2. Các đòn chọn theo thời gian khóa động tác, hồi chiêu và Linh lực; ưu tiên đại chiêu → tiến cảnh/nhập môn → đòn thường. Mỗi hit kiểm né/chí mạng/biến thiên sát thương; Food hồi mỗi 2 s, bình khi cần, hai loại hồi chiêu riêng 8 s. Thời gian đánh chia cho tỷ lệ ra đòn hữu hiệu giả định 0,85; không tính thêm Linh lực lần hai. Kiếm gom mục tiêu trong 1,2 u, Cung ở ≥4 u. Đây là mô hình giao tranh thuận lợi, chưa tính vị trí/hitbox/latency/death.
 
-**Calculation:** `round = floor(x+0.5)` cho số dương; kill mỗi level = ceil(Need/MobBaseEXP). Tổng bỏ carry là **799**. Với EXP dư được carry qua level, kết quả khác; chỉ dùng kill count có mô hình tái lập. Final kill target PLAYTEST/TUNABLE; range hiện tại ở S11 là model, không chứng minh lower bound 600 hoặc journey 2,5–4h.
+**Mô hình bãi:** 16 hạt giống, 90 phút/lượt bỏ 15 phút đầu; mỗi điểm sinh quái hồi 25 s sau chết, 1–4 người chơi luân phiên Kiếm/Cung chọn cụm gần cấp rồi cụm còn nhiều quái. Không cho hai người claim cùng một lượt đánh trong mô hình; chưa mô phỏng cùng đánh/nhặt, địa hình hay năng lực mạng. Số EXP/Vàng/đá là ngân sách cả bản đồ, không nhân cho mỗi người. Linh Biến roll 5% từ quái Lv 8+, tối đa một con/MapId.
 
-Catch-up: Lv4 Need 320, đã có 200 → Remaining 120; reward bù 120 đưa lên Lv5, không 320. Khi đã đạt mốc, chỉ BaseEXP. Q1–Q4 tổng tối đa 790 EXP nếu chưa có nguồn khác; không cộng thêm 790 lần nữa khi dùng mô hình normal farming đã đi qua Lv1–4. EXP quest cũ được giữ như input **legacy**, không dùng tổng cũ làm FACT cho journey mới. Reward Q5–Q11 retune ở S11/QUEST-03; GDD chỉ dẫn TUNABLE — QUEST-03; legacy numeric chỉ ở S11.
+**Mô hình hành trình:** 16 hạt giống/phái/kịch bản, Q1–Q3 chiếm 6 phút, nhiệm vụ/đường đi theo GDD; Q9 tùy chọn bỏ qua. Tiến cảnh chỉ sau Q8 và Lv 10, vũ khí Rare III/đại chiêu chỉ sau Q11. Tính Vàng, đá, Food và Bình Linh lực; không giả định +8 trước Q12. Không tính HP Potion/death, túi đầy, người chơi do dự, đi vòng vì địa hình hoặc mạng. Thời gian Lv 20 tách khỏi Q12/Boss. Có bốn mức đầu tư rõ tại §4.
 
+**Mô hình trạng thái:** 32 hạt giống trong hai giờ, 1–4 người đánh lệch pha, giả định đòn trúng và đủ Linh lực; đây là trần thuận lợi, không là tỷ lệ hiệu ứng thực khi chơi. Boss projection cộng hai dòng sát thương độc lập, giả định 50/65/75% thời gian ra đòn hữu hiệu. PvP chỉ mô hình một chiều, không là kết quả trận đấu.
 
-## S02 — Enhancement expected cost
+**Bất biến kiểm được:** tổng NeedEXP tới Lv 20 là 53.100, tổng 95 điểm thuộc tính. 18 dòng / 21 mẫu trang bị thường + Mộc Kiếm; 12 module hình ảnh trên một rig 26 khung. Bảy loại quái và bản đồ hiện hành cho đường farm hợp lệ tới Lv 20. Các phép tính này không thay bài kiểm thử khi triển khai.
 
-**Question:** fail giữ cấp thì expected cost bao nhiêu? **Calculation:** mỗi bước expected attempts=1/p; Vàng và đá = cost/p, cộng năm bước. Không cần Monte Carlo để kiểm kỳ vọng.
-
-| Bước | p | Attempts | Vàng kỳ vọng | Đá kỳ vọng |
-| --- | --- | --- | --- | --- |
-| +0→+1 | 100% | 1,00 | 100,00 | 1,00 |
-| +1→+2 | 90% | 1,11 | 222,22 | 1,11 |
-| +2→+3 | 80% | 1,25 | 437,50 | 2,50 |
-| +3→+4 | 65% | 1,54 | 846,15 | 4,62 |
-| +4→+5 | 45% | 2,22 | 1.888,89 | 11,11 |
-| Tổng | — | — | 3.494,76 | 20,34 |
-
-**Baseline:** ~3.494,76 Vàng và 20,34 đá/món +5. Sáu món ~20.968,59 Vàng và 122,03 đá chưa gồm mua gear/Food/Potion. Đây là trung bình, không bảo đảm RNG. Từ +0→+4:1.605,88 Vàng / 9,23 đá. Nếu Transfer P1 giá 500/2 thay nâng mới tới+4, tiết kiệm ròng **1.105,88 Vàng/7,23 đá**, không phải toàn bộ 1.605,88/9,23. Transfer consume món cũ và mất một cấp, không phải chuyển miễn phí.
-
+<a id="character-evidence"></a>
 <a id="combat-analysis"></a>
 
-# 2. Combat Analysis
+# 2. Nhân vật, chiến đấu và hiệu ứng
 
-## S03 — Sword/Bow DPS và bảy extreme builds
+## 95 điểm thuộc tính: các cách phân minh bạch
 
-**Question:** parity và build value theo skill hiện hành? **Model:** Lv20, sáu Common Huyền Tích +0, không hidden option/buff P1. Gear: ATK 44, HP 240, DEF 28, MP 60, ACC 16, EVA 32, Crit 2,5%. Chỉ class/passive hiện hành; random trung bình 1, chưa round mỗi hit. Mob Lv20: HP 800/DEF 18/ATK 70/ACC 140/EVA 60; incoming lấy Cổ Vệ interval 1,6s, mob CritChance0 P0 theo GDD.
+Mỗi cấp sau Lv 1 cho 5 điểm; Lv 20 có 95 điểm. Trước khi chọn phái ở Lv 5, Q5 dùng 20 điểm **chưa phân** sau lần hoàn điểm nhập môn. Bản cân bằng sau chọn phái chia gần đều: điểm dư lần lượt vào Sinh Lực, Linh Lực, Công Lực, rồi Thân Pháp; không mặc định dồn phần dư cho Thân Pháp.
 
-`ExpectedHit = ATK×100/(100+DEFtarget)×(1−EvadeTarget)×(1+0.5×CritChance)`.
+**Cách tính:** nền theo cấp + điểm + trang bị đã tính phẩm chất/cường hóa/Tinh Hoa, sau đó mới áp nội tại nền tảng một lần. Các hàng sau chọn phái dùng sáu món Common +0 theo mốc mặc, gồm Chí mạng trên Kiếm, Chính xác trên Cung và tốc chạy trên Giày (Lv 5/10 bậc I, Lv 13 bậc II, Lv 17/20 bậc III); đây là bộ kiểm chỉ số, không giả định người chơi đã mua đủ set. Trong các ô ghi hai số, thứ tự luôn là **Kiếm / Cung**. Q5 trước chọn phái chỉ có Tân Lữ với Mộc Kiếm + Quần I, chưa hưởng nội tại. Chính xác/Né tránh là chỉ số thô dùng trong công thức né, không phải phần trăm trúng/né; Cung được nhân Chính xác ×1,08 sau khi cộng điểm và trang bị. Tốc chạy tăng so với nền gồm +0,05% mỗi điểm Thân Pháp và bonus Giày cố định 1/2/3% theo bậc.
 
-`NormalDPS = ExpectedHit×NormalPower/Interval`.
+| Mốc / hồ sơ | Tổng điểm | Công Lực | Sinh Lực | Linh Lực | Thân Pháp | Chưa dùng | Máu Kiếm / Cung | Linh lực Kiếm / Cung | ATK | DEF Kiếm / Cung | Chính xác Kiếm / Cung | Né tránh | Chí mạng Kiếm / Cung | Tốc chạy tăng |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Lv 5 trước chọn phái | 20 | 0 | 0 | 0 | 0 | 20 | 185 (Tân Lữ) | 76 (Tân Lữ) | 26,8 | 10,4 (Tân Lữ) | 76 (Tân Lữ) | 28 | 5% (Tân Lữ) | 0% |
+| Lv 5 cân bằng | 20 | 5 | 5 | 5 | 5 | 0 | 291,5 / 265,0 | 121,0 / 133,1 | 35,3 | 18,3 / 16,9 | 112 / 131,76 | 67 | 6,5% / 6% | 1,25% |
+| Lv 10 cân bằng | 45 | 11 | 12 | 11 | 11 | 0 | 408,1 / 371,0 | 171,0 / 188,1 | 45,5 | 22,2 / 20,6 | 168 / 192,24 | 113 | 6,5% / 6% | 1,55% |
+| Lv 13 cân bằng | 60 | 15 | 15 | 15 | 15 | 0 | 555,5 / 505,0 | 223,0 / 245,3 | 64,9 | 35,3 / 32,7 | 208 / 246,24 | 150 | 7,5% / 6,5% | 2,75% |
+| Lv 17 cân bằng | 80 | 20 | 20 | 20 | 20 | 0 | 709,5 / 645,0 | 284,0 / 312,4 | 85,2 | 50,3 / 46,6 | 259 / 312,12 | 196 | 8,5% / 7% | 4% |
+| Lv 20 cân bằng | 95 | 24 | 24 | 24 | 23 | 0 | 777,7 / 707,0 | 316,0 / 347,6 | 91,6 | 52,7 / 48,8 | 289 / 344,52 | 220 | 8,5% / 7% | 4,15% |
+| Lv 20 Dồn Công Lực | 95 | 95 | 0 | 0 | 0 | 0 | 566,5 / 515,0 | 196,0 / 215,6 | 141,3 | 50,1 / 46,4 | 151 / 195,48 | 82 | 8,5% / 7% | 3% |
+| Lv 20 Dồn Sinh Lực | 95 | 0 | 95 | 0 | 0 | 0 | 1402,5 / 1275,0 | 196,0 / 215,6 | 74,8 | 60,4 / 55,9 | 151 / 195,48 | 82 | 8,5% / 7% | 3% |
+| Lv 20 Dồn Linh Lực | 95 | 0 | 0 | 95 | 0 | 0 | 566,5 / 515,0 | 671,0 / 738,1 | 74,8 | 50,1 / 46,4 | 151 / 195,48 | 82 | 8,5% / 7% | 3% |
+| Lv 20 Dồn Thân Pháp | 95 | 0 | 0 | 0 | 95 | 0 | 566,5 / 515,0 | 196,0 / 215,6 | 74,8 | 50,1 / 46,4 | 721 / 811,08 | 652 | 8,5% / 7% | 7,75% |
+| Lv 20 Không Sinh Lực | 95 | 32 | 0 | 32 | 31 | 0 | 566,5 / 515,0 | 356,0 / 391,6 | 97,2 | 50,1 / 46,4 | 337 / 396,36 | 268 | 8,5% / 7% | 4,55% |
+| Lv 20 Không Linh Lực | 95 | 32 | 32 | 0 | 31 | 0 | 848,1 / 771,0 | 196,0 / 215,6 | 97,2 | 53,6 / 49,6 | 337 / 396,36 | 268 | 8,5% / 7% | 4,55% |
 
-`SkillDPS = ExpectedHit×(1+INT×0.0025)×Σ(primaryPower/CD)`.
+## Thời gian hạ quái và duy trì Linh lực
 
-`RotationUpper = NormalDPS+SkillDPS`: upper bound **không trừ cast lock**, không claim là DPS playable. TTK=800/RotationUpper; không mô phỏng burst, travel, target acquisition, MP exhaustion.
+Mô hình 24 hạt giống, Host timeline giả lập; một mục tiêu/ba mục tiêu trong cùng cụm. Cột Kiếm/Cung viết rõ từng phái. **Các số thời gian dưới đây là mốc trước khi vũ khí có Chí mạng/Chính xác phụ và Giày có tốc chạy**: tỷ lệ hit/crit và thời gian di chuyển giữa cụm có thể đổi. Cần chạy lại trước khi dùng làm mốc nghiệm thu. Không dùng kết quả bộ +8 để tăng HP quái cơ bản.
 
-| Build | Class | VIT/INT/STR/AGI | HP | MP | ATK | DEF | Né mob | Normal DPS | Rotation upper | TTK s |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| STR95 | Kiếm Sĩ | 0/0/95/0 | 605,0 | 196,0 | 152,6 | 48,8 | 10,8% | 175,8 | 368,8 | 2,2 |
-| VIT95 | Kiếm Sĩ | 95/0/0/0 | 1.441,0 | 196,0 | 82,7 | 59,3 | 10,8% | 95,3 | 200,0 | 4,0 |
-| INT 95 | Kiếm Sĩ | 0/95/0/0 | 605,0 | 671,0 | 82,7 | 48,8 | 10,8% | 95,3 | 224,9 | 3,6 |
-| AGI 95 | Kiếm Sĩ | 0/0/0/95 | 605,0 | 196,0 | 82,7 | 48,8 | 30,1% | 100,0 | 209,7 | 3,8 |
-| Cân bằng | Kiếm Sĩ | 24/24/24/23 | 816,2 | 316,0 | 100,4 | 51,5 | 19,0% | 118,9 | 257,3 | 3,1 |
-| Kiếm mẫu | Kiếm Sĩ | 30/0/50/15 | 869,0 | 196,0 | 119,5 | 52,1 | 16,6% | 140,6 | 295,1 | 2,7 |
-| Cung mẫu | Xạ Thủ | 15/15/45/20 | 670,0 | 298,1 | 115,8 | 45,9 | 18,1% | 118,7 | 246,3 | 3,2 |
+| Mốc / quái | HP quái | Một con Kiếm / Cung, giây | Ba con Kiếm / Cung, giây |
+| --- | ---: | ---: | ---: |
+| Lv 5 / Sói Sương (đã chọn phái) | 107 | 1,39 / 1,46 | 5,36 / 6,04 |
+| Lv 8 / Sói Trúc | 339 | 4,16 / 4,39 | 13,91 / 14,39 |
+| Lv 10 / Ong | 473 | 5,75 / 4,55 | 11,38 / 16,02 |
+| Lv 11 / Ong | 473 | 3,99 / 3,39 | 8,33 / 11,33 |
+| Lv 13 / Đạo Tặc | 704 | 5,55 / 4,29 | 10,74 / 15,1 |
+| Lv 15 / Thạch Lv 16 | 974 | 7,55 / 6,2 | 14,34 / 20,11 |
+| Lv 17 trước Q11 / Thạch | 974 | 5,18 / 4,55 | 8,85 / 13,35 |
+| Lv 17 sau Q11 / Thạch | 974 | 3,71 / 2,86 | 7,38 / 9,4 |
+| Lv 20 Common III +0 / Cổ Vệ | 1393 | 7,28 / 6,35 | 11,81 / 17,05 |
+| Lv 20 chính tuyến / Cổ Vệ | 1393 | 5,28 / 4,62 | 9,0 / 13,73 |
+| Lv 20 Epic III +8 / Cổ Vệ | 1393 | 4,45 / 3,89 | 8,44 / 11,4 |
 
-**Conclusion:** Với setup trên, AGI 95 vẫn được thêm ACC/EVA nhưng không bảo đảm all-in tối ưu; +4,75% speed chỉ phần thưởng phụ. INT 95 tăng skill 23,75%, không tăng normal; raw STR có thể vẫn thắng damage. Không kết luận INT đã viable chỉ từ một cột skill bonus.
+Đối chiếu cụm hai/bốn con trên cùng hồ sơ; Kiếm/Cung đều phải ra nhiều action, không xóa cả cụm bằng một nút:
 
-Cùng ATK/ACC/gear, ratio Bow/Sword normal = `(0.95/0.80)/(1/0.72) × (1+0.5CritBow)/(1+0.5CritSword)`. Crit Sword/Bow = 12,5%/15,5% (Bow/Sword = 15,5%/12,5%) cho Bow/Sword≈0,867, Bow thấp hơn≈13,3% (hoặc Sword cao hơn≈15,3% nếu lấy Bow làm mẫu số). Không trộn hai cách ghi %.
+| Hồ sơ | Hai con Kiếm / Cung, giây | Bốn con Kiếm / Cung, giây |
+| --- | ---: | ---: |
+| Lv 8 / Sói Trúc | 9,07 / 9,42 | 18,76 / 19,54 |
+| Lv 10 / Ong | 9,06 / 10,42 | 15,61 / 21,32 |
+| Lv 15 / Thạch | 11,59 / 13,14 | 19,78 / 27,34 |
+| Lv 17 trước Q11 / Thạch | 8,31 / 8,87 | 11,51 / 17,08 |
+| Lv 20 chính tuyến / Cổ Vệ | 8,40 / 9,01 | 11,87 / 17,64 |
+| Lv 20 Epic III +8 / Cổ Vệ | 7,59 / 8,50 | 10,26 / 15,54 |
 
-**Mirror comparison — SIMULATION, cùng VIT/INT/STR/AGI = 24/24/24/23:** cùng sáu Common Huyền Tích +0/S03, khác class modifiers/passive/rotation đúng GDD. Ba targets đứng trong shape, full falloff đúng từng target; normal vẫn một target. Không cast-lock/projectile travel/overkill/reduced target count sau kill nên clear time chỉ lower bound.
+Sói Sương Lv 4 tại Lv 5 là quái thấp cấp sau cú nhảy chọn phái, nên hạ trong ~1,4 s; Tân Lữ Lv 4 với Mộc Kiếm hạ trong ~3,9 s. Cụm ba/bốn con ở Lv 8+ còn sống qua nhiều action, cho kỹ năng đánh lan giá trị. Q8 Sói Trúc Linh Biến có **1.695 HP**, với đồ kỳ vọng mất **22,7/23,7 s** (Kiếm/Cung) solo. Q10 ở Lv 15 đánh ba Đạo Tặc mất **10,0/14,0 s**; Đạo Tặc Lv 13 còn thưởng đủ. Lv 15 đánh Thạch Lv 16 trước đại chiêu hơi chậm. Trước Q11, Lv 17 đánh ba Thạch bằng đồ II mất **8,8/13,3 s**; cần kiểm né và dùng thuốc trong cảnh thật để tránh kẹt khi ba quái cùng áp sát.
 
-| Class | HP / MP | Normal DPS | 1-target upper DPS / TTK s | 3-target aggregate upper / clear s | Incoming một Cổ Vệ DPS | MP spend / FoodIII regen / deficit mỗi s | OOM / khoảng PotionIII lý thuyết s |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Kiếm | 816,2 / 316,0 | 118,9 | 257,3 / 3,1 | 528,2 / 4,5 | 23,41 | 12,36 / 7,90 / 4,46 | 70,9 / 42,5 |
-| Cung | 742,0 / 347,6 | 103,1 | 216,3 / 3,7 | 290,5 / 8,3 | 24,15 | 11,41 / 8,69 / 2,72 | 127,7 / 76,6 |
+| Hồ sơ Lv 20, Common III +0 | Linh lực Kiếm / Cung | Thiếu Linh lực mỗi giây Kiếm / Cung |
+| --- | ---: | ---: |
+| Cân bằng | 316,00 / 347,60 | 1,00 / 0,29 |
+| Dồn Công Lực | 196,00 / 215,60 | 2,50 / 1,94 |
+| Dồn Sinh Lực | 196,00 / 215,60 | 2,50 / 1,94 |
+| Dồn Linh Lực | 671,00 / 738,10 | -3,44 / -4,59 |
+| Dồn Thân Pháp | 196,00 / 215,60 | 2,50 / 1,94 |
+| Không Sinh Lực | 356,00 / 391,60 | 0,50 / -0,26 |
+| Không Linh Lực | 196,00 / 215,60 | 2,50 / 1,94 |
 
-Combat uptime 100/75/50% là sensitivity chung: DPS nhân uptime, TTK chia uptime; không tự cho Cung 100% vì có range. Incoming trên giả định không kite và một mob cùng layer, không dùng cho ba mobs luôn hit. Runtime mirror test phải đo melee exposure, kiting, uptime, 1/3-target clear, cast MP và số Potion thật; BAL-01/02/03 chưa được đóng bằng upper-bound DPS.
+Giá trị dương: cần thêm bình/nghỉ nếu dùng kỹ năng liên tục ngay khi hết hồi chiêu; âm: Food hồi dư. Tính Food III +2,5% MaxMP mỗi 2 s, không tính hai lần. Bình III hồi 60% MaxMP; mọi bậc bình Linh lực chung hồi chiêu 8 s, riêng bình Máu có đồng hồ khác. Khi di chuyển/nhặt đồ giữa các trận, nhu cầu bình thấp hơn.
 
-## S04 — MP sustain và INT sensitivity
+**Sát thương nhận ở các mốc:** giả định quái đánh mỗi 1,6 s, không né chủ động; Food hồi đúng bậc mỗi 2 s. Đây là máu mất ròng mỗi giây sau Food; Chí mạng/Chính xác vũ khí không đổi Máu tối đa hoặc hồi Food. Nhịp đánh 1,6 s chỉ là giả định mô hình, cần đo trên cảnh thật.
 
-**Question:** Food bù spam skill tới mức nào? **Model:** cùng Common Huyền Tích +0 như S03; INT 0/20/40/60/95, Food III, full skill on-cooldown P0. `SwordMPPerSecond = 8/1.4 + 14/4 + 22/7`; `BowMPPerSecond = 10/2 + 16/4.5 + 20/7`. Không tính buff Lv10. Average FoodMP/s = MaxMP×0,025; drift=spend−regen; OOM=MaxMP/drift nếu drift>0. Đây là xấp xỉ liên tục; tick 2s/cast discrete có thể làm thiếu MP trước kết quả này.
+| Hồ sơ kỳ vọng / quái | Một quái Kiếm / Cung | Hai quái Kiếm / Cung | Ba quái Kiếm / Cung |
+| --- | ---: | ---: | ---: |
+| Lv 8 / Sói Trúc | 6,5 / 6,9 | 16,5 / 17,1 | 26,6 / 27,3 |
+| Lv 13 / Đạo Tặc | 7,0 / 7,9 | 21,8 / 23,0 | 36,6 / 38,0 |
+| Lv 17 trước Q11 / Thạch | 4,5 / 6,0 | 21,8 / 23,6 | 39,1 / 41,3 |
+| Lv 20 chính tuyến / Cổ Vệ | 4,8 / 6,8 | 25,2 / 27,6 | 45,6 / 48,5 |
 
-| Class | INT | MaxMP | Food MP/s | Skill MP/s | Thiếu MP/s | OOM s | Potion dependency |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Kiếm | 0 | 196,0 | 4,90 | 12,36 | 7,46 | 26,3 | Có nếu spam dài |
-| Cung | 0 | 215,6 | 5,39 | 11,41 | 6,02 | 35,8 | Có nếu spam dài |
-| Kiếm | 20 | 296,0 | 7,40 | 12,36 | 4,96 | 59,7 | Có nếu spam dài |
-| Cung | 20 | 325,6 | 8,14 | 11,41 | 3,27 | 99,5 | Có nếu spam dài |
-| Kiếm | 40 | 396,0 | 9,90 | 12,36 | 2,46 | 161,2 | Có nếu spam dài |
-| Cung | 40 | 435,6 | 10,89 | 11,41 | 0,52 | 833,4 | Có nếu spam dài |
-| Kiếm | 60 | 496,0 | 12,40 | 12,36 | -0,04 | Không cạn trung bình | Không bắt buộc theo model |
-| Cung | 60 | 545,6 | 13,64 | 11,41 | -2,23 | Không cạn trung bình | Không bắt buộc theo model |
-| Kiếm | 95 | 671,0 | 16,78 | 12,36 | -4,42 | Không cạn trung bình | Không bắt buộc theo model |
-| Cung | 95 | 738,1 | 18,45 | 11,41 | -7,04 | Không cạn trung bình | Không bắt buộc theo model |
+**So build Lv 20:** Common III +0, Cổ Vệ ATK 60, cùng giả định. Bảng này dùng vũ khí III +0 với chỉ số Chí mạng/Chính xác mới; Máu tối đa và hồi Food không đổi. Dấu âm nghĩa là Food hồi nhiều hơn sát thương kỳ vọng. Worst Boss hit là Nham Thạch Rơi 1,8 × 160 × 1,05 qua DEF, không né/chí mạng/hồi giữa đòn.
 
-| INT | Gain skill 0,25% | Gain skill 0,30% | Gain skill 0,35% |
-| --- | --- | --- | --- |
-| 0 | 0,00% | 0,00% | 0,00% |
-| 20 | 5,00% | 6,00% | 7,00% |
-| 40 | 10,00% | 12,00% | 14,00% |
-| 60 | 15,00% | 18,00% | 21,00% |
-| 95 | 23,75% | 28,50% | 33,25% |
+| Hồ sơ | Máu Kiếm / Cung | Mất ròng với 1 / 2 / 3 Cổ Vệ (Kiếm) | Worst Boss hit Kiếm / Cung |
+| --- | ---: | ---: | ---: |
+| Cân bằng | 778 / 707 | 4,4 / 24,4 / 44,4 | 198 / 203 |
+| Không Sinh Lực | 567 / 515 | 8,5 / 28,3 / 48,1 | 201 / 207 |
+| Dồn Sinh Lực | 1403 / 1275 | -7,0 / 14,0 / 35,0 | 189 / 194 |
 
-Đổi coefficient không đổi MaxMP/Food/spend/OOM, chỉ đổi damage gain. Threshold sustain trung bình Sword≈59,7 INT; Bow≈43,8 INT trong setup này. Không Food: OOM=MaxMP/spend, tại INT 0 Sword≈15,9s và Bow≈18,9s. Potion III phục hồi 60%MP; tại thiếu hụt dương, khoảng cách uống lý thuyết `0.6MaxMP/drift`, nhưng còn CD 8s và discrete burst. Không đổi master coefficient hoặc Food chỉ từ phép tính; BAL-01/BAL-02 cần xác nhận ý đồ và test actual cast lock.
+Dồn Sinh Lực sống dai nhưng đánh chậm; không Sinh Lực vẫn chịu được hai worst hit riêng lẻ trong mô hình, không chịu được overlap bất cẩn. Ba quái cần di chuyển và dùng bình đúng lúc. Đường đạn, hitbox, recovery, target switching và latency chưa có trong mô hình.
 
-## S05 — Food HP sustain
+## Nội tại tinh thông ở Lv 13
 
-**Question:** Food có thực sự bù 100% một mob? **Model:** S03, Cổ Vệ 70 ATK/1,6s, ExpectedIncoming=(70/1,6)×100/(100+DEF)×(1−PlayerEvade). Food III HPS=0,02MaxHP, Potion III upper HPS=0,6MaxHP/8; không over-heal/latency/chi phí Potion.
+Kiếm Thế chỉ tăng 12% sát thương trực tiếp của kỹ năng khi mục tiêu ≤1,2 u; Xạ Tâm chỉ tăng khi impact ≥4 u. Phép thử cũ cho Kiếm 6,21→5,82 s solo và Cung 5,16→4,60 s; thay phân điểm cân bằng có thể dịch số nhỏ, nhưng điều kiện và xu hướng không đổi. Không cộng vào đòn thường, Bỏng hoặc xác suất trạng thái. Cảm giác thực cần combat slice.
+## Bỏng và Băng Hàn khi nhiều người cùng đánh
 
-| Build | Incoming/mob DPS | Food HPS | Mob equiv Food | Food+Potion upper |
+Status probe 32 seeds, hai giờ, nhịp cast cố định và giả định **mọi hit trúng, đủ MP**. Cột trái chỉ core, phải core + đại chiêu. Bỏng: core 4%, đại chiêu 70%, 6 s, tick 1 s × 0,06 source ATK; một effect/target, refresh expiry/source **giữ next tick**. Normal/Linh cùng Đóng Băng 1,5 s; proc core 2/1%, đại chiêu 45/30%; sau tan băng miễn 3 s target-wide. Boss Làm Chậm proc core 2%/big 100%, MoveSpeed ×0,85 và ActionClockSpeed ×0,75 trong 3 s, refresh-only. Không đặt Đóng Băng và Làm Chậm cùng một target. PvP chỉ MoveSpeed ×0,75 trong 1,5 s, không Đóng Băng/Bỏng.
+
+| Số người cùng đánh | Bỏng: cơ bản / có đại chiêu, % thời gian | Quái thường Đóng Băng: cơ bản / có đại chiêu | Linh Biến Đóng Băng: cơ bản / có đại chiêu | Boss Làm Chậm: cơ bản / có đại chiêu |
 | --- | --- | --- | --- | --- |
-| VIT95 | 24,50 | 28,82 | 1,18 | 5,59 |
-| Kiếm mẫu | 23,98 | 17,38 | 0,72 | 3,44 |
-| Cung mẫu | 24,55 | 13,40 | 0,55 | 2,59 |
+| 1 | 14,77 / 65,64% | 1,67 / 10,40% | 0,83 / 6,98% | 3,43 / 44,80% |
+| 2 | 27,77 / 89,03% | 3,22 / 14,51% | 1,66 / 10,69% | 6,92 / 86,70% |
+| 3 | 38,90 / 96,56% | 4,70 / 20,73% | 2,47 / 15,62% | 10,34 / 100,00% |
+| 4 | 48,04 / 99,03% | 5,97 / 21,29% | 3,21 / 16,99% | 13,52 / 100,00% |
 
-Q3 mới trao Mộc Kiếm nên không benchmark combat Lv1 với vũ khí sẵn có. Ví dụ **Tân Lữ Lv3 sau equip**, auto4VIT/2INT/4STR: HP 172/MP 78/ATK 25,2/DEF 6,6; Food I 1,72 HP/s và 1,17 MP/s. Target giả định Nấm Lv3 ATK 12/1,8s, mobACC72/playerEVA24; incoming≈5,81DPS → Food≈0,30mob-equivalent. Kiting/clear nhanh mới giảm incoming thực tế; Food không được quảng bá đủ mọi build.
+Bốn Cung cho quái thường Đóng Băng khoảng **21,3%**, Linh **17,0%** trong phép thử thuận lợi; giới hạn lý thuyết do 1,5 s + 3 s miễn hiệu ứng là **33,3%**. Bỏng từ bốn Kiếm gần như liên tục khi dùng đại chiêu đúng hồi chiêu, nhưng **vẫn một lần sát thương mỗi giây, không nhân bốn lần sát thương**. Số nhịp Bỏng mỗi giây nếu đặt lại nhịp đầu so với giữ lịch cũ: 1 Kiếm **0,633/0,651**, 2 **0,780/0,877**, 4 **0,687/0,987**; vì vậy luật giữ `nextTickAt`. Tick Lv 20 chỉ khoảng 5–6 HP trước DEF cho Cổ Vệ 1.393 HP, Bỏng chỉ bổ sung sát thương, không phải đòn bùng nổ. Với ba Cung cast đại chiêu lệch pha, Boss Làm Chậm có thể đạt 100% thời gian trong phép thử; đồng hồ chờ action tương lai vẫn chỉ kéo dài tối đa **33,3%** (tốc đếm 75%), mức làm chậm không chồng và vùng báo đòn/action đã bắt đầu không đổi. Không cần guard thứ hai trước kiểm bằng game chạy được, nhưng CC-01 phải đo Boss không mất đe dọa. Đóng Băng và Làm Chậm cần VFX khác nhau theo GDD/Technical.
 
-## S06 — Multi-target và Freeze
+## Hệ số sát thương PvP — mô hình một chiều, chưa phải đấu thật
 
-**Calculation:** Phong Trảm ba target tổng 3,75×; Liên Kích ba target tổng 4,50×; Kiếm Khí năm target tổng 7,50×; Xuyên Tiễn bốn target tổng 5,20×; Hàn Tiễn 1+4 tổng 4,60×, primary không nhận 0,80× lần hai; Liên Tiễn tổng 1,35× phân phối theo số target. Power GDD đã bao gồm falloff, không nhân lần hai.
+Đòn Kiếm vào Cung cùng hồ sơ điểm/trang bị, mục tiêu đứng yên; không phản công, né bằng di chuyển, Food/Bình, mạng hoặc tác dụng Làm Chậm. Dùng hệ số trước DEF; số là thời gian hạ mục tiêu, giây. Dòng Epic +8 là biên cuối game, không dùng để cân toàn bộ hành trình.
 
-Freeze 25%/cast CD 7s có uptime đơn giản Normal ≈0,25×1,2/7=4,29%, Linh Biến ≈2,14% nếu một target luôn trúng. Uptime thực thấp hơn khi né và cao hơn khi nhiều nguồn cast; không chứng minh CC balance từ kỳ vọng. Boss/PvP immunity giữ nguyên. Check stacking/refresh tại CC-01; không thêm stun 0,1s vào mọi hit vì biến feedback thành gameplay.
+| Trang bị cân bằng Lv 20 | Hệ số 0,15 | Hệ số 0,20 | Hệ số 0,25 |
+| --- | ---: | ---: | ---: |
+| Common III +0 | 35,35 | 26,32 | 20,87 |
+| Rare III +6 | 37,47 | 28,01 | 22,53 |
+| Epic III +8 | 39,98 | 30,06 | 24,06 |
 
-## S07 — Boss TTK sensitivity
+Với hệ số **0,20 BASELINE**, so hồ sơ cực đoan trên Common III +0 và Epic III +8:
 
-**Question:** target 90–150s có còn đúng? **Model:** build Kiếm/Cung mẫu S03, **ASSUMPTION FOR SIMULATION: Boss DEF 25/EVA 60**, cả DEF/ACC/EVA đều TUNABLE tại BOSS-02, không phải GDD lock; ACC không cần cho mô hình outgoing TTK này. **2-player benchmark = SwordSample + BowSample**, không single-player. `CombinedDPS = (SwordSampleDPS + BowSampleDPS) * 118/125 * uptime`. Rotation upper chuyển DEF 18→25 rồi nhân uptime; chưa mô hình đổi exposure do Cuồng Mạch; không Linh Giáp/Burn/buff. Gear+0 cố ý minh bạch; không gọi là endgame+4 benchmark.
+| Phân điểm | Common III +0, giây | Epic III +8, giây |
+| --- | ---: | ---: |
+| Cân bằng | 26,32 | 30,06 |
+| Dồn Công Lực | 11,92 | 17,3 |
+| Dồn Sinh Lực | 81,41 | 60,03 |
+| Dồn Linh Lực | 19,66 | 23,62 |
+| Dồn Thân Pháp | 24,6 | 28,54 |
+| Không Sinh Lực | 17,44 | 22,05 |
+| Không Linh Lực | 28,73 | 32,5 |
 
-| Combat uptime | Effective DPS upper | Release 32.000 TTK | Demo 12.800 TTK |
-| --- | --- | --- | --- |
-| 100% | 511,1 | 62,6s | 25,0s |
-| 75% | 383,3 | 83,5s | 33,4s |
-| 50% | 255,5 | 125,2s | 50,1s |
+Dồn Sinh Lực có trận dài, dồn Công Lực có trận ngắn; điều này là khác biệt build, chưa chứng minh mất cân bằng trong đấu thực. Đảo chiều Cung→Kiếm cân bằng ở hệ số 0,20 cho **25,9 s** với Common III +0, **29,7 s** với Epic III +8; gần với Kiếm→Cung nhưng chưa tính lợi thế khoảng cách. Hệ số 0,20 giữ phản ứng cho build cân bằng; 0,25 làm nhiều ca ngắn, 0,15 kéo dài. PvP Băng Hàn chỉ giảm 25% tốc chạy trong 1,5 s; mô hình tĩnh chưa đo truy đuổi/giữ khoảng cách. Giữ 0,20 để triển khai, đo duel thật trước khi chỉnh.
 
-**Conclusion:** đây là sensitivity, không kết quả Boss playable. Uptime đã gom cast-lock/né chiêu/di chuyển; phải đo riêng trước khi chỉnh HP. Không tăng HP vì đọc nhầm benchmark thành một người. Khi playable, đo 2/4 players, 8 nếu performance cho phép: TTK, telegraph readability/Cuồng Mạch, contribution/threat switching/eligibility; không HP auto-scaling. Boss DEF/ACC/EVA và count/overlap/scheduling vùng đá rơi thiếu specification, BOSS-02 cần chốt trước milestone 6. Demo HP multiplier phải áp cả threshold contribution; không chỉ sửa thanh HP.
-
-<a id="economy-analysis"></a>
-
-# 3. Economy Analysis
-
-## S08 — Food affordability và income/sink
-
-**Calculation:** `AverageGold = 4.5 + 2.5*L`. Bỏ gear sale/quest/Linh Biến, số mob bù một Food = Price/AverageGold; Gold auto-credit đã chốt; đây là award budget trước COOP distribution, không N bản reward đầy đủ.
-
-| Lv | Gold/mob | Food giá | Mob/Food | Food cost/phút |
-| --- | --- | --- | --- | --- |
-| 1 | 7,0 | 150 | 21,4 | 15 |
-| 10 | 29,5 | 400 | 13,6 | 40 |
-| 20 | 54,5 | 700 | 12,8 | 70 |
-
-Nguồn: normal/Linh Biến/Boss, quest đã chốt, sellValue explicit (shop Common author từ 25% buyPrice). Sink: Food/Potion, nâng gear, gear shop, Tẩy Mạch 1.200, Hồi Sinh 1.000, đá shop 800. Tại Lv20: reset≈22 mob; revive≈18,35 mob; đá≈14,68 mob. Q4 ứng 320 đủ Food 150+hai Potion 80=310, dư 10; không thưởng lại 320 khi reconnect/accept replay.
-
-Gold milestone cần lịch mua và drop-sale realization để tái lập, chưa đủ data để coi là FACT. Before balance pass phải ghi kill count, travel/death time, tỷ lệ Food uptime, Potion counts, enhance attempts và transaction log theo ba phong cách; không tự lock quest ứng trước mới.
-
-## S09 — Stone flow và variance
-
-Normal 8%: expected 12,5 kills/stone. Giả định 672 kills: E = 53,76 đá, σ=sqrt(672×0,08×0,92)=7,03; khoảng E±2σ≈39,7–67,8 là xấp xỉ, không bảo đảm. “35–50 đá miễn phí” cũ không phải kỳ vọng của model này. Normal-only để trả expected 20,34 đá cho một món +5 cần≈254 kills; sáu món≈1.526 kills, chưa tính quest/Linh Biến/Boss.
-
-Ở Lv20, vàng kỳ vọng theo 12,5 kills=681,25; shop 800 đắt hơn≈17,43% theo gross gold. Không kết luận farm luôn rẻ hơn khi thêm thời gian/Potion/death. Linh Biến P0 làm tăng flow; S16 mô hình cap1/rate10% test với stone1, không giữ legacy drop2–4 đá.
-
-## S10 — Sáu slot đều tăng giá trị +0→+5
-
-**Decision boundary:** giữ enhance multiplier GDD cho ATK/HP/MP/DEF 1/1,05/1,10/1,16/1,23/1,32; không tự lấy 8%/cấp (+40%) của proposal. Sửa mất giá trị slot bằng existing stats. **Working baseline TUNABLE tại GDD §7:** Boots thêm 2 EVA/cấp; Ring thêm 2 ACC và 0,2 điểm % CritChance/cấp; Necklace thêm 2 EVA/cấp. Rarity áp primary list mới ở GDD; Common trong bảng nên giữ kết quả số cũ. Enhance multiplier cho ATK/HP/MP/DEF; ACC/EVA tăng flat hiện dùng, không nhân lặp. Giữ fractional stat nội bộ. Flat gains được playtest cùng GEAR-01 trước freeze data.
-
-| Bạch Vân Common | +0 | +1 | +2 | +3 | +4 | +5 |
-| --- | --- | --- | --- | --- | --- | --- |
-| Weapon | 24,00 ATK | 25,20 ATK | 26,40 ATK | 27,84 ATK | 29,52 ATK | 31,68 ATK |
-| Armor | 70,00/7,00 HP/DEF | 73,50/7,35 HP/DEF | 77,00/7,70 HP/DEF | 81,20/8,12 HP/DEF | 86,10/8,61 HP/DEF | 92,40/9,24 HP/DEF |
-| Pants | 45,00/4,00 HP/DEF | 47,25/4,20 HP/DEF | 49,50/4,40 HP/DEF | 52,20/4,64 HP/DEF | 55,35/4,92 HP/DEF | 59,40/5,28 HP/DEF |
-| Boots | 3,00/8 DEF/EVA | 3,15/10 DEF/EVA | 3,30/12 DEF/EVA | 3,48/14 DEF/EVA | 3,69/16 DEF/EVA | 3,96/18 DEF/EVA |
-| Ring | 8 ACC/1,5% Crit | 10 ACC/1,7% Crit | 12 ACC/1,9% Crit | 14 ACC/2,1% Crit | 16 ACC/2,3% Crit | 18 ACC/2,5% Crit |
-| Necklace | 30,00/8 MP/EVA | 31,50/10 MP/EVA | 33,00/12 MP/EVA | 34,80/14 MP/EVA | 36,90/16 MP/EVA | 39,60/18 MP/EVA |
-
-**Validation:** primary tăng strict mỗi bước; boots EVA/ring ACC/necklace EVA tăng strict ở mọi tier. Tân Lữ boots không có EVA base vẫn thêm 2/cấp; fractional DEF không bị round mất. Tinh Hoa+4 đã có concept fixed-slot bonus, exact amounts/rarity interaction chưa chốt nên bảng chưa cộng. Probe tại S13, không gán bonus vào baseline damage. Rarity × enhance không đổi CritMultiplier 1,5.
-
-<a id="quest-progression"></a>
-
-## S11 — Quest EXP và nhịp farm (SIMULATION / PROPOSAL)
-
-**Question:** EXP8–15% giữ farm core, gap nào dài? **Model:** bar tại RequiredLevel; `reward = floor(Need*p + 0.5)`. Q5/Q6 Lv5, Q7 Lv7, Q8 Lv8, Q9 Lv12, Q10 Lv15, Q11 Lv17. Q6 baseline 0 được thử% trong model, **không thêm EXP Q6 vào GDD**; Q12 cap không EXP. Legacy chỉ input tạm, không reward final.
-
-| Quest | Legacy EXP / bar% | A8% | B10% | C12,5% | D15% |
-| --- | --- | --- | --- | --- | --- |
-| Q5 | 180 / 40,0% | 36 | 45 | 56 | 68 |
-| Q6 | 0 / 0,0% | 36 | 45 | 56 | 68 |
-| Q7 | 210 / 25,3% | 66 | 83 | 104 | 125 |
-| Q8 | 320 / 29,6% | 86 | 108 | 135 | 162 |
-| Q9 | 700 / 25,9% | 216 | 270 | 338 | 405 |
-| Q10 | 1.300 / 27,1% | 384 | 480 | 600 | 720 |
-| Q11 | 1.800 / 26,9% | 536 | 670 | 838 | 1.005 |
-
-Model khởi đầu Lv5/0 EXP sau catch-up 790; normal cùng level player, carry EXP qua gate/map GDD. Q8 forced Sói Linh Biến Lv8=38×3=114 EXP;12 normal Lv17 Q11=1.044 EXP **đã trong kill budget**. Counts chưa chốt Q4/Sói Q8/Đạo Tặc Q10 không invent: đây là normal-equivalent budget, chưa đủ script journey. Không thêm dynamic Linh Biến khác/co-op/demo/Tinh Hoa; Q8 bonus one-time giả định nhận hợp lệ. Q9 thử làm/bỏ, không chặn Q10.
-
-| Profile | EXP Q5–Q11 có/bỏ Q9 | Tổng quest kể cả onboarding có/bỏ Q9 | Normal kills có/bỏ Q9 | Kill budget×9s có Q9 |
-| --- | --- | --- | --- | --- |
-| A8% | 1.360 / 1.144 | 2.150 / 1.934 | 722 / 726 | 108,3 phút |
-| B10% | 1.701 / 1.431 | 2.491 / 2.221 | 716 / 721 | 107,4 phút |
-| C12,5% | 2.127 / 1.789 | 2.917 / 2.579 | 709 / 715 | 106,4 phút |
-| D15% | 2.553 / 2.148 | 3.343 / 2.938 | 702 / 710 | 105,3 phút |
-
-Quest kể onboarding/có Q9≈4,0–6,3% cumulative 53.100; phần lớn từ farm. Current model **~702–726 normal kills + một forced Linh Biến**, thường gọi normal-equivalent budget; không phải target final. Bỏ Q9 thêm 4–8 kills, không softlock. Dynamic Linh Biến/COOP sẽ đổi số kills thực tế nên lower bound 600 chưa được chứng minh.
-
-| Segment sau turn-in | A kills | B kills | C kills | D kills | Dải phút ở 9s/kill | Nhịp / risk |
-| --- | --- | --- | --- | --- | --- | --- |
-| Q6→Q7/Lv5→7 | 36 | 36 | 35 | 34 | 5,1–5,4 | Gom cụm/equip, gap ngắn |
-| Q7→Q8/Lv7→8 | 24 | 22 | 22 | 21 | 3,2–3,6 | Chuẩn bị Sói Linh Biến |
-| Q8→Lv12 | 135 | 136 | 134 | 134 | 20,1–20,4 | Khám phá Bạch Vân, gap dài |
-| Q9→Q10/Lv12→15 | 154 | 153 | 152 | 151 | 22,7–23,1 | Xích Nham; bỏ Q9 vẫn farm |
-| Q10→Q11/Lv15→17 | 130 | 128 | 127 | 125 | 18,8–19,5 | Gear/đá và điều tra |
-| Q11→Q12/Lv17→20 | 231 | 229 | 227 | 225 | 33,8–34,7 | Gap dài nhất, cần mục tiêu gear/Linh Biến |
-
-Gap là farm thiếu **sau turn-in**, chưa gồm 12 objective Q11; cộng 12 vào tổng. Carry/round có thể làm kill count không giảm đơn điệu. Lv12 là checkpoint phân tích; solo Q8→Q10 khi Lv15.
-
-Cycle giả định 6/9/12s/normal-equivalent kill →70,2–72,6 /105,3–108,9 /140,4–145,2 phút farm (**ASSUMPTION FOR SIMULATION**). Chưa cộng travel/NPC/inventory/death/Linh Biến-Boss wait/PvP/tìm vật chứng: không phải tổng journey2,5–4h đã đo. Player farm thêm khi READY rồi trả gần đầy vẫn có thể lên level; % nhỏ không bảo đảm không bao giờ ding.
-
-**Recommendation:** thử B10%, A/C/D làm sensitivity; Q6 có thể giữ 0 vì class/weapon/skill đủ reward. Đo gap 8→15/17→20 với mục tiêu gear/đá/Linh Biến sẵn có. Model trả ở minimum gate không reward-skip gate tiếp, trừ Q5→Q6 cùng Lv5 chủ ý. Legacy chỉ giữ trong bảng S11 để so sánh, không reward authority.
-
-**Farm goals — gợi ý từ hệ thống sẵn có, không objective bắt buộc:**
-
-| Segment | Level Goal | Gear Goal | Enhance Goal | Linh Biến/World Goal | Story Guidance | Risk |
-| --- | --- | --- | --- | --- | --- | --- |
-| Lv5→7 | Mở Q7 | Thanh Mộc/class weapon | Gom đá; +1 tutorial ở Q7 | Thử gom cụm Trúc Ảnh | Tự đứng vững sau chọn class | Chưa biết đòn lan/MP |
-| Lv7→8 | Mở Q8 | Bổ sung slot Thanh Mộc | Hiểu preview/cost, tiết kiệm đá | Chuẩn bị Sói Sương Linh Biến Q8 | Sói bỏ bãi cũ | Khoảng ngắn dễ bỏ qua gear |
-| Lv8→12 | Mở Q9 optional/Xích ngoại vi | Bạch Vân Lv10, săn Rare | Đá và nâng gear đang dùng | Sói Linh Biến, khám phá thác | Theo dòng khí qua Bạch Vân | ~20m thiếu mục tiêu; Rare không guarantee |
-| Lv12→15 | Mở Q10 | Chuẩn bị Xích Nham Lv15; Necklace shop/drop không cần Q9 | Dành đá/Vàng cho tier tới | Linh Biến Đạo Tặc khi đủ sức | Chỉ ngoại vi; đợi thực lực để điều tra sâu | ~23m; vượt sức Linh Biến trước 15 |
-| Lv15→17 | Mở Q11 | Xích Nham slots còn thiếu | +2/+3 tùy resource | Linh Biến tại Xích Nham | Vật chứng cho thấy nguồn phá ấn | ~19m, enhance RNG |
-| Lv17→20 | Mở Q12 | Rare class weapon Q11; Huyền Tích gear Lv20 | +3/+4 preparation, không ép đủ bộ | Outer Huyền Tích/Linh Biến, chuẩn bị Boss | Cổng đã mở; recommended 18, tu luyện tới20 | ~34m dài nhất, Boss access BOSS-03 |
-
-Supply theo [GDD §6](1_HUYEN_LO_GDD.md#gdd-6) tách khỏi regular drop và không tính là tăng rate trong S09/S11. S11 giữ nguyên normal-equivalent model/range 702–726; chưa mô phỏng supply grant mới hoặc thời gian thao tác. Shop tier/loot acquisition và enhancement goals là gợi ý, không guarantee Rare hay +4 trong gap.
-
-<a id="boss-availability"></a>
-
-## S12 — Respawn và Q12 availability
-
-**Respawn sensitivity:** test 8/12/15s. Toy model group 3 normal clear 9s, chờ từ last death →cycles 17/21/24s →635,3/514,3/450 kills/h; so 12s: +23,5%/0/−12,5%. Gold/EXP/stone cùng level tỷ lệ tương ứng. Giả định một bãi, chưa 25 groups/travel/stagger. Đo empty-bay/income; không cộng wait lần hai vào S11 cycle.
-
-**BOSS-03:** timer 15 phút có thể khiến Q12 đợi gần15 phút. Arrival uniform giả định cho wait trung bình7,5 phút; không FACT về player arrivals. Contribution không thay encounter availability.
-
-Tách story encounter khỏi world respawn là bằng chứng availability hữu ích ([provenance](#legacy-provenance)); implementation phải phù hợp world hiện tại. A+D chưa giới hạn wait, nên B/C vẫn cần so sánh trước Q12 acceptance.
-
-| BOSS-03 option | Wait worst / mean | Concurrency và đóng góp | Loot/reconnect/abuse | Cost và continuity |
-| --- | --- | --- | --- | --- |
-| A — Shared World Boss 15m | Gần15m / 7,5m chỉ khi arrival uniform | N players khác state Q12 dùng chung entity; per-character5% | Existing death event dedup; reconnect theo connected-at-death; không first-clear trigger | LOW; world farm giữ nguyên nhưng finale dễ đứt nhịp |
-| B — Shared Boss + guaranteed/accelerated story spawn | Cần chọn bound W; mean chưa mô hình, không gọi 0 khi đang fight | Không reset/spawn đè active Boss; serialize requests, player đã clear vẫn cùng fight | Persist one-time entitlement theo character; spawn request replay không làm thêm loot/cắt timer liên tục | MEDIUM; ít routing hơn C nhưng đổi world cadence, cần guard abuse |
-| C — Same BossDefinition + first-story lifecycle riêng | 0 timer wait nếu idle/ready; queue/concurrency bound chưa chốt | Player chưa clear vào story encounter; đã clear farm world; share eligibility/range5%, không share contribution giữa encounters | encounterID/rewardKind/deathID, first-clear flag và pending reconnect phải atomic; quyết định story encounter có full farm loot hay không để tránh double reward | HIGH; reuse sprite/AI/pattern không art/map mới nếu sub-region routing đủ, nhưng thêm save/state/filter; world15m vẫn độc lập |
-| D — Arena gate + chung Boss, route Q12 theo timer | Vẫn gần15m / uniform7,5m nếu không đổi spawn rule | Khác Q12 state cần per-character gate nhưng cùng fight; không tự trục xuất player đang săn | Existing personal reward; gate/accept replay không đổi timer; reconnect restore gate | LOW–MEDIUM; giảm spoil/hướng dẫn, **không bảo đảm availability** |
-
-**Recommendation OPEN:** thử feasibility B trước vì giữ một global Boss/8 roots; so C nếu B không bảo đảm finale và chống first-clear abuse. D hỗ trợ guidance/spoiler cho B hoặc C, A là control baseline. Không lock spawn bound, private scene hay story loot policy. Nếu chọn C phải sửa GDD “một entity” thành cùng BossDefinition/sprite/AI/patterns nhưng runtime encounter có thể khác; hiện GDD vẫn một entity. N players ở different Q12 states, late join, reconnect, contribution reset và world reward cadence là gate của mọi proposal. Không complete Q12 khi thiếu Boss eligibility.
-
-| Huyền Tích access option (thuộc BOSS-03) | Farm Lv17→20 / guidance | Spoiler / multiplayer | Code cost |
-| --- | --- | --- | --- |
-| A — Q11 Completed + Lv18 outer; arena tới Q12 | Lv17→18 phải farm Xích Nham; signpost rõ level | Per-character arena gate tránh vào sớm; khác state vẫn cần encounter filtering | MEDIUM; đổi gate, không thêm map |
-| B — Q11 Completed outer Lv17, recommended 18; arena tới Q12 Available/Accepted | Giữ farm gap hiện tại, warning Lv18 | Có thể filter landmark/banner trước Q12; gate state Available hay Accepted còn phải chọn; khác state kiểm Host/visibility | LOW–MEDIUM; ưu tiên khảo sát vì giữ map route |
-| C — Toàn map mở, lifecycle tại BOSS-03 | Không đổi farm access | Hiện có thể thấy/fight Boss trước Q12; lifecycle riêng chỉ giải quyết khi thực sự tách access/display | Phụ thuộc BOSS option, không mặc định rẻ |
-
-**Current design gap:** range18–20 là **khuyến nghị**, gate Q11 hiện cho vào17, không numeric contradiction sau clarify. Boss access/spoiler trước Q12 **chưa giải quyết**; ưu tiên option B cùng BOSS-03, không tự lock arena barrier/scene trong vòng này. NAR-01 đóng văn phong không đóng Boss lifecycle. Không cần thêm MAP-01.
-
-## S13 — Rarity sáu slot và Tinh Hoa+4
-
-**Evidence:** primary rarity list GDD gồm ACC/EVA, fixedCrit không scale. Ví dụ Bạch Vân+0; rarity nhân base primary → enhance ATK/HP/MP/DEF → flat ACC/EVA, không nhân lặp.
-
-| Slot / primary | Common1,00 | Uncommon1,08 | Rare1,16 | Epic1,25 |
-| --- | --- | --- | --- | --- |
-| Weapon ATK | 24 | 25,92 | 27,84 | 30 |
-| Armor HP/DEF | 70/7 | 75,6/7,56 | 81,2/8,12 | 87,5/8,75 |
-| Pants HP/DEF | 45/4 | 48,6/4,32 | 52,2/4,64 | 56,25/5 |
-| Boots DEF/EVA | 3/8 | 3,24/8,64 | 3,48/9,28 | 3,75/10 |
-| Ring ACC | 8 | 8,64 | 9,28 | 10 |
-| Necklace MP/EVA | 30/8 | 32,4/8,64 | 34,8/9,28 | 37,5/10 |
-
-Mỗi tier/slot có primary dương, rarity multiplier tăng strict nên gain thật; Tân Lữ BootsEVA0 vẫn có DEF 1 tăng. Giữ fractional stat; RingCrit1,5% không nhân rarity, CritMultiplier1,5 cố định.
-
-**Tinh Hoa BASELINE/TUNABLE; probe chỉ ASSUMPTION FOR SIMULATION**, chưa stat data/S03/S07, fixed bonus không random affix.
-
-| Slot, Bạch Vân Common+4 | Chưa bonus (S10) | Probe chưa duyệt | Sau probe |
-| --- | --- | --- | --- |
-| Weapon | 29,52 ATK | +0,5 điểm%CritChance | 29,52 ATK và+0,5 điểm%Crit |
-| Armor | 86,1 HP/8,61 DEF | +10 HP | 96,1 HP/8,61 DEF |
-| Pants | 55,35 HP/4,92 DEF | +1 DEF | 55,35 HP/5,92 DEF |
-| Boots | 3,69 DEF/16 EVA | +4 EVA | 3,69 DEF/20 EVA |
-| Ring | 16 ACC/2,3%Crit | +4 ACC | 20 ACC/2,3%Crit |
-| Necklace | 36,9 MP/16 EVA | +10 MP | 46,9 MP/16 EVA |
-
-Probe Weapon+0,5 điểm% tăng expected damage≈0,235% tại Crit 12,5%;+1 DEF giảm incoming;MP+10 tăng Food III0,25 MP/s trước class modifier, chưa chữa deficitS04. Fixed bonus so rarity-scaled: EpicHP/MP 12,5 thay 10. **GEAR-01 chưa chọn amounts/interaction**. Derive bonus theo item+enhance, giữ+5, không stack equip/load; test cùng flat gainsS10.
-
-<a id="loot-consumable-analysis"></a>
-
-## S14 — Loot semantics đã chốt / consumable UX còn mở
-
-**Decision:** [GDD §7](1_HUYEN_LO_GDD.md#gdd-7) owns rates, map-tier, slot/weapon, potion-tier, sellValue và Gold delivery. Các channel A/B/C/D independent; E một exclusive gear roll. Không roll rarity độc lập rồi supersede, không weighted category chung làm mất guaranteed channels. Boss cũng exclusive Rare40/Epic8/None52: probability≥1 gear48%, đúng cả hai marginals và không multi-gear. Boss personal eligibility/owner-only90s giữ nguyên.
-
-**Why Gold auto-credit:** bỏ physical coins/pickup traffic trên hành trình ~700 kills; cosmetic burst local không state. Không chốt COOP recipients bằng quyết định delivery. Uniform slots và Sword/Bow50/50 làm off-class weapon là 1/12 gear successes; với Normal5,1%, khoảng một off-class weapon/235,3 kills. Không smart-loot nhưng vendor value cho chúng; class reward Q6/Q11 vẫn đúng class. Shop Common là route xác định để lấp slot, không làm Rare/Epic vô dụng. LOOT-01 giờ chỉ tuning prices/rates/reward flow; evidence representation vẫn QUEST-02, distribution COOP-01.
-
-| Quick Potion option — CONS-01 | Economy/UX | Cost / recommendation |
-| --- | --- | --- |
-| A Highest available | Baseline đơn giản; thiếu 10% vẫn dùng III 60%, waste | LOW; giữ trước decision |
-| B Lowest tier đủ bù missing% | <=30% dùng I, <=45% II nếu I không đủ,  >45% III; khi không tier nào đủ dùng highest eligible | LOW; ưu tiên playtest, deterministic tiết kiệm, không full hotbar |
-| C Preferred tier | Người chơi kiểm soát nhưng cần setting/fallback UI | MEDIUM; sau B nếu cần |
-
-F Food CONS-01: khi chưa active chọn suitable tier (ưu tiên highest hay lowest chưa chốt); so same-tier refresh còn nhiều thời gian (consume vs reject/prompt), lower-overwrite-higher (baseline mới thay cũ vs guard), higher-overwrite-lower, gần hết timer, dead/logout/reconnect. Recommendation reject same-tier sớm và lower overwrite để tránh waste, **chưa đổi GDD**, timer vẫn 10 phút. CD HP/MP chung/tách và SAVE-01 offline/death còn mở.
-
-COOP-01 tách **quest kill assist / EXP / normal loot ownership**. Candidate assist cùng MapId/QuestId/active objective, alive, AssistRadius, participation; snapshot eligible trước cập nhật step để tránh mất credit khi killer chuyển bước. Không share Equip/Use/Enhance/Talk/PvP/BossEligibility; Q12 vẫn contribution5% per character. Chính sách phải áp dụng cho N eligible players, không mặc định chia đôi hoặc chỉ chọn một đồng đội.
-
+<a id="farm-progression"></a>
 <a id="world-economy-analysis"></a>
 
-## S15 — Representative mob stats (DERIVED)
+# 3. Đường farm và tranh chấp bãi
 
-GDD giữ formula và rounding half-up; bảng này chỉ projection, không stat authority thứ hai. Normal EXP=MobBaseEXP(Level), dynamic Linh Biến EXP=NormalEXP×3, Boss Lv20=0 EXP; forced Q8 dùng effective reward profile/receipt theo GDD, không full bonus cho mọi recipient. DEF/ACC/EVA không tự scale khi Linh Biến; ATK×1,3 giữ fractional runtime trước final damage rounding.
+## Lv 1 → 20 — lộ trình tính từ luật
 
-| Lv | HP | ATK | DEF | Normal EXP | Linh Biến EXP | Gold range |
-| --- | --- | --- | --- | --- | --- | --- |
-| 1 | 93 | 8 | 3 | 13 | 39 | 5–9 |
-| 5 | 170 | 16 | 6 | 26 | 78 | 13–21 |
-| 8 | 253 | 24 | 8 | 38 | 114 | 19–30 |
-| 10 | 320 | 30 | 10 | 47 | 141 | 23–36 |
-| 15 | 530 | 48 | 14 | 75 | 225 | 33–51 |
-| 20 | 800 | 70 | 18 | 108 | 324 | 43–66 |
+Mỗi loại quái có một level cố định. HP/EXP/Gold derive từ GDD; band dưới là **loot source**, không đòi full set. Tier Food/Potion dùng theo player level có thể khác Potion rơi từ source. Ở Lv 20, EXP = 0 dù Cổ Vệ có base EXP 108. Map gates/quest markers tại GDD.
 
-## S16 — Linh Biến flow / prices (SIMULATION / TEST)
+| Player Lv | Map / cụm nên farm | Mob Lv | HP / EXP / Gold | Gear drop / Potion-Food dùng | Lý do chuyển bãi |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Vân Khê | Talk | — | — / I | Q1 nhớ NPC / đường về |
+| 2 | Học Viện | Movement | — | — / I | Q2 platform |
+| 3 | Học Viện | Dummy Lv 3 | 60 / 0 / 0 | Mộc + Quần I / I | Q3 equip / 3 dummy |
+| 4 | Đồng DS3–DS6 | Sói Sương Lv 4 | 107 / 22 / 11–18 | I, không Weapon / I | Food / H; Q4 lên Lv 5 |
+| 5 | Đồng DS2(Q5) → Trúc TA1–3 | Sói Sương Lv 4 | 107 / 22 / 11–18 | I, không Weapon / I | Q5 Nấm Lv 2 là ngoại lệ; Q6 class / manual |
+| 6 | Trúc TA1–3 hoặc TA4 / 6 | Sói Sương Lv 4 | 107 / 22 / 11–18 | I, không Weapon / I | Sói Lv 4 còn thưởng; Sói Lv 8 khó hơn nếu chọn |
+| 7 | Trúc TA4 / TA6 | Sói Trúc Lv 8 | 339 / 38 / 19–30 | I / I | Q7 nhẫn +1; chuyển Sói Lv 8 trước mốc Lv 8 |
+| 8 | Trúc TA4 / 6 → Bạch BV1 / 2 | Sói Trúc Lv 8 | 339 / 38 / 19–30 | I / I | Q8 forced Linh / book / gates, chưa auto tiến cảnh |
+| 9 | Bạch BV1 / 2 | Ong Lv 10 | 473 / 47 / 23–36 | II chưa mặc / I | Luyện trước tiến cảnh, Sói Lv 8 vẫn hợp lệ |
+| 10 | Bạch BV1 / 2 → BV3–5 | Ong Lv 10 | 473 / 47 / 23–36 | II chưa mặc / II | Học tiến cảnh; Đoạt Lv 13 là lựa chọn khó hơn |
+| 11 | Bạch BV1 / 2 / BV3–5 | Ong Lv 10 | 473 / 47 / 23–36 | II mặc được / II | Mốc gear riêng sau tiến cảnh Lv 10; chọn nâng I hay thay II |
+| 12 | Bạch BV3–5 / Xích XN1–3 | Đoạt Lv 13 | 704 / 63 / 29–45 | II / II | Giữ/mua thêm II; ngoại vi Xích, Q9 optional |
+| 13 | Xích XN1–3 | Đoạt Lv 13 | 704 / 63 / 29–45 | II / II | Nội tại II tự mở; không active Lv 13 |
+| 14 | Xích XN1–3 hoặc XN4–6 | Đoạt Lv 13 | 704 / 63 / 29–45 | II / II | Đoạt Lv 13 gần cấp; Thạch Lv 16 nếu đủ sức |
+| 15 | Xích XN1–XN3(Q10) → XN4–6 | Thạch Lv 16 | 974 / 81 / 35–54 | II / III | Q10 6 Đoạt Lv 13 / evidence; Food III |
+| 16 | Xích XN4–6 | Thạch Lv 16 | 974 / 81 / 35–54 | II / III | Core / Bỏng / position, chưa big |
+| 17 | Xích XN4–6(Q11) → Huyền HT1 | Thạch Lv 16 | 974 / 81 / 35–54 | II; Q11 Rare III Weapon / III | Ba khu cùng Thạch Lv 16; big sau turn-in |
+| 18 | Huyền HT1 hoặc HT2–5 | Cổ Lv 20 | 1393 / 108 / 43–66 | III / III | Cổ Lv 20 khó hơn; HT1 Thạch Lv 16 vẫn full reward |
+| 19 | Huyền HT2–5 | Cổ Lv 20 | 1393 / 108 / 43–66 | III / III | Big farm; III từ Cổ, Thạch Lv 16 vẫn trong 3 cấp |
+| 20 | Huyền HT2–5 / Boss | Cổ Lv 20 | 1393 / 0 / 43–66 | III / III | Cap: 0 EXP; Thạch Lv 16 không thưởng farm; Q12 / endgame |
 
-**Event model:** một map 15 slots (5×3); mỗi slot chết respawn 12s, Host cap1 khi roll10%. Normal kill opportunities Poisson 400/player-hour, random available normal slot; Linh Biến sống 45s rồi bị hạ, không bị normal scheduler giết thêm. 80 seeds 0–79, mỗi run 6h/burn-in 1h; invariant cap1 kiểm mỗi event. Đây là giả định throughput và lifetime, không claim clear speed/encounters thật. Một reward budget/death, **không nhân reward theo số player** khi COOP chưa chốt; không Boss/quest/supply, stats tại Lv15 (Gold mean 42). Variant 3×HP được biểu diễn bằng lifetime 45s; model không phân DPS/action/pathing giữa players.
+Lv 5–7 có thể chọn Sói Lv 8 trong gap 3, nhưng không đảm bảo survival; Lv 8 không còn thưởng từ Sói Lv 4. Ong Lv 10 bắt đầu rơi Band II: Lv 10 có thể giữ trong bag, Lv 11 mặc được; mốc mở ngoại vi Xích Nham vẫn là Lv 12. Lv 17 đánh Thạch Lv 16 vẫn gear II; weapon Q11 và Cổ Vệ dẫn sang III. Quest muộn quay về quái thấp vẫn lấy objective/evidence, không lấy regular budget ngoài khoảng.
 
-| Players | Normal kills/h | Linh Biến/h | Gold/h | Stone/h | Gear/h | Material/h | Gold / Stone / Gear tăng so normal-only cùng tổng kills |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | 402,1 | 28,3 | 20.452 | 60,5 | 30,8 | 163,1 | +13,2% / +75,6% / +40,5% |
-| 2 | 800,1 | 41,5 | 38.836 | 105,5 | 56,0 | 302,3 | +9,9% / +56,7% / +30,4% |
-| 4 | 1.599,2 | 54,5 | 74.028 | 182,4 | 101,4 | 561,4 | +6,6% / +37,9% / +20,3% |
+## Mô hình lịch sinh quái theo từng điểm — MÔ PHỎNG
 
-Cap1 khiến variant share chỉ≈6,6/4,9/3,3% kills ở các rows, không bằng10% respawn probability. Solo lifetime20/45/90s cho≈35,2/28,3/21,0 encounters/h; không phát hành encounter rate như số chắc chắn. Nếu share kill thật10%, Gold/EXP +20%, Stones +115%, gear +61,6%, material +40% ở cùng total kills; cap không tự chứng minh economy an toàn. Stone boost≈38–76% trong model là risk cần tune/test SCOPE-01/LOOT-01; giữ test10%+stone1, so lower rate/reward nếu flow vượt sink, không bỏ mechanic. Aggregate 4-player throughput không performance acceptance.
+N = 1–4 cùng MapId nhưng chia pull trong scheduler; chưa mô phỏng cùng đánh/tranh loot, geometry hoặc network. Throughput là budget cả map, không full reward mỗi người. Linh counts thấp hơn 5% kills do cap/lifetime. Q8 force nằm trong journey, không steady-state world rows.
 
-**Price rationale:** shop base Pants≈AverageGold tại Lv1/5/10 × kill budget10/12/16, round về10 →70/200/470. Slot weights Weapon1,5 / Armor1,25 / Pants1 / Boots-Ring-Necklace0,75; buy round về10, sell floor25%. Vì thế Common một slot≈7,1–15,7 /8,8–17,6 /11,9–24,1 normal kills theo tier; full set420/1.200/2.820≈60,0/70,6/95,6 kills. Common gear drop marginal4% (một exact slot≈150 kills) làm shop là phương án lấp thiếu chắc chắn, không thay săn rarity. Purchase+sell không lời; enhancement fail/success không tăng sellValue nên không có upgrade-vendor refund loop.
+| Map / player Lv | N = 1 normal / Linh deaths / h | N = 1 EXP / Gold / h | N = 1 Stone / gear generated / h | Idle wait % N = 1 / 2 / 3 / 4 |
+| --- | --- | --- | --- | --- |
+| Đồng Sương (DS) / 4 | 532,0 / 0,0 | 11.704 / 7.714 | 42,6 / 27,1 | 0,0 / 0,0 / 15,0 / 35,9 |
+| Trúc Ảnh (TA) / 5 | 609,6 / 0,0 | 13.411 / 8.839 | 48,8 / 31,1 | 0,0 / 0,0 / 2,9 / 20,6 |
+| Trúc Ảnh (TA) / 8 | 342,3 / 14,8 | 14.700 / 9.478 | 42,2 / 22,9 | 0,0 / 0,6 / 13,6 / 32,8 |
+| Bạch Vân (BV) / 10 | 304,8 / 8,4 | 15.515 / 9.738 | 32,8 / 18,6 | 0,0 / 0,0 / 0,1 / 0,5 |
+| Xích Nham (XN) / 15 | 404,8 / 12,2 | 35.762 / 19.647 | 44,6 / 25,1 | 0,0 / 0,0 / 0,0 / 0,0 |
+| Huyền Tích (HT) / 20 | 438,7 / 17,3 | 0 / 26.746 | 52,4 / 28,7 | 0,0 / 0,0 / 0,5 / 1,1 |
 
-Drop-only Common sellValue Xích Nham/Huyền Tích từ AverageGold tại Lv15/20 × sell kill budget6/8 × slot weights; không fake buyPrice. Vendor rarity×1/1,5/2/3 cho economy, khác stat rarity×1/1,08/1,16/1,25. Mean Common sellValue Lv15=252, Lv20=436; kỳ vọng gear cash-out lấy mean sau floor giá từng slot/rarity: Normal≈14,36/24,85 Vàng/kill. Không nhân rarity lên mean rồi mới floor. Material adds≈2,70/3,60; Potion/Stone nếu bán hết adds4,80/16. Tổng Gold+sell-all≈79,86/103,75 vs base 42/54,50: **sell-all upper**, không inventory realization/gear giữ/stone tiêu; không cộng vừa dùng vừa bán cùng item. Linh Biến Lv15 sell-all≈486,82/kill, nhưng3×HP/lifetime và cap1 hạn chế flow. Trong solo event model sell-all tăng≈33,5% ở cùng kills; rate10% chưa final. Material normal tạo≈6–11% extra gold ở representative map levels, meaningful nhưng không là sink chính.
+Early N = 4 vẫn bottleneck: Đồng khoảng 36%, Trúc Lv 8 khoảng 33% thời gian chờ; N = 2 tại Trúc Lv 8 dưới 1%. Trúc có ba cụm Sói Lv 4 thay hai cụm, giữ budget 13 slots; Lv 8 có bốn Sói Trúc + ba Ong eligible. Cần benchmark rotate/crowd/CC, không tự thêm Channel/Party hay công bố capacity bốn người. Khi cụm gần level bị chiếm, scheduler chọn quái khó hơn; idle thấp ở Bạch/Xích/Huyền không chứng minh người chơi sẽ nhận risk đó. Chỉ chọn ngang cấp có thể chờ lâu hơn bảng.
 
-**Run-back:** đo Village→từng farm map và Boss death→rejoin, không chỉ traversal từng map. Theo traversal target cộng tuyến liên tiếp (chưa Village/portal/né quái), bounds tham khảo Đồng25–35s; Trúc60–90s; Bạch95–145s; Xích130–200s; Huyền Tích175–260s. Late run-back có thể dài hơn Boss TTK90–150s; không giả định người về làng sẽ kịp reward. Đo ở Week 1/5/6; nếu quá punitive ưu tiên tune main-route/shortcut terrain và traversal trước, không tự thêm fast travel/checkpoint P0. Không xem summed target là playable travel time.
+| BV / player Lv 10 / N = 4 respawn | Normal / Linh deaths / h | Wait% |
+| --- | --- | ---: |
+| 20 s | 1078,2 / 32,5 | 0,20 |
+| 25 s | 1012,6 / 32,1 | 0,38 |
+| 30 s | 951,2 / 31,7 | 1,13 |
+
+Giữ 25 s baseline; không giảm respawn chỉ từ toy model. Roster giữ 28 cụm/66 slots. Density/aggro/root deadlines và Q8 cap phải test ở scene thật. Q8 có thể chờ variant khác chết rồi slot respawn; không demote để demo nhanh. Threshold 20% trên một full-health life cho tối đa năm requesters đủ credit; nhiều hơn dùng waiting set/life tiếp theo, không spawn mỗi player. Boot/Return/disconnect không reroll Linh.
+
+<a id="economy-analysis"></a>
+<a id="loot-consumable-analysis"></a>
+<a id="quest-progression"></a>
+<a id="boss-availability"></a>
+
+# 4. Trang bị, kinh tế, nhiệm vụ và hành trình
+
+## Trang bị, cường hóa và chuyển giao
+
+Giữ **18 dòng / 21 mẫu thường + Mộc Kiếm**; mốc mặc I không phải vũ khí Lv 1, vũ khí I Lv 5, tất cả II Lv 11, tất cả III Lv 17. Vũ khí giữ ATK 15/28/40; Kiếm thêm 0,5/1/1,5 điểm % Chí mạng, Cung thêm 10/20/30 Chính xác. Giày I/II/III thêm 1/2/3% tốc chạy cố định. Giữ Áo 40/90/125 HP, Quần 25/55/80 HP, Dây chuyền 20/40/60 MP, các chỉ số còn lại, giá mua/bán và nguồn rơi GDD §6. Ong Lv 10 rơi II trước khi người chơi mặc ở Lv 11. Tinh Hoa I/II cố định đã chốt tại GDD; **GEAR-01 đóng ở mức data baseline**, còn sức mạnh khi chơi cần kiểm.
+
+**Kiểm biên Common +0:** Với hồ sơ cân bằng tại Lv 5/13/20 và quái thường cùng cấp (EVA theo GDD), Chí mạng Kiếm mới tăng kỳ vọng sát thương trực tiếp khoảng 0,24/0,48/0,73%; Chính xác Cung giảm tỷ lệ bị né khoảng 0,29/0,27/0,27 điểm %. Đây là khác biệt nhỏ trước mô phỏng kỹ năng/di chuyển; Giày tăng tốc chạy tuyệt đối 1/2/3 điểm % nhưng không đổi nhịp đòn hoặc hồi chiêu. Không dùng phép kiểm này để khẳng định TTK mới.
+
+<a id="gear-upgrade-values"></a>
+
+## Bảng tra đủ chỉ số 21 mẫu trang bị thường + Mộc Kiếm
+
+Bảng này **tính từ luật GDD §6**, chỉ cho phẩm chất **Common**; không phải catalog hay luật thứ hai. Mỗi ô là chỉ số **của riêng món đồ**, trước khi cộng nền nhân vật, điểm thuộc tính và nội tại phái. Kiếm cùng bậc thêm Chí mạng cố định, Cung thêm Chính xác chịu phẩm chất nhưng không chịu hệ số cường hóa; Giày thêm tốc chạy cố định. Tinh Hoa cộng sau các chỉ số này; Chí mạng và tốc chạy hiển thị theo điểm phần trăm. Số lẻ là giá trị nội bộ; UI mới làm tròn. Tinh Hoa I đã cộng tại +4; Tinh Hoa II chỉ có ở bậc III +8. Dấu **—** là cấp vượt trần hoặc không được nâng; các phẩm chất khác dùng đúng công thức GDD.
+
+| Bậc | Món | +0 | +1 | +2 | +3 | +4 | +5 | +6 | +7 | +8 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Ngoại lệ | Mộc Kiếm Q3 | ATK 10 | — | — | — | — | — | — | — | — |
+| I — Thanh Mộc | Thanh Mộc Kiếm | ATK 15 · Crit 0,5% | ATK 15,75 · Crit 0,5% | ATK 16,5 · Crit 0,5% | ATK 17,4 · Crit 0,5% | ATK 18,45 · Crit 1% | — | — | — | — |
+| I — Thanh Mộc | Thanh Mộc Cung | ATK 15 · ACC 10 | ATK 15,75 · ACC 10 | ATK 16,5 · ACC 10 | ATK 17,4 · ACC 10 | ATK 18,45 · ACC 10 · Crit 0,5% | — | — | — | — |
+| I — Thanh Mộc | Áo Thanh Mộc | HP 40 · DEF 4 | HP 42 · DEF 4,2 | HP 44 · DEF 4,4 | HP 46,4 · DEF 4,64 | HP 59,2 · DEF 4,92 | — | — | — | — |
+| I — Thanh Mộc | Quần Thanh Mộc | HP 25 · DEF 3 | HP 26,25 · DEF 3,15 | HP 27,5 · DEF 3,3 | HP 29 · DEF 3,48 | HP 30,75 · DEF 4,69 | — | — | — | — |
+| I — Thanh Mộc | Giày Thanh Mộc | DEF 2 · EVA 4 · Tốc chạy +1% | DEF 2,1 · EVA 6 · Tốc chạy +1% | DEF 2,2 · EVA 8 · Tốc chạy +1% | DEF 2,32 · EVA 10 · Tốc chạy +1% | DEF 2,46 · EVA 16 · Tốc chạy +1% | — | — | — | — |
+| I — Thanh Mộc | Nhẫn Thanh Mộc | ACC 6 · Crit 1% | ACC 8 · Crit 1,2% | ACC 10 · Crit 1,4% | ACC 12 · Crit 1,6% | ACC 18 · Crit 1,8% | — | — | — | — |
+| I — Thanh Mộc | Dây chuyền Thanh Mộc | MP 20 · EVA 5 | MP 21 · EVA 7 | MP 22 · EVA 9 | MP 23,2 · EVA 11 | MP 34,6 · EVA 13 | — | — | — | — |
+| II — Vân Nham | Vân Nham Kiếm | ATK 28 · Crit 1% | ATK 29,4 · Crit 1% | ATK 30,8 · Crit 1% | ATK 32,48 · Crit 1% | ATK 34,44 · Crit 1,5% | ATK 36,96 · Crit 1,5% | ATK 39,2 · Crit 1,5% | — | — |
+| II — Vân Nham | Vân Nham Cung | ATK 28 · ACC 20 | ATK 29,4 · ACC 20 | ATK 30,8 · ACC 20 | ATK 32,48 · ACC 20 | ATK 34,44 · ACC 20 · Crit 0,5% | ATK 36,96 · ACC 20 · Crit 0,5% | ATK 39,2 · ACC 20 · Crit 0,5% | — | — |
+| II — Vân Nham | Áo Vân Nham | HP 90 · DEF 9 | HP 94,5 · DEF 9,45 | HP 99 · DEF 9,9 | HP 104,4 · DEF 10,44 | HP 120,7 · DEF 11,07 | HP 128,8 · DEF 11,88 | HP 136 · DEF 12,6 | — | — |
+| II — Vân Nham | Quần Vân Nham | HP 55 · DEF 6 | HP 57,75 · DEF 6,3 | HP 60,5 · DEF 6,6 | HP 63,8 · DEF 6,96 | HP 67,65 · DEF 8,38 | HP 72,6 · DEF 8,92 | HP 77 · DEF 9,4 | — | — |
+| II — Vân Nham | Giày Vân Nham | DEF 4 · EVA 8 · Tốc chạy +2% | DEF 4,2 · EVA 10 · Tốc chạy +2% | DEF 4,4 · EVA 12 · Tốc chạy +2% | DEF 4,64 · EVA 14 · Tốc chạy +2% | DEF 4,92 · EVA 20 · Tốc chạy +2% | DEF 5,28 · EVA 22 · Tốc chạy +2% | DEF 5,6 · EVA 24 · Tốc chạy +2% | — | — |
+| II — Vân Nham | Nhẫn Vân Nham | ACC 10 · Crit 1,5% | ACC 12 · Crit 1,7% | ACC 14 · Crit 1,9% | ACC 16 · Crit 2,1% | ACC 22 · Crit 2,3% | ACC 24 · Crit 2,5% | ACC 26 · Crit 2,7% | — | — |
+| II — Vân Nham | Dây chuyền Vân Nham | MP 40 · EVA 8 | MP 42 · EVA 10 | MP 44 · EVA 12 | MP 46,4 · EVA 14 | MP 59,2 · EVA 16 | MP 62,8 · EVA 18 | MP 66 · EVA 20 | — | — |
+| III — Huyền Ấn | Huyền Ấn Kiếm | ATK 40 · Crit 1,5% | ATK 42 · Crit 1,5% | ATK 44 · Crit 1,5% | ATK 46,4 · Crit 1,5% | ATK 49,2 · Crit 2% | ATK 52,8 · Crit 2% | ATK 56 · Crit 2% | ATK 59,6 · Crit 2% | ATK 63,6 · Crit 2% · ACC 6 |
+| III — Huyền Ấn | Huyền Ấn Cung | ATK 40 · ACC 30 | ATK 42 · ACC 30 | ATK 44 · ACC 30 | ATK 46,4 · ACC 30 | ATK 49,2 · ACC 30 · Crit 0,5% | ATK 52,8 · ACC 30 · Crit 0,5% | ATK 56 · ACC 30 · Crit 0,5% | ATK 59,6 · ACC 30 · Crit 0,5% | ATK 63,6 · ACC 36 · Crit 0,5% |
+| III — Huyền Ấn | Áo Huyền Ấn | HP 125 · DEF 15 | HP 131,25 · DEF 15,75 | HP 137,5 · DEF 16,5 | HP 145 · DEF 17,4 | HP 163,75 · DEF 18,45 | HP 175 · DEF 19,8 | HP 185 · DEF 21 | HP 196,25 · DEF 22,35 | HP 208,75 · DEF 25,85 |
+| III — Huyền Ấn | Quần Huyền Ấn | HP 80 · DEF 9 | HP 84 · DEF 9,45 | HP 88 · DEF 9,9 | HP 92,8 · DEF 10,44 | HP 98,4 · DEF 12,07 | HP 105,6 · DEF 12,88 | HP 112 · DEF 13,6 | HP 119,2 · DEF 14,41 | HP 142,2 · DEF 15,31 |
+| III — Huyền Ấn | Giày Huyền Ấn | DEF 6 · EVA 12 · Tốc chạy +3% | DEF 6,3 · EVA 14 · Tốc chạy +3% | DEF 6,6 · EVA 16 · Tốc chạy +3% | DEF 6,96 · EVA 18 · Tốc chạy +3% | DEF 7,38 · EVA 24 · Tốc chạy +3% | DEF 7,92 · EVA 26 · Tốc chạy +3% | DEF 8,4 · EVA 28 · Tốc chạy +3% | DEF 8,94 · EVA 30 · Tốc chạy +3% | DEF 10,54 · EVA 32 · Tốc chạy +3% |
+| III — Huyền Ấn | Nhẫn Huyền Ấn | ACC 15 · Crit 2% | ACC 17 · Crit 2,2% | ACC 19 · Crit 2,4% | ACC 21 · Crit 2,6% | ACC 27 · Crit 2,8% | ACC 29 · Crit 3% | ACC 31 · Crit 3,2% | ACC 33 · Crit 3,4% | ACC 35 · Crit 4,1% |
+| III — Huyền Ấn | Dây chuyền Huyền Ấn | MP 60 · EVA 12 | MP 63 · EVA 14 | MP 66 · EVA 16 | MP 69,6 · EVA 18 | MP 83,8 · EVA 20 | MP 89,2 · EVA 22 | MP 94 · EVA 24 | MP 99,4 · EVA 26 | MP 105,4 · EVA 32 |
+
+**Kỳ vọng lũy kế từ +0** (mỗi bước hình học độc lập; thất bại tiêu chi phí nhưng giữ cấp). Cột Vàng quy đổi dùng giả định mua toàn bộ đá thiếu ở shop 800 Vàng/viên; không cộng đồng thời với Vàng thuần. Số thập phân là kỳ vọng, không bảo đảm số lần cụ thể.
+
+| Đạt cấp | Tổng lần thử kỳ vọng | Vàng thuần kỳ vọng | Tinh Thạch kỳ vọng | Vàng nếu mua toàn bộ đá |
+| --- | ---: | ---: | ---: | ---: |
+| +1 | 1,00 | 100 | 1,00 | 900 |
+| +2 | 2,11 | 322 | 2,11 | 2.011 |
+| +3 | 3,36 | 760 | 4,61 | 4.449 |
+| +4 — Tinh Hoa I | 4,90 | 1.606 | 9,23 | 8.987 |
+| +5 | 7,12 | 3.495 | 20,34 | 19.765 |
+| +6 — trần II | 9,98 | 7.209 | 40,34 | 39.479 |
+| +7 | 13,98 | 15.209 | 80,34 | 79.479 |
+| +8 — Tinh Hoa II | 20,65 | 36.542 | 173,67 | 175.479 |
+
+Một vũ khí I +4 cần bình quân 9,23 đá; II +6 từ +0 cần 40,34 đá, nhưng **I +4 → II +4** chỉ cần kỳ vọng thêm 31,11 đá cho hai bước +5/+6 và chi phí chuyển 2 đá. III +8 cần thêm 133,33 đá từ +6: mục tiêu sau truyện, không bắt để đánh Q12. Drop đá thường 8% = 12,5 kill/đá nếu chỉ tính quái thường; 640 kill cho kỳ vọng 51,2 đá, thêm khoảng 23 Linh Biến cho ~74 đá sinh ra trước nhặt/tiêu. Mua đá 800 Vàng cho phép bù thiếu nhưng +8 một món từ +0 vượt ngân sách Gold/đá chính tuyến. Boss có 5–8 đá trong một pile chung, **không** nhân theo số người tham gia. Không cần tăng drop hay sửa giá đá chỉ để biến +8 thành điều kiện story.
+
+**Một phép so cùng ô vũ khí** (chỉ số của món, làm tròn hai chữ số; chưa cộng nền nhân vật/nội tại):
+
+| Món | ATK | Chí mạng Kiếm / Chính xác Cung (riêng vũ khí) | Tinh Hoa / ý nghĩa |
+| --- | ---: | ---: | --- |
+| Rare II +6 | 45,47 | 1,5% / 23,2 | Tinh Hoa I +0,5 điểm % chí mạng; đáng giữ tới III |
+| Common III +0 | 40,00 | 1,5% / 30 | Món mới chưa vượt món II đã đầu tư |
+| Rare III +0 | 46,40 | 1,5% / 34,8 | Nhỉnh hơn Rare II +6 về ATK, chưa có Tinh Hoa |
+| Common III +4 | 49,20 | 2% / 30 | Vượt Rare II +6 sau đầu tư +4 |
+| Rare III +4 | 57,07 | 2% / 34,8 | Giữ phẩm chất Rare và mở Tinh Hoa I; chuyển từ Rare II +6 giữ +6 còn mạnh hơn |
+| Rare III +8 | 73,78 | 2% / 40,8 | Thêm Tinh Hoa II +6 ACC; trần săn sau truyện |
+| Epic III +8 | 79,50 | 2% / 43,5 | Cao hơn Rare III +8 khoảng 7,8% ATK món, không nhân cả nhân vật |
+
+Rare II +6 Áo là **156,16 HP / 14,62 DEF**, so Common III +0 **125 / 15** và Common III +4 **163,75 / 18,45**. Nhẫn Rare II +6 có **27,6 ACC / 2,7% chí mạng**, còn Dây chuyền Rare II +6 **74,96 MP / 21,28 EVA**; vì thế không tự động thay toàn bộ II bằng Common III +0. Trang bị phòng thủ/phụ kiện vẫn có giá trị: bớt bình máu, tăng ổn định trúng/né và Linh lực, dù vũ khí quyết định phần lớn tốc độ hạ quái.
+
+Ở Lv 20 cân bằng, toàn bộ Rare III +6 → +8 đổi ATK nhân vật **116,6 → 125,4** (+7,5%) và Máu Kiếm **929 → 996** (+7,2%) sau nội tại; thời gian solo Cổ Vệ **5,28 → 4,62 s** là mô phỏng trước khi phân hóa Chí mạng/Chính xác vũ khí, cần chạy lại. Toàn bộ Epic III +8 so Common III +0 đổi ATK **91,6 → 131,1**; đó là biên sức mạnh sau truyện. Tinh Hoa II và flat của Giày/Nhẫn/Dây chuyền đã tính trong các mốc +8, không nhân lại theo phẩm chất.
+
+**Chuyển giao giữ nguyên cấp, không nhân đồ:** cùng bậc tốn 800 Vàng, không đá; lên đúng một bậc tốn 500 Vàng +2 đá. Đồ nguồn mất, đồ đích giữ template/phẩm chất/instance; từ chối nếu đích không tăng. Ví dụ Rare II +6 → Epic II +0 thành Epic II +6, tiết kiệm việc đập lại +0→+6 nhưng mất giá bán Rare II (vũ khí Rare II 324 Vàng); opportunity tối thiểu **1.124 Vàng**. II +6 → III +0 tốn 500+2 đá và mất giá bán nguồn, opportunity **2.424 Vàng** nếu đá mua 800; rẻ hơn tự đập III +0→+6 ước 39.479 Vàng gồm đá mua. So sánh chỉ hợp khi đã sở hữu món nguồn; sunk cost cường hóa nguồn không được bỏ qua để gọi chuyển giao là nguồn tạo cấp miễn phí. I→III trực tiếp bị cấm. Không có vòng lặp bán/transfer: mỗi lệnh tiêu một source, target không sinh bản sao, giá bán không cộng tiền cường hóa, no-gain bị chặn; receipt chống replay.
+
+**Đường đầu tư kỳ vọng:** Lv 5 vũ khí I +0; Lv 8 +2; Lv 10 +3; Lv 11 chọn vũ khí II hoặc giữ I +4 tới lúc đủ đá; Lv 13 vũ khí II +4 và nâng Áo nếu chịu đòn nhiều; Lv 15 II +4; Lv 17 trước Q11 II +4/+5, sau Q11 chuyển sang vũ khí Rare III rồi học đại chiêu; Lv 20 chính tuyến thường chỉ vũ khí III khoảng +4..+6, các món khác +0..+2. Đó là hồ sơ kiểm, không là requirement. Band I +4 đáng làm nếu chơi lâu trước II vì Tinh Hoa I và chuyển nguyên +4; II +6 đáng làm nếu sở hữu món tốt và muốn sang III +6. Đập toàn set +8 trước Q12 không hợp supply.
+
+## Ngân sách farm và ví dụ kiểm chứng khi nhiều người đánh
+
+Cận trên bán toàn bộ đồ rơi giả định bán trang bị/nguyên liệu/bình/đá trước khi dùng hoặc nhặt hụt; không đồng thời bán và dùng. Food I/II/III tốn **900/2.400/4.200 Vàng/h** nếu hiệu lực liên tục. Theo quái cố định Lv 2/4/8/10/13/16/20, Vàng trực tiếp + cận trên bán đồ khoảng **29,24/34,54/45,16/55,38/63,78/73,88/95,53 Vàng/quái thường**. Ngoài abs level gap 3, regular EXP/Gold/loot/Journey bằng 0. Quest/supply/evidence active step vẫn hoạt động ở level thấp.
+
+Necklace III sell tăng **200 → 225 Vàng**, ngang Boots/Ring III; tổng sell sáu Common III tăng **1.725 → 1.750**. Giá mua II, sell II, rates và stat không đổi, nên transfer Rare II→III không đổi chi phí; normal Lv 20 vendor-all upper tăng khoảng **0,24 Vàng/kill**.
+
+Boss expected sell-all pile: **1.000** Thỏi + **303,33** gear + **1.300** Stone + **150** Potion + **75** phù = **2.828,33 Vàng/world death** trước pickup/use; direct Gold/EXP = 0. Respawn 15 phút + fight 90–150 s tạo Thỏi khoảng 3.429–3.636 Vàng/h/world. Q12 turn-in 1.000 riêng từng character, không nhân vật phẩm world theo N người.
+
+**Ví dụ kiểm chứng đóng góp:** mob Lv 4 HP107/EXP22/Gold15; Lv20 gây 90, Lv5 gây17. Người cao lệch level ≥4 nhận 0; người thấp nhận floor(22×17/107)=3 EXP, floor(15×17/107)=2 Gold, không nhận cả pool. TopDamage quá gap không tạo regular loot set. Người thấp 15,9% chưa đạt quest credit threshold 20%. Cùng level 70/37 damage nhận 14/7 EXP và 9/5 Gold; lẻ không redistribute. AFK damage0 không credit; cùng MapId / bán kính 8u / còn sống / đã gây sát thương trong 10s vẫn kiểm từng recipient. Quest chỉ active-step; Boss ≥10% và corpse area là predicate riêng. Không có Party. FFA chỉ nhặt, không sinh EXP/Gold/quest. Level lúc mob chết là bản chụp cho người có đóng góp, nên lên cấp ngay sau kill không làm mất quyền pickup; người tới sau xét level hiện tại.
+
+## Nhiệm vụ, hành trình và Boss
+
+Giữ **Q1–Q12**, Q9 tùy chọn; không thêm nhiệm vụ để lấp khoảng farm. Đối chiếu đúng SpawnSlot: Q4 năm Sói DS3–DS6; Q8 bốn Sói TA4+TA6 rồi Linh Biến `TA4.slot1`; Q10 sáu Đạo Tặc XN1–XN3, vật chứng ở kill thứ 2/4/6; Q11 3/3/4 Thạch XN4/5/6; Q12 sáu Cổ Vệ HT4+HT5. Vật chứng nhiệm vụ theo từng người, không RNG vô hạn. Q11 hoàn thành mới cho vũ khí Rare III và đại chiêu; không dùng chúng để tính độ khó Q11.
+
+Mô hình hành trình 16 hạt giống/phái/kịch bản, Q9 bỏ qua, Boss/wait Q12 tính riêng. Tính thời gian đánh, travel cơ bản, turn-in, Food, Linh lực và chi phí cường hóa; chưa mô phỏng sát thương nhận, death, bag đầy, do dự UI, latency và nhặt hụt. Kết quả chỉ để phát hiện mâu thuẫn lớn, không nghiệm thu mục tiêu **150–240 phút**.
+
+| Phái | Đầu tư | Phút tới Lv 20 | Vàng còn | Đá còn | Lần thử cường hóa | Chuyển giao |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Kiếm | Ít cường hóa | 119,0 | 21.025 | 72,9 | 0,0 | 0,0 |
+| Kiếm | Hợp lý: vũ khí +2→+4, áo tới +2 | 115,5 | 17.050 | 48,3 | 16,4 | 0,0 |
+| Kiếm | Ưu tiên vũ khí tới +6, không chuyển | 114,5 | 9.646 | 10,9 | 20,5 | 0,0 |
+| Kiếm | Ưu tiên vũ khí, chuyển I→II→III | 114,7 | 12.393 | 30,5 | 11,1 | 1,8 |
+| Cung | Ít cường hóa | 130,7 | 20.337 | 76,4 | 0,0 | 0,0 |
+| Cung | Hợp lý: vũ khí +2→+4, áo tới +2 | 126,7 | 16.452 | 51,8 | 16,1 | 0,0 |
+| Cung | Ưu tiên vũ khí tới +6, không chuyển | 125,3 | 9.352 | 9,2 | 20,4 | 0,0 |
+| Cung | Ưu tiên vũ khí, chuyển I→II→III | 124,5 | 13.433 | 30,9 | 10,2 | 1,8 |
+
+Chuyển giao bảo toàn cấp giảm trung bình khoảng mười lần thử và 20 đá ở kịch bản ưu tiên vũ khí; thời gian tới Lv 20 gần bằng nhau trong mô hình vì source/shop/roll khác nhau. Không suy rằng mọi người phải chuyển hay nâng +6. Vàng cuối dương trong tất cả runs; chưa trừ HP Potion/death và không cộng tự bán toàn bộ đồ rơi. Không tăng NeedEXP từ mô hình thiếu geometry. QUEST-03 vẫn cần hành trình chơi thật; nếu đoạn Lv 17–20 quá nhanh, thử riêng +10/+15/+20% NeedEXP cuối game.
+
+**Boss projection:** HP 32.000, DEF 25, EVA 60 (baseline GDD); hai người cân bằng Kiếm/Cung cùng đánh, cộng sát thương trung bình độc lập, chưa mô phỏng đồng thời né đòn/chết/threat. Tỷ lệ thời gian ra đòn hữu hiệu là giả định 50/65/75%; không auto-scale theo số người.
+
+| Trang bị / người | Hai người, 50% / 65% / 75% ra đòn | Ba người, 65% | Bốn người, 65% |
+| --- | ---: | ---: | ---: |
+| Common III +0 | 151 / 116 / 101 s | 78 s | 58 s |
+| Chính tuyến: Rare III vũ khí +6, đồ hỗn hợp | 119 / 91 / 79 s | 61 s | 46 s |
+| Rare III +6 toàn bộ (đầu tư vừa) | 118 / 90 / 78 s | 60 s | 45 s |
+| Rare III +8 toàn bộ (săn sau truyện) | 109 / 84 / 72 s | 56 s | 42 s |
+| Epic III +8 toàn bộ (biên trần) | 104 / 80 / 69 s | 53 s | 40 s |
+
+Hai người chính tuyến ở khoảng **50–65% thời gian ra đòn hữu hiệu** đạt 91–119 s, đúng mục tiêu 90–150 s. 75% cho 79 s là biên thuận lợi, cần cảnh né/telegraph thật để xem có quá nhanh. Bốn người endgame ~40 s ở 65% là hệ quả tự nhiên của cộng DPS, không lý do thêm auto-scale Boss; capacity/độ khó nhiều người phải đo. +8 làm nhanh hơn nhưng không vài giây và không cần cho Q12. Boss ATK 160, ba vùng Nham Thạch Rơi, lịch một action/các cooldown phải kiểm scene; mô hình không chứng minh đòn luôn né được. Demo HP 12.800/respawn 60 s chỉ là override nghiệm thu, không dùng làm cân bằng release.
 
 <a id="review-decisions"></a>
-
-# 4. Quyết định đã chốt
-
-Luật đã chốt nằm trong GDD, không giữ bảng audit lịch sử song song. Tra [design lock](1_HUYEN_LO_GDD.md#gdd-0), [scope P0/P1/P2 và DROP](1_HUYEN_LO_GDD.md#gdd-12); implementation contract nằm trong Technical. Lịch sử sửa và lý do thay đổi tra Git.
-
-**BOSS-01 — CLOSED (scope correction):** Cuồng Mạch HP≤30% thuộc P0, cadence×0,8 TEST/TUNABLE; count/overlap/scheduler vẫn BOSS-02. Không đồng nhất Linh Giáp/Vỡ Thế P1. SCOPE-01 chuyển từ candidate P1 sang P0 rate/economy PLAYTEST.
-
-**NAR-01 — CLOSED:** Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò mò và gỡ mâu thuẫn bối cảnh Xích Nham mà không tăng scope. Nội dung hiện hành tại [GDD §2](1_HUYEN_LO_GDD.md#gdd-2) và [§6](1_HUYEN_LO_GDD.md#gdd-6); quyết định này không đóng BOSS-03 về availability/lifecycle.
-
 <a id="open-decisions"></a>
 
-# 5. Open Decisions
+# 5. Quyết định đã chốt và cổng kiểm khi triển khai
 
-Bảng dưới chỉ giữ việc cần chốt hoặc playtest cho P0 và gate chọn scope P1. Quyết định đã đóng ở §4; candidate P1 ở §6. Deadline là gate tương lai, không ngày đã hoàn tất. OPEN/PLAYTEST không đổi baseline GDD; CRITICAL phải chốt trước milestone phụ thuộc, không chặn spike nền tảng nếu chưa phụ thuộc vào policy đó.
+**Đã chốt trong V5.7.0:** GEAR-01 (trần +4/+6/+8, bảng chi phí, hai Tinh Hoa và chuyển giao bảo toàn cấp); CONS-01 (HP/MP hai hồi chiêu riêng, chọn bình đủ bù nhỏ nhất, Food thay hiệu ứng cũ); SAVE-01 (khôi phục HP/MP/dead, không hồi offline, Food/deadline trôi theo UTC); PVP-01 (120 s so tỷ lệ máu, hòa/ngắt kết nối/restore và thưởng một lần); BOSS-02 (DEF25/ACC140/EVA60, ba vùng đá, một action/lịch ưu tiên). COOP-01, QUEST-02, BOSS-03, BOSS-01 và NAR-01 đã chốt từ trước. Những số BASELINE vẫn có thể chỉnh **sau khi đo**, nhưng không là câu hỏi chưa có luật để code.
 
-| ID | Chủ đề | Cần chốt | Baseline hiện tại | Priority | Deadline | Status |
-| --- | --- | --- | --- | --- | --- | --- |
-| BAL-01 | INT | 0,25/0,30/0,35% đủ value? | 0,25%; S03/S04 | HIGH | During Week 2–3; retest Week 5 | PLAYTEST |
-| BAL-02 | MP sustain | Intended deficit và Potion dependency? | Giữ Food/MP costs; S04 | CRITICAL | During Week 2–3 trước sustain acceptance | PLAYTEST |
-| QUEST-01 | Q9 UX | Hiện/skip/revisit branch ra sao? | Optional; Q10 không chặn, reward chỉ PvP | HIGH | Before Week 4 quest framework; UX Week 7 | OPEN |
-| PHY-01 | Collider | Kích thước final và vertical hitbox? | 0,60–0,65×1,45u; originY+0,8 | HIGH | During Week 1–2; layout retest Week 5 | PLAYTEST |
-| CC-01 | Freeze | 25% và refresh/stack nhiều caster? | Normal 1,2s / Linh Biến 0,6s; Boss/PvP immune | MEDIUM | During Week 5 CC/multi-caster pass | PLAYTEST |
-| SCOPE-01 | Linh Biến flow | Chance/reward/cap1 có phù hợp farm nhiều người và sinks? | 10% TEST; P0 modifier và Q8 deterministic; S16 | HIGH | During Week 5 world/economy; Q8 verify Week 4 | PLAYTEST |
-| SCOPE-05 | Thứ tự P1 | DPS meter/QoL/transfer/network xếp sao? | Gate P0 trước, chưa thứ tự cuối | HIGH | During Week 4 scope checkpoint; chọn sau P0 gate | OPEN |
-| BAL-03 | AGI speed | Giữ 0,05%/điểm? | ACC/EVA chính; speed TUNABLE | MEDIUM | During Week 1–2; balance retest Week 5 | PLAYTEST |
-| GEAR-01 | Tinh Hoa/rarity | Exact bonus amounts và rarity interaction? | Concept slot GDD; S10/S13 probe chưa khóa | HIGH | Before Week 4 gear data authoring | PLAYTEST |
-| COOP-01 | Co-op policies | Quest kill assist/radius/participation; EXP split/bonus; normal loot ownership? | S14 tách ba policy; Boss5% per character, không party system | CRITICAL | Before Week 3 loot recipients/EXP; assist before Week 4 quest; verify Week 6 | OPEN |
-| CONS-01 | Potion/Food | Tier selection H/M, F refresh/overwrite, CD groups, death/logout? | S14; highest baseline, Food10m/tick2s mới thay cũ | HIGH | Before Week 3 consumable implementation; restore Week 6 | OPEN |
-| SAVE-01 | Restore state | HP/MP/dead/Food và restart map restore? | Host JSON; không tự heal/regen offline | HIGH | During Week 1 save spike; freeze restore before Week 6 acceptance | OPEN |
-| PVP-01 | Match edge | Timeout hòa, disconnect và restore combat state? | Best1/120s/%HP thắng | HIGH | Before Week 7 PvP implementation | OPEN |
-| QUEST-02 | Counts/evidence | Counts Q4/Q8/Q10, virtual/physical evidence policy/rates, catch-up BaseEXP? | Supply Q5/Q6/Q7 guaranteed và full-bag safety đã rõ GDD; representation còn mở | HIGH | Before Week 4 Q1–Q8; Q10/Q11 counts before Week 6 | OPEN |
-| BOSS-02 | Boss stat/scheduler | DEF/ACC/EVA, số vùng/overlap/scheduler đá rơi? | HP 32k/ATK 140 baseline; S07 giả định DEF 25/EVA 60 | HIGH | Before Week 6 Boss implementation | OPEN |
-| ART-01 | Projectile feel | Arrow speed, telegraph/aim và hybrid timeout? | Generic mob speed V5; không homing mới | MEDIUM | During Week 2 combat slice; Ong/Hybrid retest Week 5 | PLAYTEST |
-| LOOT-01 | Loot/economy tuning | Normal/Linh Biến/Boss rates, vendor budgets và sinks phù hợp? | Semantics/Gold/map-tier/exclusive roll đã chốt GDD; S08/S16 là test | HIGH | Before Week 3 item prices; retune Week 5 flow / Week 6 Boss | PLAYTEST |
-| BOSS-03 | Story access/lifecycle | S12 A/B/C/D, Huyền Tích17/18 và arena/spoiler/concurrency/reconnect/first-clear loot? | Một global Boss15m; B/C lifecycle recommendation chưa lock | HIGH | Before Week 6 Boss/story lifecycle implementation | OPEN |
-| QUEST-03 | Quest EXP final | Profile8/10/12,5/15%, Q6 có EXP hay giữ 0? | Target8–15%; S11 ưu tiên thử10%, chưa đổi reward data | HIGH | During Week 4 provisional reward authoring; final Week 6 journey | PLAYTEST |
-| TECH-01 | Profile binding | ID→connection và duplicate selection policy? | Host load ID; một active writer/character | HIGH | During Week 1 network/profile spike | OPEN |
+NAR-01: Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò mò và gỡ mâu thuẫn bối cảnh Xích Nham mà không tăng scope. Q9 tùy chọn, trang bị 18 dòng, bí kíp, không Party P0 và vòng Boss chung cũng đã có luật; không mở lại vì chưa chơi thử.
+
+| ID / trạng thái | Điều cần đo hoặc làm | Baseline hiện tại | Điều kiện xem lại |
+| --- | --- | --- | --- |
+| BAL-01 — PLAYTEST | Giá trị bốn thuộc tính và build cực đoan | Bảng phân điểm/chỉ số §2, 95 điểm | Một build làm Q10/Q11 không thể qua dù dùng cơ chế bình thường, hoặc PvP có kết quả lệch quá xa |
+| BAL-02 — PLAYTEST | Hồi phục và chi phí Food/Bình | Food III mỗi 2 s +4% HP/+2,5% MP; hai bình riêng 8 s | Trận farm phải đứng chờ Linh lực liên tục hoặc Vàng âm sau route hợp lệ |
+| PHY-01 — PLAYTEST | Collider, platform, nhiều người | Bounds GDD, drop-through theo từng actor | Trúng đòn/đi xuyên sàn sai hoặc người khác làm đổi collision |
+| CC-01 — PLAYTEST | Đóng Băng/Làm Chậm/Bỏng khi nhiều người | Cửa miễn Đóng Băng 3 s; Boss clock ×0,75, không stack | Boss mất khả năng ra đòn, người chơi không đọc được hiệu ứng, hoặc overlap gây unfair hit |
+| SCOPE-01 — PLAYTEST | Mật độ, respawn, contention | 28 cụm/66 điểm, hồi 25 s, Linh 5%/cap1 | 2 người thiếu quái rõ hoặc 3–4 người chờ nhiều; benchmark trước claim capacity |
+| GEAR-01 — BASELINE ĐÃ CHỐT | Chạy lại TTK, hit/crit, di chuyển giữa cụm, hành trình và Boss với Chí mạng Kiếm / Chính xác Cung / tốc chạy Giày; đo cảm giác +4/+6/+8 và preview | GDD §6, bảng kinh tế §4, Host/Client playtest | Gear II/III, sức mạnh hai phái hoặc Tinh Hoa làm Boss/PvP/kinh tế lệch khi chơi thật |
+| CONS-01 — BASELINE ĐÃ CHỐT | Thử nhầm phím/bình/refresh Food | HP và MP hồi chiêu riêng; tier đủ bù nhỏ nhất, Food thay cũ | Người chơi thường xuyên phí bình hoặc tutorial Q6 kẹt |
+| SAVE-01 — BASELINE ĐÃ CHỐT | Crash/reconnect và deadline offline | GDD/Technical §6–7, không offline heal | Save khôi phục sai HP/dead/Food, roll Linh hay reward lặp |
+| PVP-01 — BASELINE ĐÃ CHỐT | Đấu thật với build/cấp/latency | Hệ số 0,20, 120 s, hòa/ngắt kết nối/restore GDD §8 | Giao tranh cân bằng quá ngắn/dài hoặc kết quả/restore không nhất quán |
+| BOSS-02 — BASELINE ĐÃ CHỐT | Độ rộng vùng/nhịp báo trước đòn | 32.000 HP, DEF25/ACC140/EVA60, ba vùng đá, một action | Không thể né bằng kỹ năng di chuyển thường, overlap khó đọc, thời gian 2 người lệch xa 90–150 s |
+| ART-01 — PLAYTEST | Đường đạn, aim, thời điểm hit, hình nhân vật | GDD/Technical art contract | Collider/hình lệch hoặc cảm giác chém/bắn khó đọc |
+| LOOT-01 — PLAYTEST | Đá/trang bị sinh ra so lượng nhặt và sink | 8% đá thường, giá shop 800, §3–4 | Người chơi hợp level không đủ nguồn cho +4, hoặc +8 quá dễ trước story |
+| QUEST-03 — PLAYTEST | Thời gian Lv1–20 và hồi phục khi lỗi | Mô hình ~115–131 phút, mục tiêu 150–240 phút | Playable journey vẫn quá nhanh/chậm sau tính đi lại, chết, UI và multiplayer |
+| TECH-01 — SPIKE | Ràng buộc connection→profile, chọn trùng, reconnect | Một writer/character; Host giữ quyền | Chỉ chốt sau Host+Client spike và thử duplicate selection/crash |
+
+Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST/SPIKE ghi rõ phải đo gì. Không tăng NeedEXP, HP quái hoặc tạo hệ thống mới từ mô hình thiếu cảnh thật.
 
 <a id="research-ideas"></a>
-
-# 6. Candidate P1 và provenance
-
-Các ID dưới đây được đưa ra khỏi bảng việc cần chốt P0, không phải đã duyệt triển khai. Chọn hoặc bỏ tại SCOPE-05 sau gate P0; scope hiện hành vẫn theo [GDD §12](1_HUYEN_LO_GDD.md#gdd-12). Không lặp danh sách ACCEPT/REJECT đã trở thành design lock hoặc DROP.
-
-| ID | Candidate | Input proposal chưa khóa |
-| --- | --- | --- |
-| SCOPE-02 | Upgrade Transfer | Same slot/higher tier, consume đồ cũ, New=max(0, Old−1), 500 Vàng + 2 đá |
-| SCOPE-03 | Buff Lv10 | R, 10s/CD40s/MP15; Chiến Ý +15% ATK/+5% speed hoặc Ưng Nhãn Cường Hóa +10 điểm % Crit/+15% range |
-| SCOPE-04 | Linh Giáp | 1.000/Groggy chỉ proposal; cần kiểm CC/workload nếu chọn |
-
 <a id="legacy-provenance"></a>
 
-**Legacy provenance:** NSO đã được khai thác như reference, không là authority hiện hành. Trace còn lại ở bảng dưới từ source server trong `research/SRC NSOACE FIX/` và Git, không phụ thuộc tài liệu research tạm. Audit trước đã kiểm các method dưới đây, không suy ra reference có crash-atomic save hoặc balance phù hợp Huyền Lộ. Pattern đã chấp nhận được mô tả trực tiếp trong GDD/Technical.
+# 6. Nguồn tham khảo và đề xuất P1
 
-| Evidence trace | Giá trị giữ lại |
-| --- | --- |
-| `Char.initMenu/finishTask`, level tracker | NPC turn-in, bag preflight, level feedback; contract hiện hành độc lập |
-| Equip/use/allocate callbacks; `AbilityFromEquip` | Tutorial theo hành động thật, +4 bonus; không chứng minh stat amounts |
-| InoshishiCave/Gymnasium creation | Story encounter lifecycle riêng: evidence BOSS-03, chưa lock implementation |
-| `Mob.dead` same quest/step; weighted regular/separate quest roll | COOP-01 assist và LOOT-01 evidence; EXP/ownership/rates chưa copy |
-| Part/map/cleanup records | Modular visual/one-way/cleanup; scope và asset contract theo GDD |
+Các đề xuất dưới đây được giữ để không mất thiết kế đang cân nhắc. **P1 / PROPOSAL, chưa duyệt triển khai**, không cộng vào balance / acceptance P0. Chọn hoặc bỏ sau core gate theo [GDD scope](1_HUYEN_LO_GDD.md#vision); không phải Open Decision chặn code P0.
+
+| ID | Candidate | Input proposal được giữ lại |
+| --- | --- | --- |
+| SCOPE-03 | **Chiến Ý — Kiếm / Ưng Nhãn Cường Hóa — Cung** | Buff Lv 10, phím R; duration 10 s, skill CD 40 s, MP 15. Chiến Ý: +15% ATK, +5% speed. Ưng Nhãn Cường Hóa: +10 điểm % CritChance, +15% range. Không phải nội tại Ưng Nhãn Lv 5; không thêm active P0. Acquisition / stacking và exact values cần chốt nếu chọn P1. |
+| SCOPE-04 | Linh Giáp / Vỡ Thế | Shield 1.000 và Groggy là proposal cũ; chưa có shield-break / CC contract P0. Cần kiểm lại Boss / CC / workload nếu chọn; không tự lấy số này làm Boss data. |
+
+**Legacy provenance compact:** NSO reference đã khai thác, không current authority. Trace từ `research/SRC NSOACE FIX/`: `Char.initMenu/finishTask` (NPC turn-in / bag checks), equip / use callbacks và `AbilityFromEquip` (onboarding / +4), `Mob.dead` (quest assist / loot input), Part / TileMap (modular / one-way). Availability instances là historical input; Boss hiện hành shared world. Không dùng reference chứng minh crash atomicity, rates hoặc balance. Lịch sử chi tiết nằm trong Git; pattern đã nhận là design Huyền Lộ.
