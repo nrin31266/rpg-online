@@ -25,8 +25,8 @@ User lock và review đã thống nhất được ghi vào GDD hiện hành. Ngu
 | Story / Q1–Q12 | [GDD §5](1_HUYEN_LO_GDD.md#quests-story) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
 | Gear / cường hóa / chuyển giao / loot / economy | [GDD §6](1_HUYEN_LO_GDD.md#gear-economy) + [Analysis §4](3_HUYEN_LO_DESIGN_ANALYSIS.md#economy-analysis) |
 | Food / Potion / death | [GDD §7](1_HUYEN_LO_GDD.md#consumables-death) + [Analysis gates](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
-| Online / PvP / chat / profiles | [GDD §8](1_HUYEN_LO_GDD.md#online-social) + [Technical §4–5](2_HUYEN_LO_TECHNICAL.md#network-authority) |
-| Save / recovery | [Technical §6](2_HUYEN_LO_TECHNICAL.md#persistence) |
+| Online / PvP cược Vàng / chat | [GDD §8](1_HUYEN_LO_GDD.md#online-social) + [Technical §4–6](2_HUYEN_LO_TECHNICAL.md#network-authority) |
+| Save / SafeAnchor / reconnect | [GDD §7–8](1_HUYEN_LO_GDD.md#consumables-death) + [Technical §5–6](2_HUYEN_LO_TECHNICAL.md#profile-authority) |
 | UX / controls / art | [GDD §9](1_HUYEN_LO_GDD.md#ux-art) + [Technical §8–9](2_HUYEN_LO_TECHNICAL.md#art-contract) |
 | Acceptance / demo / QA | [GDD §10](1_HUYEN_LO_GDD.md#acceptance-routing) + [Technical §12](2_HUYEN_LO_TECHNICAL.md#qa) |
 | Quyết định và phần cần kiểm khi chơi thử | [Analysis §5](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
@@ -41,7 +41,7 @@ BASELINE là số đang dùng để triển khai; TUNABLE chỉ chỉnh sau khi 
 
 Khi gộp nội dung, giữ mỗi luật tại một domain authority và chuyển evidence/proposal sang đúng nơi; không xóa chi tiết chỉ để giảm độ dài. P1 chưa duyệt vẫn được giữ rõ trạng thái tại [Analysis — candidates](3_HUYEN_LO_DESIGN_ANALYSIS.md#research-ideas).
 
-Bảng số ở Analysis phục vụ tra cứu combat, density và economy; không nhúng JSON/chart dài. JSON persistence vẫn là hợp đồng P0 tại Technical §6. Objectives/reward/unlock Q1–Q12 nằm trong **một bảng** GDD §5, recovery đặc biệt ngay sau bảng; luật bí kíp và nội tại tập trung ở GDD §3.
+Bảng số ở Analysis phục vụ tra cứu combat, density và economy; không nhúng JSON/chart dài. Persistence P0 là Spring Boot + PostgreSQL theo Technical §5–6; JSON chỉ dùng config/fixture/import-export dev. Objectives/reward/unlock Q1–Q12 nằm trong **một bảng** GDD §5, recovery đặc biệt ngay sau bảng; luật bí kíp và nội tại tập trung ở GDD §3.
 
 Lịch sử thay đổi nằm trong Git.
 
@@ -60,9 +60,8 @@ GDD ưu tiên tiếng Việt; Technical giữ identifier tiếng Anh khi cần c
 | Thời gian hạ mục tiêu | TTK | Từ lúc bắt đầu đánh tới khi mục tiêu chết. |
 | Hiệu ứng hình ảnh / giao diện chơi | VFX / HUD | Hình chém, trạng thái… / thanh máu, kỹ năng, nhiệm vụ khi chơi. |
 | Pixel trên một đơn vị Unity | PPU | Tỷ lệ nhập sprite để kích thước trong cảnh nhất quán. |
-| Lời gọi qua mạng | RPC | Lệnh gửi giữa client và Host. |
+| Lời gọi qua mạng | RPC | Lệnh realtime giữa Client và Unity Game Server. |
 | Đối tượng dữ liệu lưu/truyền | DTO | Bản dữ liệu không chứa tham chiếu Unity runtime. |
-| Hàng đợi vào trước xử lý trước | FIFO | Lệnh tới trước được ghi/lưu trước. |
 | Ưu tiên triển khai | P0 / P1 / P2 | P0 bắt buộc bản đầu; P1 sau core; P2 hoàn thiện thêm. |
 | Mốc dùng để triển khai / số cần đo lại | BASELINE / TUNABLE | BASELINE là số hiện hành; TUNABLE chỉ đổi sau kiểm chứng. |
 | Cụm quái | SpawnGroup | Bố trí một bãi quái do designer author; **không phải Party**. |
@@ -72,12 +71,16 @@ GDD ưu tiên tiếng Việt; Technical giữ identifier tiếng Anh khi cần c
 | Điều kiện nhận thưởng | Eligibility | Kiểm từng người: level, map, vị trí, sống / kết nối và tham gia; quest / Boss có predicate riêng. |
 | Người gây sát thương cao nhất | TopDamage | Chọn từ ledger toàn life, tie theo characterId; dùng cho shared loot priority / suppression. |
 | Mức đe dọa | Threat | Điểm quái dùng chọn mục tiêu; mỗi quái / mỗi player riêng, không phải contribution reward. |
-| Bản chụp trạng thái | Snapshot | Giá trị được giữ ở một thời điểm xác định: cast, death hoặc save. |
+| Bản chụp trạng thái | Snapshot | Giá trị được giữ tại cast, death hoặc lúc lập mutation bền vững. |
 | Dấu xác nhận | Receipt | Bằng chứng event / transaction đã commit, chặn grant / claim / reward lặp khi retry / reconnect. |
-| Gói lưu của Host | HostSaveEnvelope | Một snapshot persisted chứa characters và world records cùng revision. |
-| Trạng thái đang chạy | Runtime | State đang hoạt động trên Host, phân biệt static definition và persisted save. |
+| Backend / Game Server | Spring Boot / Unity Dedicated Server | Backend xác thực, escrow/settle Vàng và lưu tiến trình/checkpoint; Game Server chạy combat, world, PvP và quyết định kết quả realtime. |
+| Cơ sở dữ liệu | PostgreSQL | Nguồn lưu tiến trình nhân vật và giao dịch bền vững P0. |
+| Phiên / vé vào game | Session / game ticket | Phiên chơi hiện tại; vé dùng một lần, ngắn hạn, ràng tài khoản và nhân vật khi vào Game Server. |
+| Điểm khôi phục | Recovery checkpoint / SafeAnchor | DB giữ MapId/HP/MP; phiên mất thì spawn tại một SafeAnchor của map farm/combat, khu an toàn có thể giữ tọa độ hợp lệ. |
+| Tạm giữ cược / quyết toán | Escrow / settlement | Backend trừ cược của cả hai trước trận và trả thưởng/hoàn cược đúng một lần theo kết quả. |
+| Trạng thái đang chạy | Runtime | State của phiên trên Game Server, phân biệt static definition và dữ liệu lưu trong PostgreSQL. |
 | Cửa bảo vệ sau tan băng | Refractory | Deadline chung của target chặn Freeze mới; không kháng nhiều tầng. |
 | Đồng hồ chờ hành động của Boss | ActionClockSpeed | Tốc độ đếm phần thời gian còn lại trước action tiếp theo; Băng Hàn giảm còn 75%, không đặt lại timer. |
 | Bậc trang bị | Gear band | Ba chặng I / II / III; khác rarity và enhancement của từng instance. |
 
-Art đọc [GDD §9](1_HUYEN_LO_GDD.md#ux-art) → [Technical §8](2_HUYEN_LO_TECHNICAL.md#art-contract); layout/anchors đọc GDD §4. Co-farm không cần Party; world support N players, **P0 acceptance: tối thiểu 2 concurrent players**, chưa công bố capacity.
+Art đọc [GDD §9](1_HUYEN_LO_GDD.md#ux-art) → [Technical §8](2_HUYEN_LO_TECHNICAL.md#art-contract); layout/anchors đọc GDD §4. Co-farm không cần Party; world support N players, **P0 acceptance: tối thiểu 2 concurrent players** kết nối Dedicated Game Server, chưa công bố capacity.

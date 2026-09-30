@@ -8,7 +8,7 @@ GDD là design authority; Technical là implementation contract. **DERIVED** là
 
 # 1. Phương pháp, đối chiếu và giới hạn
 
-Bộ số trong GDD V5.7.2 là luật; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. Chưa chạy Unity hoặc nghiệm thu game thật.
+Bộ số combat/gear trong GDD V6.1.0 giữ nguyên; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; các mô phỏng farm không đổi. Chưa chạy Unity hoặc nghiệm thu game thật.
 
 **Nguồn đầu vào:** [nhân vật](1_HUYEN_LO_GDD.md#character-power), [kỹ năng/trạng thái](1_HUYEN_LO_GDD.md#class-combat), [quái và bãi](1_HUYEN_LO_GDD.md#world-farm), [trang bị/thưởng](1_HUYEN_LO_GDD.md#gear-economy), [Food/Bình](1_HUYEN_LO_GDD.md#consumables-death). Analysis không giữ catalog thứ hai.
 
@@ -50,7 +50,7 @@ Mỗi cấp sau Lv 1 cho 5 điểm; Lv 20 có 95 điểm. Trước khi chọn ph
 
 ## Thời gian hạ quái và duy trì Linh lực
 
-Mô hình 24 hạt giống, Host timeline giả lập; một mục tiêu/ba mục tiêu trong cùng cụm. Cột Kiếm/Cung viết rõ từng phái. **Các số thời gian dưới đây là mốc trước khi vũ khí có Chí mạng/Chính xác phụ và Giày có tốc chạy**: tỷ lệ hit/crit và thời gian di chuyển giữa cụm có thể đổi. Cần chạy lại trước khi dùng làm mốc nghiệm thu. Không dùng kết quả bộ +8 để tăng HP quái cơ bản.
+Mô hình 24 hạt giống, timeline giả lập; một mục tiêu/ba mục tiêu trong cùng cụm. Cột Kiếm/Cung viết rõ từng phái. **Các số thời gian dưới đây là mốc trước khi vũ khí có Chí mạng/Chính xác phụ và Giày có tốc chạy**: tỷ lệ hit/crit và thời gian di chuyển giữa cụm có thể đổi. Cần chạy lại trước khi dùng làm mốc nghiệm thu. Không dùng kết quả bộ +8 để tăng HP quái cơ bản.
 
 | Mốc / quái | HP quái | Một con Kiếm / Cung, giây | Ba con Kiếm / Cung, giây |
 | --- | ---: | ---: | ---: |
@@ -128,7 +128,7 @@ Bốn Cung cho quái thường Đóng Băng khoảng **21,3%**, Linh **17,0%** t
 
 ## Hệ số sát thương PvP — mô hình một chiều, chưa phải đấu thật
 
-Đòn Kiếm vào Cung cùng hồ sơ điểm/trang bị, mục tiêu đứng yên; không phản công, né bằng di chuyển, Food/Bình, mạng hoặc tác dụng Làm Chậm. Dùng hệ số trước DEF; số là thời gian hạ mục tiêu, giây. Dòng Epic +8 là biên cuối game, không dùng để cân toàn bộ hành trình.
+Đòn Kiếm vào Cung cùng hồ sơ điểm/trang bị, mục tiêu đứng yên; không phản công, né bằng di chuyển, Food/Bình **đang được phép dùng trong PvP**, mạng hoặc tác dụng Làm Chậm. Dùng hệ số trước DEF; số là thời gian hạ mục tiêu nếu không hồi phục, giây. Dòng Epic +8 là biên cuối game, không dùng để cân toàn bộ hành trình hay suy rằng trận sẽ có người thắng trước 120 s.
 
 | Trang bị cân bằng Lv 20 | Hệ số 0,15 | Hệ số 0,20 | Hệ số 0,25 |
 | --- | ---: | ---: | ---: |
@@ -148,7 +148,17 @@ Với hệ số **0,20 BASELINE**, so hồ sơ cực đoan trên Common III +0 v
 | Không Sinh Lực | 17,44 | 22,05 |
 | Không Linh Lực | 28,73 | 32,5 |
 
-Dồn Sinh Lực có trận dài, dồn Công Lực có trận ngắn; điều này là khác biệt build, chưa chứng minh mất cân bằng trong đấu thực. Đảo chiều Cung→Kiếm cân bằng ở hệ số 0,20 cho **25,9 s** với Common III +0, **29,7 s** với Epic III +8; gần với Kiếm→Cung nhưng chưa tính lợi thế khoảng cách. Hệ số 0,20 giữ phản ứng cho build cân bằng; 0,25 làm nhiều ca ngắn, 0,15 kéo dài. PvP Băng Hàn chỉ giảm 25% tốc chạy trong 1,5 s; mô hình tĩnh chưa đo truy đuổi/giữ khoảng cách. Giữ 0,20 để triển khai, đo duel thật trước khi chỉnh.
+Dồn Sinh Lực có trận dài, dồn Công Lực có trận ngắn; điều này là khác biệt build, chưa chứng minh mất cân bằng trong đấu thực. Đảo chiều Cung→Kiếm cân bằng ở hệ số 0,20 cho **25,9 s** với Common III +0, **29,7 s** với Epic III +8; gần với Kiếm→Cung nhưng chưa tính lợi thế khoảng cách. Hệ số 0,20 giữ phản ứng cho build cân bằng; 0,25 làm nhiều ca ngắn, 0,15 kéo dài. PvP Băng Hàn chỉ giảm 25% tốc chạy trong 1,5 s; mô hình tĩnh chưa đo truy đuổi/giữ khoảng cách, Food tick và tối đa 3 bình HP + 3 bình MP/người. **Hết 120 s cả hai còn sống là DRAW bất kể tỷ lệ HP**; cần duel thật để đo tần suất hòa, không dùng bảng TTK để chọn thắng bằng HP.
+
+**Đối chiếu tiền cược xác định** (hai người cùng cược `W`, pot `2W`; Spring escrow trước khi MatchId bắt đầu):
+
+| W mỗi người | WIN/FORFEIT: winner nhận / phí hệ thống | DRAW: mỗi người nhận lại | SYSTEM_ABORT/cancel trước Active: mỗi người nhận lại |
+| ---: | ---: | ---: | ---: |
+| 1.000 | 1.800 / 200 | 900 | 1.000 |
+| 5.000 | 9.000 / 1.000 | 4.500 | 5.000 |
+| 10.000 | 18.000 / 2.000 | 9.000 | 10.000 |
+
+Winner đã nộp `W` nên lãi ròng `0,8W`; loser mất `W`. DRAW mỗi người mất `0,1W`; system abort không thu phí. Mọi mức cược 1.000–10.000 bước 1.000 cho kết quả Vàng nguyên; không cần làm tròn. Bảng này kiểm arithmetic, chưa đánh giá đủ Vàng ở Q9 hay hành vi người chơi; Q9 vẫn optional.
 
 <a id="farm-progression"></a>
 <a id="world-economy-analysis"></a>
@@ -332,7 +342,7 @@ Hai người chính tuyến ở khoảng **50–65% thời gian ra đòn hữu h
 
 # 5. Quyết định đã chốt và cổng kiểm khi triển khai
 
-**Đã chốt trong V5.7.0:** GEAR-01 (trần +4/+6/+8, bảng chi phí, hai Tinh Hoa và chuyển giao bảo toàn cấp); CONS-01 (HP/MP hai hồi chiêu riêng, chọn bình đủ bù nhỏ nhất, Food thay hiệu ứng cũ); SAVE-01 (khôi phục HP/MP/dead, không hồi offline, Food/deadline trôi theo UTC); PVP-01 (120 s so tỷ lệ máu, hòa/ngắt kết nối/restore và thưởng một lần); BOSS-02 (DEF25/ACC140/EVA60, ba vùng đá, một action/lịch ưu tiên). COOP-01, QUEST-02, BOSS-03, BOSS-01 và NAR-01 đã chốt từ trước. Những số BASELINE vẫn có thể chỉnh **sau khi đo**, nhưng không là câu hỏi chưa có luật để code.
+**Gameplay đã chốt:** GEAR-01 (trần +4/+6/+8, hai Tinh Hoa, chuyển giao); CONS-01 (hai hồi chiêu bình riêng); BOSS-02 (DEF25/ACC140/EVA60, ba vùng đá, một action/lịch ưu tiên). COOP-01, QUEST-02, BOSS-03, BOSS-01 và NAR-01 cũng đã chốt. **PVP-01 V6.1:** cược 1.000–10.000 bước 1.000, escrow cả hai trước MatchId, Food/Bình hợp lệ với quota 3+3, 120 s cả hai sống DRAW, fee/refund qua Spring receipt. **SAVE-01 V6.1:** PostgreSQL giữ tiến trình và MapId/HP/MP checkpoint; resume phiên còn trong RAM hoặc spawn SafeAnchor từ checkpoint. Các phép tính stat/loot/TTK PvE không đổi; mô hình PvP chưa tính hồi phục mới.
 
 NAR-01: Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò mò và gỡ mâu thuẫn bối cảnh Xích Nham mà không tăng scope. Q9 tùy chọn, trang bị 18 dòng, bí kíp, không Party P0 và vòng Boss chung cũng đã có luật; không mở lại vì chưa chơi thử.
 
@@ -343,15 +353,17 @@ NAR-01: Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò m�
 | PHY-01 — PLAYTEST | Collider, platform, nhiều người | Bounds GDD, drop-through theo từng actor | Trúng đòn/đi xuyên sàn sai hoặc người khác làm đổi collision |
 | CC-01 — PLAYTEST | Đóng Băng/Làm Chậm/Bỏng khi nhiều người | Cửa miễn Đóng Băng 3 s; Boss clock ×0,75, không stack | Boss mất khả năng ra đòn, người chơi không đọc được hiệu ứng, hoặc overlap gây unfair hit |
 | SCOPE-01 — PLAYTEST | Mật độ, respawn, contention | 28 cụm/66 điểm, hồi 25 s, Linh 5%/cap1 | 2 người thiếu quái rõ hoặc 3–4 người chờ nhiều; benchmark trước claim capacity |
-| GEAR-01 — BASELINE ĐÃ CHỐT | Chạy lại TTK, hit/crit, di chuyển giữa cụm, hành trình và Boss với Chí mạng Kiếm / Chính xác Cung / tốc chạy Giày; đo cảm giác +4/+6/+8 và preview | GDD §6, bảng kinh tế §4, Host/Client playtest | Gear II/III, sức mạnh hai phái hoặc Tinh Hoa làm Boss/PvP/kinh tế lệch khi chơi thật |
+| GEAR-01 — BASELINE ĐÃ CHỐT | Chạy lại TTK, hit/crit, di chuyển giữa cụm, hành trình và Boss với Chí mạng Kiếm / Chính xác Cung / tốc chạy Giày; đo cảm giác +4/+6/+8 và preview | GDD §6, bảng kinh tế §4, hai Client + Dedicated Server playtest | Gear II/III, sức mạnh hai phái hoặc Tinh Hoa làm Boss/PvP/kinh tế lệch khi chơi thật |
 | CONS-01 — BASELINE ĐÃ CHỐT | Thử nhầm phím/bình/refresh Food | HP và MP hồi chiêu riêng; tier đủ bù nhỏ nhất, Food thay cũ | Người chơi thường xuyên phí bình hoặc tutorial Q6 kẹt |
-| SAVE-01 — BASELINE ĐÃ CHỐT | Crash/reconnect và deadline offline | GDD/Technical §6–7, không offline heal | Save khôi phục sai HP/dead/Food, roll Linh hay reward lặp |
-| PVP-01 — BASELINE ĐÃ CHỐT | Đấu thật với build/cấp/latency | Hệ số 0,20, 120 s, hòa/ngắt kết nối/restore GDD §8 | Giao tranh cân bằng quá ngắn/dài hoặc kết quả/restore không nhất quán |
+| SAVE-01 — V6.1 ĐÃ CHỐT | Checkpoint 30 s + portal/logout/death/revive/PvP; resume 15 s nếu phiên còn; mất phiên dùng SafeAnchor và HP/MP đã commit | Technical §5–7, sequence/generation, safe-zone coordinate validation | Checkpoint cũ đè mới, HP=0 hồi sinh miễn phí, load Arena hoặc mất Potion nhưng hồi máu không được checkpoint |
+| PVP-01 — V6.1 ĐÃ CHỐT | Escrow hai người trước MatchId; 10 mức cược; Food tick/Bình quota; outcome và payout idempotent | GDD §8, Technical §4/§6, bảng arithmetic ở trên | HELD/ACTIVE mắc kẹt tiền; hết 120 s vẫn so HP; FORFEIT sai thời điểm; result retry trả Vàng hai lần |
 | BOSS-02 — BASELINE ĐÃ CHỐT | Độ rộng vùng/nhịp báo trước đòn | 32.000 HP, DEF25/ACC140/EVA60, ba vùng đá, một action | Không thể né bằng kỹ năng di chuyển thường, overlap khó đọc, thời gian 2 người lệch xa 90–150 s |
 | ART-01 — PLAYTEST | Đường đạn, aim, thời điểm hit, hình nhân vật | GDD/Technical art contract | Collider/hình lệch hoặc cảm giác chém/bắn khó đọc |
 | LOOT-01 — PLAYTEST | Đá/trang bị sinh ra so lượng nhặt và sink | 8% đá thường, giá shop 800, §3–4 | Người chơi hợp level không đủ nguồn cho +4, hoặc +8 quá dễ trước story |
 | QUEST-03 — PLAYTEST | Thời gian Lv1–20 và hồi phục khi lỗi | Mô hình ~115–131 phút, mục tiêu 150–240 phút | Playable journey vẫn quá nhanh/chậm sau tính đi lại, chết, UI và multiplayer |
-| TECH-01 — SPIKE | Ràng buộc connection→profile, chọn trùng, reconnect | Một writer/character; Host giữ quyền | Chỉ chốt sau Host+Client spike và thử duplicate selection/crash |
+| TECH-01 — SPIKE | Login → Character Select → one-time ticket → dedicated join; lease/duplicate session, internal service credential và backend outage | Technical §5–6: Spring xác minh account/character; Game Server xác minh ticket, một writer/character | Spike hai Client + backend/DB thật, thử duplicate join, consumed ticket, timeout trước/sau commit và server crash |
+
+**Rủi ro kiến trúc V6.1:** auth/ticket/lease, checkpoint ordering/validation, reconnect grace, escrow orphan recovery, transaction N recipients, backend downtime và dedicated build/headless physics cần integration tests. Mốc giờ player-host/JSON cũ không còn dùng để cam kết lịch; spike đầu đo integration/latency, sau đó Technical mới đặt lại ngân sách. Quest, gear, combat PvE và world balance giữ số hiện tại; các luật PvP/recovery trên là user lock, không Open Decision.
 
 Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST/SPIKE ghi rõ phải đo gì. Không tăng NeedEXP, HP quái hoặc tạo hệ thống mới từ mô hình thiếu cảnh thật.
 
