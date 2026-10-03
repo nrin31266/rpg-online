@@ -1,0 +1,198 @@
+{
+  "files": {
+    "docs/design/1_HUYEN_LO_GDD.md": {
+      "before": {
+        "lines": 789,
+        "pipe_rows": 336,
+        "headings": 26,
+        "critical": {
+          "53.100": 1,
+          "95 điểm": 3,
+          "32.000": 1,
+          "26 frame": 3,
+          "26 khung": 0,
+          "1.800": 2,
+          "200": 9
+        },
+        "sha256": "82f8110b1565b2b14054639a5eef2c8243391a0194bdc613542fbc7dfb32f08e"
+      },
+      "after": {
+        "lines": 793,
+        "pipe_rows": 336,
+        "headings": 26,
+        "critical": {
+          "53.100": 1,
+          "95 điểm": 3,
+          "32.000": 1,
+          "26 frame": 3,
+          "26 khung": 0,
+          "1.800": 2,
+          "200": 9
+        },
+        "sha256": "771c7b0ace9879b9355d17b8fdb2ba3cbdaa13c34b8323698e4576d8fa221d01"
+      }
+    },
+    "docs/design/2_HUYEN_LO_TECHNICAL.md": {
+      "before": {
+        "lines": 428,
+        "pipe_rows": 124,
+        "headings": 18,
+        "critical": {
+          "53.100": 1,
+          "95 điểm": 1,
+          "32.000": 2,
+          "26 frame": 2,
+          "26 khung": 0,
+          "1.800": 1,
+          "200": 6
+        },
+        "sha256": "b597f30a3eb595d09b389e045de98945c2c372f367e024afab43075ed907b2b2"
+      },
+      "after": {
+        "lines": 434,
+        "pipe_rows": 124,
+        "headings": 18,
+        "critical": {
+          "53.100": 1,
+          "95 điểm": 1,
+          "32.000": 2,
+          "26 frame": 2,
+          "26 khung": 0,
+          "1.800": 1,
+          "200": 6
+        },
+        "sha256": "07391d17b95220f4701edca9c9937609410a440d48ad2fac4187f2620a02f46e"
+      }
+    },
+    "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md": {
+      "before": {
+        "lines": 540,
+        "pipe_rows": 273,
+        "headings": 25,
+        "critical": {
+          "53.100": 1,
+          "95 điểm": 4,
+          "32.000": 2,
+          "26 frame": 3,
+          "26 khung": 1,
+          "1.800": 1,
+          "200": 4
+        },
+        "sha256": "4fb90e07a471f60fce543f823dabafc146e766d67efebade00a4f3cc11754dd4"
+      },
+      "after": {
+        "lines": 542,
+        "pipe_rows": 273,
+        "headings": 25,
+        "critical": {
+          "53.100": 1,
+          "95 điểm": 4,
+          "32.000": 2,
+          "26 frame": 3,
+          "26 khung": 1,
+          "1.800": 1,
+          "200": 4
+        },
+        "sha256": "4615cc12b0268c68ea7c4b6dd45ec3914f504325633aed34897915931affb4ac"
+      }
+    },
+    "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md": {
+      "before": {
+        "lines": 913,
+        "pipe_rows": 401,
+        "headings": 50,
+        "critical": {
+          "53.100": 0,
+          "95 điểm": 0,
+          "32.000": 0,
+          "26 frame": 7,
+          "26 khung": 0,
+          "1.800": 0,
+          "200": 2
+        },
+        "sha256": "d409a991ba33404efb938ccb42b3ad6cb3de3ec90a7e68cf1cb08fe64d322437"
+      },
+      "after": {
+        "lines": 941,
+        "pipe_rows": 401,
+        "headings": 52,
+        "critical": {
+          "53.100": 0,
+          "95 điểm": 0,
+          "32.000": 0,
+          "26 frame": 7,
+          "26 khung": 0,
+          "1.800": 0,
+          "200": 2
+        },
+        "sha256": "0ed7c908e7e0e6c84893a54af84be75dee6be8bef2093a8e9144b3db68ebaa13"
+      }
+    },
+    "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md": {
+      "before": {
+        "lines": 332,
+        "pipe_rows": 147,
+        "headings": 17,
+        "critical": {
+          "53.100": 2,
+          "95 điểm": 2,
+          "32.000": 2,
+          "26 frame": 6,
+          "26 khung": 0,
+          "1.800": 2,
+          "200": 2
+        },
+        "sha256": "863d44391646eaab67730c805476e765b0eb6d0f03ce5bfcc1acf155ff87fde1"
+      },
+      "after": {
+        "lines": 334,
+        "pipe_rows": 147,
+        "headings": 17,
+        "critical": {
+          "53.100": 2,
+          "95 điểm": 2,
+          "32.000": 2,
+          "26 frame": 6,
+          "26 khung": 0,
+          "1.800": 2,
+          "200": 2
+        },
+        "sha256": "689060f7409f354c632d394f49dce6921f2521fcf7a58042cefcd9c4dc4664c5"
+      }
+    },
+    "docs/design/README.md": {
+      "before": {
+        "lines": 90,
+        "pipe_rows": 45,
+        "headings": 6,
+        "critical": {
+          "53.100": 0,
+          "95 điểm": 0,
+          "32.000": 0,
+          "26 frame": 0,
+          "26 khung": 0,
+          "1.800": 0,
+          "200": 0
+        },
+        "sha256": "b78b988ac52b68beab7d1a32e9bd1bb7ff9dd4ca103b77b082c81a7553853e1f"
+      },
+      "after": {
+        "lines": 90,
+        "pipe_rows": 45,
+        "headings": 6,
+        "critical": {
+          "53.100": 0,
+          "95 điểm": 0,
+          "32.000": 0,
+          "26 frame": 0,
+          "26 khung": 0,
+          "1.800": 0,
+          "200": 0
+        },
+        "sha256": "ea524736fa04a2e365fa1c8b103d6d84ce100b5b9b96e31cc7c9c8ace067c4f5"
+      }
+    }
+  },
+  "errors": [],
+  "status": "PASS"
+}

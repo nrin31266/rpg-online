@@ -152,14 +152,14 @@ namespace HuyenLo.Tests
         }
         [Test] public void MobWindupMissResolvesOnClockInsteadOfHittingAfterPlayerReturns() {
             var s=new SliceSession();var mob=s.Mobs.First(x=>x.Slot=="DS1.slot1");s.Player.Map=Map.Mist;
-            s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);s.Tick(.02);Assert.That(mob.Windup,Is.True);
+            s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);s.Tick(.02);Advance(s,.16);Assert.That(mob.Windup,Is.True);
             double hp=s.Player.Hp;s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y+3);Advance(s,1);
             Assert.That(mob.Windup,Is.False);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);s.Tick(.02);
             Assert.That(s.Player.Hp,Is.EqualTo(hp),"Jump dodge must not turn into a delayed hit");
         }
         [Test] public void PortalCancelsMobWindupAndEmptyMapReturnsWithoutNewLifeOrLoot() {
             var s=new SliceSession();var mob=s.Mobs.First(x=>x.Slot=="DS1.slot1");s.Player.Map=Map.Mist;s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
-            s.Tick(.02);Assert.That(mob.Windup,Is.True);mob.Hp=mob.MaxHp-1;int generation=mob.Generation;
+            s.Tick(.02);Advance(s,.16);Assert.That(mob.Windup,Is.True);mob.Hp=mob.MaxHp-1;int generation=mob.Generation;
             s.Player.Position=new Point(-4,.8);Assert.That(s.TryExit("toVillageM"),Is.True);Assert.That(mob.Windup,Is.False);
             Advance(s,3);Assert.That(mob.Hp,Is.EqualTo(mob.MaxHp));Assert.That(mob.Generation,Is.EqualTo(generation));Assert.That(s.Loot,Is.Empty);
             s.Player.Position=new Point(30,.8);Assert.That(s.TryExit("toMist"),Is.True);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
@@ -210,6 +210,38 @@ namespace HuyenLo.Tests
             s.Tick(.02);double first=a.HitAt;Assert.That(a.Windup,Is.True);Assert.That(b.Windup,Is.False);Advance(s,.08);
             Assert.That(b.Windup,Is.True);Assert.That(b.HitAt,Is.GreaterThan(first));Assert.That(a.NextAttack-(first-.35),Is.EqualTo(a.Interval).Within(.001));
             double x=a.Position.X;Advance(s,.38);Assert.That(a.Position.X,Is.Not.EqualTo(x),"Recovery should visibly reposition without a new cooldown");
+        }
+        [Test] public void ClassAdmissionRequiresManualUnequipAndHasTwoGuides(){
+            var s=PrototypePresets.Create(PrototypeStart.Class);s.QuestState=QuestState.InProgress;s.Stage=1;s.Player.Map=Map.Academy;s.Player.Position=SliceSession.Anchors.First(x=>x.Id=="Phong").Position;
+            long wood=s.Player.Inventory.Equipment[GearSlot.Weapon].Instance;
+            Assert.That(SliceSession.Anchors.Any(x=>x.Id=="Diep"&&x.Name=="Diệp Lam"),Is.True);
+            Assert.That(s.ChooseSword(),Is.False);Assert.That(s.Player.School,Is.EqualTo(School.Novice));Assert.That(s.Receipts.Contains("Q6.class"),Is.False);
+            Assert.That(s.Unequip(GearSlot.Weapon),Is.True);Assert.That(s.Player.Inventory.Bag.Any(x=>x.Instance==wood),Is.True);
+            Assert.That(s.ChooseSword(),Is.True);Assert.That(s.Player.Inventory.Equipment.ContainsKey(GearSlot.Weapon),Is.False);
+            Assert.That(s.Player.Inventory.Bag.Count(x=>x.Id=="sword1"),Is.EqualTo(1));Assert.That(s.ChooseSword(),Is.False);
+        }
+        [Test] public void ReciprocalExitPreservesTravelDirection(){
+            var s=new SliceSession();s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Academy));Assert.That(s.Player.Position.X,Is.EqualTo(31));
+            s.ObservePosition(new Point(34,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(-1));
+            s.ObservePosition(new Point(30,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Mist));Assert.That(s.Player.Position.X,Is.EqualTo(-1));
+            s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(27));
+        }
+        [Test] public void FourWolvesStaySeparatedWithContinuousStepsAndIndependentAttacks(){
+            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(103,.65);s.Player.InvulnerableUntil=100;
+            var pack=s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")).OrderBy(x=>x.Id).ToArray();double minGap=100;
+            for(int i=0;i<400;i++){
+                var before=pack.Select(x=>x.Position.X).ToArray();s.Tick(.02);
+                for(int j=0;j<4;j++)Assert.That(Math.Abs(pack[j].Position.X-before[j]),Is.LessThanOrEqualTo(pack[j].Speed*.02+.0001),"No teleport/separation shove");
+                for(int j=1;j<4;j++)minGap=Math.Min(minGap,pack[j].Position.X-pack[j-1].Position.X);
+            }
+            Assert.That(minGap,Is.GreaterThanOrEqualTo(.93));Assert.That(pack[0].NextAttack,Is.GreaterThan(0));
+            // Removing the front wolf opens space. A rear wolf advances and attacks without a group mutex.
+            pack[0].Hp=0;pack[0].RespawnAt=100;Advance(s,3);Assert.That(pack[1].Position.X,Is.LessThan(104.1));Assert.That(pack[1].NextAttack,Is.GreaterThan(8));
+        }
+        [Test] public void ProbePocketsDoNotGrantQ5KillCredit(){
+            var s=PrototypePresets.Create(PrototypeStart.Crowd);s.Quest=5;s.Stage=3;s.QuestState=QuestState.InProgress;
+            var m=s.Mobs.First(x=>x.Slot.StartsWith("PROBE7."));m.Hp=1;m.Dummy=true;s.Player.Position=m.Position;s.Combat.Press("1",1);Advance(s,1);
+            Assert.That(m.Alive,Is.False);Assert.That(s.Kills,Is.Zero);
         }
         [Test] public void ExpInvariantAndHalfUpDamage() {
             Assert.That(Rules.Exp.Last(),Is.EqualTo(53100));Assert.That(19*5,Is.EqualTo(95));Assert.That(Rules.Round(2.5),Is.EqualTo(3));

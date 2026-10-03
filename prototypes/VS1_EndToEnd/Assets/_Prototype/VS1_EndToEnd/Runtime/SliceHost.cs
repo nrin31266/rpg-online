@@ -27,6 +27,10 @@ namespace HuyenLo.Runtime
         private InputAction[] combatBindings;
         private long inputSequence;
         private Camera cameraView;
+        private Vector3 cameraVelocity;
+        private readonly List<(Transform root,Vector3 home,float factor)> scenery=new List<(Transform,Vector3,float)>();
+        private readonly Dictionary<string,TextMesh> npcMarkers=new Dictionary<string,TextMesh>();
+        private TextMesh speech;private double speechUntil;
         private GameObject world,playerVisual;
         private BoxCollider2D playerCollider;
         private SpriteRenderer torso,pants,weapon;
@@ -90,19 +94,52 @@ namespace HuyenLo.Runtime
         private void BuildMap() {
             foreach(var v in floating)if(v.mesh!=null)Destroy(v.mesh.gameObject);floating.Clear();
             if(world!=null){world.SetActive(false);Destroy(world);}world=new GameObject("Map "+Session.Player.Map);mobViews.Clear();lootViews.Clear();platforms.Clear();ignored.Clear();renderedMap=Session.Player.Map;renderedRevision=Session.WorldRevision;
-            float width=renderedMap==Map.Mist?126:renderedMap==Map.Village?44:42;
-            Ground("Ground",width/2-10,-.3f,width,.6f);Ground("LeftBoundary",-9,3,1,7);Ground("RightBoundary",width-11,3,1,7);
-            if(renderedMap==Map.Academy){Ground("HV_JumpLedge one-way",8,2.8f,4,.4f,true);Label("HV_JumpLedge\nS / ↓ để xuống",new Vector3(8,5,0),world.transform);Label("HV_DummyYard",new Vector3(22,2.6f,0),world.transform);}
-            if(renderedMap==Map.Mist)Ground("DS optional upper lane",50,2.8f,12,.4f,true);
-            foreach(var a in SliceSession.Anchors.Where(x=>x.Map==renderedMap)){
-                if(!a.EdgeExit)RectVisual(a.Id,world.transform,new Vector2((float)a.Position.X,(float)a.Position.Y),new Vector2(.6f,1.6f),new Color(.5f,.65f,.52f));
-                Label(a.Name+(a.EdgeExit?"\nĐi tới mép để chuyển vùng":"\nE: nói chuyện"),new Vector3((float)a.Position.X,2.1f,0),world.transform,.09f);
+            scenery.Clear();npcMarkers.Clear();speech=null;
+            float min=(float)BlockoutLayout.MinX(renderedMap),max=(float)BlockoutLayout.MaxX(renderedMap);
+            BuildBackdrop(min,max);
+            foreach(var surface in BlockoutLayout.Surfaces(renderedMap)){
+                Ground(surface.Name,(float)surface.X,(float)surface.Y,(float)surface.Width,(float)surface.Height,surface.OneWay);
+                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,(float)(surface.Y+surface.Height/2)),new Vector2((float)surface.Width,.08f),new Color(.48f,.63f,.47f),1);
             }
-            if(renderedMap==Map.Mist)for(int i=1;i<=6;i++)Label("DS"+i,new Vector3(i<=2?5+(i-1)*10:30+(i-3)*20,3,0),world.transform);
-            foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap))mobViews[m.Id]=RectVisual(m.Slot,world.transform,new Vector2((float)m.Position.X,(float)m.Position.Y),m.Dummy?new Vector2(.6f,1.4f):new Vector2(.8f,.7f),m.Dummy?new Color(.65f,.5f,.25f):m.Level==2?new Color(.7f,.35f,.45f):new Color(.55f,.65f,.78f),5);
+            Ground("LeftBoundary",min,5,1,14);Ground("RightBoundary",max,5,1,14);
+            if(renderedMap==Map.Academy){
+                Label("CỔNG ĐÔNG → VÂN KHÊ",new Vector3(31,3,0),world.transform,.07f);
+                Label("BẬC TẬP NHẢY\nS / ↓ để xuống",new Vector3(8,4.3f,0),world.transform,.07f);
+                Label("SÂN BÙ NHÌN",new Vector3(23,2.6f,0),world.transform,.08f);
+                Building("Đại sảnh nhập môn",3,12,6);Building("Võ đường phía tây",-18,11,5);Building("Kho binh khí",23,10,4);
+            }else if(renderedMap==Map.Village){
+                Building("Nhà thuốc",5,4,4);Building("Lò rèn",10,4,3.8f);Building("Quán nghỉ",15,4,5);Building("Nhà trưởng lão",20,5,5.5f);
+                Label("← HỌC VIỆN     ·     ĐỒNG SƯƠNG →",new Vector3(24,5.6f,0),world.transform,.065f);
+            }else {
+                Label("DS1 · NẤM",new Vector3(5,2.4f,0),world.transform,.06f);Label("DS2 · NẤM SƯƠNG",new Vector3(15,3,0),world.transform,.06f);
+                for(int i=3;i<=6;i++)Label("DS"+i+" · SÓI",new Vector3(30+(i-3)*20,2.2f,0),world.transform,.06f);
+                Label("ĐƯỜNG CAO · PROBE8",new Vector3(54,5.5f,0),world.transform,.06f);
+                Label("BÃI PHỤ · PROBE7 · 4 SÓI",new Vector3(110,2.7f,0),world.transform,.06f);
+                RectVisual("Ancient standing stone",world.transform,new Vector2(99,2.1f),new Vector2(1.5f,4.2f),new Color(.28f,.36f,.35f),-1);
+            }
+            foreach(var a in SliceSession.Anchors.Where(x=>x.Map==renderedMap)){
+                if(!a.EdgeExit){
+                    RectVisual(a.Id+" robe",world.transform,new Vector2((float)a.Position.X,.65f),new Vector2(.55f,1.1f),a.Id=="Diep"?new Color(.34f,.58f,.72f):new Color(.56f,.57f,.35f),7);
+                    RectVisual(a.Id+" head",world.transform,new Vector2((float)a.Position.X,1.35f),new Vector2(.35f,.38f),new Color(.8f,.67f,.5f),8);
+                    npcMarkers[a.Id]=Label("",new Vector3((float)a.Position.X,2.15f,0),world.transform,.17f);
+                    Label(a.Name,new Vector3((float)a.Position.X,1.8f,0),world.transform,.075f);
+                }else{
+                    RectVisual("Road sign "+a.Id,world.transform,new Vector2((float)a.Position.X,1.1f),new Vector2(.12f,2.2f),new Color(.45f,.38f,.28f),2);
+                    Label(a.Name,new Vector3((float)a.Position.X,3.1f,0),world.transform,.08f);
+                }
+            }
+            foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap)){
+                var view=RectVisual(m.Slot,world.transform,new Vector2((float)m.Position.X,(float)m.Position.Y),m.Dummy?new Vector2(.6f,1.4f):new Vector2(.8f,.7f),m.Dummy?new Color(.65f,.5f,.25f):m.Level==2?new Color(.7f,.35f,.45f):new Color(.55f,.65f,.78f),5);mobViews[m.Id]=view;
+                if(!m.Dummy&&m.Level==4){
+                    RectVisual("Wolf head",view.transform,new Vector2(-.44f,.14f),new Vector2(.26f,.38f),new Color(.65f,.73f,.81f),6);
+                    RectVisual("Wolf ear",view.transform,new Vector2(-.42f,.42f),new Vector2(.13f,.3f),new Color(.53f,.63f,.73f),6);
+                    RectVisual("Wolf legs A",view.transform,new Vector2(-.3f,-.58f),new Vector2(.15f,.35f),new Color(.45f,.55f,.66f),5);
+                    RectVisual("Wolf legs B",view.transform,new Vector2(.32f,-.58f),new Vector2(.15f,.35f),new Color(.45f,.55f,.66f),5);
+                }
+            }
             var spawn=new Vector2((float)Session.Player.Position.X,(float)Session.Player.Position.Y);
-            playerVisual.transform.position=spawn;Body.position=spawn;Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();lastGroundAt=jumpBufferedUntil=-100;cameraView.transform.position=new Vector3(Mathf.Max(5,Body.position.x),3,-10);
-            Label(MapName(renderedMap)+" — blockout VS-1",new Vector3(8,6,0),world.transform,.13f);
+            spawn.y=Mathf.Max(spawn.y,.72f);playerVisual.transform.position=spawn;Body.position=spawn;Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();lastGroundAt=jumpBufferedUntil=-100;cameraVelocity=Vector3.zero;cameraView.transform.position=CameraTarget();
+
         }
         public void CombatPress(string key,int slot=0){if(!Modal)Session.Combat.Press(key,slot);}
         public void CombatRelease(string key)=>Session.Combat.Release(key);
@@ -110,7 +147,42 @@ namespace HuyenLo.Runtime
             if(Modal||!Session.Player.Alive)return;
             var loot=Session.LootCandidate();if(loot!=null){Session.PickUp(loot.Id);return;}
             var anchor=Session.NearAnchor();if(anchor==null){Session.Feedback="Không có NPC hoặc đồ trong tầm tương tác.";return;}
-            if(Session.Interact(anchor.Id))Hud.OpenNpc(anchor.Id);
+            if(Session.Interact(anchor.Id)){Hud.OpenNpc(anchor.Id);Speak(anchor.Id);}
+        }
+        private Vector3 CameraTarget(){
+            var visual=playerVisual.transform.position;
+            float half=cameraView.orthographicSize*cameraView.aspect;
+            float min=(float)BlockoutLayout.MinX(renderedMap)+half,max=(float)BlockoutLayout.MaxX(renderedMap)-half;
+            return new Vector3(Mathf.Clamp(visual.x,Mathf.Min(min,max),Mathf.Max(min,max)),Mathf.Max(3.4f,visual.y-1),-10);
+        }
+        private void BuildBackdrop(float min,float max){
+            cameraView.backgroundColor=renderedMap==Map.Mist?new Color(.13f,.23f,.28f):new Color(.17f,.23f,.3f);
+            for(int layer=0;layer<2;layer++){
+                var root=new GameObject("Background "+layer);root.transform.SetParent(world.transform);
+                for(float x=min-20;x<max+25;x+=13){
+                    var peak=RectVisual("Mountain silhouette",root.transform,new Vector2(x,layer==0?7:5),new Vector2(14,14),layer==0?new Color(.18f,.29f,.35f):new Color(.16f,.26f,.3f),-20+layer);
+                    peak.transform.localEulerAngles=new Vector3(0,0,45);
+                }
+                scenery.Add((root.transform,root.transform.position,layer==0?.12f:.05f));
+            }
+            for(float x=min+3;x<max-3;x+=5.5f){
+                if(renderedMap==Map.Mist){
+                    RectVisual("Tree trunk",world.transform,new Vector2(x,2.3f),new Vector2(.45f,4.6f),new Color(.21f,.28f,.23f),-3);
+                    RectVisual("Tree canopy",world.transform,new Vector2(x,5),new Vector2(4.5f,3),new Color(.19f,.34f,.28f),-4);
+                }
+                RectVisual("Foreground grass",world.transform,new Vector2(x,-.1f),new Vector2(1.7f,.35f),new Color(.16f,.31f,.24f),13);
+                RectVisual("Rock",world.transform,new Vector2(x+1.8f,.22f),new Vector2(.8f,.4f),new Color(.3f,.4f,.4f),-1);
+            }
+        }
+        private void Building(string name,float x,float width,float height){
+            RectVisual(name+" wall",world.transform,new Vector2(x,height/2),new Vector2(width,height),new Color(.27f,.32f,.36f),-5);
+            RectVisual(name+" roof",world.transform,new Vector2(x,height+.25f),new Vector2(width+1,.6f),new Color(.35f,.27f,.27f),-4);
+            for(float col=x-width/2+.4f;col<x+width/2;col+=2.5f)RectVisual("Pillar",world.transform,new Vector2(col,height/2),new Vector2(.22f,height),new Color(.38f,.39f,.36f),-3);
+            Label(name,new Vector3(x,height-.8f,0),world.transform,.065f);
+        }
+        public void Speak(string id){
+            if(speech!=null)Destroy(speech.gameObject);var a=SliceSession.Anchors.First(x=>x.Id==id);
+            speech=Label(Hud.Dialogue(id),new Vector3((float)a.Position.X,3.3f,0),world.transform,.065f);speechUntil=Session.Now+4;
         }
         private void BindSession(){Session.OnEvent=x=>Debug.Log("[VS1] "+x);}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -122,11 +194,11 @@ namespace HuyenLo.Runtime
         }
 #endif
         public void HandleMenuKey(string key){
-            if(key=="up")Hud.Navigate(-1);else if(key=="down"||key=="tab")Hud.Navigate(1);else if(key=="activate")Hud.ActivateSelected();else if(key=="escape")Hud.Close();
+            if(key=="up")Hud.Navigate(-1);else if(key=="down"||key=="tab")Hud.Navigate(1);else if(key=="left")Hud.Navigate(-1);else if(key=="right")Hud.Navigate(1);else if(key=="activate")Hud.ActivateSelected();else if(key=="escape")Hud.Close();
         }
         private void Update() {
             if(ExternalInput){combatEvents.Clear();return;}var k=Keyboard.current;if(k==null){combatEvents.Clear();return;}
-            if(k.escapeKey.wasPressedThisFrame){Hud.Close();Session.Combat.ClearFocus();axis=0;combatEvents.Clear();return;}
+            if(k.escapeKey.wasPressedThisFrame){if(Modal){Hud.Back();axis=0;combatEvents.Clear();return;}Hud.Close();Session.Combat.ClearFocus();axis=0;combatEvents.Clear();return;}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if(k.f8Key.wasPressedThisFrame){Hud.Toggle("debug");axis=0;combatEvents.Clear();return;}
 #endif
@@ -135,8 +207,10 @@ namespace HuyenLo.Runtime
             if(k.qKey.wasPressedThisFrame){Hud.Toggle("quest");axis=0;combatEvents.Clear();return;}
             if(Modal){
                 axis=0;Session.Combat.CancelIntent();combatEvents.Clear();
-                if(k.upArrowKey.wasPressedThisFrame||k.wKey.wasPressedThisFrame)HandleMenuKey("up");
-                if(k.downArrowKey.wasPressedThisFrame||k.sKey.wasPressedThisFrame)HandleMenuKey("down");
+                if(k.upArrowKey.wasPressedThisFrame||k.wKey.wasPressedThisFrame)Hud.NavigateGrid(0,-1);
+                if(k.leftArrowKey.wasPressedThisFrame||k.aKey.wasPressedThisFrame)Hud.NavigateGrid(-1,0);
+                if(k.rightArrowKey.wasPressedThisFrame||k.dKey.wasPressedThisFrame)Hud.NavigateGrid(1,0);
+                if(k.downArrowKey.wasPressedThisFrame||k.sKey.wasPressedThisFrame)Hud.NavigateGrid(0,1);
                 if(k.tabKey.wasPressedThisFrame)Hud.Navigate(k.shiftKey.isPressed?-1:1);
                 if(k.enterKey.wasPressedThisFrame||k.numpadEnterKey.wasPressedThisFrame||k.eKey.wasPressedThisFrame)HandleMenuKey("activate");
                 return;
@@ -156,7 +230,7 @@ namespace HuyenLo.Runtime
                 var target=Session.Mobs.Where(x=>x.Alive&&x.Map==renderedMap&&point.Distance(x.Position)<1)
                     .OrderBy(x=>point.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
                 if(target!=null)Session.Combat.Explicit(target);
-                else {var loot=Session.LootCandidate();if(loot!=null&&point.Distance(loot.Position)<.8){Session.PickUp(loot.Id);return;}var anchor=Session.NearAnchor();if(anchor!=null&&point.Distance(anchor.Position)<1.2&&Session.Interact(anchor.Id))Hud.OpenNpc(anchor.Id);}
+                else {var loot=Session.LootCandidate();if(loot!=null&&point.Distance(loot.Position)<.8){Session.PickUp(loot.Id);return;}var anchor=Session.NearAnchor();if(anchor!=null&&point.Distance(anchor.Position)<1.2&&Session.Interact(anchor.Id)){Hud.OpenNpc(anchor.Id);Speak(anchor.Id);}}
             }
         }
         private bool IsGrounded() {
@@ -205,7 +279,10 @@ namespace HuyenLo.Runtime
         private void LateUpdate() {
             if(Session.WorldRevision!=renderedRevision)BuildMap();
             if(!Session.Player.Alive && Session.Player.Map==Map.Village && Body.position.y<-8)Body.position=new Vector2((float)Session.Player.Position.X,.8f);
-            cameraView.transform.position=new Vector3(Mathf.Lerp(cameraView.transform.position.x,Mathf.Max(5,Body.position.x),Time.deltaTime*8),3,-10);
+            cameraView.transform.position=Vector3.SmoothDamp(cameraView.transform.position,CameraTarget(),ref cameraVelocity,.13f,100,Time.deltaTime);
+            foreach(var layer in scenery)layer.root.position=layer.home+new Vector3(cameraView.transform.position.x*layer.factor,0,0);
+            foreach(var pair in npcMarkers){pair.Value.text=Hud.Marker(pair.Key);pair.Value.color=pair.Value.text=="?"?Color.yellow:pair.Value.text=="!"?new Color(.7f,.9f,.55f):Color.white;}
+            if(speech!=null&&Session.Now>speechUntil){Destroy(speech.gameObject);speech=null;}
             var inv=Session.Player.Inventory;torso.color=inv.Equipment.ContainsKey(GearSlot.Armor)?new Color(.3f,.7f,.5f):new Color(.55f,.55f,.6f);
             pants.color=inv.Equipment.ContainsKey(GearSlot.Pants)?new Color(.25f,.55f,.5f):new Color(.25f,.3f,.4f);
             weapon.enabled=inv.Equipment.TryGetValue(GearSlot.Weapon,out var visibleWeapon);weapon.color=visibleWeapon!=null&&visibleWeapon.Id=="sword1"?new Color(.75f,.87f,.83f):new Color(.6f,.4f,.2f);
@@ -216,7 +293,7 @@ namespace HuyenLo.Runtime
             torso.transform.localPosition=new Vector3(action==null?0:Session.Combat.Facing*.07f,.15f,0);
             if(!Session.Player.Alive){torso.color=Color.gray;pants.color=Color.gray;}else if(Session.Now-Session.LastHurtAt<.12)torso.color=Color.white;
             foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap)){
-                var view=mobViews[m.Id];view.enabled=m.Alive;view.transform.localPosition=new Vector3((float)m.Position.X,(float)m.Position.Y,0);
+                var view=mobViews[m.Id];view.gameObject.SetActive(m.Alive);view.enabled=m.Alive;if(!m.Dummy&&m.Level==4)view.transform.localScale=new Vector3(-m.Facing*.8f,.7f,1);var rendered=Vector2.Lerp(new Vector2((float)m.PreviousPosition.X,(float)m.PreviousPosition.Y),new Vector2((float)m.Position.X,(float)m.Position.Y),Mathf.Clamp01((Time.time-Time.fixedTime)/Time.fixedDeltaTime));view.transform.localPosition=rendered;
                 view.color=flashUntil.TryGetValue(m.Id,out var until)&&Session.Now<until?Color.white:m.Returning?Color.gray:m.Windup?new Color(1,.5f,.3f):m.Dummy?new Color(.65f,.5f,.25f):m.Level==2?new Color(.7f,.35f,.45f):new Color(.55f,.65f,.78f);
             }
             foreach(var l in Session.Loot.Where(x=>x.Map==renderedMap&&!x.Claimed)){

@@ -8,7 +8,7 @@ GDD là design authority; Technical là implementation contract. **DERIVED** là
 
 # 1. Phương pháp, đối chiếu và giới hạn
 
-Bộ power/MP/CD/gear làm control V6.2.2 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](../../prototypes/VS1_EndToEnd/README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
+Bộ power/MP/CD/gear làm control V6.2.3 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](../../prototypes/VS1_EndToEnd/README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
 
 **Nguồn đầu vào:** [nhân vật](1_HUYEN_LO_GDD.md#character-power), [kỹ năng/trạng thái](1_HUYEN_LO_GDD.md#class-combat), [quái và bãi](1_HUYEN_LO_GDD.md#world-farm), [trang bị/thưởng](1_HUYEN_LO_GDD.md#gear-economy), [Food/Bình](1_HUYEN_LO_GDD.md#consumables-death). Analysis không giữ catalog thứ hai.
 
@@ -384,6 +384,8 @@ Chuyển giao bảo toàn cấp giảm trung bình khoảng mười lần thử 
 | Epic III +8 toàn bộ (biên trần) | 104 / 80 / 69 s | 53 s | 40 s |
 
 Hai người chính tuyến ở khoảng **50–65% thời gian ra đòn hữu hiệu** đạt 91–119 s, đúng mục tiêu 90–150 s. 75% cho 79 s là biên thuận lợi, cần cảnh né/telegraph thật để xem có quá nhanh. Bốn người endgame ~40 s ở 65% là hệ quả tự nhiên của cộng DPS, không lý do thêm auto-scale Boss; capacity/độ khó nhiều người phải đo. +8 làm nhanh hơn nhưng không vài giây và không cần cho Q12. Boss ATK 160, ba vùng Nham Thạch Rơi, lịch một action/các cooldown phải kiểm scene; mô hình không chứng minh đòn luôn né được. Demo HP 12.800/respawn 60 s chỉ là override nghiệm thu, không dùng làm cân bằng release.
+
+**Feedback V6.2.3 — CURRENT PROBE:** mock trước gộp người hướng dẫn phái và đảo mép Học Viện, hai sai lệch đã được đưa về đúng contract. User yêu cầu manual unequip trước chọn class; reject không grant/đổi class. Crowd steering dùng stable lane goal + khoảng trống và render interpolation để tránh tug-of-war; không tăng stat/giảm interval. Đồng Sương mock giữ DS1–DS6/10 slots, thêm PROBE7/4 và PROBE8/3 ở hai lane riêng để kiểm crowd/vertical; 17 slots là workload mock, không thay budget release hoặc capacity promise. PROBE không credit Q5, vẫn level-gap loot thường. Bảng TTK/farm/hành trình trước chưa tính topology/crowd mới; vẫn là lịch sử đối chiếu, cần rerun khi gate tương ứng.
 
 <a id="review-decisions"></a>
 <a id="open-decisions"></a>

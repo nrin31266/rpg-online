@@ -42,10 +42,10 @@ namespace HuyenLo.Domain
             new Anchor("Bach","Bách Luyện",Map.Village,10),new Anchor("Moc","Mộc An",Map.Village,15),
             new Anchor("Ta","Tạ Minh",Map.Village,20),
             new Anchor("toAcademy","← Học Viện",Map.Village,-4,exit:true),new Anchor("toMist","Đồng Sương →",Map.Village,30,exit:true),
-            new Anchor("toVillageA","← Vân Khê",Map.Academy,-4,exit:true),new Anchor("Phong","Phong Du",Map.Academy,0),
-            new Anchor("ClassHall","Chọn Kiếm / Cung",Map.Academy,3),
+            new Anchor("toVillageA","Vân Khê →",Map.Academy,34,exit:true),new Anchor("Phong","Phong Du",Map.Academy,0),
+            new Anchor("Diep","Diệp Lam",Map.Academy,6),
             new Anchor("toVillageM","← Vân Khê",Map.Mist,-4,exit:true),
-            new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,110,exit:true)
+            new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,126,exit:true)
         };
         public SliceSession(int seed=731) {
             Random=new Random(seed);Combat=new CombatController(this);
@@ -56,6 +56,9 @@ namespace HuyenLo.Domain
             int id=30;
             for(int pocket=3;pocket<=6;pocket++)for(int slot=1;slot<=2;slot++)
                 Mobs.Add(new Mob(id++,$"DS{pocket}.slot{slot}","Sói Sương",Map.Mist,new Point(30+(pocket-3)*20+(slot-1)*2,.65),4,107,13,5,76,28,2.4,1,1.3));
+            // Two extra mock pockets are explicitly probes, outside the release DS1–DS6 budget/quest credit.
+            for(int i=0;i<4;i++)Mobs.Add(new Mob(60+i,"PROBE7.slot"+(i+1),"Sói Sương",Map.Mist,new Point(106+i*1.5,.65),4,107,13,5,76,28,2.4,1,1.3){Lane=7,LaneMin=101,LaneMax=121});
+            for(int i=0;i<3;i++)Mobs.Add(new Mob(70+i,"PROBE8.slot"+(i+1),"Sói Sương",Map.Mist,new Point(51+i*1.5,3.85),4,107,13,5,76,28,2.4,1,1.3){Lane=8,LaneMin=49.5,LaneMax=58.5});
         }
         public void Emit(string value){Feedback=value;Events.Add($"{Now:F2} {value}");OnEvent?.Invoke(Events[Events.Count-1]);}
         public Item NewItem(string id,int count=1,string binding=null,double quality=1) => new Item(++nextItem,id,count,binding,quality);
@@ -78,11 +81,11 @@ namespace HuyenLo.Domain
                 if(QuestState==QuestState.Ready)return $"Q{Quest}: Báo lại {Anchors.First(x=>x.Id==QuestNpc).Name}";
                 string[][] steps={
                     new[]{"Nói chuyện Yên Thảo","Nói chuyện Bách Luyện","Nói chuyện Mộc An","Báo Lâm Bá"},
-                    new[]{"Tới HV_Entrance","Nhảy lên HV_JumpLedge (x8)","Đi xuống xuyên sàn tới HV_DropLanding","Đi qua mép trái về Vân Khê","Báo Lâm Bá"},
+                    new[]{"Tới HV_Entrance ở mép đông","Nhảy lên HV_JumpLedge (x8)","Đi xuống xuyên sàn tới HV_DropLanding","Đi qua mép phải về Vân Khê","Báo Lâm Bá"},
                     new[]{"Mặc Mộc Kiếm trong hành trang","Tới HV_DummyYard (x22)",$"Hạ Bù Nhìn {Kills}/3","Báo Phong Du"},
                     new[]{"Hạ Nấm tại DS2_MushroomPatch (x15)","Nhặt Áo + Nấm Sương tutorial","Mặc Áo Thanh Mộc","Bán Nấm Sương tutorial tại Bách Luyện","Báo Bách Luyện"},
                     new[]{"Chuẩn bị Food I + Bình Máu I tại Yên Thảo","Dùng Food","Tới DS4_ExitTrail (x50)",$"Hạ Sói DS3–DS6 {Kills}/5","Báo Yên Thảo"},
-                    new[]{"Tới HV_ClassHall (x3)","Tương tác ClassHall, chọn Kiếm","Mặc Kiếm + cộng ≥1 điểm + dùng bí kíp","Cast S1 tại HV_DummyYard","Dùng Bình Linh lực khi thiếu MP (đã cấp dự trữ)","Báo Tạ Minh"}
+                    new[]{"Tới HV_ClassHall (x3)","Tháo Mộc Kiếm (C → Trang bị), nói chuyện Phong Du để chọn Kiếm","Mặc Kiếm + cộng ≥1 điểm + dùng bí kíp","Cast S1 tại HV_DummyYard","Dùng Bình Linh lực khi thiếu MP (đã cấp dự trữ)","Báo Tạ Minh"}
                 };
                 return $"Q{Quest}: "+steps[Quest-1][Math.Min(Stage,steps[Quest-1].Length-1)];
             }
@@ -111,7 +114,9 @@ namespace HuyenLo.Domain
             Emit("Nói chuyện "+a.Name);return true;
         }
         public bool ChooseSword() {
-            if(!Player.Alive||!Near("ClassHall")||Quest!=6||Stage!=1||QuestState!=QuestState.InProgress||Player.School!=School.Novice)return false;
+            if(!Player.Alive||!Near("Phong")||Quest!=6||Stage!=1||QuestState!=QuestState.InProgress||Player.School!=School.Novice)return false;
+            if(Player.Inventory.Equipment.ContainsKey(GearSlot.Weapon)){Emit("Hãy tháo Mộc Kiếm ở Nhân vật → Trang bị trước khi nhập phái.");return false;}
+            if(Combat.Running!=null||Combat.HasPendingCast){Emit("Chờ action kết thúc trước khi nhập phái.");return false;}
             if(!Grant("Q6.class",NewItem("sword1"),NewItem("manual1",binding:"Q6")))return false;
             Combat.Cancel();Player.School=School.Sword;Player.Clamp();Stage=2;Emit("Đã chọn Kiếm; nội tại MaxHP ×1,10 / DEF ×1,08.");return true;
         }
@@ -204,7 +209,7 @@ namespace HuyenLo.Domain
             ObserveExits();
             if(QuestState!=QuestState.InProgress)return;
             if(Quest==2 && Player.Map==Map.Academy){
-                if(Stage==0 && position.Distance(new Point(0,.8))<=1.5){Stage=1;Emit("HV_Entrance");}
+                if(Stage==0 && position.Distance(new Point(31,.8))<=1.5){Stage=1;Emit("HV_Entrance");}
                 if(Stage==1 && grounded && position.Distance(new Point(8,3.8))<=1.5){Stage=2;Emit("HV_JumpLedge — đạt cao độ thật");}
                 if(Stage==2 && dropped)Receipts.Add("Q2.dropped");
                 if(Stage==2 && Receipts.Contains("Q2.dropped") && grounded && position.Distance(new Point(8,.8))<=1.5){Stage=3;Emit("HV_DropLanding — tiếp đất thật");}
@@ -228,7 +233,7 @@ namespace HuyenLo.Domain
             if(id=="outOfSlice"){Emit(Complete?"Trúc Ảnh đã mở trong tiến trình, chưa có trong VS-1.":"Cần hoàn thành Q6.");return false;}
             Map destination=id=="toAcademy"?Map.Academy:id=="toMist"?Map.Mist:Map.Village;
             if(Quest==2&&Stage==3&&Player.Map==Map.Academy&&destination==Map.Village){Stage=4;QuestState=QuestState.Ready;}
-            ChangeMap(destination,destination==Map.Village?new Point(id=="toVillageA"?-1:27,.8):new Point(-1,.8));return true;
+            ChangeMap(destination,destination==Map.Village?new Point(id=="toVillageA"?-1:27,.72):new Point(destination==Map.Academy?31:-1,.72));return true;
         }
         private void ChangeMap(Map map,Point spawn){
             foreach(var m in Mobs.Where(x=>x.Map==Player.Map&&x.Alive&&!x.Dummy)){m.Windup=false;m.ReturnSince=Now;}
@@ -260,7 +265,7 @@ namespace HuyenLo.Domain
             int tag=Quest*100+Stage;
             if(qualified&&m.QuestTag==tag&&QuestState==QuestState.InProgress){
                 if(Quest==3&&Stage==2&&m.Dummy){Kills++;if(Kills==3){Stage=3;QuestState=QuestState.Ready;}}
-                if(Quest==5&&Stage==3&&m.Slot.StartsWith("DS")&&m.Level==4){Kills++;if(Kills==5){Stage=4;QuestState=QuestState.Ready;}}
+                if(Quest==5&&Stage==3&&new[]{"DS3","DS4","DS5","DS6"}.Any(x=>m.Slot.StartsWith(x+"."))&&m.Level==4){Kills++;if(Kills==5){Stage=4;QuestState=QuestState.Ready;}}
                 if(Quest==4&&Stage==0&&m.Slot=="DS2.slot1"){TutorialSupply(m.Position);Stage=1;}
             }
             int atDeath=Player.Level;
@@ -288,7 +293,7 @@ namespace HuyenLo.Domain
             }
             Combat.Tick(manualContext);
             foreach(var m in Mobs){
-                if(!m.Alive){if(Now>=m.RespawnAt){m.Generation++;m.Hp=m.MaxHp;m.Position=m.Home;m.QuestDamage=0;m.Engaged=false;m.Returning=false;m.ReturnSince=-1;m.NextAttack=Now+(m.Id%5)*.07;Emit("Respawn "+m.Slot+"@"+m.Generation);}continue;}
+                if(!m.Alive){if(Now>=m.RespawnAt){m.Generation++;m.Hp=m.MaxHp;m.Position=m.Home;m.QuestDamage=0;m.Engaged=false;m.ApproachSide=0;m.Returning=false;m.ReturnSince=-1;m.NextAttack=Now+(m.Id%5)*.07;Emit("Respawn "+m.Slot+"@"+m.Generation);}continue;}
                 if(m.Dummy)continue;
                 if(m.Map!=Player.Map){
                     m.Windup=false;
@@ -299,13 +304,22 @@ namespace HuyenLo.Domain
                     }
                     continue;
                 }
-                TickMob(m,dt);
+                m.PreviousPosition=m.Position;TickMob(m,dt);
             }
             // Tutorial entitlement keeps the same instance; regular world loot expires.
             foreach(var l in Loot.Where(x=>!x.Claimed&&Now-x.Created>=60)){
                 if(l.Tutorial){l.Position=Mobs.First(x=>x.Slot=="DS2.slot1").Home;l.Created=Now;Emit("Tutorial supply re-offer same instance "+l.Id);}
                 else l.Claimed=true;
             }
+        }
+        private static void MoveMob(Mob m,double goal,double dt,Mob[] peers) {
+            goal=Math.Max(Math.Max(m.Home.X-8,m.LaneMin),Math.Min(Math.Min(m.Home.X+8,m.LaneMax),goal));
+            double dx=goal-m.Position.X,step=Math.Sign(dx)*Math.Min(Math.Abs(dx),m.Speed*dt);
+            foreach(var p in peers){
+                double gap=p.Position.X-m.Position.X;
+                if(gap*step>0&&Math.Abs(gap)<Math.Abs(step)+.94)step=Math.Sign(step)*Math.Max(0,Math.Abs(gap)-.94);
+            }
+            m.Position=new Point(m.Position.X+step,m.Home.Y);
         }
         private void TickMob(Mob m,double dt) {
             double dist=m.Position.Distance(Player.Position);
@@ -329,23 +343,19 @@ namespace HuyenLo.Domain
             }
             m.ReturnSince=-1;
             if(m.Windup)return;
-            if(Now>=m.HitAt&&Now<m.HitAt+.28&&m.NextAttack>Now){
-                double side=m.Position.X<Player.Position.X?-1:1;
-                m.Position=new Point(Math.Max(m.Home.X-8,Math.Min(m.Home.X+8,m.Position.X+side*m.Speed*.35*dt)),m.Home.Y);return;
-            }
-            if(dist>5 && m.Hp==m.MaxHp)return;
+            if(dist>5 && m.Hp==m.MaxHp&&!m.Engaged)return;
             double delta=Player.Position.X-m.Position.X;
-            if(Math.Abs(delta)>m.Range*.9){m.Position=new Point(m.Position.X+Math.Sign(delta)*Math.Min(Math.Abs(delta)-m.Range*.8,m.Speed*dt),m.Home.Y);}
-            else {
-                if(!m.Engaged){m.Engaged=true;m.NextAttack=Math.Max(m.NextAttack,Now+(m.Id%5)*.07);}
-                if(Now>=m.NextAttack){m.Facing=delta<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;}
-            }
-            if(!m.Windup){
-                foreach(var other in Mobs.Where(x=>x.Id!=m.Id&&x.Alive&&!x.Dummy&&x.Map==m.Map)){
-                    double dx=m.Position.X-other.Position.X;
-                    if(Math.Abs(dx)<.48){double direction=Math.Abs(dx)<.01?(m.Id<other.Id?-1:1):Math.Sign(dx);m.Position=new Point(Math.Max(m.Home.X-8,Math.Min(m.Home.X+8,m.Position.X+direction*(.48-Math.Abs(dx))*dt*3)),m.Home.Y);}
-                }
-            }
+            if(!m.Engaged){m.Engaged=true;m.ApproachSide=delta>0?-1:1;m.NextAttack=Math.Max(m.NextAttack,Now+((m.Id+m.Generation-1)%6)*.07);}
+            if(Math.Abs(delta)>m.Range+1.2&&Math.Sign(delta)==m.ApproachSide)m.ApproachSide=-m.ApproachSide;
+            // Stable ordering along a lane, with continuous movement toward free space.
+            // Rear mobs wait outside bite range; no attack token/formation or body shove.
+            var peers=Mobs.Where(x=>x!=m&&x.Alive&&!x.Dummy&&!x.Returning&&x.Map==m.Map&&x.Lane==m.Lane&&Math.Abs(x.Home.Y-m.Home.Y)<.3&&Math.Abs(x.Home.X-m.Home.X)<8).ToArray();
+            int rank=peers.Count(x=>x.Engaged&&x.ApproachSide==m.ApproachSide&&x.Id<m.Id);
+            double goal=Player.Position.X+m.ApproachSide*(m.Range*.82+rank*.96);
+            if(Now>=m.HitAt&&Now<m.HitAt+.22&&m.NextAttack>Now)goal+=m.ApproachSide*.30;
+            MoveMob(m,goal,dt,peers);
+            delta=Player.Position.X-m.Position.X;
+            if(Math.Abs(delta)<=m.Range && Now>=m.NextAttack){m.Facing=delta<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;}
             if(Math.Abs(m.Position.X-m.Home.X)>8){m.Returning=true;m.Windup=false;}
         }
     }

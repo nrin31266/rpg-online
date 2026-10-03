@@ -48,6 +48,8 @@ Giữ ít abstraction: một điểm nhận intent của phiên, một nguồn c
 | Commit progression | Adapter RAM có receipt/revision, cho phép inject pending/reject/retry để thử flow; mất khi đóng phiên | Spring/PostgreSQL commit theo §6; chỉ ACK bền vững mới publish persistent success |
 | Admission/recovery | Profile dev/reset rõ, chưa claim login/save/reconnect | Login/Select/ticket/lease/checkpoint/escrow và backend outage theo §5–7 |
 
+**UI focus/submenu:** modal giữ breadcrumb + selected action/itemInstanceId, không giữ closure tới item đã bị consume/reset. NPC root chỉ hiện quest/service; service view lấy đúng danh sách; Esc quay một cấp rồi đóng, I/C/Q mở root mới. Bag grid điều hướng theo hàng/cột và ô rỗng, detail dùng cùng domain validators; equipment slots có selected/empty/locked cues. Markers derive quest state, dialogue không tự grant objective/reward. Class admission kiểm slot Vũ khí trống trước staged grant; tháo/cất là commands riêng.
+
 **ID ổn định:** Skill/Item/Quest/Map/group/slot IDs thuộc definition, không đổi theo thứ tự Inspector/list hoặc display name. Runtime instanceID/actionID/generation xác định một life/action riêng; không dùng GameObject instance hoặc sprite frame làm business identity. Kết quả/callback từ life cũ bị từ chối. Client request sequence/correlation không thay authoritative result identity.
 
 **Một đồng hồ gameplay/authority session:** hit/spawn, CD/action lock, status/tick, AI và due-slot dùng cùng timebase. Animator/UI không có timer quyết gameplay riêng; mọi part của actor lấy cùng state/phase. Deadline bền vững UTC theo §6–7 phải được quy đổi rõ với thời gian phiên, backend vẫn có timestamp giao dịch/reconciler riêng. `AnimationEvent` chỉ phát feedback cosmetic; bỏ frame hoặc event không được sinh, mất hay lặp damage. Không lấy VFX collision/socket/render bounds làm authoritative hitbox. Hitstop/crit shake/material audio DEFERRED, không dừng clock gameplay.
@@ -59,6 +61,10 @@ Giữ ít abstraction: một điểm nhận intent của phiên, một nguồn c
 <a id="maps"></a>
 
 # 2. Unity Scene / Map Architecture
+
+**Melee lane probe:** tính stand goal ổn định theo side/ID trên cùng lane, bước đi bị giới hạn speed × dt và khoảng trống giữa các mob; không cộng repulsion sau chase gây rung ở điểm cân bằng. Rear mob ngoài range phải chờ không gian hoặc player di chuyển, không guaranteed hit và không group attack token. Recovery reposition chỉ dùng chỗ trống; windup origin/facing đã start không bị steering đổi. Các ca 2/3/4 con, cross-side, đổi hướng/target/chết front mob thuộc PHY-01, không suy capacity online từ local.
+
+**Blockout V6.2.3:** dữ liệu `BlockoutLayout` của mock tách surface rectangle/one-way/bounds khỏi drawing; reciprocal exit links + destination spawn nằm đúng mép, camera snap chỉ khi transition/reset. Physics body tiếp tục FixedUpdate, camera bám interpolated visual Transform tại LateUpdate với dead zone/damping/clamp; mob logical positions giữ previous/current cho visual interpolation, không snap simulation để cứu render. [Unity — Rigidbody2D interpolation](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Rigidbody2D-interpolation.html) mô tả smoothing giữa physics updates; đây là căn cứ probe, không bảo đảm cảm giác mượt trên mọi máy.
 
 Local production slice dự kiến vào World với profile dev và ba roots theo [VS-1](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#vs-1); giữ MapId/map-transition validation trong session. Prototype cũ chỉ là đối chiếu, chưa chứng minh contract MapExit mới. Luồng sau là TARGET online, không bắt buộc login cho combat probe đầu.
 

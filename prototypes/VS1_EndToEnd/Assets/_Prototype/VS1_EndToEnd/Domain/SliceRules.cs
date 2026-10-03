@@ -162,13 +162,15 @@ namespace HuyenLo.Domain
         public int Id,Generation=1,Level;
         public string Name,Slot;
         public Map Map;
-        public Point Position,Home;
+        public Point Position,Home,PreviousPosition;
+        public int Lane,ApproachSide;
+        public double LaneMin=-10000,LaneMax=10000;
         public double Hp,MaxHp,Atk,Def,Acc,Eva,Speed,Range,Interval,NextAttack,HitAt,RespawnAt,ReturnSince=-1,QuestDamage,LastDamage;
         public int Facing=1,QuestTag;
         public bool Dummy,Returning,Windup,Engaged;
         public bool Alive => Hp>0;
         public Mob(int id,string slot,string name,Map map,Point home,int level,double hp,double atk,double def,double acc,double eva,double speed,double range,double interval,bool dummy=false)
-        {Id=id;Slot=slot;Name=name;Map=map;Home=Position=home;Level=level;Hp=MaxHp=hp;Atk=atk;Def=def;Acc=acc;Eva=eva;Speed=speed;Range=range;Interval=interval;Dummy=dummy;}
+        {Id=id;Slot=slot;Name=name;Map=map;Home=Position=PreviousPosition=home;Level=level;Hp=MaxHp=hp;Atk=atk;Def=def;Acc=acc;Eva=eva;Speed=speed;Range=range;Interval=interval;Dummy=dummy;}
     }
     public sealed class Loot
     {

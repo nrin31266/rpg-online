@@ -1,0 +1,50 @@
+[
+  {
+    "SOURCE": "reciprocal exit",
+    "DESTINATION": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs",
+    "proof": "destination==Map.Academy?31:-1",
+    "verified": true
+  },
+  {
+    "SOURCE": "weapon preflight",
+    "DESTINATION": "docs/design/1_HUYEN_LO_GDD.md",
+    "proof": "ô Vũ khí phải trống",
+    "verified": true
+  },
+  {
+    "SOURCE": "mock scope distinction",
+    "DESTINATION": "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "proof": "PROBE không credit Q5",
+    "verified": true
+  },
+  {
+    "SOURCE": "crowd lane policy",
+    "DESTINATION": "docs/design/2_HUYEN_LO_TECHNICAL.md",
+    "proof": "không cộng repulsion sau chase",
+    "verified": true
+  },
+  {
+    "SOURCE": "grid navigation",
+    "DESTINATION": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs",
+    "proof": "public void NavigateGrid",
+    "verified": true
+  },
+  {
+    "SOURCE": "measured gate",
+    "DESTINATION": "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md",
+    "proof": "G-L vẫn PARTIAL",
+    "verified": true
+  },
+  {
+    "SOURCE": "two guides",
+    "DESTINATION": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs",
+    "proof": "new Anchor(\"Diep\",\"Diệp Lam\"",
+    "verified": true
+  },
+  {
+    "SOURCE": "map geometry",
+    "DESTINATION": "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+    "proof": "13.1. Map blockout VS-1",
+    "verified": true
+  }
+]

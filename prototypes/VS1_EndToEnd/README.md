@@ -1,4 +1,4 @@
-# Huyền Lộ — game mẫu V6.2.2
+# Huyền Lộ — game mẫu V6.2.3
 
 Đây là **disposable/reference prototype**, không production base. Unity project mẫu nằm riêng tại `prototypes/VS1_EndToEnd/`; tương lai `game/` dùng cho Unity Client/Dedicated và `backend/` cho Spring/PostgreSQL, chưa dựng. Gameplay authority là [GDD hiện hành](../../docs/design/1_HUYEN_LO_GDD.md), integration contract ở [Technical](../../docs/design/2_HUYEN_LO_TECHNICAL.md), thứ tự ở [Roadmap](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md).
 
@@ -10,7 +10,7 @@ Mở folder này bằng Unity Hub **6000.5.9f1**, scene [VS1.unity](Assets/_Prot
 ./prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64
 ```
 
-**F8 hoặc nút Debug** mở menu mốc Q1–Q6/sân tập Kiếm Lv5/reset. Chọn mốc, rồi xác nhận reset; menu mặc định chọn Hủy để tránh mất phiên. Chọn Bắt đầu mới xóa toàn bộ RAM và về Q1. Menu debug tạm dừng local simulation; các panel gameplay khác không tạo miễn sát thương. Không save JSON hoặc auto-resume; dùng mốc để thử nhanh. Preset có nhãn DEBUG, không là evidence hành trình.
+**F8 hoặc nút Debug** mở menu mốc Q1–Q6/sân tập Kiếm Lv5/bãi 4 Sói/reset. Chọn mốc, rồi xác nhận reset; menu mặc định chọn Hủy để tránh mất phiên. Chọn Bắt đầu mới xóa toàn bộ RAM và về Q1. Menu debug tạm dừng local simulation; các panel gameplay khác không tạo miễn sát thương. Không save JSON hoặc auto-resume; dùng mốc để thử nhanh. Preset có nhãn DEBUG, không là evidence hành trình.
 
 | Phím | Thao tác |
 | --- | --- |
@@ -19,7 +19,7 @@ Mở folder này bằng Unity Hub **6000.5.9f1**, scene [VS1.unity](Assets/_Prot
 | S/↓ | Drop trên one-way; không cần Space |
 | 1/2/3 | Chọn skill + yêu cầu đúng một lần; Novice dùng 1 Mộc Kiếm, slot chưa mở báo lý do |
 | E | Nhặt đồ hoặc mở NPC; không dùng cho MapExit |
-| ↑/↓ hoặc W/S, Tab/Shift+Tab trong menu | Đổi action được highlight |
+| ↑/↓ hoặc W/S, Tab/Shift+Tab trong menu | Đổi action; bag dùng ↑↓←→ / WASD theo ô |
 | Enter/E trong menu | Nhận/trả quest, equip/learn, mua/bán, cộng điểm, rương, revive; không cần chuột |
 | I / C / Q | Túi / Nhân vật với skill tab / Quest |
 | F / H / M | Food / Bình Máu / Bình Linh lực |
@@ -28,11 +28,15 @@ Mở folder này bằng Unity Hub **6000.5.9f1**, scene [VS1.unity](Assets/_Prot
 
 **Không J, không giữ để repeat.** Một press acquire/focus; hơi xa thì tiếp cận ngang có giới hạn rồi cast một lần. Release giữ pending; manual movement/jump/drop/focus/UI/Esc/map hủy. No target/blocked/quá xa/MP/CD chưa sẵn không commit cost. Normal damage không interrupt hoặc knockback. Chạm exit có arrow/tên vùng tự chuyển map; exit đích đặt ngoài trigger ngược.
 
+## Map mới
+
+Học Viện nằm tây Vân Khê: vào từ mép phải x31, về qua mép phải x34. Đồng Sương nằm đông: đi phải hub vào mép trái Mist. Các map có mountain silhouettes/parallax, phố/đại sảnh/rừng, nền liền và các one-way tạo route cao-thấp. Mist giữ sáu pocket DS1–DS6/10 slots; thêm PROBE7/4 Sói dưới và PROBE8/3 Sói trên, tổng17 cho mock. PROBE không credit Q5 hoặc thay budget release. F8 chọn Bãi phụ để thử bốn Sói; jump từ bậc x35 qua lane x43 tới x54.
+
 ## Route và probe
 
-Q1 NPC → Q2 movement/ledge/drop/EdgeExit → Q3 ba Dummy đồng thời (Lv3) → Q4 Nấm DS2/loot/equip/sell (Lv4) → Q5 Food/HP + năm Sói (Lv5) → Q6 chọn Kiếm/equip/điểm/bí kíp/S1/MP. NPC mở với quest action ưu tiên; dùng Enter/E xác nhận và Esc quay lại world. Học/use/equip trong I, cộng điểm/skill tab trong C. Q4 tutorial supply chỉ tạo đúng active kill step; ngoài bước đó không future entitlement. Khi full bag, claim/grant giữ instance để retry.
+Q1 NPC → Q2 movement/ledge/drop/EdgeExit → Q3 ba Dummy đồng thời (Lv3) → Q4 Nấm DS2/loot/equip/sell (Lv4) → Q5 Food/HP + năm Sói (Lv5) → Q6 tháo Mộc Kiếm trước/chọn Kiếm tại Phong Du/equip/điểm/bí kíp/S1/MP. Diệp Lam là NPC Cung riêng, nhánh Cung chưa mở trong mock. NPC mở với quest action ưu tiên; dùng Enter/E xác nhận và Esc quay lại world. NPC có hội thoại + !/?; chọn Mua/Bán/Gửi/Lấy mới mở submenu đó. I là bag grid30 ô, detail bên phải, Enter mở thao tác món. C → Trang bị là hình người/sáu slot → chọn slot → Tháo. Esc quay một cấp, rồi đóng root; I/C/Q đổi root. Học/use/equip trong I, cộng điểm/skill tab trong C. Q4 tutorial supply chỉ tạo đúng active kill step; ngoài bước đó không future entitlement. Khi full bag, claim/grant giữ instance để retry.
 
-Coyote `.10s`, jump buffer `.12s`, release cutoff, ground/air acceleration, fall cap và melee phase/separation/recovery movement là **giá trị probe**, chưa lock production. Geometry/cast vẫn authority clock; variable jump không cấp double jump. Class không có permanent Normal. S2/S3/Cung chỉ fixture, không content route; backend/network/chat/PvP/Boss chưa làm. Art vẫn primitive, chưa full rig26/socket hoặc Common UI Kit production; tests không thay manual feel/usability review.
+Coyote `.10s`, jump buffer `.12s`, release cutoff, ground/air acceleration, fall cap và melee phase/separation/recovery movement là **giá trị probe**, chưa lock production. Geometry/cast vẫn authority clock; variable jump không cấp double jump. Class không có permanent Normal. S2/S3/Cung chỉ fixture, không content route; backend/network/chat/PvP/Boss chưa làm. Art vẫn primitive; icon bag đã có motif khối/count và paper doll tạm, chưa full rig26/socket hoặc Common UI Kit production; tests không thay manual feel/usability review.
 
 ## Kiểm chứng
 
@@ -43,10 +47,10 @@ HUYEN_LO_EDITOR=/home/nguyenvanrin/Unity/Hub/Editor/6000.5.9f1/Editor/Unity
 "$HUYEN_LO_EDITOR" -batchmode -nographics -projectPath "$PWD/prototypes/VS1_EndToEnd" -runTests -testPlatform EditMode -testResults /tmp/huyenlo-edit.xml -logFile /tmp/huyenlo-edit.log
 "$HUYEN_LO_EDITOR" -batchmode -nographics -projectPath "$PWD/prototypes/VS1_EndToEnd" -runTests -testPlatform PlayMode -testResults /tmp/huyenlo-play.xml -logFile /tmp/huyenlo-play.log
 "$HUYEN_LO_EDITOR" -batchmode -nographics -quit -projectPath "$PWD/prototypes/VS1_EndToEnd" -executeMethod HuyenLo.Editor.SliceBuild.Linux -logFile /tmp/huyenlo-build.log
-python3 prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_2/verify_revision.py
+python3 prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_3/verify_revision.py
 ```
 
-[Evidence revision mới](PrototypeEvidence/V6_2_2/validation.json) và [audit docs](PrototypeEvidence/V6_2_2/document-audit.json). Acceptance driver `--verify-route --evidence-path /tmp/huyenlo-route` đi fresh Q1–Q6 bằng Rigidbody2D, auto exits và keyboard menu adapter; không dùng debug preset hoặc set quest/EXP/HP/position để skip. TimeScale4 chỉ cho automation; đây không manual playtest. Real Input System tests kiểm NPC/shop/inventory/debug và air cast; movement fixture kiểm tap/hold/coyote/no-double/drop.
+[Evidence revision mới](PrototypeEvidence/V6_2_3/validation.json) và [audit docs](PrototypeEvidence/V6_2_3/document-audit.json). Acceptance driver `--verify-route --evidence-path /tmp/huyenlo-route` đi fresh Q1–Q6 bằng Rigidbody2D, auto exits và keyboard menu adapter; không dùng debug preset hoặc set quest/EXP/HP/position để skip. TimeScale4 chỉ cho automation; đây không manual playtest. Real Input System tests kiểm NPC/shop/inventory/debug và air cast; movement fixture kiểm tap/hold/coyote/no-double/drop.
 
 Evidence [V6.2.0 và migration cũ](PrototypeEvidence/VS1_EndToEnd/validation.json) giữ nguyên byte và đường dẫn lịch sử. Scripts/audit cũ thuộc checkpoint trước, không chạy lên revision mới để ghi đè. Folder Assets/_Prototype vẫn giữ meta/GUID qua relocation cả project. Font [DejaVu Sans](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/DejaVuSans.ttf) có [license](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/LICENSE.txt).
 
