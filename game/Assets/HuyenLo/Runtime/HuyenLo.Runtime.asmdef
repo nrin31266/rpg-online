@@ -1,0 +1,9 @@
+{
+  "name": "HuyenLo.Runtime",
+  "references": [
+    "HuyenLo.Domain",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "autoReferenced": true
+}

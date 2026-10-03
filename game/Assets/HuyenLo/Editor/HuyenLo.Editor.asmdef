@@ -1,0 +1,11 @@
+{
+  "name": "HuyenLo.Editor",
+  "references": [
+    "HuyenLo.Runtime",
+    "HuyenLo.Domain"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true
+}

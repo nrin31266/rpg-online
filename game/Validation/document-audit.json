@@ -1,0 +1,253 @@
+{
+  "baseline_revision": "4a57b80",
+  "comparisons": [
+    {
+      "before": {
+        "file": "docs/design/README.md",
+        "lines": 90,
+        "pipes": 45,
+        "headings": 6,
+        "critical": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "sha": "d835fd636647a3ef92b5565a79b08adae85b0273bfbf5740404b7940ff367043"
+      },
+      "after": {
+        "file": "docs/design/README.md",
+        "lines": 90,
+        "pipes": 45,
+        "headings": 6,
+        "critical": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "sha": "774c1ebb6f47543a2721316d6f49eac4837c6c86e2024dbcb47e635e96580d07"
+      }
+    },
+    {
+      "before": {
+        "file": "docs/design/1_HUYEN_LO_GDD.md",
+        "lines": 750,
+        "pipes": 336,
+        "headings": 25,
+        "critical": [
+          1,
+          3,
+          1,
+          3,
+          1
+        ],
+        "sha": "4ebaafe584ee147b5e24edee0ea024b38cfbb58ade613f169419dba0d800fd66"
+      },
+      "after": {
+        "file": "docs/design/1_HUYEN_LO_GDD.md",
+        "lines": 768,
+        "pipes": 336,
+        "headings": 26,
+        "critical": [
+          1,
+          3,
+          1,
+          3,
+          1
+        ],
+        "sha": "38fc3590fc6731b77009f414dfeac9a1337526ee020f9f13be28ddd914c782c0"
+      }
+    },
+    {
+      "before": {
+        "file": "docs/design/2_HUYEN_LO_TECHNICAL.md",
+        "lines": 385,
+        "pipes": 124,
+        "headings": 16,
+        "critical": [
+          1,
+          1,
+          2,
+          3,
+          1
+        ],
+        "sha": "6910fc32df2eb5b8de4497a0cc9f4173cd49f9995095a67452cebb77050d038d"
+      },
+      "after": {
+        "file": "docs/design/2_HUYEN_LO_TECHNICAL.md",
+        "lines": 399,
+        "pipes": 124,
+        "headings": 17,
+        "critical": [
+          1,
+          1,
+          2,
+          3,
+          1
+        ],
+        "sha": "cb7574920a5ecb2d9c40f330e02c7479a28659c17d9b626c6819259bdde15a9a"
+      }
+    },
+    {
+      "before": {
+        "file": "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md",
+        "lines": 479,
+        "pipes": 246,
+        "headings": 22,
+        "critical": [
+          1,
+          4,
+          2,
+          3,
+          1
+        ],
+        "sha": "daec88d97189b726bdc8cda473af14a30e7f90a5b8902233827fdeb8956a752d"
+      },
+      "after": {
+        "file": "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md",
+        "lines": 513,
+        "pipes": 263,
+        "headings": 23,
+        "critical": [
+          1,
+          4,
+          2,
+          4,
+          1
+        ],
+        "sha": "fba2f6dd8ea2fc53eba62c5cf378bc050c4198e98d63ecfb711276d31d655e65"
+      }
+    },
+    {
+      "before": {
+        "file": "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+        "lines": 850,
+        "pipes": 402,
+        "headings": 46,
+        "critical": [
+          0,
+          0,
+          0,
+          9,
+          0
+        ],
+        "sha": "df0e635b15ff336b0433a5988334d8f983b64ad93028eb7ab4fab6224097fa1f"
+      },
+      "after": {
+        "file": "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+        "lines": 849,
+        "pipes": 401,
+        "headings": 46,
+        "critical": [
+          0,
+          0,
+          0,
+          9,
+          0
+        ],
+        "sha": "1e6277e6908ba62be4279ababf759762029c525a3284bd12ca221a13c3569d41"
+      }
+    },
+    {
+      "before": {
+        "file": "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md",
+        "lines": 268,
+        "pipes": 112,
+        "headings": 14,
+        "critical": [
+          2,
+          2,
+          2,
+          7,
+          2
+        ],
+        "sha": "c3187b5d55d41a8b7fe1ea73655b9d5cb2dcd145bc02f2f18df75a6f9809330c"
+      },
+      "after": {
+        "file": "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md",
+        "lines": 293,
+        "pipes": 126,
+        "headings": 15,
+        "critical": [
+          2,
+          2,
+          2,
+          8,
+          2
+        ],
+        "sha": "9085e0d22c17bc862cd49207817177a6438acc131835fbf06fa119d7857545c0"
+      }
+    }
+  ],
+  "research_moves": [
+    {
+      "source": "NSO_RESEARCH_GAPS_BEFORE_HUYEN_LO_LOCK.md",
+      "destination": "research/notes/NSO_RESEARCH_GAPS_BEFORE_HUYEN_LO_LOCK.md",
+      "sha_preserved": true
+    },
+    {
+      "source": "NSO_WORLD_FARM_TARGETING_RESEARCH.md",
+      "destination": "research/notes/NSO_WORLD_FARM_TARGETING_RESEARCH.md",
+      "sha_preserved": true
+    },
+    {
+      "source": "NSO_TO_HUYEN_LO_MODERNIZATION_RESEARCH.md",
+      "destination": "research/notes/NSO_TO_HUYEN_LO_MODERNIZATION_RESEARCH.md",
+      "sha_preserved": true
+    }
+  ],
+  "critical_order": [
+    "53.100",
+    "95 điểm",
+    "32.000",
+    "26 frame/khung",
+    "payout 1.800 and 200 on same row"
+  ],
+  "sampled_source_destination": [
+    {
+      "id": "S01",
+      "destination": "1_HUYEN_LO_GDD.md#class-combat",
+      "content": "ingle (hai class) | +0,12 s | 0,30 s | | Phong Trảm tiến cảnh | +0,14 s | 0,30 s | | Linh Tiễn tiến cảnh | Ba logical hits cùng +0,12 s | 0,34 s | | Kiếm Khí | +0,16 s | 0,40 s | | Hàn Tiễn | +0,18 s | 0,40 s |  Source stats/passive capability và action origin chụp tại start, target DEF/EV"
+    },
+    {
+      "id": "S08",
+      "destination": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#icons-ui",
+      "content": " buộc | | HUD/world UI/chat/portal | Bars, quest tracker, food/bình, focus marker/mini HP + screen name/level/current-max HP, reward tooltip, bubble hai dòng, signpost, Boss timer/banner | Kit/typography/marker glyphs; không HP bars Party, chat history/quest arrow P0 |  Ba skill entries/cl"
+    },
+    {
+      "id": "S11",
+      "destination": "2_HUYEN_LO_TECHNICAL.md#shared-combat-input",
+      "content": "ndidates khác execution range. Loot/interactable candidate riêng: eligibility/range/capacity/window theo GDD, E act ngay; next candidate không mutate focus.  Tap attempt một lần, không movement. Hold J/slot cùng requested intent/press token, profile RepeatOnHold; S3 accepted start tiêu tok"
+    },
+    {
+      "id": "S04",
+      "destination": "2_HUYEN_LO_TECHNICAL.md#combat-data",
+      "content": "oldown riêng mỗi SkillId, không reset khi đổi slot.  **Manual learn command:** sáu manual definitions map tới sáu class SkillIds độc lập (S1/S2/S3 mỗi class); class/level/prerequisite S1 cho S2/S3 và boundCharacterId giữ GDD. Validate ownership/alive/idle/no pending action, chưa learned; c"
+    },
+    {
+      "id": "S12",
+      "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#vs-1",
+      "content": "<a id=\"vs-1\"></a>  # 2. VS-1 — lát cắt đầu tiên phải chơi được  **CURRENT ROADMAP BASELINE:** Q1–Q6, Tân Lữ → Kiếm, ba map **Vân Khê / Học Viện / Đồng Sương** là phạm vi đang dùng để bắt đầu triển khai. Dùng layout/marker/spawn của GDD cho phần có mặt; Trúc Ảnh mở trong que"
+    },
+    {
+      "id": "S05",
+      "destination": "1_HUYEN_LO_GDD.md#character-power",
+      "content": " hoàn 15 thành **20 unspent** một lần; chọn class Q6 rồi tự cộng. Chưa class không dùng skill / vũ khí class; kể cả Lv 5+ vẫn dùng normal Tân Lữ / Mộc Kiếm để làm Q5. Reset nhập môn xảy ra một lần khi đạt Lv 5; nếu trì hoãn Q6 tới Lv 6+, giữ mọi điểm level-up thêm, tổng spent + unspent = 5"
+    },
+    {
+      "id": "S06",
+      "destination": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#player-visual",
+      "content": "ance được giữ tại [Phụ lục A — technique](#art-technique-rationale).  **A14 — ra đòn khi chạy/nhảy/rơi:** giữ gravity và horizontal momentum đã duyệt; CURRENT thử Novice/S1, permissions skill S2/S3 còn gate. Upper action/lower locomotion cần chung phase/root/socket; không thêm movement loc"
+    },
+    {
+      "id": "S09",
+      "destination": "3_HUYEN_LO_DESIGN_ANALYSIS.md#design-lock-rationale",
+      "content": "| 4/1,7/0,34 |  Kiếm S1 có trade-off đơn mục tiêu rõ, S2 group max3. Cung AAA hơn S1 khoảng 4,35% power/MP và 22,76% power/CD, thêm proc; S1 vẫn ít MP/cast, CD/commitment ngắn hơn. Đây là **balance risk**, chưa chứng minh S1 dead button/domination mọi chiều; không gọi S1 PvP-only hoặc tự s"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

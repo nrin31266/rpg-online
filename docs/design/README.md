@@ -16,7 +16,7 @@ TARGET P0 giữ Kiếm + Cung và Dedicated + Spring/PostgreSQL online. CURRENT 
 
 Nếu Analysis / Technical mâu thuẫn GDD, GDD thắng. Deterministic defect đã xác minh phải sửa đồng bộ; proposal không tự đổi luật.
 
-User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
+DESIGN LOCK V6.2.0 đã sync: ba skill tích lũy/class, J-selected + 1/2/3 select+execute, logical ranged và focus/interaction riêng. Chi tiết luật ở GDD, contract ở Technical, rationale/gates ở Analysis; review artifact tạm được dọn sau audit. User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
 
 ## Quick Routing
 

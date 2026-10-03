@@ -1,0 +1,169 @@
+{
+  "date": "2026-10-03",
+  "scope": "VS-1 local, Q1–Q6, Tân Lữ → Kiếm, Vân Khê/Học Viện/Đồng Sương",
+  "unity": "6000.5.9f1",
+  "baseline_git_revision": "4a57b802ea4ae2870409184ca8428d90cee5d4d4",
+  "tests": [
+    {
+      "file": "editmode.xml",
+      "id": "2",
+      "testcasecount": "34",
+      "result": "Passed",
+      "total": "34",
+      "passed": "34",
+      "failed": "0",
+      "inconclusive": "0",
+      "skipped": "0",
+      "asserts": "0",
+      "engine-version": "3.5.0.0",
+      "clr-version": "4.0.30319.42000",
+      "start-time": "2026-10-03 11:30:38Z",
+      "end-time": "2026-10-03 11:30:39Z",
+      "duration": "0.0803633"
+    },
+    {
+      "file": "playmode.xml",
+      "id": "2",
+      "testcasecount": "2",
+      "result": "Passed",
+      "total": "2",
+      "passed": "2",
+      "failed": "0",
+      "inconclusive": "0",
+      "skipped": "0",
+      "asserts": "0",
+      "engine-version": "3.5.0.0",
+      "clr-version": "4.0.30319.42000",
+      "start-time": "2026-10-03 11:16:52Z",
+      "end-time": "2026-10-03 11:17:42Z",
+      "duration": "49.7538715"
+    },
+    {
+      "file": "input-physics.xml",
+      "id": "2",
+      "testcasecount": "1",
+      "result": "Passed",
+      "total": "1",
+      "passed": "1",
+      "failed": "0",
+      "inconclusive": "0",
+      "skipped": "0",
+      "asserts": "0",
+      "engine-version": "3.5.0.0",
+      "clr-version": "4.0.30319.42000",
+      "start-time": "2026-10-03 11:20:58Z",
+      "end-time": "2026-10-03 11:20:59Z",
+      "duration": "0.4596759"
+    }
+  ],
+  "distinct_tests_passed": 36,
+  "repeat_test_note": "input-physics.xml reruns the InputPhysics PlayMode test with stricter airborne assertions; it is not a third distinct PlayMode test.",
+  "coverage_note": "Full PlayMode suite precedes final portal/lifecycle fix; EditMode 34 tests and final rebuilt standalone continuous route passed after that fix. Final HUD-only fixes were checked in the rebuilt standalone screenshots.",
+  "build": {
+    "status": "PASS",
+    "platform": "Linux x86_64",
+    "development": true,
+    "output": "game/Builds/Linux/HuyenLo.x86_64",
+    "log": "linux-build.log",
+    "unity_report_size": "157.9 mb"
+  },
+  "route": {
+    "status": "PASS",
+    "completed_quests": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "final_school": "Sword",
+    "final_level": 5,
+    "no_teleport_or_quest_exp_hp_injection": true,
+    "actual_rigidbody_movement": true,
+    "driver": "automated input/command driver through runtime boundaries",
+    "time_scale": 4,
+    "simulation_seconds": 197.38,
+    "evidence": [
+      "continuous-route.log",
+      "route-result.txt",
+      "standalone.log",
+      "continuous-route.mp4",
+      "onboarding.png",
+      "combat-focus.png",
+      "sword-q6.png"
+    ],
+    "video": {
+      "codec": "H.264 OpenH264",
+      "fps": 10,
+      "frames": 478,
+      "seconds": 47.8,
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "canonical_audit": "document-audit.json",
+  "gl_status": "PARTIAL",
+  "remaining": [
+    "26-frame rig/pose/pivot/socket production probe; A01/A02 remain open",
+    "Measured art/QA/rework hours and usable-asset percentage from Free art workflow are not available",
+    "Manual control/game-feel review at normal simulation speed"
+  ],
+  "unmeasured_art": {
+    "hours": null,
+    "usable_percentage": null
+  },
+  "stop": "G-L; G-N Dedicated/backend/full content not started",
+  "source_sha256": {
+    "game/Assets/HuyenLo/Domain/CombatController.cs": "7f248f9b001a5a33ae97823b7974cd0c463fc294b5c05a590d7104b5827e5228",
+    "game/Assets/HuyenLo/Domain/SliceRules.cs": "a58072b0195a9d6f78b30c2d1864fe113548b5544b456446e18550746ecbdcac",
+    "game/Assets/HuyenLo/Domain/SliceSession.cs": "19d9b1c1119ddab9f31eb6d6b09072a68e652b9c0323e02186755f14019fa3a8",
+    "game/Assets/HuyenLo/Editor/SliceBuild.cs": "f6dc31529b5cf02c7bbd13c2e0895b453c18877606e4bfc64f2d26ad967b2dcb",
+    "game/Assets/HuyenLo/Runtime/SliceHost.cs": "dee975fec930494bcdbc4297c58e22ac71d85919bfe42c86c522af038b3d71d2",
+    "game/Assets/HuyenLo/Runtime/SliceHud.cs": "e4b5869ac7b03167a512a8ae713c5179e49307d164191182014d09151bcec692",
+    "game/Assets/HuyenLo/Runtime/SliceRouteProbe.cs": "75061b9efcaeb96eb30dc79e4703d20a4a54cfbc22eac1617b54a728e564cb07",
+    "game/Assets/HuyenLo/Tests/EditMode/DomainTests.cs": "6396b978a5ab2942ce811e0ce839a4e9da29f6f033466fef9398a2369d9c6be6",
+    "game/Assets/HuyenLo/Tests/PlayMode/ContinuousRouteTests.cs": "b9e95eb2880653f6f9c0bb7fc085fba2f2609dddae0ed700a32a6e37616cb920",
+    "game/Assets/HuyenLo/Tests/PlayMode/InputPhysicsTests.cs": "e5c573a3ebae16d0ff7973f0cba57abe8b5b3599c8b74326b34ad7437156c44c"
+  },
+  "document_validation": {
+    "status": "PASS",
+    "script": "python3 game/Validation/verify_documents.py",
+    "preserved_numeric_analysis_rows": true,
+    "research_hashes_preserved": true,
+    "source_destination_samples_checked": 8,
+    "links_and_anchors": "PASS",
+    "critical_values_preserved": [
+      "53.100",
+      "95 điểm",
+      "32.000",
+      "26 frame/khung",
+      "1.800/200"
+    ],
+    "contradiction_review": "Searched all canonical docs; remaining class Normal/evolution/four-SkillId mentions are explicit historical comparison or rejection. Hybrid roster/LoS/unreachable exact response remain prototypes; A11 tentative projectile branch removed from current scope."
+  },
+  "git": {
+    "branch": "main",
+    "head": "4a57b80",
+    "status": [
+      " M .gitignore",
+      "M  docs/design/1_HUYEN_LO_GDD.md",
+      "MM docs/design/2_HUYEN_LO_TECHNICAL.md",
+      "MM docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md",
+      "MM docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "MM docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md",
+      "M  docs/design/README.md",
+      "?? game/",
+      "?? research/"
+    ],
+    "unstaged_stat": ".gitignore                                          | 21 +++++++++++++++++++--\n docs/design/2_HUYEN_LO_TECHNICAL.md                 |  4 ++--\n docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md           |  6 +++---\n .../4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md    | 12 ++++++------\n docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md    |  6 ++++--\n 5 files changed, 34 insertions(+), 15 deletions(-)",
+    "tracked_since_head_stat": ".gitignore                                         |  21 +++-\n docs/design/1_HUYEN_LO_GDD.md                      | 116 ++++++++++++---------\n docs/design/2_HUYEN_LO_TECHNICAL.md                |  66 +++++++-----\n docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md          |  62 ++++++++---\n .../4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md   | 107 ++++++++++---------\n docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md   |  37 +++++--\n docs/design/README.md                              |   2 +-\n 7 files changed, 259 insertions(+), 152 deletions(-)",
+    "stat_excludes_untracked": [
+      "game/",
+      "research/"
+    ],
+    "automatic_commit": false,
+    "existing_staging_preserved": true,
+    "whitespace_check": "PASS (working tree and index)"
+  }
+}

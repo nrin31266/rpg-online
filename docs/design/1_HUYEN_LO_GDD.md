@@ -1,10 +1,10 @@
 # RPG Online: Huyền Lộ
 ## Tài liệu thiết kế game
 
-**Current Design Version:** V6.1.0
+**Current Design Version:** V6.2.0
 
 **Status:** PRE-IMPLEMENTATION DESIGN  
-**Last Reviewed:** 2026-10-03 (consolidation; bộ luật V6.1.0 giữ nguyên)
+**Last Reviewed:** 2026-10-03 (DESIGN LOCK SYNC; progression/control/authority đã duyệt)
 
 <a id="gdd-0"></a>
 
@@ -16,9 +16,9 @@ User lock và review đã thống nhất được ghi vào GDD hiện hành; Ana
 
 | Phạm vi khóa | Luật |
 | --- | --- |
-| Nhân vật | Cap Lv 20; Tân Lữ nhập môn Lv 1–4; từ Lv 5 được chọn một trong hai class; một nhân vật nam |
+| Nhân vật | Cap Lv 20; Tân Lữ trước chuyển class (kể cả Lv 5+ để làm Q5); từ Lv 5 được chọn một trong hai class; một nhân vật nam |
 | Build | Bốn thuộc tính, 95 điểm ở Lv 20, không branch cap, không Skill Rank |
-| Combat | Active nhập môn → tiến cảnh đánh lan; hai nội tại / class; Băng Hàn chọn Đóng Băng hoặc Làm Chậm theo loại mục tiêu |
+| Combat | Ba skill tích lũy / class ở Lv 5/10/17; hai nội tại / class; Băng Hàn chọn Đóng Băng hoặc Làm Chậm theo loại mục tiêu |
 | Nội dung | 7 loại quái có level cố định trên 6 base rigs; Linh Biến modifier P0, 1 World Boss; 5 farm maps + 3 support zones |
 | RPG | Food hồi phục chính, không tự hồi khi thiếu Food; Death có hậu quả; 6 ô × 3 bậc trang bị; I tối đa +4, II +6, III +8 |
 | Online | Client–Server; Unity Dedicated Game Server quyết định gameplay; PvP 1v1 cược Vàng qua backend escrow; shared loot, Map Chat, MapId P0 |
@@ -55,7 +55,7 @@ Target Lv 20: 2,5–4 h gồm travel / quest / shop / run-back, chưa được p
 
 | Hệ thống | P0 | P1 khi core ổn | P2 |
 | --- | --- | --- | --- |
-| Player / combat | Novice, hai class, bốn attributes / Tẩy Mạch, normal + 2 active + 2 nội tại / class, nhập môn / tiến cảnh qua bí kíp, đánh lan / Bỏng / Băng Hàn | Buff R: Chiến Ý / Ưng Nhãn Cường Hóa (P1); DPS Meter | Cosmetic polish |
+| Player / combat | Novice, hai class, bốn attributes / Tẩy Mạch, 3 active tích lũy + 2 nội tại / class, nhập môn / tiến cảnh qua bí kíp, đánh lan / Bỏng / Băng Hàn | Buff R: Chiến Ý / Ưng Nhãn Cường Hóa (P1); DPS Meter | Cosmetic polish |
 | World | Năm bãi, cụm quái, bảy loại quái / sáu rigs, Linh Biến modifier, Boss basic + ba pattern / Cuồng Mạch | Linh Giáp / Vỡ Thế | Hazard, Boss polish |
 | RPG | 18 dòng trang bị / 6 ô / 3 bậc, phẩm chất, I +4 / II +6 / III +8, shop / đồ rơi / túi / kho, Food / Death, chuyển giao cường hóa | Sắp túi; khóa đồ; Bùa Hồi Thành | Mua lại, mở rộng túi |
 | Story / UI | Q1–Q12 với Q9 nhánh optional; ba Stage Summary; Journey; controls / HUD | Quest arrow, chat history | Extra cosmetics |
@@ -105,12 +105,12 @@ Mob EXP theo §4. Sau onboarding farm là nguồn EXP / Vàng / đá / gear / ma
 | DEF | 5 + 0,6 × (L−1) | VIT +0,10 |
 | ACC | 60 + 4 × (L−1) | AGI +6 |
 | EVA | 20 + 2 × (L−1) | AGI +6 |
-| SkillDamageBonus | 1 | INT +0,35%, chỉ direct skill, không normal / DoT |
+| SkillDamageBonus | 1 | INT +0,35%, chỉ direct skill, không basic Tân Lữ / DoT |
 | MoveSpeedMultiplier | 1 | AGI +0,05%; cộng thêm tốc chạy cố định từ Giày (§6) |
 
 Bốn thuộc tính hiển thị: **Công Lực (STR), Sinh Lực (VIT), Linh Lực (INT), Thân Pháp (AGI)**. STR tăng direct damage; VIT giữ mạng; INT tăng MP và skill damage; AGI accuracy/evasion, mobility phụ. CritChance nền **5% cho mọi class/Tân Lữ + gear**, CritMultiplier 1,5; nội tại không cộng Crit ngầm.
 
-`EvadeChance = 0.02 + 0.43*EVADefender/(EVADefender+2.5*ACCAttacker)`, tiệm cận 45%. All-in không bị khóa progression, không cam kết DPS ngang nhau hoặc đứng chịu ba quái. Chưa cộng điểm tại Lv 5 vẫn làm được Q5 bằng Mộc Kiếm; sau chọn class có normal và active nhập môn. Các mốc: nội tại nền tảng ở 5 → tiến cảnh ở 10 → nội tại tinh thông ở 13 → đại chiêu ở 17. Bảng gear và ATK quái đã đối chiếu lại với HP/MP theo cấp; playable test vẫn quyết định balance.
+`EvadeChance = 0.02 + 0.43*EVADefender/(EVADefender+2.5*ACCAttacker)`, tiệm cận 45%. All-in không bị khóa progression, không cam kết DPS ngang nhau hoặc đứng chịu ba quái. Chưa cộng điểm tại Lv 5 vẫn làm được Q5 bằng Mộc Kiếm; sau chọn class học S1; không còn class Normal Attack. Các mốc: nội tại nền tảng ở 5 → tiến cảnh ở 10 → nội tại tinh thông ở 13 → đại chiêu ở 17. Bảng gear và ATK quái đã đối chiếu lại với HP/MP theo cấp; playable test vẫn quyết định balance.
 
 **Khi MaxHP/MaxMP thay đổi** do gear/cộng hoặc tẩy điểm: giữ HP/MP hiện có rồi clamp không vượt Max mới; không tự hồi theo tỷ lệ, không revive qua equip/reset. Hồi đầy vẫn qua nghỉ/hồi sinh đã quy định.
 
@@ -124,17 +124,17 @@ Tẩy Mạch Phù: 1.200 Vàng tại Tạ Minh, stock vô hạn; hoàn điểm v
 
 # 3. Phái, kỹ năng và chiến đấu
 
-| Class | Normal / interval / range | Identity |
+| Giai đoạn | Combat action | Identity |
 | --- | --- | --- |
-| Tân Lữ | 1,00 × / 1,00 s / cận chiến 1,2 u | Mộc Kiếm, chưa kỹ năng class |
-| Kiếm | 1,00 × / 0,80 s / cận chiến 1,2 u | Áp sát, cung quét / đường kiếm, Bỏng |
-| Cung | 0,95 × / 0,90 s / tầm bắn nền 6,5 u | Tầm xa mặc định, ba tên, Băng Hàn |
+| Tân Lữ, chưa chuyển class | Basic Mộc Kiếm 1,00 × / CD 1,00 s / cận chiến 1,2 u; MP 0 | Onboarding Q3–Q5; giữ được ở Lv 5+ trước Q6 |
+| Kiếm, sau chuyển class | S1 single → thêm S2 arc → thêm S3 line; ba slot tích lũy | Áp sát, Bỏng; không Normal Attack thứ tư |
+| Cung, sau chuyển class | S1 single → thêm S2 spread → thêm S3 primary/explosion | Tầm xa, Băng Hàn; không Normal Attack thứ tư |
 
-Nhịp đòn thường là **BASELINE / TUNABLE**: Tân Lữ chậm rõ để học ra đòn, còn 0,80/0,90 s của Kiếm/Cung cần kiểm cảm giác xen giữa các kỹ năng trên scene thật.
+Class transition bỏ quyền dùng basic Tân Lữ, giữ asset Mộc Kiếm cho onboarding. Chưa học S1 sau chọn class thì học sách/equip theo Q6, không cấp fallback miễn MP. S1 mặc định được chọn sau learn; mở S2/S3 không tự cast hoặc đổi selection. Số power/MP/CD dưới đây là BASELINE / TUNABLE, không retune trong lượt sync.
 
 Hỏa của Kiếm và Băng của Cung là phong vị kỹ năng qua VFX / Bỏng / Băng Hàn; không có hệ khắc nguyên tố hay bảng kháng riêng.
 
-**Hai active + hai nội tại/class.** Active đầu giữ một SkillId qua tiến cảnh; hotkey 1 thay profile sau học sách, không thêm slot/rank/điểm kỹ năng. Active cần level **và** learned manual flag. Nội tại tự học khi đủ **class + level**, kể cả chọn class muộn; có tên, icon, tooltip và mốc khóa/mở trong bảng skill. Không manual/hotkey/point/rank, không persist thêm cờ unlock nội tại.
+**Ba active tích lũy + hai nội tại/class.** Mỗi active có SkillId và cooldown riêng; S2 không thay S1, S3 không xóa S1/S2. Sáu class SkillIds cho hai class, sáu manual definitions, bốn passive IDs; basic Tân Lữ là definition onboarding riêng. Active cần level **và** learned manual flag; không Skill Rank/điểm skill. Nội tại derive đúng class + level, kể cả chọn class muộn; tên/icon/tooltip/khóa-mở, không manual/hotkey/persist thêm cờ.
 
 | Class / mốc | Nội tại và tooltip — BASELINE / TUNABLE | Cách thể hiện |
 | --- | --- | --- |
@@ -150,10 +150,10 @@ Nội tại hiện tên, icon, tooltip, trạng thái khóa/mở trong bảng k�
 | Milestone | Kiếm / Cung | Cách nhận và học |
 | --- | --- | --- |
 | Q6 / Lv 5 | Phong Trảm Kiếm Phổ / Linh Tiễn Cung Pháp | Staged grant sau class choice, trước cast objective; use unlock active nhập môn |
-| Q8 reward | Phong Trảm Tiến Cảnh / Linh Tiễn Tiến Cảnh | Completion reward Lv 8; use cần Lv 10 + đã học nhập môn, thay profile trên cùng active slot |
+| Q8 reward | Phong Trảm Tiến Cảnh / Linh Tiễn Tiến Cảnh | Completion reward Lv 8; use cần Lv 10 + đã học nhập môn, unlock S2 độc lập, giữ S1 |
 | Q11 reward / Lv 17 | Kiếm Khí Chân Quyết / Hàn Tiễn Chân Quyết | Completion reward + Rare weapon; use cần Lv 17 + nhập môn, unlock đại chiêu; không bắt buộc đã học tiến cảnh |
 
-Sáu manual IDs, guaranteed one-time / class-specific, stack 1 / quest-bound, không sell / drop / trade; có thể cất rương cùng character, learn từ bag; consume-on-learn. Chỉ học khi alive / idle, không pending cast; kiểm class / level / prerequisite, rồi atomically consume book + set learned flag theo SkillId / profile; Replay / duplicate learned reject không consume. **Bí kíp không có cooldown**; chống học lặp bằng learned flag và grant / learn receipt. Cooldown dưới đây thuộc kỹ năng được mở. Evolution giữ CD key: deadline mới = max(deadline cũ, lastCast + CD profile mới), không cấp lượt cast miễn phí. Chưa đủ Lv 10 giữ book, tooltip “Cần Lv 10”, không mất sách; không random book farm. Full bag theo reward preflight; Q6 staged pending không lock quest vĩnh viễn. Nội tại Lv 5/Lv 13 tự học theo bảng trên, không manual. NPC không thêm menu học riêng: dùng trong bag. HUD locked nói rõ level / manual / quest; Lv 10 có book chưa học vẫn nhập môn, tiến cảnh feedback ngắn khi use. Manual là power item thật, evidence chính tuyến vẫn virtual.
+Sáu manual IDs, guaranteed one-time / class-specific, stack 1 / quest-bound, không sell / drop / trade; có thể cất rương cùng character, learn từ bag; consume-on-learn. Chỉ học khi alive / idle, không pending cast; kiểm class / level / prerequisite, rồi atomically consume book + set learned flag theo SkillId; Replay / duplicate learned reject không consume. **Bí kíp không có cooldown**; chống học lặp bằng learned flag và grant / learn receipt. Cooldown dưới đây thuộc kỹ năng được mở. Cooldown riêng mỗi SkillId; học skill mới/chuyển slot không reset deadline skill cũ; action đang chạy giữ snapshot. Chưa đủ Lv 10 giữ book, tooltip “Cần Lv 10”, không mất sách; không random book farm. Full bag theo reward preflight; Q6 staged pending không lock quest vĩnh viễn. Nội tại Lv 5/Lv 13 tự học theo bảng trên, không manual. NPC không thêm menu học riêng: dùng trong bag. HUD locked nói rõ level / manual / quest; Lv 10 có book chưa học vẫn nhập môn, tiến cảnh feedback ngắn khi use. Manual là power item thật, evidence chính tuyến vẫn virtual.
 
 ## Bộ kỹ năng — BASELINE / TUNABLE
 
@@ -162,36 +162,52 @@ Sáu manual IDs, guaranteed one-time / class-specific, stack 1 / quest-bound, kh
 | Phong Trảm nhập môn | 5 / Q6 | Melee single 1,7 u | 1,20 × | 1 | 2 / 1,0 s | None |
 | Phong Trảm tiến cảnh | 10 / Q8 | Arc 120°, 1,7 u | 1,35 × / target | 3 | 4 / 1,5 s | Bỏng 4% |
 | Kiếm Khí | 17 / Q11 | Line 5,5 u, width 0,6 u | 2,80 / 2,60 / 2,40 / 2,20 / 2,00 × | 5 | 16 / 7 s | Bỏng 70% |
-| Linh Tiễn nhập môn | 5 / Q6 | Single projectile 6,5 u, 1 arrow | 1,15 × | 1 | 2 / 1,0 s | None |
-| Linh Tiễn tiến cảnh | 10 / Q8 | SnapshotSpread 6,5 u, 3 arrows | 0,90 / 0,80 / 0,70 × / arrow | 3 unique | 4 / 1,7 s | Băng Hàn: 2% Normal / 1% Linh; 2% Boss / PvP |
+| Linh Tiễn nhập môn | 5 / Q6 | Logical single 6,5 u, 1 visual arrow | 1,15 × | 1 | 2 / 1,0 s | None |
+| Linh Tiễn tiến cảnh | 10 / Q8 | Logical Spread 6,5 u, 3 hits | 0,90 / 0,80 / 0,70 × / arrow | 3 unique | 4 / 1,7 s | Băng Hàn: 2% Normal / 1% Linh; 2% Boss / PvP |
 | Hàn Tiễn | 17 / Q11 | Primary 6,5 u + explosion radius 2 u | 2,80 × primary; 1,60 × secondary | 1 + 4 | 16 / 7 s | Băng Hàn: 45% Normal / 30% Linh; 100% Boss / PvP |
 
 Tầm đánh trong skill profiles là tầm thực, không cộng thêm nội tại. Phong Trảm có cùng Bỏng 4% ở mọi level từ Lv 10; Kiếm Khí dùng cùng effect với 70% chance. Nội tại Lv 13 chỉ nhân sát thương trực tiếp khi đúng cự ly.
 
-Target rank deterministic: primary theo cone / aim, rồi distance và stable instanceID. Cung cone ± 25° phía trước, không auto quay sau. Kiếm ưu tiên phía trước; trống thì auto-face target sau ≤ 1,2 u. Không target vẫn cast theo facing / aim, charge MP / CD, không tìm ngoài cone.
+<a id="focus-input"></a>
 
-**Ba tên:** snapshot A / B / C khi ≥ 3 targets, A / B / A khi 2, A / A / A khi 1. Giữ arrow power theo index; không chia lại power. Target đã chết / invalid trước arrow spawn → tên đó bay theo hướng aim snapshot, không chuyển sang target khác; projectile đã bay không homing. Không target → cả ba theo cùng facing / aim, vẫn đúng 3 arrow. Game Server collision có thể hit mob khác đầu tiên trong allowed flight; mỗi arrow tối đa 1 hit. Snapshot không bảo đảm trúng. Status chỉ xét một lần cho mỗi unique target **thực nhận landed hit / cast**, không 3 rolls vào A / A / A. Primary Hàn không nhận explosion lần hai; line theo thứ tự đường đánh.
+## CombatFocus, tap/hold và interaction
+
+CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. ACQUIRE → RETAIN → REACQUIRE: chọn nearest eligible trong search bounds, tie stable entity ID; selection độc lập facing rồi auto-face khi start action. Search/retention khác execution range; reward level-gap không cấm combat/quest.
+
+AUTO giữ target alive/eligible/cùng MapId/life còn đúng và còn relevant trong context; quái hơi gần hơn không cướp focus. Chết/invalid có thể acquire con gần hợp lệ tiếp theo; người chơi chủ động chạy/nhảy sang combat context khác có thể mất relevance. Hysteresis/search/retention/vertical bounds là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa. EXPLICIT do click là pinned: nearest và đổi slot không thay nó; chỉ explicit replacement/clear hoặc lifecycle invalid (death/despawn/generation/map) mới clear. Focus tồn tại không bảo đảm skill đánh tới; ngoài range không âm thầm đổi target để cast.
+
+1/2/3 chọn unlocked S1/S2/S3 và thử execute một lần ngay; J execute selected slot. Tân Lữ dùng J basic cùng pipeline. Locked slot chỉ báo điều kiện, không đổi selection. Slot hợp lệ được chọn cả khi attempt bị reject; chạy action cũ vẫn giữ SkillId/profile snapshot.
+
+Tap không tự đi. Không valid target/victim thì không action/MP/CD/movement. Primary-based cần valid primary; Arc/Line cần victim trong hình dự kiến, không bắt mọi victim là focus. Có focus ngoài range: retain, tap reject; hold J **hoặc** 1/2/3 mới thử bounded horizontal approach bằng run speed, budget theo quãng còn thiếu ngoài range skill; timeout/blocked tolerance TUNABLE. Không auto jump/drop/dash/pathfinding/vượt terrain không đi được. Release/manual move/jump/drop/UI/Esc/death/portal hủy assist ngay; đóng modal cần press mới.
+
+Một latest physical press sở hữu held intent; input mới thay cũ, release không khôi phục hold cũ. RepeatOnHold theo profile: Novice/S1/S2 = true baseline cần kiểm MP; S3 = false. S3 được approach/cast lần đầu, accepted start tiêu press token; giữ qua CD không cast nữa, cần physical press mới. Không auto loot/potion/route/đổi skill. Một latest buffer thử 150 ms ở recovery ngắn; không FIFO hoặc chờ dài qua CD/range/MP reject. Common action lock chặn action mới, đổi selection không reset CD.
+
+Gravity/horizontal momentum tiếp tục khi Novice/S1 cast trên không; airborne permissions S2/S3 còn prototype. Damage thường chỉ HP/flash/text/impact, không Hurt state/hit-stun/knockback/interrupt. Terminal/death → hard CC đúng category → unresolved action; không recovery cancel jump/dash P0.
+
+Loot/interactable candidate là khái niệm nhẹ tách CombatFocus: highlight món gần đủ quyền/range, E nhặt/tương tác ngay, không press đầu chỉ focus rồi press thứ hai. Nhặt xong candidate gần tiếp theo; rời range clear/change. Personal tutorial entitlement/shared ownership vẫn theo §5–6, không auto-loot từ combat hold.
+
+**Ba hit Cung:** snapshot A/B/C, A/B/A hoặc A/A/A tại start; resolve cả ba cùng clock +0,12 s, giữ power theo index. Invalid target làm mất index đó, không chuyển target/chia power. Mỗi logical hit có Evade/Crit roll, status tối đa một application/unique landed target/cast kể cả proc fail cache. Hàn primary hợp lệ tại resolve tạo tâm nổ ở primary position kể cả primary Evade; invalid primary không nổ; secondary roll riêng, primary không nhận explosion lần hai. Line intersections gần→xa quyết falloff, focus không đổi thứ tự. Secondary theo geometry, không PlatformID damage gate.
+
+Projectile player/mob ranged chỉ presentation; authority resolve target/shape tại clock. Không gameplay flight/collision/interception hoặc damage từ visual arrival. Melee và Boss ground telegraph vẫn revalidate vị trí/hurtbox tại hit moment để né. Terrain LoS A không LoS là prototype control, B SolidWall so trước Bow production; full geometry LoS DROP P0, exact A/B chưa production lock.
 
 ## Sát thương, nhịp đòn và trạng thái
 
 ATK/INT skill bonus/ACC/Crit và nội tại nguồn chụp tại cast start; target DEF/EVA và vị trí/hurtbox xét tại hit/impact. Đổi gear/level giữa action không sửa damage của action đã phát.
 
-Normal raw = FinalATK × power; skill raw = FinalATK × power × SkillDamageBonus và bonus nội tại có điều kiện. Trong match PvP, nhân raw theo §8 trước DEF/Crit/random; PvE không dùng hệ số đó. Game Server validate → Evade → Crit → DEF / random → HP: `Damage=max(1,round(Raw*100/(100+TargetDEF)*Random(0.95,1.05)*CritMultiplier))`; miss 0 / NÉ. `round(x)=floor(x+0.5)` cho x ≥ 0. ActualHpLost = min(calculatedDamage, remainingHP) vào threat / contribution, không overkill.
+Basic Tân Lữ raw = FinalATK × power; skill raw = FinalATK × power × SkillDamageBonus và bonus nội tại có điều kiện. Trong match PvP, nhân raw theo §8 trước DEF/Crit/random; PvE không dùng hệ số đó. Game Server validate → Evade → Crit → DEF / random → HP: `Damage=max(1,round(Raw*100/(100+TargetDEF)*Random(0.95,1.05)*CritMultiplier))`; miss 0 / NÉ. `round(x)=floor(x+0.5)` cho x ≥ 0. ActualHpLost = min(calculatedDamage, remainingHP) vào threat / contribution, không overkill.
 
-Một action lock chung; CD / MP commit tại cast start, normal cũng có CD riêng. Các mốc tính từ cast start — BASELINE / TUNABLE:
+Một action lock chung; CD / MP commit tại cast start, basic Tân Lữ cũng có CD riêng. Các mốc tính từ cast start — BASELINE / TUNABLE:
 
-| Action | Hit / projectile spawn | Action lock |
+| Action | Logical resolve | Action lock |
 | --- | --- | --- |
-| Normal | +0,10 s | 0,26 s |
+| Basic Tân Lữ | +0,10 s | 0,26 s |
 | Nhập môn single (hai class) | +0,12 s | 0,30 s |
 | Phong Trảm tiến cảnh | +0,14 s | 0,30 s |
-| Linh Tiễn tiến cảnh | Ba tên: +0,12 / +0,15 / +0,18 s | 0,34 s |
+| Linh Tiễn tiến cảnh | Ba logical hits cùng +0,12 s | 0,34 s |
 | Kiếm Khí | +0,16 s | 0,40 s |
-| Hàn Tiễn | Spawn +0,18 s | 0,40 s |
+| Hàn Tiễn | +0,18 s | 0,40 s |
 
-Executor/spawn/range/collision của skill Cung giữ theo bảng hiện hành; tốc độ flight player projectile chưa có số, normal Cung còn cần hoàn thiện executor/speed ở [A05](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions) trước triển khai branch. Ghi fixture rõ, không tự chọn hitscan hoặc đổi semantics để đồng bộ VFX.
-
-Projectile damage tại Game Server impact. Death / portal / invalid generation hủy pending hit / spawn, không hoàn cost; projectile đã spawn tiếp tục trong MapId gốc tới hit / expiry, không chuyển theo caster. AnimationEvent chỉ visual. ART-01 tune timings, chạy lại model khi đổi.
+Source stats/passive capability và action origin chụp tại start, target DEF/EVA/position kiểm tại resolve. Caster di chuyển sau start không dời origin/kéo range. Death/portal/hard CC đúng category hủy unresolved action, không refund cost; đã resolve không bị visual sửa. AnimationEvent cosmetic, không schedule damage. ART-01 kiểm visual timing; các mô hình rotation cũ cần chạy lại theo [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md#design-lock-rationale).
 
 **Status application:** Bỏng và Băng Hàn mỗi loại có tối đa một roll theo `(actionId,actualTargetId,effectId)` tại landed hit đầu tiên; cache cả fail, không reroll trên A/A/A. **Băng Hàn là một application**, chọn kết quả theo loại target trước roll; không roll Làm Chậm và Đóng Băng độc lập.
 
@@ -203,9 +219,9 @@ Projectile damage tại Game Server impact. Death / portal / invalid generation 
 | Băng Hàn / Boss | Chỉ **Làm Chậm 3 s**: tốc chạy khi đổi vị trí ×0,85; **đồng hồ chờ action kế tiếp chạy ở 75% tốc độ**. Linh Tiễn 2%, Hàn Tiễn 100%. Không Đóng Băng. |
 | Băng Hàn / người chơi PvP | Chỉ **Làm Chậm 1,5 s**: MoveSpeed ×0,75. Linh Tiễn 2%, Hàn Tiễn 100%; không ảnh hưởng tốc đánh, hồi chiêu, animation hoặc action đang cast. Không Đóng Băng. |
 
-Đang Đóng Băng không roll/apply Băng Hàn; tan băng được miễn Đóng Băng **3 s trên cùng target**, N Cung cùng dùng một deadline, không chain-freeze. Đóng Băng khóa di chuyển/AI đánh và hủy windup/hit/spawn chưa giải quyết; projectile đã bay vẫn sống, target không nhận thêm damage. Boss/người chơi không Đóng Băng. Làm Chậm chỉ refresh deadline về `now + duration`, không stack magnitude. Boss còn 1,5 s chờ action thì debuff **không reset về full CD**: chỉ giảm tốc đếm phần thời gian còn lại; hết debuff đếm lại 100%. Action/telegraph/projectile **đã bắt đầu** giữ nguyên mốc và tốc độ. Cuồng Mạch đổi future base cadence, Băng Hàn chỉ tác động đồng hồ chờ sau khi đã chọn cadence đó; nhiều Cung không nhân nhiều lớp slow. Một target chỉ dùng đúng effect của category.
+Đang Đóng Băng không roll/apply Băng Hàn; tan băng được miễn Đóng Băng **3 s trên cùng target**, N Cung cùng dùng một deadline, không chain-freeze. Đóng Băng khóa di chuyển/AI đánh và hủy windup/hit/spawn chưa giải quyết; visual đã phát không sinh hit sau cancel, target không nhận thêm damage. Boss/người chơi không Đóng Băng. Làm Chậm chỉ refresh deadline về `now + duration`, không stack magnitude. Boss còn 1,5 s chờ action thì debuff **không reset về full CD**: chỉ giảm tốc đếm phần thời gian còn lại; hết debuff đếm lại 100%. Action/telegraph/projectile **đã bắt đầu** giữ nguyên mốc và tốc độ. Cuồng Mạch đổi future base cadence, Băng Hàn chỉ tác động đồng hồ chờ sau khi đã chọn cadence đó; nhiều Cung không nhân nhiều lớp slow. Một target chỉ dùng đúng effect của category.
 
-Nhiều Kiếm cùng đánh chỉ refresh một Bỏng trên target: tick đầu không bị đẩy lùi mãi, source/ATK snapshot/expiry thay khi proc, tick đúng expiry trước remove. Đòn trực tiếp của Kiếm Thế chỉ nhận +12% nếu đúng khoảng cách từ action origin; Xạ Tâm dùng projectile origin và vị trí actual target tại impact. Hai nội tại tinh thông không đổi status chance/magnitude. DoT credit source thực; source chết không xóa Bỏng đã áp. Eligibility tại death theo §6; không active Buff P0.
+Nhiều Kiếm cùng đánh chỉ refresh một Bỏng trên target: tick đầu không bị đẩy lùi mãi, source/ATK snapshot/expiry thay khi proc, tick đúng expiry trước remove. Đòn trực tiếp của Kiếm Thế chỉ nhận +12% nếu đúng khoảng cách từ action origin; Xạ Tâm dùng immutable action origin và actual target position tại logical resolve. Hai nội tại tinh thông không đổi status chance/magnitude. DoT credit source thực; source chết không xóa Bỏng đã áp. Eligibility tại death theo §6; không active Buff P0.
 
 Player–Monster không contact damage / body blocking; Monster–Monster không shoving. Chỉ light separation steering nếu cần readability, không formation runtime hoặc extra stun / knockback. Melee originY + 0,8 u, vertical hitbox PHY-01.
 
@@ -294,7 +310,7 @@ Level là nhận diện nội dung; không tạo thêm variant chỉ để mỗi
 | HT4 | Cổ Môn Vệ Binh | 20 | 3 |
 | HT5 | Cổ Môn Vệ Binh | 20 | 3 |
 
-Safe Entrance 6–8 u → pockets → alternate path / vertical route → landmark → exit; không maze / moving platform / hazard P0. Aggro 5 u / leash 8 u, tâm cụm khoảng 18–20 u hoặc terrain tách tương đương. Trong pocket author sparse / line / split phù hợp shape; không áp spacing 0,8–1,5 u cho mọi cụm. Melee Sói tự converge khi chase; Ong giữ hover band reachable bằng Kiếm, không blob cố định. Hit alert chỉ đánh thức cụm, không truyền sang cụm khác; attack offset 0–0,35 s. Vượt leash Return tạm immune, về spawn full HP.
+Safe Entrance 6–8 u → pockets → alternate path / vertical route → landmark → exit; không maze / moving platform / hazard P0. Aggro 5 u / leash 8 u, tâm cụm khoảng 18–20 u hoặc terrain tách tương đương. Trong pocket author sparse / line / split phù hợp shape; không áp spacing 0,8–1,5 u cho mọi cụm. Melee Sói tự converge khi chase; Ong giữ hover band reachable bằng Kiếm, không blob cố định. Hit alert chỉ đánh thức cụm, không truyền sang cụm khác; attack offset 0–0,35 s. Vượt leash kết thúc encounter; nguyên tắc không free-farm melee unreachable đã khóa. Exact grace/Return/regen/reset/untargetable/immunity là PROTOTYPE, không miễn sát thương tức thì chỉ vì một cú nhảy. Xét reachable threat khác trước; reset không loot/reroll/respawn life mới.
 
 Farm theo bãi gần level trong khoảng thưởng §6; mob cao hơn có reward nếu trong khoảng nhưng không đảm bảo an toàn. Mob identity/level quyết định gear band; map quyết định material/flavor. **[Farm Matrix Lv 1–20](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression)** giữ derived HP / EXP / Gold, không copy stats table vào GDD. Measure solo / 2 / 3 / 4 players, wait / crowd / CPU / network và run-back trước capacity claim; low-level pockets ít slot có thể cần rotate, không thêm Party / Channel.
 
@@ -304,18 +320,18 @@ Farm theo bãi gần level trong khoảng thưởng §6; mob cao hơn có reward
 | --- | --- | ---: | --- | ---: | --- |
 | Nấm Linh | Melee only | 1,2 | 0,8 / — | 1,8 s | — |
 | Sói Sương / Sói Trúc Ảnh | Melee only; chase nhanh | 2,4 | 1,0 / — | 1,3 s | — |
-| Ong Giáp | Ranged / Flying | 2,0 | — / 5 | 1,6 s | Generic, speed 5,5 u / s |
-| Đoạt Mạch Đạo Tặc | Hybrid | 2,2 | 1,2 / 5 | 1,5 s | Generic, speed 5 u / s |
-| Xích Thạch Linh | Hybrid | 1,4 | 1,1 / 4,5 | 2,0 s | Generic, speed 4 u / s |
-| Cổ Môn Vệ Binh | Hybrid | 1,8 | 1,4 / 6 | 1,6 s | Generic, speed 6 u / s |
+| Ong Giáp | Ranged / Flying | 2,0 | — / 5 | 1,6 s | Visual generic, speed 5,5 u / s |
+| Đoạt Mạch Đạo Tặc | Hybrid | 2,2 | 1,2 / 5 | 1,5 s | Visual generic, speed 5 u / s |
+| Xích Thạch Linh | Hybrid | 1,4 | 1,1 / 4,5 | 2,0 s | Visual generic, speed 4 u / s |
+| Cổ Môn Vệ Binh | Hybrid | 1,8 | 1,4 / 6 | 1,6 s | Visual generic, speed 6 u / s |
 
-Hybrid reachable → Chase / Melee; ranged khi platform không reach / vertical / chase blocked-timeout, không chỉ vì distance>melee. Ong FlyingBox ~6 × 3 u là phạm vi roam, không hover height cố định. Ong phải approach vào vertical melee band khi engage, không treo mãi ngoài tầm Kiếm; hover / approach timings PHY-01 / ART-01. Một Linh Đạn generic đổi scale / tint / speed / trail; không projectile / animation riêng từng loài.
+Roster giữ ba Hybrid tới content approval sau prototype 3/1/0; candidate một đại diện Cổ Vệ chưa là replacement. Hybrid reachable → Chase / Melee; ranged khi platform không reach / vertical / chase blocked-timeout, không chỉ vì distance>melee. Ong FlyingBox ~6 × 3 u là phạm vi roam, không hover height cố định. Ong phải approach vào vertical melee band khi engage, không treo mãi ngoài tầm Kiếm; hover / approach timings PHY-01 / ART-01. Một Linh Đạn generic đổi scale / tint / speed / trail; không projectile / animation riêng từng loài.
 
 Stat normal tại level L (`round(x) = floor(x + 0.5)` cho x ≥ 0, kể cả EXP / final Damage): `HP = round(40 + 1.04*L*L*L)` khi L ≤ 5; L>5 đặt `x = L - 5`, `HP = round(170 + 50*x + 2.1*x*x)`; `DEF = round(2 + 0.8*L)`; `ATK = round(6 + 1.5*L + 0.06*L*L)`; `ACC = 60 + 4*L`; `EVA = 20 + 2*L`; `NormalEXP = round(10 + 2.5*L + 0.12*L*L)`; `GoldMin = 3 + 2*L`; `GoldMax = 6 + 3*L` (integer uniform inclusive). ATK mid/late tăng để bù một phần HP player tăng theo cấp; HP mob giữ theo TTK probe. Một curve chung, chỉ evaluate ở bảy identity-levels đã author; hp / atk multipliers mặc định 1.0, chỉ tune có evidence sau playtest. Normal / variant slot respawn **25 s BASELINE / TUNABLE**, test 20 / 25 / 30 s, tính từ death; không timer variant riêng. Mục tiêu vòng bãi: clear A → nhặt → B / C / D → quay lại, không đứng nguyên một pocket đợi respawn.
 
 TTK target cùng level + Common + 0: early 2–4 s, mid 3–6 s, late 4–8 s TEST, không guarantee mọi build. Đánh Thạch Lv 16 khi player15 trước đại chiêu còn là probe chậm; giữ HP curve, không tăng mọi HP chỉ để kéo giờ chơi. Normal solo / 2–4-target / Q8 Linh và gear-lag probes ở Analysis.
 
-**Mob attack contract:** đi qua aggro radius vẫn bị acquire / chase, body overlap không gây damage. Melee: Acquire → Chase → attack range → Face → Windup / lock facing → HitMoment / front hitbox → Recovery. Target chạy xuyên ra sau / nhảy ra khỏi vertical range / rời hitbox trước HitMoment thì MISS; không guaranteed damage vì animation đã start, không quay 180° giữa swing. Ranged / Hybrid: Acquire → Aim / Windup → projectileSpawnMoment → Game Server projectile → collision → damage; AnimationEvent chỉ visual. Mob normal attack power 1.0, CritChance 0 P0; formula Damage chung, exact hitbox / windup tại PHY-01 / ART-01.
+**Mob attack contract:** đi qua aggro radius vẫn bị acquire / chase, body overlap không gây damage. Melee: Acquire → Chase → attack range → Face → Windup / lock facing → HitMoment / front hitbox → Recovery. Target chạy xuyên ra sau / nhảy ra khỏi vertical range / rời hitbox trước HitMoment thì MISS; không guaranteed damage vì animation đã start, không quay 180° giữa swing. Ranged / Hybrid: Acquire → Aim / Windup → resolveMoment → authority logical target resolve → result → visual projectile; AnimationEvent chỉ visual. Mob normal attack power 1.0, CritChance 0 P0; formula Damage chung, exact hitbox / windup tại PHY-01 / ART-01.
 
 **Mob / Linh Biến threat:** một `Threat[playerId]` và `Contribution[playerId]` riêng mỗi mob. Initial acquire nearest valid player hoặc attacker đầu tiên; direct / DoT cộng ActualHpLost (cap overkill, dedup), không raw damage. Sticky target: challenger có threat>0 và ≥ 1,25 × current mới đổi; current invalid / dead / disconnect / khác MapId / out-of-leash thì chọn highest valid threat, tie playerId; nếu không có threat chọn nearest valid trong aggro. Báo động cụm chỉ wake, từng mob tự acquire / resolve. Return về spawn full HP, clear threat / contribution / status, hủy pending action; không giữ damage từ lượt kéo trước. Linh Biến dùng cùng resolver, không nearest-only sau acquire.
 
@@ -534,7 +550,7 @@ Boss Thỏi chỉ thành currency khi nhặt + bán NPC, không auto-credit / kh
 | `abs(PlayerLevel−MobLevel) ≤ 3` | 1,00 | Đủ điều kiện thưởng; roll profile thường, Journey khi đủ participation |
 | `abs(PlayerLevel−MobLevel) ≥ 4` | 0 | EXP / Gold / regular loot / Journey kill = 0 |
 
-Áp riêng từng recipient, snapshot trước level-up, đối xứng cả player quá cao lẫn quá thấp; không có tầng nửa thưởng hay gate RNG theo level. Lv 20 EXP luôn0, Gold/loot/Journey vẫn hợp lệ. Quest/supply/evidence xét riêng §5, vẫn làm quest muộn. Nameplate hai trạng thái theo người xem: bình thường “Đủ điều kiện nhận thưởng”, xám “Chênh lệch quá 3 cấp — không có thưởng farm”; level và marker quest vẫn hiện.
+Áp riêng từng recipient, snapshot trước level-up, đối xứng cả player quá cao lẫn quá thấp; không có tầng nửa thưởng hay gate RNG theo level. Lv 20 EXP luôn0, Gold/loot/Journey vẫn hợp lệ. Quest/supply/evidence xét riêng §5, vẫn làm quest muộn. Reward eligibility hiển thị tooltip/reject feedback khi cần, không spam trên mọi nameplate; level/quest/Linh/Boss cues giữ vai trò riêng.
 
 **Physical loot Normal / Linh Biến:** roll một shared set / death, không personal sets. TopDamage là highest ActualHpLost trên entire life ledger, tie characterId; nếu TopDamage factor = 0 thì **không roll regular physical set**, không fallback người thứ hai. TopDamage đủ điều kiện thì roll profile bình thường nguyên quantity; không gate RNG theo level. TopDamage absent / dead không chuyển priority; owner window có thể không ai nhặt, deadline vẫn chạy. Quest tutorial supply tách khỏi regular set.
 
@@ -640,23 +656,25 @@ Sau kết quả, người còn phiên trở về Vân Khê với HP/MP trước 
 
 Luồng màn hình P0: Boot/Main Menu → Login tài khoản được cấp → chọn nhân vật → overlay kết nối → map/điểm khôi phục hợp lệ. Nhân vật mới bắt đầu ở Vân Khê. Không có Register cho player; không cần Loading Scene riêng.
 
-Một mapping, không secondary. S + Space ưu tiên drop-through. Text input chặn gameplay; Esc cancel / đóng cửa sổ.
+Một Move action: A/← và D/→ là alternate bindings, không cộng đôi tốc độ; không full remapping P0. S + Space ưu tiên drop-through. Text input chặn gameplay; Esc cancel / đóng cửa sổ.
 
 | Phím | Action | Phím | Action |
 | --- | --- | --- | --- |
-| A / D | Move trái / phải | H | Quick HP Potion |
+| A / ←, D / → | Move trái / phải | H | Quick HP Potion |
 | Space | Jump | M | Quick MP Potion |
 | S + Space | Drop-through | F | Food |
-| J | Normal Attack | E | Interact / Pickup |
-| 1 | Nhập môn / tiến cảnh | I | Inventory |
-| 2 | Đại chiêu | C | Character |
-| 3 | Reserve, không dùng P0 | Q | Quest |
+| J | Execute selected skill; Tân Lữ basic | E | Interact / Pickup |
+| 1 | Select S1 + execute attempt ngay | I | Inventory |
+| 2 | Select S2 + execute attempt ngay | C | Character |
+| 3 | Select S3 + execute attempt ngay | Q | Quest |
 | R | Buff P1 | Enter | Chat |
 | Esc | Cancel | — | — |
 
-Phím H/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Phím F dùng Food bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. E tương tác NPC/nhặt đồ theo mục tiêu.
+Phím H/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Phím F dùng Food bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. E tác động ngay candidate NPC/loot riêng, không thay CombatFocus.
 
-HUD: HP / MP / EXP / level, skill CD, Food / Potion, quest, Boss timer. Trong PvP hiện cược/pot, đồng hồ 120 s và số lần dùng HP/MP Potion còn lại (ban đầu 3/3). Bảng skill hiện hai active (nhập môn/tiến cảnh chung slot) và hai nội tại/class: icon, tooltip, level/điều kiện khóa, auto-open Lv 5/Lv 13; không thêm hotkey nội tại. Bag-full rõ; tooltip enhance trước / sau. Portal / signpost tên vùng / hướng; quest arrow P1.
+Target HUD tối giản: world marker + mini HP; screen name/level/current-max HP/bar, bind đúng focus ID/generation; không portrait/element/rarity/generic buff panel.
+
+HUD: HP / MP / EXP / level, skill CD, Food / Potion, quest, Boss timer. Trong PvP hiện cược/pot, đồng hồ 120 s và số lần dùng HP/MP Potion còn lại (ban đầu 3/3). Bảng skill hiện ba active tích lũy, selected/locked/CD/MP riêng và hai nội tại/class: icon, tooltip, level/điều kiện khóa, auto-open Lv 5/Lv 13; không thêm hotkey nội tại. Bag-full rõ; tooltip enhance trước / sau. Portal / signpost tên vùng / hướng; quest arrow P1.
 
 | Tracker state | Người chơi thấy |
 | --- | --- |
@@ -691,11 +709,11 @@ Một male modular rig, không female MVP: **64 × 64 px / PPU 32**, body **44�
 
 **26 frames**, parts đồng bộ index / pivot. Ý nghĩa giới hạn tổng hình raster hay ô/profile đang **OPEN A01**; chưa duyệt thay user-lock bằng 33 pose. [Art §1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#player-visual) phân biệt ô timeline/hình reuse/pose class; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions) giữ trạng thái quyết định. Ba visual families trùng ba gear bands: Thanh Mộc / Vân Nham / Huyền Ấn. Weapon / Armor / Pants modular; Boots / Ring / Necklace icon / stat only. Cùng family reuse silhouette / frame nhưng khác tier có palette / tint hoặc accent rẻ: Thanh Mộc vải / lục; Vân Nham đá / đồng; Huyền Ấn cổ văn. Không tự thêm animation set khi A01/A02 chưa được duyệt; gear vẫn dùng male rig chung, khả năng thêm pose/profile class phải giải quyết OPEN trước. Head / Hair là base visual, không Helmet slot.
 
-Art P0: male rig, ba families, Sword / Bow visuals, sáu normal sprite sets + một palette Sói Trúc Ảnh (bảy identities), không sprite set riêng Linh Biến, một Boss, ba environment families, UI kit, bốn active VFX presets, nhập môn / evolution reuse cùng class motif, Linh Đạn generic, aura Linh Biến, heal / upgrade / death feedback. Forest dùng Đồng Sương / Trúc Ảnh; Mountain dùng Bạch Vân / Xích Nham; Ancient dùng Huyền Tích; hub tái dùng architectural props phù hợp.
+Art P0: male rig, ba families, Sword / Bow visuals, sáu normal sprite sets + một palette Sói Trúc Ảnh (bảy identities), không sprite set riêng Linh Biến, một Boss, ba environment families, UI kit, sáu skill bindings, reuse motif/preset hình theo class; số unique VFX còn cần kiểm, Linh Đạn generic, aura Linh Biến, heal / upgrade / death feedback. Forest dùng Đồng Sương / Trúc Ảnh; Mountain dùng Bạch Vân / Xích Nham; Ancient dùng Huyền Tích; hub tái dùng architectural props phù hợp.
 
 **Yêu cầu hình ảnh người chơi thấy:** default outfit khi chưa mặc/unequip; Mộc Kiếm và sáu vũ khí phái phải nhận diện đúng món; Weapon/Armor/Pants thay hình theo band, phụ kiện stat-only như §6. Cue mặt đứng/one-way/prop, trạng thái Bỏng/Đóng Băng/Làm Chậm và hình đòn không được gây hiểu nhầm về hit/CC/loot. Pose/hybrid/socket, import/layer và số ảnh sản xuất do [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-integration) sở hữu; cách tích hợp runtime/physics do [Technical §8](2_HUYEN_LO_TECHNICAL.md#art-contract) sở hữu. Pipeline cũ đã chuyển nguyên sang [Art §22.1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#legacy-visual-flow).
 
-Flash / damage / heal / NÉ, local hit-stop, trail, loot beam và sound; không hard CC mới. Layer / import tại Technical.
+Flash / damage / heal / NÉ, trail, loot beam và sound; không hard CC mới. Layer / import tại Technical.
 
 | Trạng thái nhìn thấy | Cách đọc trên cùng rig / VFX pool |
 | --- | --- |
@@ -723,7 +741,7 @@ Production accounting thuộc [Art §23](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYS
 | Nhóm | Tiêu chuẩn |
 | --- | --- |
 | Player | Movement / jump / drop-through; Lv 1–20; reset 20 điểm Lv 5; hai class; 95 điểm Lv 20; Tẩy Mạch không mất dữ liệu |
-| Combat | Normal đúng interval; hai active + hai nội tại / class Lv 5 / Lv 13, manual / evolution Lv 5 / 10 / 17; shape / maxTargets / falloff; snapshot / pierce / explosion không double-hit; Evade / Crit; Bỏng / Băng Hàn đúng target branch, post-thaw protection target-wide |
+| Combat | Basic Tân Lữ trước class; ba active tích lũy + hai nội tại / class, manual Lv 5 / 10 / 17, CD riêng/common lock/J-selected/slot-select+execute; shape / maxTargets / falloff; snapshot / pierce / explosion không double-hit; Evade / Crit; Bỏng / Băng Hàn đúng target branch, post-thaw protection target-wide |
 | World | Năm farm maps, ba support zones; SpawnGroup / return / respawn; đúng bảy fixed-level identities / sáu rigs, Linh Biến max 1 / MapId và Q8 deterministic, một Boss với telegraph / target / reset / Cuồng Mạch |
 | Story | Q1–Q12 có setup / objectives / turn-in; thiếu level không auto-chain; READY_TO_TURN_IN không auto trả; Q9 không chặn Q10; Q11 complete mới mở vùng; Q12 per character / Main Story Complete; vòng chơi tiếp tục |
 | RPG / art | Food / Potion / Death; túi / kho / shop; 6 ô / 18 dòng / 21 mẫu thường / phẩm chất / giới hạn I+4, II+6, III+8 / chuyển giao cùng bậc hoặc lên bậc kế; modular 64 × 64 / PPU 32 / 26 frames |
