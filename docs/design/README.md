@@ -12,11 +12,11 @@
 
 GDD = WHAT/gameplay authority; Technical = HOW/implementation; Analysis = WHY/evidence/quyết định; Art = detail ART/VISUAL/PRODUCTION; Roadmap = WHEN/CURRENT/DEFERRED.
 
-TARGET P0 giữ Kiếm + Cung và Dedicated + Spring/PostgreSQL online. CURRENT ROADMAP BASELINE là VS-1 local Kiếm Q1–Q6 ở Vân Khê/Học Viện/Đồng Sương; Cung/online đầy đủ DEFER theo [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#target-current-deferred), không bị bỏ hoặc đổi thành P1. Gate Dedicated + hai clients diễn ra trước production rộng; local pass không thay final acceptance.
+TARGET P0 giữ Kiếm + Cung và Dedicated + Spring/PostgreSQL online. CURRENT là harvest disposable/reference VS-1, docs/feel/art/UI probe và review production base; local slice revision mới vẫn Kiếm Q1–Q6 ở Vân Khê/Học Viện/Đồng Sương; Cung/online đầy đủ DEFER theo [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#target-current-deferred), không bị bỏ hoặc đổi thành P1. Gate Dedicated + hai clients diễn ra trước production rộng; local pass không thay final acceptance.
 
 Nếu Analysis / Technical mâu thuẫn GDD, GDD thắng. Deterministic defect đã xác minh phải sửa đồng bộ; proposal không tự đổi luật.
 
-DESIGN LOCK V6.2.0 đã sync: ba skill tích lũy/class, J-selected + 1/2/3 select+execute, logical ranged và focus/interaction riêng. Chi tiết luật ở GDD, contract ở Technical, rationale/gates ở Analysis; review artifact tạm được dọn sau audit. User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
+Feedback V6.2.1 đã sync: ba skill tích lũy/class, 1–3 one-press bounded approach/cast, logical ranged và focus/interaction riêng; luật chi tiết ở owner. Prototype cũ không production codebase hoặc evidence pass cho revision mới; harvest/probe → production base → G-L mới → G-N sớm theo Roadmap. Chi tiết luật ở GDD, contract ở Technical, rationale/gates ở Analysis; review artifact tạm được dọn sau audit. User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
 
 ## Quick Routing
 

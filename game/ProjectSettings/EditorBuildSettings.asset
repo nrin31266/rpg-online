@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/HuyenLo/Scenes/VS1.unity
+    path: Assets/_Prototype/VS1_EndToEnd/Scenes/VS1.unity
     guid: 5ad67a70938bb48b2819b55512b6d8e7
   m_configObjects: {}

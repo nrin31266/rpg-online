@@ -1,54 +1,53 @@
-# Huyền Lộ — VS-1 local
+# Huyền Lộ — prototype tham khảo, chưa có production codebase
 
-Unity project thực, tạo bằng Editor **6000.5.9f1** đang cài. Mở thư mục `game/` bằng Unity Hub, mở [VS1.unity](Assets/HuyenLo/Scenes/VS1.unity) rồi Play. Bản Linux được build tại `Builds/Linux/HuyenLo.x86_64` (output không đưa vào Git).
+**DESIGN + PROTOTYPE VALIDATION.** VS-1 này là **disposable/reference integration prototype V6.2.0**, checkpoint `46006c4`. Nó phục vụ harvest findings, không là production architecture và không phải base để gắn network. **Production codebase chưa bắt đầu.** Folder/class/asmdef names prototype không là authority; contract hiện hành thuộc [GDD V6.2.1](../docs/design/1_HUYEN_LO_GDD.md), [Technical](../docs/design/2_HUYEN_LO_TECHNICAL.md) và [Roadmap gates](../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates).
 
-Scope hiện có là **Q1–Q6, Tân Lữ → Kiếm, Vân Khê / Học Viện / Đồng Sương**. Phiên local giữ trạng thái trong RAM; đóng game mất tiến trình. Quyết định gameplay thuộc [GDD](../docs/design/1_HUYEN_LO_GDD.md), contract thuộc [Technical](../docs/design/2_HUYEN_LO_TECHNICAL.md), gate thuộc [Roadmap](../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#vs-1).
+```text
+Assets/_Prototype/VS1_EndToEnd/   domain/runtime/editor/tests/scenes/resources cũ
+PrototypeEvidence/VS1_EndToEnd/  build/test/route evidence V6.2.0 + audit feedback riêng
+```
 
-| Phím | Thao tác |
-| --- | --- |
-| A hoặc ← / D hoặc → | Đi trái / phải; hai binding không cộng đôi tốc độ |
-| Space / S + Space | Nhảy / xuống sàn one-way |
-| E | Tương tác ngay NPC/portal/đồ gần; loot không thay CombatFocus |
-| J | Mộc Kiếm khi còn Tân Lữ; sau chọn Kiếm dùng slot đã chọn |
-| 1 | Chọn S1 + thử cast ngay; giữ để lặp/tiếp cận ngang có giới hạn |
-| 2 / 3 | Feedback khóa trong VS-1; không mở content Lv10/Lv17 |
-| Click quái / Esc | Focus EXPLICIT / đóng modal, clear focus và held intent |
-| F / H / M | Food / Bình Máu / Bình Linh Lực |
-| B / C / K / L | Túi/trang bị / cộng điểm / bảng skill / quest |
+Đã move cùng `.meta`, giữ GUID và sửa scene/build/font paths; production folder `Assets/HuyenLo/` chưa tồn tại. Unity project thực 6000.5.9f1 vẫn mở được qua Hub tại `game/`; scene [VS1.unity](Assets/_Prototype/VS1_EndToEnd/Scenes/VS1.unity). Session trong RAM, đóng game mất tiến trình. Source NSO/research chỉ reference, không gameplay authority.
 
-Nhận và trả quest bằng nút tại đúng NPC. Q3 mở túi để mặc Mộc Kiếm, dùng ba life Bù Nhìn với respawn thật. Q4 mua đủ ba supply, dùng F rồi đi Đồng Sương. Q5 nhặt hai supply bằng E, mặc Áo, bán sample tại Bách Luyện. Q6 nhận tại Tạ Minh ở làng, chọn Kiếm tại ClassHall ở Học Viện, mặc Kiếm/cộng điểm/học sách, dùng S1 ở DummyYard rồi M và về trả Tạ Minh. Mộc An cho nghỉ/rương; hồi sinh miễn phí về làng hoặc tiêu phù tại chỗ. Trúc Ảnh chỉ mở trong quest state, portal báo ngoài phạm vi build.
+## Prototype cũ khác contract mới
 
-Code chính:
+| Hạng mục | Behavior có trong prototype V6.2.0 | Docs V6.2.1 cho probe/base tiếp theo |
+| --- | --- | --- |
+| Combat | J-selected, slot select+cast, hold repeat/approach | Không J/RepeatOnHold; 1–3 one-press bounded approach/cast, release giữ pending, manual/UI/Esc/focus/map cancel |
+| Onboarding | Q3→Lv4, Q4 Sói→Lv5, Q5 Nấm/loot | Q3 Lv3, Q4 Nấm/loot/equip/sell→Lv4, Q5 Food/Bình Máu + Sói→Lv5 |
+| Di chuyển map | E ở portal anchors | EdgeExit auto ở mép có arrow/tên đích; SpecialGate riêng |
+| Jump/drop | Space, S+Space | Space/↑ Jump; S/↓ Drop trên one-way, có Movement Feel prototype gate |
+| Panels | B/C/K/L | I Inventory, C Character + skill tab, Q Quest là default để kiểm usability |
+| Art/AI/UI | Primitive/text UI, melee dễ pile, jump basic | Art/rig + movement + separation/reposition + manual usability probe trước base |
 
-- [SliceRules.cs](Assets/HuyenLo/Domain/SliceRules.cs): definitions CURRENT, stat/equip/EXP/inventory arithmetic và các profile fixture.
-- [CombatController.cs](Assets/HuyenLo/Domain/CombatController.cs): pipeline J/slot chung, AUTO/EXPLICIT focus, press token/buffer, bounded assist, snapshot và logical resolve. Assembly domain không reference Unity.
-- [SliceSession.cs](Assets/HuyenLo/Domain/SliceSession.cs): local authority, mobs/clock/lifetimes, inventory/shop/claim/receipts, staged quest/retry, Food/Bình/death. UI gọi command, không sở hữu mutation.
-- [SliceHost.cs](Assets/HuyenLo/Runtime/SliceHost.cs): Input System, Rigidbody2D player/world collision, per-actor drop-through, camera/maps và presentation.
-- [SliceHud.cs](Assets/HuyenLo/Runtime/SliceHud.cs): HUD/modal và dispatch command. Target name/level/HP cùng ID/generation; AnimationEvent/VFX không có API gây hit.
-- [SliceBuild.cs](Assets/HuyenLo/Editor/SliceBuild.cs): tạo scene qua Editor API và build Linux; menu `Huyền Lộ`.
+**Vòng này ưu tiên sửa docs và phân loại prototype; chưa rewrite gameplay prototype thành revision mới.** Không dùng old tests/video PASS để ký G-L mới. Muốn thử V6.2.1 phải implement probe theo docs rồi ghi evidence revision riêng. Reuse domain code chỉ sau review/test contract; không mặc định copy nguyên mono-flow/local receipts/asmdefs vào production.
 
-Các điểm **probe**, chưa thành luật production: layout/toạ độ blockout, speed 5 u/s/jump velocity 12/gravity scale 2, Dummy DEF/EVA=0, vertical combat bound, input buffer 150 ms, grace unreachable 2 s → Return untargetable + reset tại home. Giữ roster hybrid/LoS/art decisions mở ở canonical docs; VS-1 chưa có các loài hybrid hoặc Cung. S2/S3/Bow definitions chỉ dùng fixture để kiểm action/shape/batch, không unlock qua route; status của các skill muộn chưa triển khai. Local receipt chỉ chứng minh idempotency trong RAM, không chứng minh crash atomicity, UTC recovery hay multiplayer correctness.
+Để tái hiện behavior cũ: A/D hoặc arrows đi; Space nhảy, S+Space drop; J/1 đánh; E NPC/portal/pickup; F/H/M consumables; B túi, C điểm, K skill, L quest; click EXPLICIT focus, Esc clear/modal. Q1–Q6 và Tân Lữ→Kiếm ở ba maps; S2/S3/Cung chỉ fixture definitions, không production content/status. Probe cũ dùng speed 5/jump velocity12/gravity2, Dummy DEF/EVA0, 150ms buffer, unreachable2s→Return untargetable/reset: **không production lock**.
 
-Art là các primitive đọc được trạng thái, thay màu Quần/Áo và vũ khí Mộc/Kiếm, hit flash/text và pose theo action clock. Chưa có rig raster 26 frame/socket production, Common UI Kit production hoặc tỷ lệ asset Free dùng được. Font Việt [DejaVu Sans](Assets/HuyenLo/Resources/Fonts/DejaVuSans.ttf) được import và include trong build; [license](Assets/HuyenLo/Resources/Fonts/LICENSE.txt) đi kèm.
+## Source và chạy lại reference
 
-## Chạy kiểm tra
+[SliceRules](Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs), [CombatController](Assets/_Prototype/VS1_EndToEnd/Domain/CombatController.cs), [SliceSession](Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs) là prototype domain; [SliceHost](Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHost.cs)/[SliceHud](Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs) là adapters/presentation; [SliceBuild](Assets/_Prototype/VS1_EndToEnd/Editor/SliceBuild.cs) tạo scene/build reference. Font [DejaVu Sans](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/DejaVuSans.ttf) có [license](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/LICENSE.txt).
 
-Từ root repo, đặt biến đường dẫn Editor thực:
+Từ root repo:
 
 ```sh
 HUYEN_LO_EDITOR=/home/nguyenvanrin/Unity/Hub/Editor/6000.5.9f1/Editor/Unity
-"$HUYEN_LO_EDITOR" -batchmode -nographics -projectPath "$PWD/game" -runTests -testPlatform EditMode -testResults /tmp/huyenlo-edit.xml -logFile /tmp/huyenlo-edit.log
-"$HUYEN_LO_EDITOR" -batchmode -nographics -projectPath "$PWD/game" -runTests -testPlatform PlayMode -testResults /tmp/huyenlo-play.xml -logFile /tmp/huyenlo-play.log
-"$HUYEN_LO_EDITOR" -batchmode -nographics -quit -projectPath "$PWD/game" -executeMethod HuyenLo.Editor.SliceBuild.Linux -logFile /tmp/huyenlo-build.log
-python3 game/Validation/verify_documents.py
+"$HUYEN_LO_EDITOR" -batchmode -nographics -projectPath "$PWD/game" -runTests -testPlatform EditMode -testResults /tmp/huyenlo-reference-edit.xml -logFile /tmp/huyenlo-reference-edit.log
+"$HUYEN_LO_EDITOR" -batchmode -nographics -projectPath "$PWD/game" -runTests -testPlatform PlayMode -testResults /tmp/huyenlo-reference-play.xml -logFile /tmp/huyenlo-reference-play.log
+"$HUYEN_LO_EDITOR" -batchmode -nographics -quit -projectPath "$PWD/game" -executeMethod HuyenLo.Editor.SliceBuild.Linux -logFile /tmp/huyenlo-reference-build.log
+python3 game/PrototypeEvidence/VS1_EndToEnd/verify_feedback.py
 ```
 
-Development build có acceptance driver riêng (không khởi động trong chế độ chơi thường):
+Build reference mới dùng `Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64`; output ignored Git. Build Linux trước checkpoint còn tại `Builds/Linux/HuyenLo.x86_64`, là artifact cũ. Development-only [SliceRouteProbe](Assets/_Prototype/VS1_EndToEnd/Runtime/SliceRouteProbe.cs) vẫn tái hiện **route cũ**, không skip quest/EXP/HP/position; nó chạy physics/portal thật nhưng driver tự động, thời gian ×4, không manual feel review:
 
 ```sh
-game/Builds/Linux/HuyenLo.x86_64 -screen-fullscreen 0 -screen-width 1280 -screen-height 720 -logFile /tmp/huyenlo-player.log --verify-route --capture-route --evidence-path /tmp/huyenlo-route
+game/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64 -screen-fullscreen 0 -screen-width 1280 -screen-height 720 -logFile /tmp/huyenlo-reference-player.log --verify-route --capture-route --evidence-path /tmp/huyenlo-reference-route
 ```
 
-[SliceRouteProbe.cs](Assets/HuyenLo/Runtime/SliceRouteProbe.cs) gửi movement/interaction/domain command qua cùng boundary với UI. Route không set quest/EXP/HP/vị trí để skip; đi bằng Rigidbody2D, nhảy/drop thật và portal thật. Tốc độ thời gian ×4 phục vụ kiểm tự động; đây không phải video playtest game feel ở tốc độ thường. Các test fixture riêng có arrange state rõ, không được dùng thay hành trình này. Input fixture dùng keyboard events của Input System, bật IgnoreFocus **chỉ trong test batch** rồi khôi phục settings.
+## Evidence và điểm dừng
 
-Kết quả và giới hạn gate: [validation.json](Validation/validation.json), [audit tài liệu](Validation/document-audit.json), [log route](Validation/continuous-route.log), [video route](Validation/continuous-route.mp4). **G-L PARTIAL**: route/runtime có evidence, còn cần rig/pose/pivot/socket probe, giờ art/QA/rework và % asset dùng được, cùng review thao tác ở tốc độ thường. Dừng ở G-L; chưa mở Dedicated/backend/content sau slice.
+[validation.json](PrototypeEvidence/VS1_EndToEnd/validation.json), [audit sync cũ](PrototypeEvidence/VS1_EndToEnd/document-audit.json), [route log cũ](PrototypeEvidence/VS1_EndToEnd/continuous-route.log), [video cũ](PrototypeEvidence/VS1_EndToEnd/continuous-route.mp4) giữ nguyên để trace V6.2.0. Paths/source hashes/Git status trong các record này là **historical snapshot trước migration**, không live status. `verify_documents.py` là verifier của lượt sync cũ: đừng chạy lại lên canonical đã thay để overwrite historical evidence. [Audit feedback mới](PrototypeEvidence/VS1_EndToEnd/feedback-audit.json) ghi counts/links/source→destination/meta migration riêng; không chứng minh gameplay mới.
+
+[Migration verification](PrototypeEvidence/VS1_EndToEnd/migration-validation.json): 34 EditMode pass và build Linux reference pass sau move; chỉ chứng minh GUID/build paths/source cũ còn chạy, không behavior V6.2.1.
+
+**G-L PARTIAL; chưa bắt đầu production base hoặc G-N.** Next: harvest/docs → Movement Feel + UI/rig/art probes → design/build production base (G-B) → G-L revision mới → network gate sớm. Các open art/LoS/hybrid/unreachable decisions vẫn ở Analysis; không kéo full Cung/Boss/backend vào vòng feedback này.

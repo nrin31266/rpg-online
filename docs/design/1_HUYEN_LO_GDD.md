@@ -1,16 +1,18 @@
 # RPG Online: Huyền Lộ
 ## Tài liệu thiết kế game
 
-**Current Design Version:** V6.2.0
+**Current Design Version:** V6.2.1
 
-**Status:** PRE-IMPLEMENTATION DESIGN  
-**Last Reviewed:** 2026-10-03 (DESIGN LOCK SYNC; progression/control/authority đã duyệt)
+**Status:** DESIGN + PROTOTYPE VALIDATION; production codebase chưa bắt đầu
+**Last Reviewed:** 2026-10-03 (feedback prototype; onboarding/control/navigation baseline đã sửa)
 
 <a id="gdd-0"></a>
 
 # 0. Thẩm quyền và luật đã khóa
 
 GDD giữ luật game (WHAT); [Technical](2_HUYEN_LO_TECHNICAL.md) giữ hợp đồng triển khai (HOW); [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) giữ evidence/quyết định (WHY); [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md) giữ chi tiết hình ảnh/production; [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md) giữ thứ tự và CURRENT/DEFERRED (WHEN).
+
+VS-1 hiện có là **disposable/reference integration prototype**; folder/class prototype không là architecture authority hoặc production base. Evidence của bản cũ không nghiệm thu control/quest mới.
 
 User lock và review đã thống nhất được ghi vào GDD hiện hành; Analysis / Technical không tự đổi gameplay. Deterministic defect đã xác minh phải sửa đồng bộ; proposal và reference không tự thành luật.
 
@@ -65,7 +67,7 @@ P1 chỉ triển khai sau core và quyết định scope; thông số proposal g
 
 **DROP:** Guild / Trade / Pet / Mount / Crafting / Auction / FreePK; nhiều tiền tệ; Skill Rank; cường hóa vượt giới hạn từng bậc (III không vượt +8); Channel / Zone; world chat / hạ tầng MMO nhiều cụm máy chủ; nợ EXP; hút HP / MP; Decoy; ghép đá; Hương EXP; hệ kháng / yếu nguyên tố. Không thêm thuộc tính hoặc hiệu ứng ngẫu nhiên ngoài luật hiện hành.
 
-**TARGET / CURRENT / DEFERRED:** P0 trong GDD là game đích đầy đủ, gồm cả Kiếm/Cung và online Dedicated + Spring/PostgreSQL. Hiện triển khai local/offline Kiếm trước; Cung và các hệ online được hoãn theo thứ tự, vẫn thuộc TARGET P0. Đây là chiến lược triển khai, không đổi genre hoặc final acceptance. Phạm vi bản thử và gate mạng sớm nằm ở [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#target-current-deferred).
+**TARGET / CURRENT / DEFERRED:** P0 trong GDD là game đích đầy đủ, gồm cả Kiếm/Cung và online Dedicated + Spring/PostgreSQL. Hiện thu hoạch feedback prototype, sửa docs và probe art/feel trước thiết kế production base Kiếm; Cung và các hệ online được hoãn theo thứ tự, vẫn thuộc TARGET P0. Đây là chiến lược triển khai, không đổi genre hoặc final acceptance. Phạm vi bản thử và gate mạng sớm nằm ở [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#target-current-deferred).
 
 > **Thứ tự triển khai / ngân sách:** [Roadmap — VS-1 và mục tiêu quản lý](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#vs-1)
 
@@ -76,7 +78,7 @@ P1 chỉ triển khai sau core và quyết định scope; thông số proposal g
 
 # 2. Sức mạnh nhân vật và tiến trình
 
-Lv 20 cap; 5 điểm / level-up = **95 điểm**. Lv 1 chưa có điểm; Lv 2–4 auto +2 STR / +2 VIT / +1 INT, tổng 15. Lv 5 thêm 5 và hoàn 15 thành **20 unspent** một lần; chọn class Q6 rồi tự cộng. Chưa class không dùng skill / vũ khí class; kể cả Lv 5+ vẫn dùng normal Tân Lữ / Mộc Kiếm để làm Q5. Reset nhập môn xảy ra một lần khi đạt Lv 5; nếu trì hoãn Q6 tới Lv 6+, giữ mọi điểm level-up thêm, tổng spent + unspent = 5 × (L−1), không set lại 20. Q3 trao Mộc Kiếm; Lv 1–2 học NPC / movement, chưa bị yêu cầu combat.
+Lv 20 cap; 5 điểm / level-up = **95 điểm**. Lv 1 chưa có điểm; Lv 2–4 auto +2 STR / +2 VIT / +1 INT, tổng 15. Lv 5 thêm 5 và hoàn 15 thành **20 unspent** một lần; chọn class Q6 rồi tự cộng. Chưa class không dùng skill / vũ khí class; kể cả Lv 5+ vẫn dùng basic Tân Lữ / Mộc Kiếm cho Q4/Q5 hoặc quest muộn. Reset nhập môn xảy ra một lần khi đạt Lv 5; nếu trì hoãn Q6 tới Lv 6+, giữ mọi điểm level-up thêm, tổng spent + unspent = 5 × (L−1), không set lại 20. Q3 trao Mộc Kiếm; Lv 1–2 học NPC / movement, chưa bị yêu cầu combat.
 
 | Lv | EXP lên cấp | Tích lũy | Lv | EXP lên cấp | Tích lũy |
 | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -170,21 +172,23 @@ Tầm đánh trong skill profiles là tầm thực, không cộng thêm nội t�
 
 <a id="focus-input"></a>
 
-## CombatFocus, tap/hold và interaction
+## CombatFocus, một lần bấm skill và interaction
 
 CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. ACQUIRE → RETAIN → REACQUIRE: chọn nearest eligible trong search bounds, tie stable entity ID; selection độc lập facing rồi auto-face khi start action. Search/retention khác execution range; reward level-gap không cấm combat/quest.
 
 AUTO giữ target alive/eligible/cùng MapId/life còn đúng và còn relevant trong context; quái hơi gần hơn không cướp focus. Chết/invalid có thể acquire con gần hợp lệ tiếp theo; người chơi chủ động chạy/nhảy sang combat context khác có thể mất relevance. Hysteresis/search/retention/vertical bounds là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa. EXPLICIT do click là pinned: nearest và đổi slot không thay nó; chỉ explicit replacement/clear hoặc lifecycle invalid (death/despawn/generation/map) mới clear. Focus tồn tại không bảo đảm skill đánh tới; ngoài range không âm thầm đổi target để cast.
 
-1/2/3 chọn unlocked S1/S2/S3 và thử execute một lần ngay; J execute selected slot. Tân Lữ dùng J basic cùng pipeline. Locked slot chỉ báo điều kiện, không đổi selection. Slot hợp lệ được chọn cả khi attempt bị reject; chạy action cũ vẫn giữ SkillId/profile snapshot.
+1/2/3 chọn unlocked S1/S2/S3 và yêu cầu thực thi **đúng một lần cho mỗi physical press**; Tân Lữ dùng **1 = basic Mộc Kiếm** cùng pipeline, 2/3 khóa. Bỏ binding combat J và RepeatOnHold cho mọi profile. Giữ phím không lặp cast, không lặp approach, không sinh intent mới. Slot hợp lệ được chọn cả khi attempt reject; locked slot không đổi selection hoặc hủy action đã accepted. SelectedSlot là cue UX, không cần một phím execute khác. Running action giữ SkillId/profile snapshot.
 
-Tap không tự đi. Không valid target/victim thì không action/MP/CD/movement. Primary-based cần valid primary; Arc/Line cần victim trong hình dự kiến, không bắt mọi victim là focus. Có focus ngoài range: retain, tap reject; hold J **hoặc** 1/2/3 mới thử bounded horizontal approach bằng run speed, budget theo quãng còn thiếu ngoài range skill; timeout/blocked tolerance TUNABLE. Không auto jump/drop/dash/pathfinding/vượt terrain không đi được. Release/manual move/jump/drop/UI/Esc/death/portal hủy assist ngay; đóng modal cần press mới.
+Không focus: physical press acquire nearest eligible **trong local search/approach envelope**; không chờ quái xuất hiện để tự cast. AUTO còn relevant hoặc EXPLICIT hợp lệ thì ưu tiên target đó, không đổi target để né range reject. Không valid target/victim thì không action/MP/CD/movement. Primary-based cần valid primary; Arc/Line cần victim trong hình dự kiến tại prospective reachable origin trước assist và tại origin thực trước commit, không bắt mọi victim là focus.
 
-Một latest physical press sở hữu held intent; input mới thay cũ, release không khôi phục hold cũ. RepeatOnHold theo profile: Novice/S1/S2 = true baseline cần kiểm MP; S3 = false. S3 được approach/cast lần đầu, accepted start tiêu press token; giữ qua CD không cast nữa, cần physical press mới. Không auto loot/potion/route/đổi skill. Một latest buffer thử 150 ms ở recovery ngắn; không FIFO hoặc chờ dài qua CD/range/MP reject. Common action lock chặn action mới, đổi selection không reset CD.
+Hơi ngoài range: một press có thể tạo **một pending cast + bounded horizontal approach**, tới tầm thì revalidate và cast một lần. Target ID/generation + requested SkillId được giữ trong pending intent; không cast target khác khi con đó chết/invalid. Reacquire chỉ cho press mới. Budget tính quãng còn thiếu ngoài execution range từng profile, timeout/progress/blocked tolerance TUNABLE; không chạy sang bãi xa hoặc qua tầng khác. Không auto jump/drop/dash/pathfinding/vượt mép hoặc terrain không đi được. CD dài/thiếu MP/skill khóa reject trước approach, không đứng chờ hồi để tự nổ.
+
+Thả phím không hủy pending một lần bấm; manual move/jump/drop, click đổi/clear focus, UI/Esc/death/chuyển map hủy nó ngay. Input skill hợp lệ mới thay pending/buffer cũ, không chồng nhiều đường chạy; không sửa action đã start. Bị blocked/quá xa/hết deadline/target invalid thì clear + feedback, không retry vô hạn. Một latest input buffer thử 150 ms chỉ quanh recovery ngắn khi skill sẽ sẵn; không FIFO hoặc queue dài qua CD/MP reject. Common action lock chặn action mới, đổi slot không reset CD. Cast start mới commit MP/CD và action origin; approach chỉ là movement, không đảm bảo hit hoặc miễn sát thương.
 
 Gravity/horizontal momentum tiếp tục khi Novice/S1 cast trên không; airborne permissions S2/S3 còn prototype. Damage thường chỉ HP/flash/text/impact, không Hurt state/hit-stun/knockback/interrupt. Terminal/death → hard CC đúng category → unresolved action; không recovery cancel jump/dash P0.
 
-Loot/interactable candidate là khái niệm nhẹ tách CombatFocus: highlight món gần đủ quyền/range, E nhặt/tương tác ngay, không press đầu chỉ focus rồi press thứ hai. Nhặt xong candidate gần tiếp theo; rời range clear/change. Personal tutorial entitlement/shared ownership vẫn theo §5–6, không auto-loot từ combat hold.
+Loot/interactable candidate là khái niệm nhẹ tách CombatFocus: highlight món gần đủ quyền/range, E nhặt/tương tác ngay, không press đầu chỉ focus rồi press thứ hai. Nhặt xong candidate gần tiếp theo; rời range clear/change. Personal tutorial entitlement/shared ownership vẫn theo §5–6, combat press không tự loot/potion/route.
 
 **Ba hit Cung:** snapshot A/B/C, A/B/A hoặc A/A/A tại start; resolve cả ba cùng clock +0,12 s, giữ power theo index. Invalid target làm mất index đó, không chuyển target/chia power. Mỗi logical hit có Evade/Crit roll, status tối đa một application/unique landed target/cast kể cả proc fail cache. Hàn primary hợp lệ tại resolve tạo tâm nổ ở primary position kể cả primary Evade; invalid primary không nổ; secondary roll riêng, primary không nhận explosion lần hai. Line intersections gần→xa quyết falloff, focus không đổi thứ tự. Secondary theo geometry, không PlatformID damage gate.
 
@@ -207,7 +211,7 @@ Một action lock chung; CD / MP commit tại cast start, basic Tân Lữ cũng 
 | Kiếm Khí | +0,16 s | 0,40 s |
 | Hàn Tiễn | +0,18 s | 0,40 s |
 
-Source stats/passive capability và action origin chụp tại start, target DEF/EVA/position kiểm tại resolve. Caster di chuyển sau start không dời origin/kéo range. Death/portal/hard CC đúng category hủy unresolved action, không refund cost; đã resolve không bị visual sửa. AnimationEvent cosmetic, không schedule damage. ART-01 kiểm visual timing; các mô hình rotation cũ cần chạy lại theo [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md#design-lock-rationale).
+Source stats/passive capability và action origin chụp tại start, target DEF/EVA/position kiểm tại resolve. Caster di chuyển sau start không dời origin/kéo range. Death/chuyển map/hard CC đúng category hủy unresolved action, không refund cost; đã resolve không bị visual sửa. AnimationEvent cosmetic, không schedule damage. ART-01 kiểm visual timing; các mô hình rotation cũ cần chạy lại theo [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md#design-lock-rationale).
 
 **Status application:** Bỏng và Băng Hàn mỗi loại có tối đa một roll theo `(actionId,actualTargetId,effectId)` tại landed hit đầu tiên; cache cả fail, không reroll trên A/A/A. **Băng Hàn là một application**, chọn kết quả theo loại target trước roll; không roll Làm Chậm và Đóng Băng độc lập.
 
@@ -238,7 +242,7 @@ Mỗi map farm/combat có **một SafeAnchor cố định** để khôi phục k
 
 | Vùng | Hình thái và mục đích |
 | --- | --- |
-| Vân Khê | Hub yên bình: NPC, mua thuốc, rèn đồ, rương và nghỉ; đường về đọc được từ portal. |
+| Vân Khê | Hub yên bình: NPC, mua thuốc, rèn đồ, rương và nghỉ; đường về đọc được từ mũi tên mép map. |
 | Học Viện | Khu nhập môn với ledge / drop-through và bãi Bù Nhìn; thao tác lớp học dùng NPC / terrain hiện có. |
 | Lôi Đài | Không gian tỷ thí 1v1, tách khỏi farm world bằng match membership. |
 | Đồng Sương | Đồng thoáng, 1–2 tầng; thấy quái và lối thoát sớm, chưa ép gom đông. |
@@ -262,6 +266,11 @@ Mỗi điểm sinh quái chọn một **mob identity có level cố định**, v
 **28 cụm / 66 điểm sinh quái — TEST/TUNABLE.** Giữ budget hiện tại, phân lại identity để có đường farm liên tục; Trúc có 3 cụm Sói Sương Lv 4 làm bước đệm trước Sói Trúc Lv 8. Quest anchors giữ vị trí. Đây là budget authoring, không capacity promise; contention theo [Analysis §3](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression).
 
 5 farm + Village / Academy / Arena = 8 logical roots. Huyền Tích vào từ Lv 17, khuyến nghị 18; Q12 Lv 20 là quest gate, Boss không gate 20. Village / Academy mở onboarding; Arena qua Challenge. Old maps luôn quay lại được; farm map không tự nhận quest.
+
+
+**MapExit / EdgeExit:** nối map thường bằng vùng mép có mũi tên chỉ hướng + tên vùng đích khi tới gần; player đi/chạm exit hợp lệ thì tự chuyển map, **không bấm E và không dựng cổng dịch chuyển**. Village↔Academy, Village↔Đồng Sương và các đường nối bãi thường dùng loại này. RequiredLevel/unlock vẫn kiểm ở authority; exit khóa hiện lý do, không kéo player hoặc tạo transition retry liên tục. Spawn phía trong mép đích, ngoài trigger trả về; mỗi actor chỉ một transition đang pending. Chi tiết validation/ACK ở Technical.
+
+**SpecialGate / Portal:** chỉ cửa đặc biệt có ý nghĩa gameplay như Huyền Môn/Q11, Arena/Challenge hoặc teleport được thiết kế riêng; activation/interact theo quest/mode. Map transition là tên chung cho cả hai loại; mọi cancel/checkpoint/MapId rule áp cho cả hai. Huyền Môn khóa vẫn tương tác từ phía ngoài, không biến thành EdgeExit để bỏ qua ritual. Mũi tên mép + tên vùng và NPC marker cơ bản là P0; quest navigation arrow xuyên map/auto-route vẫn P1 hoặc ngoài scope.
 
 **Fixed monster ladder — canonical:** 7 identities, 6 base sprite/AI rigs; Sói Trúc Ảnh reuse Sói Sương bằng palette. Hai Sói xám lạnh/lục tối có nameplate riêng; Linh dùng aura tím/ấn sáng chung, không dùng màu sói làm dấu Linh.
 
@@ -310,7 +319,7 @@ Level là nhận diện nội dung; không tạo thêm variant chỉ để mỗi
 | HT4 | Cổ Môn Vệ Binh | 20 | 3 |
 | HT5 | Cổ Môn Vệ Binh | 20 | 3 |
 
-Safe Entrance 6–8 u → pockets → alternate path / vertical route → landmark → exit; không maze / moving platform / hazard P0. Aggro 5 u / leash 8 u, tâm cụm khoảng 18–20 u hoặc terrain tách tương đương. Trong pocket author sparse / line / split phù hợp shape; không áp spacing 0,8–1,5 u cho mọi cụm. Melee Sói tự converge khi chase; Ong giữ hover band reachable bằng Kiếm, không blob cố định. Hit alert chỉ đánh thức cụm, không truyền sang cụm khác; attack offset 0–0,35 s. Vượt leash kết thúc encounter; nguyên tắc không free-farm melee unreachable đã khóa. Exact grace/Return/regen/reset/untargetable/immunity là PROTOTYPE, không miễn sát thương tức thì chỉ vì một cú nhảy. Xét reachable threat khác trước; reset không loot/reroll/respawn life mới.
+Safe Entrance 6–8 u → pockets → alternate path / vertical route → landmark → exit; không maze / moving platform / hazard P0. Aggro 5 u / leash 8 u, tâm cụm khoảng 18–20 u hoặc terrain tách tương đương. Trong pocket author sparse / line / split phù hợp shape; không áp spacing 0,8–1,5 u cho mọi cụm. Melee Sói tiếp cận thành cụm đọc được, không chồng cùng tọa độ thành một cục cắn liên tục; Ong giữ hover band reachable bằng Kiếm, không blob cố định. Hit alert chỉ đánh thức cụm, không truyền sang cụm khác; attack offset 0–0,35 s. Vượt leash kết thúc encounter; nguyên tắc không free-farm melee unreachable đã khóa. Exact grace/Return/regen/reset/untargetable/immunity là PROTOTYPE, không miễn sát thương tức thì chỉ vì một cú nhảy. Xét reachable threat khác trước; reset không loot/reroll/respawn life mới.
 
 Farm theo bãi gần level trong khoảng thưởng §6; mob cao hơn có reward nếu trong khoảng nhưng không đảm bảo an toàn. Mob identity/level quyết định gear band; map quyết định material/flavor. **[Farm Matrix Lv 1–20](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression)** giữ derived HP / EXP / Gold, không copy stats table vào GDD. Measure solo / 2 / 3 / 4 players, wait / crowd / CPU / network và run-back trước capacity claim; low-level pockets ít slot có thể cần rotate, không thêm Party / Channel.
 
@@ -331,7 +340,9 @@ Stat normal tại level L (`round(x) = floor(x + 0.5)` cho x ≥ 0, kể cả EX
 
 TTK target cùng level + Common + 0: early 2–4 s, mid 3–6 s, late 4–8 s TEST, không guarantee mọi build. Đánh Thạch Lv 16 khi player15 trước đại chiêu còn là probe chậm; giữ HP curve, không tăng mọi HP chỉ để kéo giờ chơi. Normal solo / 2–4-target / Q8 Linh và gear-lag probes ở Analysis.
 
-**Mob attack contract:** đi qua aggro radius vẫn bị acquire / chase, body overlap không gây damage. Melee: Acquire → Chase → attack range → Face → Windup / lock facing → HitMoment / front hitbox → Recovery. Target chạy xuyên ra sau / nhảy ra khỏi vertical range / rời hitbox trước HitMoment thì MISS; không guaranteed damage vì animation đã start, không quay 180° giữa swing. Ranged / Hybrid: Acquire → Aim / Windup → resolveMoment → authority logical target resolve → result → visual projectile; AnimationEvent chỉ visual. Mob normal attack power 1.0, CritChance 0 P0; formula Damage chung, exact hitbox / windup tại PHY-01 / ART-01.
+**Mob attack contract:** đi qua aggro radius vẫn bị acquire / chase, body overlap không gây damage. Melee: Acquire → Chase → attack range → Face → Windup / lock facing → HitMoment / front hitbox → Recovery / reposition ngắn khi có chỗ hợp lệ → tiếp cận lại. Target chạy xuyên ra sau / nhảy ra khỏi vertical range / rời hitbox trước HitMoment thì MISS; không guaranteed damage vì animation đã start, không quay 180° giữa swing. Ranged / Hybrid: Acquire → Aim / Windup → resolveMoment → authority logical target resolve → result → visual projectile; AnimationEvent chỉ visual. Mob normal attack power 1.0, CritChance 0 P0; formula Damage chung, exact hitbox / windup tại PHY-01 / ART-01.
+
+**Melee crowd feel — baseline nguyên tắc, exact behavior TUNABLE:** soft separation và mục tiêu đứng lệch nhau trên lane giúp 2–4 con còn trong tầm AoE nhưng không trùng một điểm. Sau đòn, có bước chỉnh vị trí/lùi ngắn khi hợp lệ; không bắt mọi loài lùi mỗi hit hoặc đồng bộ cả đàn. Reposition dùng recovery/interval hiện có, không tự giảm attack interval hoặc thêm guaranteed safe window. Windup/hit origin đã start không bị steering sửa; không knockback/body shove. Thử offset attack positions theo trái/phải cùng lane, ưu tiên khoảng trống + stable ID; **không khóa 3–4 slot**, vòng tròn bao player, group attack token hay formation subsystem. Cố định phase lệch nhau theo life để tránh đồng loạt cắn; spacing/time/offset kiểm PHY-01, không suy DPS mới từ mô hình cũ.
 
 **Mob / Linh Biến threat:** một `Threat[playerId]` và `Contribution[playerId]` riêng mỗi mob. Initial acquire nearest valid player hoặc attacker đầu tiên; direct / DoT cộng ActualHpLost (cap overkill, dedup), không raw damage. Sticky target: challenger có threat>0 và ≥ 1,25 × current mới đổi; current invalid / dead / disconnect / khác MapId / out-of-leash thì chọn highest valid threat, tie playerId; nếu không có threat chọn nearest valid trong aggro. Báo động cụm chỉ wake, từng mob tự acquire / resolve. Return về spawn full HP, clear threat / contribution / status, hủy pending action; không giữ damage từ lượt kéo trước. Linh Biến dùng cùng resolver, không nearest-only sau acquire.
 
@@ -398,32 +409,34 @@ Q12 **per character**: chưa complete hiển thị **Huyền Nham Cự Thú**, �
 
 ## Q1–Q12 và nhiệm vụ
 
-Q1–Q4 catch-up tới Lv 2 / 3 / 4 / 5, `CatchUp = max(0, TargetCumulativeEXP - CharacterTotalEXP)`; BaseEXP = 0 khi đã qua mốc. Q5 / Q7–Q11 EXP hiện dùng 10% thanh cấp (half-up), Q6 = 0, Q12 = 0 ở cap; các số là BASELINE / TUNABLE cho QUEST-03. **Giữ 12 QuestId**: các bước ngắn đầu game phục vụ onboarding/recovery, Q9 là nhánh tùy chọn và không chặn Q10. Không thêm ID chỉ để lấp khoảng farm.
+Q1 catch-up Lv 2, Q2 Lv 3, Q3 không EXP (giữ Lv 3), Q4 Nấm/loot catch-up Lv 4, Q5 Sói catch-up Lv 5, `CatchUp = max(0, TargetCumulativeEXP - CharacterTotalEXP)`; BaseEXP = 0 khi đã qua mốc. Q7–Q11 EXP hiện dùng 10% thanh cấp (half-up), Q3/Q6 = 0, Q12 = 0 ở cap; các số là BASELINE / TUNABLE cho QUEST-03. **Giữ 12 QuestId**: các bước ngắn đầu game phục vụ onboarding/recovery, Q9 là nhánh tùy chọn và không chặn Q10. Không thêm ID chỉ để lấp khoảng farm.
 
-**State:** LOCKED → AVAILABLE khi đủ prerequisite + level → nhận → IN_PROGRESS → đủ active objectives → READY_TO_TURN_IN → đúng NPC/range → COMPLETED + reward/unlock. Ready không auto-turn-in/teleport; thiếu cấp thì NPC/HUD chỉ rõ mốc và bãi phù hợp. Cổng cũ vẫn quay lại được.
+**State:** LOCKED → AVAILABLE khi đủ prerequisite + level → nhận → IN_PROGRESS → đủ active objectives → READY_TO_TURN_IN → đúng NPC/range → COMPLETED + reward/unlock. Ready không auto-turn-in/chuyển map; thiếu cấp thì NPC/HUD chỉ rõ mốc và bãi phù hợp. Lối cũ vẫn quay lại được.
 
-**Markers/regions:** mỗi ID dưới là key của trigger/interact anchor trên map/NPC hiện có; Game Server kiểm MapId/vị trí. Visit radius 1,5 u TEST, E trong 2 u TEST. Waypoint Huyền Môn đang khóa vẫn interact được từ phía ngoài Xích Nham ở Q11. Dấu `+` trong objectives chỉ các mục tiêu cùng active group, không phải thêm QuestId.
+**Objective theo hành động:** quest data lưu Jump/DropThrough/UseFood/UseHpPotion/UseMpPotion/Interact/Pickup, không lưu phím. Tutorial/HUD lấy glyph từ binding hiện hành ở §9; key press đơn thuần không credit action thất bại.
+
+**Markers/regions:** mỗi ID dưới là key của trigger/interact anchor trên map/NPC hiện có; Game Server kiểm MapId/vị trí. Visit radius 1,5 u TEST, Interact trong 2 u TEST (binding tại §9). Waypoint Huyền Môn đang khóa vẫn interact được từ phía ngoài Xích Nham ở Q11. Dấu `+` trong objectives chỉ các mục tiêu cùng active group, không phải thêm QuestId.
 
 | Quest / Lv | Story + người giao → trả | Objectives theo thứ tự | Reward | Unlock / next |
 | --- | --- | --- | --- | --- |
 | Q1 — Người mới đến Vân Khê / 1 | Lâm Bá: “Nhớ chỗ thuốc, lò rèn và đường về. Ra núi rồi, chẳng ai giữ hộ mạng mình.” Lâm Bá → Lâm Bá. | Nói chuyện Yên Thảo → Bách Luyện → Mộc An → báo Lâm Bá. | Catch-up Lv 2 + 50 Vàng | Q2 sau Q1 + Lv 2 |
-| Q2 — Bước chân đầu tiên / 2 | Lâm Bá: “Đi thử một vòng. Chân vững rồi hãy cầm kiếm.” Lâm Bá → Lâm Bá. | `HV_Entrance` → nhảy tới `HV_JumpLedge` → S + Space xuống `HV_DropLanding` → qua portal thật về Vân Khê → báo Lâm Bá. | Catch-up Lv 3 + 75 Vàng | Q3 sau Q2 + Lv 3 |
-| Q3 — Vũ khí trong tay / 3 | Phong Du: “Đừng vội. Giữ thế cho chắc, rồi ra đòn.” Phong Du → Phong Du. | Nhận/mặc Mộc Kiếm → `HV_DummyYard` → hạ 3 Bù Nhìn, mỗi con đóng góp ≥20% → báo Phong Du. Dummy HP 60, không đánh/trả thưởng; hồi sinh 25 s TEST. | Mộc Kiếm cấp trước một lần; turn-in catch-up Lv 4 + Quần Thanh Mộc I | Q4 sau Q3 + Lv 4 |
-| Q4 — Sinh tồn ngoài làng / 4 | Yên Thảo: “Ăn trước khi đi. Thuốc để dành lúc cần.” Yên Thảo → Yên Thảo. | Ứng 320 Vàng một lần → mua Food I, HP Potion I, MP Potion I mỗi loại 1 → dùng Food bằng F → `DS4_ExitTrail`, hạ **5 Sói Sương Lv 4 trong DS3–DS6** → báo Yên Thảo. H dùng khi thiếu HP, không bắt dùng lúc đầy. | Turn-in catch-up Lv 5 | Q5 sau Q4 + Lv 5 |
-| Q5 — Chiến lợi phẩm đầu tiên / 5 | Bách Luyện: “Thứ mặc được thì giữ. Thứ thừa đem bán, lấy đồng lộ phí.” Bách Luyện → Bách Luyện. | `DS2_MushroomPatch`: hạ 1 Nấm Lv 2 khi đúng step, đóng góp ≥20% → E nhận Áo Thanh Mộc + Nấm Sương tutorial → mặc áo → bán sample cho Bách Luyện → báo Bách Luyện. | Áo I + sample cấp theo bước; turn-in 45 EXP | Q6 sau Q5 + Lv 5 |
-| Q6 — Lễ Nhập Lộ / 5 | Tạ Minh: “Kiếm hay cung, tự ngươi chọn. Đã chọn thì phải học giữ hơi thở.” Tạ Minh → Tạ Minh. | `HV_ClassHall`: chọn class (điểm đã được trả lại một lần khi lên Lv 5) → nhận weapon I + bí kíp nhập môn; mặc weapon + xác nhận đã cộng ≥1 điểm + học sách → cast active ở `HV_DummyYard` → nhận MP Potion I dự trữ, bấm M khi thiếu MP → báo Tạ Minh. Bảng skill hiện nội tại Lv 5 mở/Lv 13 khóa. | Class, weapon + bí kíp theo bước, MP Potion I; 0 EXP | Q7 sau Q6 + Lv 7; mở Trúc Ảnh |
+| Q2 — Bước chân đầu tiên / 2 | Lâm Bá: “Đi thử một vòng. Chân vững rồi hãy cầm kiếm.” Lâm Bá → Lâm Bá. | `HV_Entrance` → nhảy tới `HV_JumpLedge` → đi xuống xuyên sàn tới `HV_DropLanding` → đi qua MapExit về Vân Khê → báo Lâm Bá. | Catch-up Lv 3 + 75 Vàng | Q3 sau Q2 + Lv 3 |
+| Q3 — Vũ khí trong tay / 3 | Phong Du: “Đừng vội. Giữ thế cho chắc, rồi ra đòn.” Phong Du → Phong Du. | Nhận/mặc Mộc Kiếm → `HV_DummyYard` → hạ 3 Bù Nhìn, mỗi life đóng góp ≥20% → báo Phong Du. Yard có ít nhất 3 Dummy cùng lúc; HP 60, không đánh/trả thưởng; respawn 25 s TEST. | Mộc Kiếm cấp trước một lần; turn-in Quần Thanh Mộc I, 0 EXP | Q4 sau Q3 + Lv 3 |
+| Q4 — Chiến lợi phẩm đầu tiên / 3 | Bách Luyện: “Thứ mặc được thì giữ. Thứ thừa đem bán, lấy đồng lộ phí.” Bách Luyện → Bách Luyện. | `DS2_MushroomPatch`: hạ 1 Nấm Lv 2 khi đúng step, đóng góp ≥20% → nhặt Áo Thanh Mộc + Nấm Sương tutorial → mặc áo → bán sample cho Bách Luyện → báo Bách Luyện. | Áo I + sample cấp theo bước; turn-in catch-up Lv 4 | Q5 sau Q4 + Lv 4 |
+| Q5 — Sinh tồn ngoài làng / 4 | Yên Thảo: “Ăn trước khi đi. Thuốc để dành lúc cần.” Yên Thảo → Yên Thảo. | Ứng 320 Vàng một lần → chuẩn bị Food I + HP Potion I (mua nếu chưa có; món hợp lệ đang có cũng tính) → dùng Food → `DS4_ExitTrail`, hạ **5 Sói Sương Lv 4 trong DS3–DS6** → báo Yên Thảo. Bình Máu được giới thiệu, chỉ dùng khi thiếu HP, không objective tiêu lúc đầy; Bình MP dạy ở Q6. | Turn-in catch-up Lv 5 | Q6 sau Q5 + Lv 5 |
+| Q6 — Lễ Nhập Lộ / 5 | Tạ Minh: “Kiếm hay cung, tự ngươi chọn. Đã chọn thì phải học giữ hơi thở.” Tạ Minh → Tạ Minh. | `HV_ClassHall`: chọn class (điểm đã được trả lại một lần khi lên Lv 5) → nhận weapon I + bí kíp nhập môn; mặc weapon + xác nhận đã cộng ≥1 điểm + học sách → cast S1 ở `HV_DummyYard` → nhận MP Potion I dự trữ, dùng khi thiếu MP → báo Tạ Minh. Bảng skill hiện nội tại Lv 5 mở/Lv 13 khóa. | Class, weapon + bí kíp theo bước, MP Potion I; 0 EXP | Q7 sau Q6 + Lv 7; mở Trúc Ảnh |
 | Q7 — Tinh Thạch đầu tiên / 7 | Bách Luyện: “Một nhát búa không thành đồ tốt. Cứ làm cho đều tay.” Bách Luyện → Bách Luyện. | Chọn nhẫn I đang sở hữu (thiếu mới cấp) → preview → nâng +0→+1 hoặc xác nhận nhẫn đã ≥+1 → mặc/xác nhận đúng nhẫn → báo Bách Luyện. | Nhẫn I nếu thiếu; 1 đá + 100 Vàng dự trữ chỉ khi cần nâng; turn-in 83 EXP | Q8 sau Q7 + Lv 8; hết Chương I |
-| Q8 — Bóng sói trong Trúc Ảnh / 8 | Lâm Bá: “Vết cào này lạ. Xem dưới chân cầu có gì.” Mảnh ấn mang vết đục của người. Lâm Bá → Lâm Bá. | E `TA4_BrokenSeal` → hạ **4 Sói Trúc Ảnh Lv 8 tại TA4 + TA6**, nhận 2 Dấu Trọc Khí virtual ở qualifying kill #1/#2 → E dấu ấn → hạ 1 Sói Trúc Ảnh **Linh Biến tại `TA4.slot1`** với ≥20% → báo Lâm Bá. | 108 EXP + bí kíp tiến cảnh đúng class (dùng từ Lv 10) + 2 đá | Mở Bạch Vân; Xích Nham thêm Lv 12; Q9 tùy chọn Lv 12 / Q10 Lv 15 cần Q8 |
+| Q8 — Bóng sói trong Trúc Ảnh / 8 | Lâm Bá: “Vết cào này lạ. Xem dưới chân cầu có gì.” Mảnh ấn mang vết đục của người. Lâm Bá → Lâm Bá. | Tương tác `TA4_BrokenSeal` → hạ **4 Sói Trúc Ảnh Lv 8 tại TA4 + TA6**, nhận 2 Dấu Trọc Khí virtual ở qualifying kill #1/#2 → tương tác dấu ấn → hạ 1 Sói Trúc Ảnh **Linh Biến tại `TA4.slot1`** với ≥20% → báo Lâm Bá. | 108 EXP + bí kíp tiến cảnh đúng class (dùng từ Lv 10) + 2 đá | Mở Bạch Vân; Xích Nham thêm Lv 12; Q9 tùy chọn Lv 12 / Q10 Lv 15 cần Q8 |
 | Q9 — Khảo Chiến Đồng Môn / 12 | Hạo Vũ: “Có đồng môn thì thử vài đường. Chưa gặp ai, cứ đi tiếp.” Hạo Vũ → Hạo Vũ. | Nói chuyện Hạo Vũ → mời/chấp nhận cược 1v1 → hoàn thành một trận đấu thật có kết quả thắng/thua/hòa → báo Hạo Vũ. FORFEIT do ngắt kết nối và SYSTEM_ABORT không tính mục tiêu. | 270 EXP + 200 Vàng sau PvP thật | Optional; không chặn Q10, bỏ qua không thưởng |
-| Q10 — Dấu chân Xích Nham / 15 | Tạ Minh: “Chúng lấy đá, còn dòng khí thì mặc kệ. Đem dấu vết về.” Tạ Minh → Tạ Minh. | E `XN1_ChiselMarks` → hạ **6 Đoạt Mạch Lv 13 tại XN1–XN3**, nhận 3 Vật Chứng virtual ở qualifying kill #2/#4/#6 → E `XN2_SealScar` → báo Tạ Minh. | 480 EXP + 3 đá | Q11 sau Q10 + Lv 17 |
-| Q11 — Mở Lối Huyền Môn / 17 | Tạ Minh: “Nối lại từng chỗ. Đừng chạm cổng khi dòng khí chưa yên.” Tạ Minh → Tạ Minh. | E `XN4_SealA` + hạ **3 Thạch Lv 16 tại XN4** → Mảnh 1; E `XN5_SealB` + **3 tại XN5** → Mảnh 2; E `XN6_SealC` + **4 tại XN6** → Mảnh 3; E `XN_HuyenMon_Outer` kiểm đủ mảnh/kích hoạt → báo Tạ Minh. | 670 EXP + Rare III weapon + bí kíp đại chiêu đúng class | Chỉ **Completed** mới mở Huyền Tích; Q12 thêm Lv 20; hết Chương II |
+| Q10 — Dấu chân Xích Nham / 15 | Tạ Minh: “Chúng lấy đá, còn dòng khí thì mặc kệ. Đem dấu vết về.” Tạ Minh → Tạ Minh. | Tương tác `XN1_ChiselMarks` → hạ **6 Đoạt Mạch Lv 13 tại XN1–XN3**, nhận 3 Vật Chứng virtual ở qualifying kill #2/#4/#6 → Tương tác `XN2_SealScar` → báo Tạ Minh. | 480 EXP + 3 đá | Q11 sau Q10 + Lv 17 |
+| Q11 — Mở Lối Huyền Môn / 17 | Tạ Minh: “Nối lại từng chỗ. Đừng chạm cổng khi dòng khí chưa yên.” Tạ Minh → Tạ Minh. | Tương tác `XN4_SealA` + hạ **3 Thạch Lv 16 tại XN4** → Mảnh 1; Tương tác `XN5_SealB` + **3 tại XN5** → Mảnh 2; Tương tác `XN6_SealC` + **4 tại XN6** → Mảnh 3; Tương tác `XN_HuyenMon_Outer` kiểm đủ mảnh/kích hoạt → báo Tạ Minh. | 670 EXP + Rare III weapon + bí kíp đại chiêu đúng class | Chỉ **Completed** mới mở Huyền Tích; Q12 thêm Lv 20; hết Chương II |
 | Q12 — Tiếng gọi từ Huyền Tích / 20 | Tạ Minh: “Giúp nó buông gánh cũ. Đường tu luyện của ngươi còn dài.” Tạ Minh → Tạ Minh. | `HT4_GuardRoute`: hạ **6 Cổ Vệ Lv 20 tại HT4 + HT5** → tới `HT_BossLandmark` → đóng góp ≥10% HP trong **một life Boss** ở death khi đúng step → báo Tạ Minh. | 1.000 Vàng một lần; 0 EXP, không thêm Boss pile | Main Story/Chương III complete; Dư Ảnh và farm tiếp tục |
 
-**Recovery chung:** talk/visit/kill chỉ credit sau Game Server event hợp lệ; lưu step/counter sau commit, death/reconnect không xóa. Ngã ở Q2 thì thử lại, không giả credit chỉ vì bấm phím. Mộc Kiếm Q3 không bán/vứt, grant pending nếu túi đầy. Q4 không cấp lại 320 Vàng khi replay; H đầy HP bị từ chối mà không tiêu thuốc. Q5 áo giữ binding tới lúc mặc, sample chỉ bán đúng step; hết hạn ground/full bag/reconnect giữ entitlement chưa claim với cùng itemInstanceId. Quest reward chỉ trao tại đúng NPC sau capacity preflight.
+**Recovery chung:** talk/visit/kill chỉ credit sau Game Server event hợp lệ; lưu step/counter sau commit, death/reconnect không xóa. Ngã ở Q2 thì thử lại, không giả credit chỉ vì bấm phím. Mộc Kiếm Q3 không bán/vứt, grant pending nếu túi đầy. Q5 không cấp lại 320 Vàng khi replay; dùng bình lúc đầy HP bị từ chối mà không tiêu thuốc. Q4 áo giữ binding tới lúc mặc, sample chỉ bán đúng step; hết hạn ground/full bag/reconnect giữ entitlement chưa claim với cùng itemInstanceId. Quest reward chỉ trao tại đúng NPC sau capacity preflight.
 
 | Quest cần xử lý riêng | Contract không lặp lại trong bảng objectives |
 | --- | --- |
-| Q6 | Reset Lv 5 đúng một lần kể cả chọn class muộn; giữ điểm lên cấp sau đó. Equip/learn/xác nhận điểm cùng active group; đã cộng ≥1 điểm chấp nhận, không ép cộng mới khi pool 0. Manual grant/learn và thuốc dự trữ có receipt; nếu Food hồi đầy MP, cast lại để dùng M thật, không fake consume. |
+| Q6 | Reset Lv 5 đúng một lần kể cả chọn class muộn; giữ điểm lên cấp sau đó. Equip/learn/xác nhận điểm cùng active group; đã cộng ≥1 điểm chấp nhận, không ép cộng mới khi pool 0. Manual grant/learn và thuốc dự trữ có receipt; nếu Food hồi đầy MP, cast lại để dùng Bình Linh Lực thật, không fake consume. |
 | Q7 | Selected ring instance được giữ binding không bán/vứt tới khi xác nhận đã mặc; đang mặc +1 không phải tháo/mặc lại. Chỉ cấp đá/Vàng nếu thật cần +0→+1, không duplicate resource sau reconnect. |
 | Q8 | Chỉ step Linh Biến giữ force request; variant khác đang sống chiếm cap thì chờ lifecycle, không demote/despawn. N requesters chia cùng `TA4.slot1`; quest credit theo từng recipient, reward Linh Biến như mọi con Linh khác. |
 | Q9 | Không có đối thủ thì giữ optional và đi Q10; không bot/skip reward. Disconnect/abort không tự hoàn thành, kết quả theo PVP-01. |
@@ -630,7 +643,7 @@ Corpse đủ 10% còn trong BossCombatArea tại Huyền Tích được Boss que
 
 Online multiplayer theo mô hình Client–Server. Player đăng nhập bằng tài khoản do admin cấp, chọn nhân vật rồi kết nối Unity Dedicated Game Server; không có Register cho player. Game Server quyết định combat, quái, Boss và kết quả trận PvP; Spring Boot/PostgreSQL lưu tiến trình, tạm giữ và quyết toán Vàng cược. Client không gửi level / Vàng / EXP / gear / thuộc tính như dữ liệu đáng tin. **P0 acceptance: tối thiểu 2 concurrent players** — hai Client kết nối Game Server; đây là mức nghiệm thu, không phải giới hạn world. P0 chạy local/LAN; triển khai Internet công khai ngoài phạm vi P0.
 
-MapId P0 kiểm combat / mob / portal / loot / chat; khác map không tương tác, chỉ render khu hiện tại. Hide / show P1 không gate slice. Boss timer / banner global khi map rỗng; tên Cự Thú / Dư Ảnh theo character, không tạo entity khác.
+MapId P0 kiểm combat / mob / map transition / loot / chat; khác map không tương tác, chỉ render khu hiện tại. Hide / show P1 không gate slice. Boss timer / banner global khi map rỗng; tên Cự Thú / Dư Ảnh theo character, không tạo entity khác.
 
 World support N players; không hard-code hai slot / Player 1–Player 2. Threat / contribution, MapId / chat, quest assist và loot eligibility dùng collection theo playerId. PvP **1v1** là mode riêng, không giới hạn multiplayer world. Co-op xét N recipients theo contribution / eligibility và level factor §6; kill / evidence credit §5, shared loot windows tách khỏi credit. **Không Party P0:** không create/invite/accept/leader/leave/kick, UI/HP bars/chat nhóm, EXP bonus, loot/quest sharing dành riêng nhóm hoặc raid. N người cùng farm chỉ cần tham gia đánh: contribution, threat, credit và quyền loot xét từng character; không membership container ở giữa. “Cụm quái” là bãi author, không tổ đội. Party chỉ xem xét sau P0, chưa có thiết kế cần code.
 
@@ -656,25 +669,29 @@ Sau kết quả, người còn phiên trở về Vân Khê với HP/MP trước 
 
 Luồng màn hình P0: Boot/Main Menu → Login tài khoản được cấp → chọn nhân vật → overlay kết nối → map/điểm khôi phục hợp lệ. Nhân vật mới bắt đầu ở Vân Khê. Không có Register cho player; không cần Loading Scene riêng.
 
-Một Move action: A/← và D/→ là alternate bindings, không cộng đôi tốc độ; không full remapping P0. S + Space ưu tiên drop-through. Text input chặn gameplay; Esc cancel / đóng cửa sổ.
+Một Move action: A/← và D/→ là alternate bindings, không cộng đôi tốc độ; không full remapping P0. Jump/DropThrough là actions riêng; cùng frame trên one-way thì Drop ưu tiên. Text input chặn gameplay; Esc cancel / đóng cửa sổ.
 
 | Phím | Action | Phím | Action |
 | --- | --- | --- | --- |
 | A / ←, D / → | Move trái / phải | H | Quick HP Potion |
-| Space | Jump | M | Quick MP Potion |
-| S + Space | Drop-through | F | Food |
-| J | Execute selected skill; Tân Lữ basic | E | Interact / Pickup |
-| 1 | Select S1 + execute attempt ngay | I | Inventory |
-| 2 | Select S2 + execute attempt ngay | C | Character |
-| 3 | Select S3 + execute attempt ngay | Q | Quest |
+| Space / ↑ | Jump | M | Quick MP Potion |
+| S / ↓ | Drop-through trên one-way đang đứng | F | Food |
+| — | — | E | Interact / Pickup (không dùng cho MapExit thường) |
+| 1 | Basic Tân Lữ / Select S1 + one-shot approach/cast | I | Inventory |
+| 2 | Select S2 + one-shot approach/cast | C | Character + skill tab |
+| 3 | Select S3 + one-shot approach/cast | Q | Quest |
 | R | Buff P1 | Enter | Chat |
 | Esc | Cancel | — | — |
+
+**Binding baseline cho prototype tiếp theo:** I Inventory, C Character (gồm skill tab), Q Quest; không B/K/L panel bindings song song. Đây là bộ mặc định để kiểm usability, chưa cam kết tối ưu hoặc thêm key-remapping P0. Space/↑ và S/↓ là OR action; drop chỉ trên one-way đang đứng, không crouch/đi xuyên solid. Nếu Jump + Drop cùng frame trên one-way thì Drop ưu tiên; trên solid Jump vẫn hợp lệ.
+
+**Movement Feel gate:** coyote time, jump input buffer, variable height theo release, ground acceleration/deceleration và fall tuning là PROTOTYPE; không khóa số trước collider/scale/map/art sample. Không thêm double-jump/dash. Drop không hưởng coyote để nhảy bật ngược lên sàn; authority và client phải dùng cùng semantics. Xem contract/probe Technical.
 
 Phím H/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Phím F dùng Food bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. E tác động ngay candidate NPC/loot riêng, không thay CombatFocus.
 
 Target HUD tối giản: world marker + mini HP; screen name/level/current-max HP/bar, bind đúng focus ID/generation; không portrait/element/rarity/generic buff panel.
 
-HUD: HP / MP / EXP / level, skill CD, Food / Potion, quest, Boss timer. Trong PvP hiện cược/pot, đồng hồ 120 s và số lần dùng HP/MP Potion còn lại (ban đầu 3/3). Bảng skill hiện ba active tích lũy, selected/locked/CD/MP riêng và hai nội tại/class: icon, tooltip, level/điều kiện khóa, auto-open Lv 5/Lv 13; không thêm hotkey nội tại. Bag-full rõ; tooltip enhance trước / sau. Portal / signpost tên vùng / hướng; quest arrow P1.
+HUD: HP / MP / EXP / level, skill CD, Food / Potion, quest, Boss timer. Trong PvP hiện cược/pot, đồng hồ 120 s và số lần dùng HP/MP Potion còn lại (ban đầu 3/3). Bảng skill hiện ba active tích lũy, selected/locked/CD/MP riêng và hai nội tại/class: icon, tooltip, level/điều kiện khóa, auto-open Lv 5/Lv 13; không thêm hotkey nội tại. Bag-full rõ; tooltip enhance trước / sau. MapExit arrow + tên vùng đích, NPC marker cơ bản P0; SpecialGate có cue riêng. Quest navigation arrow xuyên map vẫn P1. Route automation không chứng minh inventory/shop/quest dễ dùng; cần manual usability review ở tốc độ thường, xem Art/Roadmap.
 
 | Tracker state | Người chơi thấy |
 | --- | --- |
@@ -734,18 +751,18 @@ Production accounting thuộc [Art §23](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYS
 
 # 10. Nghiệm thu và hướng dẫn tra cứu
 
-**VS-1 local là nghiệm thu lát cắt, không thay các tiêu chuẩn TARGET dưới đây.** Chi tiết CURRENT/DEFERRED nằm ở Roadmap; không ký hoàn thành P0 khi chỉ Kiếm/offline chạy được.
+**VS-1 hiện có là prototype tham khảo, không phải production codebase hoặc nghiệm thu TARGET.** G-L theo revision mới cần evidence mới; test/video cũ chỉ ghi behavior của revision cũ. Chi tiết CURRENT/DEFERRED nằm ở Roadmap; không ký hoàn thành P0 khi chỉ Kiếm/offline chạy được.
 
 **Chưa nghiệm thu**: cần playable build / evidence hai Client kết nối Dedicated Game Server (tối thiểu 2 concurrent players), không thay bằng simulation hoặc diễn giải thành capacity tối đa.
 
 | Nhóm | Tiêu chuẩn |
 | --- | --- |
 | Player | Movement / jump / drop-through; Lv 1–20; reset 20 điểm Lv 5; hai class; 95 điểm Lv 20; Tẩy Mạch không mất dữ liệu |
-| Combat | Basic Tân Lữ trước class; ba active tích lũy + hai nội tại / class, manual Lv 5 / 10 / 17, CD riêng/common lock/J-selected/slot-select+execute; shape / maxTargets / falloff; snapshot / pierce / explosion không double-hit; Evade / Crit; Bỏng / Băng Hàn đúng target branch, post-thaw protection target-wide |
+| Combat | Basic Tân Lữ trước class; ba active tích lũy + hai nội tại / class, manual Lv 5 / 10 / 17, CD riêng/common lock/1–3 one-shot approach+cast, không J/RepeatOnHold; shape / maxTargets / falloff; snapshot / pierce / explosion không double-hit; Evade / Crit; Bỏng / Băng Hàn đúng target branch, post-thaw protection target-wide |
 | World | Năm farm maps, ba support zones; SpawnGroup / return / respawn; đúng bảy fixed-level identities / sáu rigs, Linh Biến max 1 / MapId và Q8 deterministic, một Boss với telegraph / target / reset / Cuồng Mạch |
 | Story | Q1–Q12 có setup / objectives / turn-in; thiếu level không auto-chain; READY_TO_TURN_IN không auto trả; Q9 không chặn Q10; Q11 complete mới mở vùng; Q12 per character / Main Story Complete; vòng chơi tiếp tục |
 | RPG / art | Food / Potion / Death; túi / kho / shop; 6 ô / 18 dòng / 21 mẫu thường / phẩm chất / giới hạn I+4, II+6, III+8 / chuyển giao cùng bậc hoặc lên bậc kế; modular 64 × 64 / PPU 32 / 26 frames |
-| Online | N-player collections; P0 acceptance tối thiểu 2 concurrent players qua LAN; combat / portal / chat / loot MapId validation; co-op; PvP cược 1v1, escrow trước trận, timeout 120 s hòa; Boss contribution 10% và shared pile 90 s |
+| Online | N-player collections; P0 acceptance tối thiểu 2 concurrent players qua LAN; combat / MapExit/SpecialGate / chat / loot MapId validation; co-op; PvP cược 1v1, escrow trước trận, timeout 120 s hòa; Boss contribution 10% và shared pile 90 s |
 | Reliability | Login/character binding qua Spring Boot; PostgreSQL lưu tiến trình, recovery checkpoint và escrow/settlement receipt; reconnect ngắn resume phiên còn sống, phiên đã mất dùng SafeAnchor; hai Client + Game Server + backend + database, demo fixtures và script/build/video fallback |
 
 Mọi thay đổi tiến trình lưu ngay qua backend, **enhance fail cũng lưu chi phí**; checkpoint MapId/HP/MP theo chu kỳ và chuyển trạng thái quan trọng, không save từng hit hay toàn world. Persistence contract, demo fixtures và acceptance đầy đủ tại Technical.

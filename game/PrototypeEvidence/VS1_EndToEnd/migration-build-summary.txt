@@ -1,0 +1,14 @@
+Build Report
+Uncompressed usage by category (Percentages based on user generated assets only):
+Textures               3.2 mb	 79.6% 
+Meshes                 0.0 kb	 0.0% 
+Animations             0.0 kb	 0.0% 
+Sounds                 0.0 kb	 0.0% 
+Shaders                12.8 kb	 0.3% 
+Other Assets           760.1 kb	 18.6% 
+Levels                 1.1 kb	 0.0% 
+File headers           12.0 kb	 0.3% 
+Total User Assets      4.0 mb	 100.0% 
+Complete build size    157.9 mb
+Used Assets and files from the Resources folder, sorted by uncompressed size:
+Build Finished, Result: Success.

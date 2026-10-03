@@ -8,7 +8,7 @@ import re
 import subprocess
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 DESIGN = ROOT / 'docs/design'
 BASELINE_REVISION = '4a57b80'

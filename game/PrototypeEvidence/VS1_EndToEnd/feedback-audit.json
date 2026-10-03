@@ -1,0 +1,244 @@
+{
+  "checkpoint": "46006c4",
+  "date": "2026-10-03",
+  "revision": "V6.2.1",
+  "passed": true,
+  "critical_order": [
+    "53.100",
+    "95 điểm",
+    "32.000",
+    "26 frame/khung",
+    "1.800/200 same row"
+  ],
+  "comparisons": [
+    {
+      "file": "docs/design/1_HUYEN_LO_GDD.md",
+      "before": {
+        "lines": 768,
+        "pipes": 336,
+        "headings": 26,
+        "sha": "38fc3590fc6731b77009f414dfeac9a1337526ee020f9f13be28ddd914c782c0",
+        "critical": [
+          1,
+          3,
+          1,
+          3,
+          1
+        ]
+      },
+      "after": {
+        "lines": 785,
+        "pipes": 336,
+        "headings": 26,
+        "sha": "97b26c46af6822c7e16fa05b234bba01a50d94dc2e78fbf4b78424eaf2c9b744",
+        "critical": [
+          1,
+          3,
+          1,
+          3,
+          1
+        ]
+      }
+    },
+    {
+      "file": "docs/design/2_HUYEN_LO_TECHNICAL.md",
+      "before": {
+        "lines": 399,
+        "pipes": 124,
+        "headings": 17,
+        "sha": "cb7574920a5ecb2d9c40f330e02c7479a28659c17d9b626c6819259bdde15a9a",
+        "critical": [
+          1,
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "after": {
+        "lines": 410,
+        "pipes": 124,
+        "headings": 17,
+        "sha": "bc3eaf1734c1df52ee6eeba6b3ea980abd5e59196c88ea93c507c8090dfc54e9",
+        "critical": [
+          1,
+          1,
+          2,
+          3,
+          1
+        ]
+      }
+    },
+    {
+      "file": "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md",
+      "before": {
+        "lines": 513,
+        "pipes": 263,
+        "headings": 23,
+        "sha": "fba2f6dd8ea2fc53eba62c5cf378bc050c4198e98d63ecfb711276d31d655e65",
+        "critical": [
+          1,
+          4,
+          2,
+          4,
+          1
+        ]
+      },
+      "after": {
+        "lines": 532,
+        "pipes": 273,
+        "headings": 24,
+        "sha": "d9469c8c0e7f64c24c1e634a1401e7482b180c74fbdc6ec8801681bcce758c45",
+        "critical": [
+          1,
+          4,
+          2,
+          5,
+          1
+        ]
+      }
+    },
+    {
+      "file": "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "before": {
+        "lines": 849,
+        "pipes": 401,
+        "headings": 46,
+        "sha": "1e6277e6908ba62be4279ababf759762029c525a3284bd12ca221a13c3569d41",
+        "critical": [
+          0,
+          0,
+          0,
+          9,
+          0
+        ]
+      },
+      "after": {
+        "lines": 858,
+        "pipes": 401,
+        "headings": 46,
+        "sha": "66e84b0995d74c1a2ae8cfbeee0a65040a53bcf64986d333f710d82f2693db3a",
+        "critical": [
+          0,
+          0,
+          0,
+          9,
+          0
+        ]
+      }
+    },
+    {
+      "file": "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md",
+      "before": {
+        "lines": 293,
+        "pipes": 126,
+        "headings": 15,
+        "sha": "9085e0d22c17bc862cd49207817177a6438acc131835fbf06fa119d7857545c0",
+        "critical": [
+          2,
+          2,
+          2,
+          8,
+          2
+        ]
+      },
+      "after": {
+        "lines": 315,
+        "pipes": 139,
+        "headings": 16,
+        "sha": "eba7fb5c91761bae59da488934a511a5ae8e7ea9eca5f43efaf31df81cf4bfdf",
+        "critical": [
+          2,
+          2,
+          2,
+          8,
+          2
+        ]
+      }
+    },
+    {
+      "file": "docs/design/README.md",
+      "before": {
+        "lines": 90,
+        "pipes": 45,
+        "headings": 6,
+        "sha": "774c1ebb6f47543a2721316d6f49eac4837c6c86e2024dbcb47e635e96580d07",
+        "critical": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "after": {
+        "lines": 90,
+        "pipes": 45,
+        "headings": 6,
+        "sha": "4f5c65b4904057f40484c6b14ca832932d5a5bb92aa770e5d2a30c54b7c126fd",
+        "critical": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "meta_files_preserved": 28,
+  "historical_evidence_files_preserved": 15,
+  "intentional_numeric_route_changes": "Analysis early Lv3/4/5 route rows only; new Nấm values derive GDD, old simulations retained. Art P05 wording clarified to resolved-result/visual-only semantics, no numeric budget changed.",
+  "sampled_source_destination": [
+    {
+      "id": "F01",
+      "destination": "1_HUYEN_LO_GDD.md#quests-story",
+      "line": 425,
+      "snippet": "| Q4 — Chiến lợi phẩm đầu tiên / 3 | Bách Luyện: “Thứ mặc được thì giữ. Thứ thừa đem bán, lấy đồng lộ phí.” Bách Luyện → Bách Luyện. | `DS2_MushroomPatch`: hạ 1 Nấm Lv 2 khi đúng step, đóng góp ≥20% → nhặt Áo Thanh Mộc + Nấm Sương tutorial → mặc áo → bán sample cho Bách Luyện → báo Bách Luyện. | Áo I + sample cấp theo bước; turn-in catch-up Lv 4 | Q5 sau Q4 + Lv 4 |"
+    },
+    {
+      "id": "F09",
+      "destination": "3_HUYEN_LO_DESIGN_ANALYSIS.md#balance-baselines",
+      "line": 185,
+      "snippet": "**LEGACY / SUPERSEDED — class Normal V6.1, không phải reasoning hiện hành:** Normal từng không MP, lấp quãng CD/MP thiếu và gây damage ổn định. Trong giả định skill luôn sẵn đúng CD, Lv10 core chiếm lock khoảng0,30/1,5 hoặc0,34/1,7 =**20% thời gian**; Lv17 thêm0,40/7≈5,7%. Đây chỉ là occupancy suy ra, không bảo đảm normal đạt full attack rate vì mốc CD có thể đụng nhau. Cần log số normal/skill/idle do MP và action lock; không kết luận normal vô dụng từ CD1 s của Lv5."
+    },
+    {
+      "id": "F03",
+      "destination": "2_HUYEN_LO_TECHNICAL.md#shared-combat-input",
+      "line": 168,
+      "snippet": "`PendingCast` nhỏ cho một press: requested SkillId, target/life/map, intentId, expiry, start/progress position; không source-stat/action snapshot hoặc commit cost lúc approach. Validate learned/state/MP/CD trước movement, trừ một latest buffer recovery ngắn nếu skill sẵn tại recovery end. In-range start ngay; hơi ngoài range và cùng reachable lane thì bounded run. Tới tầm revalidate target/profile/MP/CD/state/geometry rồi accepted start mới snapshot/commit. Target invalid/changed, blocked, hết budget/timeout hoặc manual movement/jump/drop/UI/Esc/death/map transition → clear + reason, không reacquire/cast đích mới cùng press. Press unlocked mới replace pending/buffer cũ; running action immutable. Release không cancel one-shot pending, hold không tạo cast thứ hai. Một latest buffer thử 150 ms, không FIFO/queue chờ CD dài hoặc thiếu MP. Reject không giữ intent để bất ngờ cast sau này."
+    },
+    {
+      "id": "F02",
+      "destination": "2_HUYEN_LO_TECHNICAL.md#maps",
+      "line": 81,
+      "snippet": "**MapTransition contract:** `EdgeExit` là trigger mép map + targetMap/targetExit/spawn anchor; authority kiểm actor alive, MapId/generation, overlap đúng exit, connected destination và unlock, không nhận arbitrary destination từ client. `SpecialGate` có activation/interaction riêng theo GDD (Huyền Môn/Arena), không chung E cho mọi exit. Hai loại đi qua cùng pipeline MapId/checkpoint/cancel. Một pending transition/actor, dedup request/trigger; vào vùng đích ngoài return trigger, chỉ re-arm sau khi rời exit. Reject hiện reason một lần và không spam retry khi đứng tại biên; cần rời rồi vào lại. Actor khác không bị khóa exit. Backend commit destination checkpoint trước publish theo §6; fail giữ nguồn và không cho destination snapshot giả. Collider/safe-strip/camera và pending ACK phải kiểm riêng, không lấy trigger local prototype chứng minh online."
+    },
+    {
+      "id": "F04",
+      "destination": "2_HUYEN_LO_TECHNICAL.md#movement-feel",
+      "line": 174,
+      "snippet": "**Movement Feel prototype contract:** action-based Jump/Drop OR aliases; release Jump chỉ khi không còn binding Jump nào held. Coyote time từ last valid grounded support; jump buffer có expiry và consume một lần; mỗi press tối đa một jump. Grounded reject đi lên, kiểm feet/support, không dựa sprite bounds. Variable height bằng release cutoff/extra gravity khi đi lên; acceleration/deceleration theo ground/air state, tốc trần dùng MoveSpeed evaluator gồm AGI/boots/Slow; fall tuning/cap không đổi pose clock. Tất cả duration/forces là PROTOTYPE/TUNABLE, chưa có “chuẩn platformer” được lock. Dùng authority timebase và fixed physics; không render-FPS-dependent timer. Coyote/buffer không cấp double jump; clear khi death/map/UI/Freeze phù hợp."
+    },
+    {
+      "id": "F07",
+      "destination": "1_HUYEN_LO_GDD.md#quests-story",
+      "line": 424,
+      "snippet": "| Q3 — Vũ khí trong tay / 3 | Phong Du: “Đừng vội. Giữ thế cho chắc, rồi ra đòn.” Phong Du → Phong Du. | Nhận/mặc Mộc Kiếm → `HV_DummyYard` → hạ 3 Bù Nhìn, mỗi life đóng góp ≥20% → báo Phong Du. Yard có ít nhất 3 Dummy cùng lúc; HP 60, không đánh/trả thưởng; respawn 25 s TEST. | Mộc Kiếm cấp trước một lần; turn-in Quần Thanh Mộc I, 0 EXP | Q4 sau Q3 + Lv 3 |"
+    },
+    {
+      "id": "F05",
+      "destination": "2_HUYEN_LO_TECHNICAL.md#combat-data",
+      "line": 153,
+      "snippet": "**Melee separation/reposition prototype:** production phải đạt nguyên tắc cluster đọc được mà không pile; exact spacing/response vẫn PHY-01 TUNABLE. Disable body collisions Player–Monster và Monster–Monster; hurtbox/query riêng. Ground AI chọn desired X offsets trái/phải quanh reachable target trên cùng lane; thử một danh sách 3–4 offsets chỉ là fixture, không lock slot count hoặc formation system. Điểm bị tường/mép/actor gần chiếm thì chọn điểm hợp lệ khác hoặc hold có hạn; không teleport sang phía kia player, không group attack mutex. Threat target không đổi vì offset bị chiếm. N-player probe theo từng mob/target, không assume hai người."
+    },
+    {
+      "id": "F08",
+      "destination": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#icons-ui",
+      "line": 542,
+      "snippet": "**UI usability gate P11:** dùng kit panel/button/slot/tooltip/list hiện có để review ở tốc độ thường: tìm món/equip/bán sample không nhầm, nhận/trả quest và next action dễ hiểu, dismiss modal không lọt attack, pending approach có thể hủy rõ, locked skill/exit có reason; thử cả lỗi full bag/đầy HP/sai NPC. Log do dự/misclick/số bước/giờ sửa và nhận xét người chơi; không khóa ngưỡng thời gian hoặc gọi text-only automation là UX PASS."
+    }
+  ],
+  "errors": [],
+  "scope": "documentation and prototype relocation; not runtime acceptance of revised gameplay"
+}
