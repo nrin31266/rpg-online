@@ -1,8 +1,8 @@
 # Huyền Lộ — Phân tích thiết kế
 
-**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-09-30 · **Vai trò:** evidence, simulation và quyết định mở.
+**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-10-03 · **Vai trò:** evidence, simulation và quyết định mở.
 
-GDD là design authority; Technical là implementation contract. **DERIVED** là phép tính từ GDD; **SIMULATION** phụ thuộc giả định; **PROPOSAL** chưa thành luật. Bảng chỉ số trang bị và hồ sơ xác định đã tính lại với Chí mạng Kiếm, Chính xác Cung và tốc chạy Giày. Các mô phỏng giao tranh, hành trình và Boss còn dùng hồ sơ trước thay đổi này; xem là mốc đối chiếu, cần chạy lại khi có harness/runtime. Chưa có Unity/runtime acceptance.
+GDD là design authority; Technical là implementation contract; Art sở hữu visual/production; [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md) giữ CURRENT/DEFERRED. Local Kiếm là bước triển khai đầu, mọi bảng Cung/online vẫn là evidence TARGET P0. **DERIVED** là phép tính từ GDD; **SIMULATION** phụ thuộc giả định; **PROPOSAL** chưa thành luật. Bảng chỉ số trang bị và hồ sơ xác định đã tính lại với Chí mạng Kiếm, Chính xác Cung và tốc chạy Giày. Các mô phỏng giao tranh, hành trình và Boss còn dùng hồ sơ trước thay đổi này; xem là mốc đối chiếu, cần chạy lại khi có harness/runtime. Chưa có Unity/runtime acceptance.
 
 <a id="balance-baselines"></a>
 
@@ -20,7 +20,7 @@ Bộ số combat/gear trong GDD V6.1.0 giữ nguyên; các bảng dưới đây 
 
 **Mô hình trạng thái:** 32 hạt giống trong hai giờ, 1–4 người đánh lệch pha, giả định đòn trúng và đủ Linh lực; đây là trần thuận lợi, không là tỷ lệ hiệu ứng thực khi chơi. Boss projection cộng hai dòng sát thương độc lập, giả định 50/65/75% thời gian ra đòn hữu hiệu. PvP chỉ mô hình một chiều, không là kết quả trận đấu.
 
-**Bất biến kiểm được:** tổng NeedEXP tới Lv 20 là 53.100, tổng 95 điểm thuộc tính. 18 dòng / 21 mẫu trang bị thường + Mộc Kiếm; 12 module hình ảnh trên một rig 26 khung. Bảy loại quái và bản đồ hiện hành cho đường farm hợp lệ tới Lv 20. Các phép tính này không thay bài kiểm thử khi triển khai.
+**Bất biến kiểm được:** tổng NeedEXP tới Lv 20 là 53.100, tổng 95 điểm thuộc tính. 18 dòng / 21 mẫu trang bị thường + Mộc Kiếm. Mốc art cũ “12 module hình ảnh trên một rig 26 khung” là phép đếm ba band × bốn loại, không chứng minh tổng asset hoặc diễn giải 26-frame; [Art accounting](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#production-accounting) giữ kịch bản đầy đủ, A01/A17 OPEN. Bảy loại quái và bản đồ hiện hành cho đường farm hợp lệ tới Lv 20. Các phép tính này không thay bài kiểm thử khi triển khai.
 
 <a id="character-evidence"></a>
 <a id="combat-analysis"></a>
@@ -159,6 +159,51 @@ Dồn Sinh Lực có trận dài, dồn Công Lực có trận ngắn; điều n
 | 10.000 | 18.000 / 2.000 | 9.000 | 10.000 |
 
 Winner đã nộp `W` nên lãi ròng `0,8W`; loser mất `W`. DRAW mỗi người mất `0,1W`; system abort không thu phí. Mọi mức cược 1.000–10.000 bước 1.000 cho kết quả Vàng nguyên; không cần làm tròn. Bảng này kiểm arithmetic, chưa đánh giá đủ Vàng ở Q9 hay hành vi người chơi; Q9 vẫn optional.
+
+<a id="art-combat-timing-evidence"></a>
+
+## Evidence timing từ Art — giữ baseline, chưa retune
+
+Phần này chuyển đầy đủ từ Art §10/§10.1/§10.2 ngày 2026-10-03. Chủ sở hữu phép tính/probe là Analysis; [Art §10](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-timing) giữ cách diễn pose/VFX. Đây là **DERIVED / PROPOSAL**, không kết quả Unity. Các mốc test không thay luật [GDD §3](1_HUYEN_LO_GDD.md#class-combat).
+
+**Đọc từ:** GDD §3, Analysis §2. Giữ số hiện hành trước test; mô phỏng TTK cũ chưa tính đủ Chí mạng/Chính xác vũ khí và Giày, không bằng chứng chốt nhịp.
+
+| Đại lượng | Hiện hành / suy ra | Probe recommendation, chưa đổi luật |
+| --- | --- | --- |
+| Normal interval | Tân Lữ1,00 s; Kiếm0,80 s; Cung0,90 s | Giữ làm control; nếu feel sai, thử Kiếm0,70–0,90 và Cung0,85–1,05 s theo cặp, gap khoảng0,05–0,20 s. Không đổi range/damage cùng lượt thử |
+| Cung chậm hơn Kiếm | Interval +0,10 s =12,5% dài hơn; tần suất đòn1,111 so1,25/s =11,1% ít hơn | 0,10 s hợp lý để probe draw, chưa chứng minh tối ưu. Với power0,95, raw normal/s khoảng15,6% thấp hơn Kiếm trước hit/crit, bù bằng range/accuracy chứ không riêng art |
+| Normal hit/spawn và lock | +0,10 s /0,26 s cho mọi class | Kiếm Attack3 ở12 FPS dài0,25 s gần khớp lock; hit0,10 cần duration riêng. Cung draw0,10 s có nguy cơ quá ngắn. Thử release0,12–0,18 s, lock0,28–0,36 s **chỉ nếu cần**, rerun scheduler/TTK |
+| Lv5 core | 2MP/1,0 s, spawn/hit0,12 s, lock0,30 s | Pose prepare/draw cần hoàn trước0,12; dùng hold/time map. Nếu spam làm normal không có vai trò, đo usage rồi thử CD1,2/1,4 s riêng, không mặc định nerf |
+| Lv10 core | Kiếm4MP/1,5 s/lock0,30; Cung4MP/1,7 s/lock0,34 | Giữ control; khi cần probe CD ±0,2 s, giữ cost/power trước để tách ảnh hưởng |
+| Lv17 signature | 16MP/7 s/lock0,40; Kiếm hit0,16, Hàn spawn0,18 | Cast chuẩn bị có thể giữ bốn pose khác duration. CD6/7/8 s là sensitivity test sau có scene, không tự tăng để VFX dài hơn |
+
+Timing contract là **anticipation → release/hit mốc server → recovery**, tách interval/CD/action lock/flight/VFX decay. Skill4 ở12 FPS dài0,333 s >lock nhập môn0,30 s: nếu giữ duration đều sẽ trễ pose return hoặc khóa người chơi ngoài luật. Đề xuất sampling theo normalized action phase, đặt release khớp mốc server, cắt/chuyển recovery khi action mới hợp lệ; main VFX có thể tan sau actor về Idle. Không queue thêm hit do frame skipped.
+
+Normal còn vai trò: không MP, lấp quãng CD/MP thiếu và gây damage ổn định. Trong giả định skill luôn sẵn đúng CD, Lv10 core chiếm lock khoảng0,30/1,5 hoặc0,34/1,7 =**20% thời gian**; Lv17 thêm0,40/7≈5,7%. Đây chỉ là occupancy suy ra, không bảo đảm normal đạt full attack rate vì mốc CD có thể đụng nhau. Cần log số normal/skill/idle do MP và action lock; không kết luận normal vô dụng từ CD1 s của Lv5.
+
+<a id="art-sustain-evidence"></a>
+
+### Sustain Lv 5/10/20 — giả định thuận lợi
+
+Phép tính dưới dùng bảng **chỉ số đã cập nhật** trong Analysis, hồ sơ cân bằng/full Common+0 ở đúng band, Food đúng cấp. Upper demand = cost/CD cho core + big khi đã học; không tính travel/evade/lock làm bỏ cast, không dự báo TTK thực.
+
+| Mốc / Kiếm–Cung | MaxMP | Food MP/s | Upper skill MP/s | Thiếu MP/s |
+| --- | --- | --- | --- | --- |
+| Lv5 / FoodI / core | 121 /133,1 | 0,9075 /0,9983 | 2 /2 | 1,0925 /1,0018 |
+| Lv10 / FoodII / tiến cảnh | 171 /188,1 | 1,71 /1,881 | 4/1,5=2,6667 /4/1,7=2,3529 | 0,9567 /0,4719 |
+| Lv20 / FoodIII / core+big | 316 /347,6 | 3,95 /4,345 | 4/1,5+16/7=4,9524 /4/1,7+16/7=4,6387 | 1,0024 /0,2937 |
+
+FoodI/II/III hồi MP tương ứng0,75%/1%/1,25% MaxMP mỗi giây trung bình. Không tính regen khi chết/không Food. Thay CD, action lock, Boots hoặc target travel sẽ đổi thời gian hữu hiệu/cost bình; thử có Food, thiếu Food, cân bằng và zero-INT, không dùng full+8 làm chuẩn mọi người.
+
+TTK target cùng cấp/Common+0 hiện early2–4 s, mid3–6, late4–8 s; các loài chỉ có bảy level cố định nên đo actual pair gần cấp, không dựng thêm mob giả cùng mỗi level. Đo trước/sau Q11, solo và nhóm2/3/5 target, hit/miss ở hai tầng, run-back và 2/4 player. Giữ HP curve trước khi có evidence, không tăng máu để bù VFX signature quá dài.
+
+<a id="art-proc-evidence"></a>
+
+### Proc và nhịp feedback — tần suất, không phải uptime
+
+Normal không roll Bỏng/Băng Hàn. Upper successful chance cadence trên một target trúng mọi cast: Kiếm core4%/1,5 s → một proc kỳ vọng mỗi37,5 s; Cung core2%/1,7 s →85 s, Linh1%→170 s. Đại chiêu Kiếm70%/7 s →10 s; Hàn normal45%→15,6 s, Linh30%→23,3 s. Đây là tần suất roll thuận lợi, không uptime vì refresh/protection/miss/đổi target. Không tăng core proc chỉ để art status xuất hiện nhiều.
+
+Giữ Bỏng một overlay và tick1 s, refresh không restart animation entry liên tục; Freeze1,5 s rồi protection3 s target-wide; Boss/PvP chỉ Slow. Ba tên A/A/A chỉ một roll/effect/unique actual target/cast, kể cả fail. Test 1/2/4 Kiếm/Cung lệch pha vì overlay/proc spam có thể che action dù damage không stack. Giữ số proc hiện tại, dùng fixture status có chủ đích để kiểm art thay vì buff gameplay.
 
 <a id="farm-progression"></a>
 <a id="world-economy-analysis"></a>
@@ -363,9 +408,61 @@ NAR-01: Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò m�
 | QUEST-03 — PLAYTEST | Thời gian Lv1–20 và hồi phục khi lỗi | Mô hình ~115–131 phút, mục tiêu 150–240 phút | Playable journey vẫn quá nhanh/chậm sau tính đi lại, chết, UI và multiplayer |
 | TECH-01 — SPIKE | Login → Character Select → one-time ticket → dedicated join; lease/duplicate session, internal service credential và backend outage | Technical §5–6: Spring xác minh account/character; Game Server xác minh ticket, một writer/character | Spike hai Client + backend/DB thật, thử duplicate join, consumed ticket, timeout trước/sau commit và server crash |
 
+TECH-01/SAVE-01 và A15 còn cần chốt thứ tự Potion–hit–checkpoint, definite reject khác timeout, deathUtc/cap release ở terminal-pending và neo clock phiên↔UTC. [Các chuỗi probe cụ thể](2_HUYEN_LO_TECHNICAL.md#pending-ordering-probes) bổ sung acceptance của spike, chưa bằng chứng runtime hoặc approval schema. Các gap này không chặn local Kiếm bằng RAM fixture, nhưng phải giải trước G-D/reliability.
+
 **Rủi ro kiến trúc V6.1:** auth/ticket/lease, checkpoint ordering/validation, reconnect grace, escrow orphan recovery, transaction N recipients, backend downtime và dedicated build/headless physics cần integration tests. Mốc giờ player-host/JSON cũ không còn dùng để cam kết lịch; spike đầu đo integration/latency, sau đó Technical mới đặt lại ngân sách. Quest, gear, combat PvE và world balance giữ số hiện tại; các luật PvP/recovery trên là user lock, không Open Decision.
 
+[Review Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT kiểm Kiếm/Q1–Q6 local rồi gate Dedicated hai Client trước production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
+
 Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST/SPIKE ghi rõ phải đo gì. Không tăng NeedEXP, HP quái hoặc tạo hệ thống mới từ mô hình thiếu cảnh thật.
+
+<a id="art-open-decisions"></a>
+
+## Sổ quyết định Art và các dependency — alias A01–A17
+
+Đây là **nơi duy nhất giữ trạng thái quyết định** cho A01–A17, chuyển nguyên options/recommendation/cách chốt từ Art §25. Axx là alias lịch sử, gắn vào gate sẵn có dưới đây; không tạo một hệ luật cạnh tranh với BAL/ART/PHY/TECH. Trong bảng options cũ, `§10` chỉ [evidence timing đã chuyển](#art-combat-timing-evidence). P01–P15 là **ca thử** trong [Art §24](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-validation), không decision ID hay phase roadmap. Tất cả ca Unity vẫn **CHƯA CHẠY**.
+
+| ID / vấn đề | Options và trade-off | Recommendation hiện tại | Cách chốt |
+| --- | --- | --- | --- |
+| A01 Ý nghĩa 26 frame | 26 ảnh tổng: chặt budget nhưng có thể thiếu Bow; 26 ô/profile dùng lại ảnh: tăng vài upper pose; hai bộ đầy đủ: dễ author nhưng dư locomotion | 26 ô baseline/profile, pose map chung, upper body riêng theo class; **cần duyệt lại diễn giải user-lock** | Duyệt design + P01/P03, không tự tuyên bố lock đã đổi |
+| A02 Technique/weapon poses | Raster toàn bộ: sạch nhưng tốn; socket/skeletal thuần: ít ảnh nhưng rủi ro outline/khớp; hybrid: setup vừa và pose chính sạch | Hybrid body raster/weapon socket, góc sửa khi cần; 13–25 weapon outcomes chỉ là kịch bản | P01–P03 và chi phí P15 |
+| A03 Boots | Giữ stat-only: không cost world; bỏ: giảm gear nhưng đổi economy/balance; footwear slot có visual thật: thêm layer | Giữ stat-only P0, LowerBody chứa footwear mỹ thuật | Có thể quyết bằng design; nếu bỏ phải tính lại P13/loot/traversal |
+| A04 Skill/VFX concept | Nét Mạch Ấn, kiếm khí/băng hoặc linh ảnh: khác sắc thái/cost; linh ảnh lớn dễ bị hiểu là entity đánh thêm | Motif linh mạch ấm/lạnh, 4 active presets/6 profiles; signature bằng hình và nhịp | P03/P04/P14; concept cụ thể chưa khóa |
+| A05 Multi-target Cung | Flight hiện hành: giữ collision nhưng impact lệch; đổi speed/spawn: giảm lệch, có thể đổi né; resolve đồng thời: đổi gameplay lớn | Giữ một fan release và impact server. Nếu bắt damage cùng nhịp, duyệt contract mới riêng | Design + P04/P12/P13, art không tự sửa |
+| A06 Normal/timing/CD/proc | Giữ baseline; đổi duration pose nhưng giữ clock; tune hit/lock/CD nếu cảm giác sai | Giữ 0,80/0,90 s và MP/CD/proc; thử release Bow/timeline trước đổi damage/HP | P03/P13; các test ranges §10 không là acceptance mới |
+| A07 Dummy | HP60/25 s cũ: rẻ nhưng chờ; HP60 + pool nhanh: giữ Q3 nhưng vẫn one-shot; HP lớn/scaling: test dài hơn nhưng phức tạp hoặc hại Q3 | Một prefab/yard, HP60; thử 3 điểm đứng/respawn 3–5 s; không DPS Meter/scaling P0 | P07; timer/count thay đổi cần duyệt GDD |
+| A08 Corpse/flying loot | Fade nhanh: sạch; hold lâu: thấy kill nhưng clutter; rơi visual: tự nhiên; tan tại chỗ: rẻ; chiếu loot xuống nền: reachable nhưng cần luật server | Ground hold 0,5–1,5 s/fade 0,3–0,5 s; Ong rơi visual/fallback tan; loot server chọn điểm hợp lệ | P06/P09; corpse art và loot gameplay quyết riêng |
+| A09 Terrain/building | Cell 16/32/64 px; tile-only hoặc mini kit/full asset; ít variant giảm cost nhưng lặp texture | Thử 32 px, 17 semantic + 4 cosmetic/họ; kit cho motif lặp, full asset cho landmark độc nhất | P08/P09/P15; blockout quyết số module thật |
+| A10 Tầng/AI/projectile mask | Ground cùng lane reachable: rẻ; navigation đổi tầng: linh hoạt nhưng tăng logic; platform chặn đạn/cho xuyên: đều cần cue và balance | Author mob trên lane AI hiện có hỗ trợ, hybrid fallback; solid chặn nhất quán; one-way mask chưa khóa | Technical/Design + P09; không mặc định mob Jump |
+| A11 Anticipation online | Chỉ local pose: rẻ nhưng chờ projectile; projectile tạm: mượt hơn, cần xử lý ghost/dedup; rollback combat: tăng scope | Pose/âm/cast cosmetic ngay, projectile chính/result authoritative; projectile tạm chỉ khi đo thấy cần | P12; không thêm prediction/rollback physics P0 |
+| A12 Camera/UI/pixel scale | 480×270 hoặc 640×360 và policy màn hình khác; icon 32 px/lớn hơn; snap/rotation | Giữ PPU32, thử world view 15/20 u, UI font đủ dấu; chọn readability trước export | P01/P08/P11/P14; pin pipeline ở Technical spike |
+| A13 Select preview | Default/class preview: không thêm data; exact gear: reuse rig nhưng cần canonical visual summary | Default preview/name/level/class; exact gear chỉ nếu duyệt dependency read-only | Design/Technical + P11/P12; không account redesign |
+| A14 Action khi nhảy/chạy | Full pose attack trên không: ít setup nhưng chân lệch; upper action + lower locomotion: reuse tốt nhưng overlap khó; pose riêng: đẹp nhưng tăng cost | Không thêm movement lock để cứu art; thử hành vi được cho phép, thêm đúng pose/track thiếu | P01/P03/P09; khóa movement/jump là gameplay proposal |
+| A15 Death terminal-pending | Chờ ACK mới Death: nhất quán nhưng trễ; terminal state → Death ngay: đọc tốt nhưng cần event/state riêng | Diễn theo server terminal, success/reward sau ACK; deathUtc/deadline không tự đổi | Technical + P06/P12; không local đoán chết |
+| A16 Boss scope | 28 pose core hoặc thêm 4 roar; canvas 128/192 px; roar pose riêng hoặc overlay | Giữ behavior/telegraph, Cuồng không chen action; canvas theo room, roar optional | P14/P15; ngưỡng 30% không tự tạo action mới |
+| A17 Accounting thực | Xuất PNG variants: nhiều ảnh; palette reuse: ít ảnh nhưng có setup; thêm shape: silhouette tốt và tăng cost | Thay S0 bằng manifest/giờ slice; không chốt tổng giờ khi chưa có evidence | P15 và review scope trước production hàng loạt |
+
+| Alias lịch sử | Gate liên quan | Trạng thái sau consolidation / phạm vi được chấp nhận |
+| --- | --- | --- |
+| A01 | ART-01 | OPEN: phép cộng 26 ô là xác định; ý nghĩa giới hạn tổng raster hay ô/profile chưa được duyệt lại. Giữ nguyên user-lock trong GDD. |
+| A02 | ART-01 | OPEN: hybrid và số góc/pose là phương án thử, chưa specification kỹ thuật cuối. Kiếm CURRENT; phần Cung DEFERRED. |
+| A03 | GEAR-01 / BAL-01 / LOOT-01 | BASELINE giữ sáu slots/Boots stat-only theo GDD. Option bỏ/visual Boots vẫn OPEN, chưa duyệt thay gameplay. |
+| A04 | ART-01 / CC-01 | APPROVED nguyên tắc phân biệt cast/main VFX/impact/status; OPEN concept cụ thể, số frame và motif. Kiếm CURRENT, Cung/Boss thử ở phase sau. |
+| A05 | ART-01 / PHY-01 / BAL-01 | BASELINE giữ SnapshotSpread/flight/fallback/status dedup hiện hành. OPEN normal Cung executor/speed còn thiếu, tốc độ flight player projectile chưa có số và option đổi spread đồng thời; không tự chốt hitscan. |
+| A06 | ART-01 / BAL-02 / GEAR-01 | BASELINE giữ interval/MP/CD/proc; OPEN các sensitivity ranges. Timing pose bám clock đã được chấp nhận, retune gameplay cần evidence. |
+| A07 | ART-01 / QUEST-03 / SCOPE-01 | BASELINE HP60/25 s Q3; OPEN DEF/EVA, số điểm đứng và timer nhanh. Q3/Q6 solo CURRENT; contention thử ở gate mạng. |
+| A08 | ART-01 / PHY-01 / LOOT-01 | APPROVED corpse tách gameplay terminal/respawn. OPEN hold/fade exact, flying fall và điểm loot server chọn. |
+| A09 | ART-01 / PHY-01 | APPROVED cue solid/one-way/prop và surface đọc được; OPEN tile cell/module count/cách dựng kit. Room CURRENT, full families DEFERRED. |
+| A10 | PHY-01 / ART-01 | OPEN ground route đổi tầng, projectile mask one-way. Author lane reachable làm baseline thử, không thêm mob Jump/navigation tự động. |
+| A11 | TECH-01 / ART-01 | BASELINE presentation chỉ đọc authority; OPEN immediate local anticipation/tentative projectile và schema. Local Authority CURRENT; Dedicated/2-client gate kế tiếp. |
+| A12 | ART-01 / PHY-01 | OPEN camera/reference resolution/UI scale, pixel snapping và icon size; PPU32 giữ nguyên. |
+| A13 | TECH-01 / ART-01 | OPEN preview default hoặc exact gear/read-only summary; Login/Select TARGET P0, DEFERRED khỏi VS-1. |
+| A14 | ART-01 / PHY-01 / BAL-01 | OPEN quyền chạy/nhảy lúc cast và cách phối upper/lower pose. Không thêm movement lock để giữ số ảnh. |
+| A15 | TECH-01 / SAVE-01 / ART-01 | BASELINE terminal-pending không reward/respawn trước commit; OPEN event presentation trước ACK và deathUtc t0 contract chi tiết. |
+| A16 | BOSS-02 / CC-01 / ART-01 | DEFERRED art prototype Boss; OPEN canvas/28 pose/roar. Behavior, telegraph và Cuồng đã có baseline GDD, không bị bỏ. |
+| A17 | ART-01 / SCOPE-01 / TECH-01 | OPEN tổng count/giờ thực; CURRENT đo Kiếm/room/kit và % art dùng được. S0 chỉ kịch bản, thay estimate sau evidence. |
+
+Không có proposal gameplay nào bị chuyển sang LOCKED trong lượt này. **REJECTED cho CURRENT**: production hàng loạt trước gate, dùng AnimationEvent/VFX để sinh damage, dùng mô phỏng làm acceptance, hoặc gọi Cung là P1. Các lựa chọn thẩm mỹ chưa có prototype tiếp tục OPEN; việc chưa làm là DEFERRED, không phải loại bỏ khỏi TARGET.
 
 <a id="research-ideas"></a>
 <a id="legacy-provenance"></a>

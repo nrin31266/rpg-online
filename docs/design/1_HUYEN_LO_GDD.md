@@ -4,13 +4,13 @@
 **Current Design Version:** V6.1.0
 
 **Status:** PRE-IMPLEMENTATION DESIGN  
-**Last Reviewed:** 2026-09-30
+**Last Reviewed:** 2026-10-03 (consolidation; bộ luật V6.1.0 giữ nguyên)
 
 <a id="gdd-0"></a>
 
 # 0. Thẩm quyền và luật đã khóa
 
-GDD giữ luật game; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) giữ evidence / quyết định mở; [Technical](2_HUYEN_LO_TECHNICAL.md) giữ implementation contract.
+GDD giữ luật game (WHAT); [Technical](2_HUYEN_LO_TECHNICAL.md) giữ hợp đồng triển khai (HOW); [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) giữ evidence/quyết định (WHY); [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md) giữ chi tiết hình ảnh/production; [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md) giữ thứ tự và CURRENT/DEFERRED (WHEN).
 
 User lock và review đã thống nhất được ghi vào GDD hiện hành; Analysis / Technical không tự đổi gameplay. Deterministic defect đã xác minh phải sửa đồng bộ; proposal và reference không tự thành luật.
 
@@ -65,9 +65,9 @@ P1 chỉ triển khai sau core và quyết định scope; thông số proposal g
 
 **DROP:** Guild / Trade / Pet / Mount / Crafting / Auction / FreePK; nhiều tiền tệ; Skill Rank; cường hóa vượt giới hạn từng bậc (III không vượt +8); Channel / Zone; world chat / hạ tầng MMO nhiều cụm máy chủ; nợ EXP; hút HP / MP; Decoy; ghép đá; Hương EXP; hệ kháng / yếu nguyên tố. Không thêm thuộc tính hoặc hiệu ứng ngẫu nhiên ngoài luật hiện hành.
 
-Roadmap / budget là giả định cần đo slice, không acceptance; xem Technical.
+**TARGET / CURRENT / DEFERRED:** P0 trong GDD là game đích đầy đủ, gồm cả Kiếm/Cung và online Dedicated + Spring/PostgreSQL. Hiện triển khai local/offline Kiếm trước; Cung và các hệ online được hoãn theo thứ tự, vẫn thuộc TARGET P0. Đây là chiến lược triển khai, không đổi genre hoặc final acceptance. Phạm vi bản thử và gate mạng sớm nằm ở [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#target-current-deferred).
 
-> **Implementation:** [Technical — spike / roadmap](2_HUYEN_LO_TECHNICAL.md#roadmap)
+> **Thứ tự triển khai / ngân sách:** [Roadmap — VS-1 và mục tiêu quản lý](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#vs-1)
 
 ---
 
@@ -188,6 +188,8 @@ Một action lock chung; CD / MP commit tại cast start, normal cũng có CD ri
 | Linh Tiễn tiến cảnh | Ba tên: +0,12 / +0,15 / +0,18 s | 0,34 s |
 | Kiếm Khí | +0,16 s | 0,40 s |
 | Hàn Tiễn | Spawn +0,18 s | 0,40 s |
+
+Executor/spawn/range/collision của skill Cung giữ theo bảng hiện hành; tốc độ flight player projectile chưa có số, normal Cung còn cần hoàn thiện executor/speed ở [A05](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions) trước triển khai branch. Ghi fixture rõ, không tự chọn hitscan hoặc đổi semantics để đồng bộ VFX.
 
 Projectile damage tại Game Server impact. Death / portal / invalid generation hủy pending hit / spawn, không hoàn cost; projectile đã spawn tiếp tục trong MapId gốc tới hit / expiry, không chuyển theo caster. AnimationEvent chỉ visual. ART-01 tune timings, chạy lại model khi đổi.
 
@@ -687,17 +689,11 @@ Một male modular rig, không female MVP: **64 × 64 px / PPU 32**, body **44�
 | Jump | 2 | 8 | Hit | 2 | 10 |
 | Fall | 2 | 8 | Death | 3 | 8 |
 
-**26 frames**, parts đồng bộ index / pivot. Ba visual families trùng ba gear bands: Thanh Mộc / Vân Nham / Huyền Ấn. Weapon / Armor / Pants modular; Boots / Ring / Necklace icon / stat only. Cùng family reuse silhouette / frame nhưng khác tier có palette / tint hoặc accent rẻ: Thanh Mộc vải / lục; Vân Nham đá / đồng; Huyền Ấn cổ văn. Không thêm animation set; Head / Hair là base visual, không Helmet slot.
+**26 frames**, parts đồng bộ index / pivot. Ý nghĩa giới hạn tổng hình raster hay ô/profile đang **OPEN A01**; chưa duyệt thay user-lock bằng 33 pose. [Art §1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#player-visual) phân biệt ô timeline/hình reuse/pose class; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions) giữ trạng thái quyết định. Ba visual families trùng ba gear bands: Thanh Mộc / Vân Nham / Huyền Ấn. Weapon / Armor / Pants modular; Boots / Ring / Necklace icon / stat only. Cùng family reuse silhouette / frame nhưng khác tier có palette / tint hoặc accent rẻ: Thanh Mộc vải / lục; Vân Nham đá / đồng; Huyền Ấn cổ văn. Không tự thêm animation set khi A01/A02 chưa được duyệt; gear vẫn dùng male rig chung, khả năng thêm pose/profile class phải giải quyết OPEN trước. Head / Hair là base visual, không Helmet slot.
 
 Art P0: male rig, ba families, Sword / Bow visuals, sáu normal sprite sets + một palette Sói Trúc Ảnh (bảy identities), không sprite set riêng Linh Biến, một Boss, ba environment families, UI kit, bốn active VFX presets, nhập môn / evolution reuse cùng class motif, Linh Đạn generic, aura Linh Biến, heal / upgrade / death feedback. Forest dùng Đồng Sương / Trúc Ảnh; Mountain dùng Bạch Vân / Xích Nham; Ancient dùng Huyền Tích; hub tái dùng architectural props phù hợp.
 
-**Visual production flow** (import/layer/collider chi tiết tại Technical §8):
-
-| Pipeline | Thứ tự và ranh giới |
-| --- | --- |
-| Nhân vật | Source sprite → canvas64×64 / PPU 32 → slice 26 frames → chung pivot chân → male BodyBase / HairHead / Pants / Armor / Weapon → đồng bộ state / frame → palette / accent ba gear bands → actor SortingGroup → status / VFX overlays. Hurtbox / collider độc lập visual, đổi gear / scale Linh không đổi physics. |
-| Map | Forest / Mountain / Ancient → tileset / palette → background → Ground / one-way Platform → back props → landmark → foreground → anchors quái / NPC / portal → colliders → camera bounds → kiểm contrast / telegraph / loot / chat. Không thêm lighting framework P0; dùng màu / VFX hiện có. |
-| Gắn layout với art | Đồng thoáng / sparse; Trúc nhiều tầng / cầu; Bạch bậc thác; Xích hẻm núi / ba dấu ấn; Huyền phế tích / landmark Boss. Hub reuse props; safe strips và đường về phải đọc được. |
+**Yêu cầu hình ảnh người chơi thấy:** default outfit khi chưa mặc/unequip; Mộc Kiếm và sáu vũ khí phái phải nhận diện đúng món; Weapon/Armor/Pants thay hình theo band, phụ kiện stat-only như §6. Cue mặt đứng/one-way/prop, trạng thái Bỏng/Đóng Băng/Làm Chậm và hình đòn không được gây hiểu nhầm về hit/CC/loot. Pose/hybrid/socket, import/layer và số ảnh sản xuất do [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-integration) sở hữu; cách tích hợp runtime/physics do [Technical §8](2_HUYEN_LO_TECHNICAL.md#art-contract) sở hữu. Pipeline cũ đã chuyển nguyên sang [Art §22.1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#legacy-visual-flow).
 
 Flash / damage / heal / NÉ, local hit-stop, trail, loot beam và sound; không hard CC mới. Layer / import tại Technical.
 
@@ -710,7 +706,7 @@ Flash / damage / heal / NÉ, local hit-stop, trail, loot beam và sound; không 
 Các overlay chỉ là presentation của status Game Server đã resolve; không thêm sprite/animation rig riêng hoặc đổi collider.
 
 > **Implementation:** [Technical — art / animation](2_HUYEN_LO_TECHNICAL.md#art-contract)
-Art accounting: 3 bands × (Sword + Bow + Armor + Pants) = 12 visual modules trên chung 26-frame rig, không 18 full rigs; 21 regular template icons có thể reuse motif / palette, sáu manual icons dùng hai motif class + ba accents. Một base body / hair, aura / status overlays chung; actual slicing / pose reuse cần ART-01 đo, không nhân template count thành rig count.
+Production accounting thuộc [Art §23](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#production-accounting); phép tính 12 modules trước review được giữ nguyên ở [trace](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#legacy-art-accounting), không là tổng asset đã duyệt.
 
 ---
 
@@ -719,6 +715,8 @@ Art accounting: 3 bands × (Sword + Bow + Armor + Pants) = 12 visual modules tr�
 <a id="gdd-14"></a>
 
 # 10. Nghiệm thu và hướng dẫn tra cứu
+
+**VS-1 local là nghiệm thu lát cắt, không thay các tiêu chuẩn TARGET dưới đây.** Chi tiết CURRENT/DEFERRED nằm ở Roadmap; không ký hoàn thành P0 khi chỉ Kiếm/offline chạy được.
 
 **Chưa nghiệm thu**: cần playable build / evidence hai Client kết nối Dedicated Game Server (tối thiểu 2 concurrent players), không thay bằng simulation hoặc diễn giải thành capacity tối đa.
 
