@@ -23,24 +23,23 @@ namespace HuyenLo.Domain
         public readonly string Id, Name;
         public readonly int Slot, Mp, MaxTargets;
         public readonly double Range, Power, Cooldown, HitDelay, Lock, Vertical;
-        public readonly bool Repeat;
-        public readonly Shape Shape;
+                public readonly Shape Shape;
         public Skill(string id, string name, int slot, int mp, double range, double power, double cd,
-            double hit, double actionLock, bool repeat, Shape shape = Shape.Single, int maxTargets = 1, double vertical = 1.6)
+            double hit, double actionLock, Shape shape = Shape.Single, int maxTargets = 1, double vertical = 1.6)
         { Id=id; Name=name; Slot=slot; Mp=mp; Range=range; Power=power; Cooldown=cd; HitDelay=hit;
-          Lock=actionLock; Repeat=repeat; Shape=shape; MaxTargets=maxTargets; Vertical=vertical; }
+          Lock=actionLock; Shape=shape; MaxTargets=maxTargets; Vertical=vertical; }
     }
     public static class Rules
     {
         public static readonly int[] Exp = {0,100,250,470,790,1240,1860,2690,3770,5150,6900,9100,11800,15100,19100,23900,29600,36300,44100,53100};
-        public static readonly Skill Novice = new Skill("novice", "Mộc Kiếm", 0, 0, 1.2, 1, 1, .10, .26, true);
-        public static readonly Skill Sword1 = new Skill("sword.s1", "Phong Trảm nhập môn", 1, 2, 1.7, 1.2, 1, .12, .30, true);
+        public static readonly Skill Novice = new Skill("novice", "Mộc Kiếm", 1, 0, 1.2, 1, 1, .10, .26);
+        public static readonly Skill Sword1 = new Skill("sword.s1", "Phong Trảm nhập môn", 1, 2, 1.7, 1.2, 1, .12, .30);
         // Fixture definitions, not unlockable in VS-1. Same evaluator supports later gates.
-        public static readonly Skill Sword2 = new Skill("sword.s2", "Phong Trảm tiến cảnh", 2, 4, 1.7, 1.35, 1.5, .14, .30, true, Shape.Arc, 3);
-        public static readonly Skill Sword3 = new Skill("sword.s3", "Kiếm Khí", 3, 16, 5.5, 2.8, 7, .16, .40, false, Shape.Line, 5, .3);
-        public static readonly Skill Bow1 = new Skill("bow.s1", "Linh Tiễn", 1, 2, 6.5, 1.15, 1, .12, .30, true);
-        public static readonly Skill Bow2 = new Skill("bow.s2", "Ba Linh Tiễn", 2, 4, 6.5, .9, 1.7, .12, .34, true, Shape.Spread, 3);
-        public static readonly Skill Bow3 = new Skill("bow.s3", "Hàn Tiễn", 3, 16, 6.5, 2.8, 7, .18, .40, false, Shape.Explosion, 5);
+        public static readonly Skill Sword2 = new Skill("sword.s2", "Phong Trảm tiến cảnh", 2, 4, 1.7, 1.35, 1.5, .14, .30, Shape.Arc, 3);
+        public static readonly Skill Sword3 = new Skill("sword.s3", "Kiếm Khí", 3, 16, 5.5, 2.8, 7, .16, .40, Shape.Line, 5, .3);
+        public static readonly Skill Bow1 = new Skill("bow.s1", "Linh Tiễn", 1, 2, 6.5, 1.15, 1, .12, .30);
+        public static readonly Skill Bow2 = new Skill("bow.s2", "Ba Linh Tiễn", 2, 4, 6.5, .9, 1.7, .12, .34, Shape.Spread, 3);
+        public static readonly Skill Bow3 = new Skill("bow.s3", "Hàn Tiễn", 3, 16, 6.5, 2.8, 7, .18, .40, Shape.Explosion, 5);
         public static int Round(double x) => (int)Math.Floor(x+.5);
         public static int Axis(bool leftA, bool leftArrow, bool rightD, bool rightArrow) =>
             ((rightD || rightArrow) ? 1 : 0) - ((leftA || leftArrow) ? 1 : 0);
@@ -166,7 +165,7 @@ namespace HuyenLo.Domain
         public Point Position,Home;
         public double Hp,MaxHp,Atk,Def,Acc,Eva,Speed,Range,Interval,NextAttack,HitAt,RespawnAt,ReturnSince=-1,QuestDamage,LastDamage;
         public int Facing=1,QuestTag;
-        public bool Dummy,Returning,Windup;
+        public bool Dummy,Returning,Windup,Engaged;
         public bool Alive => Hp>0;
         public Mob(int id,string slot,string name,Map map,Point home,int level,double hp,double atk,double def,double acc,double eva,double speed,double range,double interval,bool dummy=false)
         {Id=id;Slot=slot;Name=name;Map=map;Home=Position=home;Level=level;Hp=MaxHp=hp;Atk=atk;Def=def;Acc=acc;Eva=eva;Speed=speed;Range=range;Interval=interval;Dummy=dummy;}

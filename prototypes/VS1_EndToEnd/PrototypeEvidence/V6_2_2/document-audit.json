@@ -1,0 +1,243 @@
+{
+  "revision": "V6.2.2",
+  "date": "2026-10-04",
+  "checkpoint": "54350dd",
+  "passed": true,
+  "comparisons": [
+    {
+      "file": "docs/design/1_HUYEN_LO_GDD.md",
+      "before": {
+        "lines": 785,
+        "pipes": 336,
+        "headings": 26,
+        "sha256": "97b26c46af6822c7e16fa05b234bba01a50d94dc2e78fbf4b78424eaf2c9b744",
+        "critical": [
+          1,
+          3,
+          1,
+          3,
+          1
+        ]
+      },
+      "after": {
+        "lines": 789,
+        "pipes": 336,
+        "headings": 26,
+        "sha256": "82f8110b1565b2b14054639a5eef2c8243391a0194bdc613542fbc7dfb32f08e",
+        "critical": [
+          1,
+          3,
+          1,
+          3,
+          1
+        ]
+      }
+    },
+    {
+      "file": "docs/design/2_HUYEN_LO_TECHNICAL.md",
+      "before": {
+        "lines": 410,
+        "pipes": 124,
+        "headings": 17,
+        "sha256": "bc3eaf1734c1df52ee6eeba6b3ea980abd5e59196c88ea93c507c8090dfc54e9",
+        "critical": [
+          1,
+          1,
+          2,
+          3,
+          1
+        ]
+      },
+      "after": {
+        "lines": 428,
+        "pipes": 124,
+        "headings": 18,
+        "sha256": "b597f30a3eb595d09b389e045de98945c2c372f367e024afab43075ed907b2b2",
+        "critical": [
+          1,
+          1,
+          2,
+          3,
+          1
+        ]
+      }
+    },
+    {
+      "file": "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md",
+      "before": {
+        "lines": 532,
+        "pipes": 273,
+        "headings": 24,
+        "sha256": "d9469c8c0e7f64c24c1e634a1401e7482b180c74fbdc6ec8801681bcce758c45",
+        "critical": [
+          1,
+          4,
+          2,
+          5,
+          1
+        ]
+      },
+      "after": {
+        "lines": 540,
+        "pipes": 273,
+        "headings": 25,
+        "sha256": "4fb90e07a471f60fce543f823dabafc146e766d67efebade00a4f3cc11754dd4",
+        "critical": [
+          1,
+          4,
+          2,
+          6,
+          1
+        ]
+      }
+    },
+    {
+      "file": "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "before": {
+        "lines": 858,
+        "pipes": 401,
+        "headings": 46,
+        "sha256": "66e84b0995d74c1a2ae8cfbeee0a65040a53bcf64986d333f710d82f2693db3a",
+        "critical": [
+          0,
+          0,
+          0,
+          9,
+          0
+        ]
+      },
+      "after": {
+        "lines": 913,
+        "pipes": 401,
+        "headings": 50,
+        "sha256": "d409a991ba33404efb938ccb42b3ad6cb3de3ec90a7e68cf1cb08fe64d322437",
+        "critical": [
+          0,
+          0,
+          0,
+          10,
+          0
+        ]
+      }
+    },
+    {
+      "file": "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md",
+      "before": {
+        "lines": 315,
+        "pipes": 139,
+        "headings": 16,
+        "sha256": "eba7fb5c91761bae59da488934a511a5ae8e7ea9eca5f43efaf31df81cf4bfdf",
+        "critical": [
+          2,
+          2,
+          2,
+          8,
+          2
+        ]
+      },
+      "after": {
+        "lines": 332,
+        "pipes": 147,
+        "headings": 17,
+        "sha256": "863d44391646eaab67730c805476e765b0eb6d0f03ce5bfcc1acf155ff87fde1",
+        "critical": [
+          2,
+          2,
+          2,
+          8,
+          2
+        ]
+      }
+    },
+    {
+      "file": "docs/design/README.md",
+      "before": {
+        "lines": 90,
+        "pipes": 45,
+        "headings": 6,
+        "sha256": "4f5c65b4904057f40484c6b14ca832932d5a5bb92aa770e5d2a30c54b7c126fd",
+        "critical": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "after": {
+        "lines": 90,
+        "pipes": 45,
+        "headings": 6,
+        "sha256": "b78b988ac52b68beab7d1a32e9bd1bb7ff9dd4ca103b77b082c81a7553853e1f",
+        "critical": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    }
+  ],
+  "critical_order": [
+    "53.100",
+    "95 điểm",
+    "32.000",
+    "26 frame/khung",
+    "1.800/200 same row"
+  ],
+  "meta_files_preserved": 29,
+  "historical_files_preserved": 22,
+  "sampled_source_destination": [
+    {
+      "id": "lifecycle",
+      "file": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "line": 642,
+      "snippet": "**Đường đi của file:** editable source ở `ArtSource/Probes/Sword01/` → PNG export vào `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` → Unity import tạo sprite refs + `.meta` → definition/prefab tham chiếu refs. PNG export chính là imported asset; không chép thêm một bản PNG “runtime”. Cache Library không version. Khi production base đã duyệt, chuyển asset được chọn sang `game/Assets/GameArt/`, giữ GUID khi move và đưa refs vào presentation definition; prototype source không tự thành production architecture."
+    },
+    {
+      "id": "keyboard",
+      "file": "1_HUYEN_LO_GDD.md",
+      "line": 690,
+      "snippet": "**Menu bằng bàn phím:** Interact mở NPC với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: ↑/↓ hoặc W/S, Tab/Shift+Tab đổi lựa chọn; Enter hoặc Interact xác nhận; Esc đóng. Arrow/Space/1–3 không lọt thành movement/cast khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở đây là UI navigation, không thêm combat target cycling. Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Click explicit focus vẫn tùy chọn; auto-acquire và clear focus đủ cho route keyboard."
+    },
+    {
+      "id": "sockets",
+      "file": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "line": 648,
+      "snippet": "**Socket probe A02:** so hai phương án trên cùng tám pose/hai hướng: (A) pose data lưu điểm/góc pixel rồi runtime đặt weapon; (B) author Transform socket trong rig/prefab rồi export bảng theo poseKey. Chọn một nguồn cuối, không sửa cả Transform và data độc lập. Trong mẫu A, tọa độ canvas gốc trái-dưới: điểm `(u,v)` đổi local thành `((u−32)/32,v/32)` theo Bottom-Center/PPU32; exporter từ gốc trái-trên phải đổi Y một lần. Weapon grip offset/góc và front/back per pose ghi cùng entry; mirror cả điểm/góc đúng một lần ở VisualRoot. P01/P02 kiểm tay không trượt, nock/release đọc đúng, equip không restart clip. Chưa pass/chọn phương án thì chưa nhân catalog."
+    },
+    {
+      "id": "manifest",
+      "file": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "line": 646,
+      "snippet": "**Minimum pose manifest — presentation only:** `PoseKey`, `SpriteRefsByLayer`, `Duration/phase mapping`, `Grip`, `Muzzle`, `WeaponOrder`; thêm `Foot/Head/Tip` hoặc `HeadOffset` khi pose cần. Missing optional socket có fallback được ghi rõ; poseKey và spriteRef có thể reuse. Không có damage, MP, range, cooldown, gameplay hitbox hoặc authority hit moment trong manifest."
+    },
+    {
+      "id": "supply",
+      "file": "1_HUYEN_LO_GDD.md",
+      "line": 435,
+      "snippet": "**Tutorial supply active-step only:** kill/grant chỉ tạo đồ tutorial/quest-bound và entitlement khi QuestId, InProgress, active step và source hợp lệ. Ngoài bước đó, quái chỉ roll loot thường; không spawn áo/sample tutorial hoặc tạo quyền nhận cho quest tương lai. Entitlement đã tạo hợp lệ vẫn giữ cùng instance để retry claim khi hết hạn/túi đầy; không dùng recovery này để hồi tố kill cũ."
+    },
+    {
+      "id": "provenance",
+      "file": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "line": 661,
+      "snippet": "Một record cho mỗi nguồn/pack với asset IDs liên quan: URL hoặc source hash, author/tool, license text/file, phạm vi sử dụng đã kiểm, modified/from-source revision, ngày lấy và người kiểm. Asset tự vẽ ghi tác giả; AI ghi tool/model nếu biết và reference nguồn. Thiếu thông tin thì đánh dấu chưa kiểm và dùng placeholder, không tính vào số asset sẵn sàng phát hành. Kiểm quyền tại lúc dùng/mua; không suy toàn pack có cùng quyền từ một ảnh mẫu."
+    },
+    {
+      "id": "modules",
+      "file": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "line": 633,
+      "snippet": "1. Chuẩn bị tám module: BodyBase, Hair, DefaultArmor, DefaultLower, ArmorI, LowerI, Mộc Kiếm, Kiếm I. Dùng cùng canvas/palette/mốc chân; module chưa có dùng placeholder có nhãn."
+    },
+    {
+      "id": "dod",
+      "file": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+      "line": 701,
+      "snippet": "- [ ] Canvas/PPU/pivot/mốc chân đúng; alpha/palette sạch, không crop lệch cell hoặc bleed."
+    }
+  ],
+  "errors": [],
+  "scope": "documentation and disposable prototype; no production base/Dedicated/backend acceptance"
+}

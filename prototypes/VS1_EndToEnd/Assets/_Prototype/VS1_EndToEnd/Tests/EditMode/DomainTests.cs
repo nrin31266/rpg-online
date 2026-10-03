@@ -11,7 +11,7 @@ namespace HuyenLo.Tests
             var s=new SliceSession(123);s.Player.School=School.Sword;s.Player.Level=5;s.Player.Map=Map.Academy;s.Player.Position=new Point(21,.8);
             s.Player.Inventory.Equipment[GearSlot.Weapon]=s.NewItem("sword1");s.Player.Mp=100;
             foreach(var skill in skills)s.Combat.Unlocked[skill.Slot]=skill;
-            foreach(var m in s.Mobs){m.Dummy=true;m.Hp=m.MaxHp=10000;}
+            foreach(var m in s.Mobs){m.Dummy=true;m.Hp=m.MaxHp=10000;if(m.Id!=10)m.Map=Map.Mist;}
             return s;
         }
         private void Advance(SliceSession s,double duration){for(int i=0;i<(int)Math.Ceiling(duration/.02);i++)s.Tick(.02);}
@@ -21,16 +21,16 @@ namespace HuyenLo.Tests
             var s=Fixture(Rules.Sword1);s.Player.Position=new Point(100,.8);double mp=s.Player.Mp;
             s.Combat.Press("1",1);Advance(s,1);Assert.That(s.Combat.StartedCount,Is.Zero);Assert.That(s.Player.Mp,Is.EqualTo(mp));Assert.That(s.Combat.Cooldowns,Is.Empty);Assert.That(s.Combat.AssistAxis,Is.Zero);
         }
-        [Test] public void SlotPressExecutesImmediatelyAndJUsesSelection() {
+        [Test] public void SlotPressExecutesImmediatelyAndSecondPhysicalPressStartsAgain() {
             var s=Fixture(Rules.Sword1);s.Combat.Press("1",1);Assert.That(s.Combat.Running.Skill,Is.SameAs(Rules.Sword1));s.Combat.Release("1");Advance(s,1.1);
-            s.Combat.Press("J");Assert.That(s.Combat.StartedCount,Is.EqualTo(2));Assert.That(s.Combat.Running.Skill.Id,Is.EqualTo("sword.s1"));
+            s.Combat.Press("1",1);Assert.That(s.Combat.StartedCount,Is.EqualTo(2));Assert.That(s.Combat.Running.Skill.Id,Is.EqualTo("sword.s1"));
         }
         [Test] public void LockedSlotDoesNotSelectOrStart() {
             var s=Fixture(Rules.Sword1);s.Combat.Press("2",2);Assert.That(s.Combat.SelectedSlot,Is.EqualTo(1));Assert.That(s.Combat.StartedCount,Is.Zero);
         }
         [Test] public void SpamKeepsImmutableActionAndIndependentCooldowns() {
             var s=Fixture(Rules.Sword1,Rules.Sword2,Rules.Sword3);s.Combat.Press("1",1);var action=s.Combat.Running;
-            s.Combat.Press("2",2);s.Combat.Press("3",3);s.Combat.Press("J");
+            s.Combat.Press("2",2);s.Combat.Press("3",3);
             Assert.That(s.Combat.Running,Is.SameAs(action));Assert.That(action.Skill.Id,Is.EqualTo("sword.s1"));Assert.That(s.Combat.StartedCount,Is.EqualTo(1));
             Assert.That(s.Combat.SelectedSlot,Is.EqualTo(3));Advance(s,.34);Assert.That(s.Combat.StartedCount,Is.LessThanOrEqualTo(2));Assert.That(s.Combat.Cooldowns["sword.s1"],Is.EqualTo(1));
         }
@@ -45,7 +45,7 @@ namespace HuyenLo.Tests
             var s=Fixture(Rules.Sword3);s.Combat.Press("3",3);Advance(s,15);Assert.That(s.Combat.StartedCount,Is.EqualTo(1));
             s.Combat.Release("3");s.Combat.Press("3",3);Assert.That(s.Combat.StartedCount,Is.EqualTo(2));
         }
-        [Test] public void NewHoldOwnerReleaseDoesNotResurrectOlderHold() {
+        [Test] public void RejectedPressDoesNotCreateLongQueue() {
             var s=Fixture(Rules.Sword1,Rules.Sword2);s.Combat.Press("1",1);s.Combat.Press("2",2);s.Combat.Release("2");Advance(s,3);Assert.That(s.Combat.StartedCount,Is.EqualTo(1));
         }
         [Test] public void AutoFocusStickyThenDeathReacquires() {
@@ -61,12 +61,12 @@ namespace HuyenLo.Tests
         [Test] public void FacingIndependentAcquireAndExplicitOutOfRangeDoesNotSubstitute() {
             var s=Fixture(Rules.Sword1);s.Player.Position=new Point(23,.8);s.Combat.Facing=1;s.Combat.Press("1",1);Assert.That(s.Combat.Running.Facing,Is.EqualTo(-1));s.Combat.Cancel();
             var a=s.Mobs[0];a.Position=new Point(30,.8);var b=s.Mobs[1];b.Map=Map.Academy;b.Position=new Point(23.5,.8);s.Combat.Explicit(a);double mp=s.Player.Mp;
-            s.Combat.Press("J");Assert.That(s.Combat.Running,Is.Null);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));Assert.That(s.Player.Mp,Is.EqualTo(mp));
+            s.Combat.Press("1",1);Assert.That(s.Combat.Running,Is.Null);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));Assert.That(s.Player.Mp,Is.EqualTo(mp));
         }
         [Test] public void ApproachIsBoundedHorizontalAndManualCancels() {
-            var s=Fixture(Rules.Sword1);s.Player.Position=new Point(19,.8);s.Combat.Press("J");Advance(s,.22);Assert.That(s.Combat.AssistAxis,Is.EqualTo(1));
+            var s=Fixture(Rules.Sword1);s.Player.Position=new Point(19,.8);s.Combat.Press("1",1);Advance(s,.22);Assert.That(s.Combat.AssistAxis,Is.EqualTo(1));
             s.Combat.ManualOverride();Assert.That(s.Combat.AssistAxis,Is.Zero);Advance(s,2);Assert.That(s.Combat.StartedCount,Is.Zero);
-            s.Combat.Press("J");Advance(s,1);Assert.That(s.Combat.AssistAxis,Is.Zero); // blocked progress times out
+            s.Combat.Press("1",1);Advance(s,1);Assert.That(s.Combat.AssistAxis,Is.Zero); // blocked progress times out
         }
         [Test] public void SourceSnapshotAndGenerationAreImmutable() {
             var s=Fixture(Rules.Sword1);s.Combat.Press("1",1);var action=s.Combat.Running;double atk=action.Atk;s.Player.Str=500;
@@ -160,10 +160,56 @@ namespace HuyenLo.Tests
         [Test] public void PortalCancelsMobWindupAndEmptyMapReturnsWithoutNewLifeOrLoot() {
             var s=new SliceSession();var mob=s.Mobs.First(x=>x.Slot=="DS1.slot1");s.Player.Map=Map.Mist;s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
             s.Tick(.02);Assert.That(mob.Windup,Is.True);mob.Hp=mob.MaxHp-1;int generation=mob.Generation;
-            s.Player.Position=new Point(-4,.8);Assert.That(s.Portal("toVillageM"),Is.True);Assert.That(mob.Windup,Is.False);
+            s.Player.Position=new Point(-4,.8);Assert.That(s.TryExit("toVillageM"),Is.True);Assert.That(mob.Windup,Is.False);
             Advance(s,3);Assert.That(mob.Hp,Is.EqualTo(mob.MaxHp));Assert.That(mob.Generation,Is.EqualTo(generation));Assert.That(s.Loot,Is.Empty);
-            s.Player.Position=new Point(30,.8);Assert.That(s.Portal("toMist"),Is.True);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
+            s.Player.Position=new Point(30,.8);Assert.That(s.TryExit("toMist"),Is.True);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
             double hp=s.Player.Hp;s.Tick(.02);Assert.That(s.Player.Hp,Is.EqualTo(hp),"Portal must not retain a deferred old hit");
+        }
+        [TestCase(1)] [TestCase(2)] [TestCase(3)] public void EverySkillNeedsAnotherPhysicalPress(int slot) {
+            var skill=slot==1?Rules.Sword1:slot==2?Rules.Sword2:Rules.Sword3;var s=Fixture(skill);
+            s.Combat.Press(slot.ToString(),slot);Advance(s,16);Assert.That(s.Combat.StartedCount,Is.EqualTo(1));
+            s.Combat.Press("J");Assert.That(s.Combat.StartedCount,Is.EqualTo(1),"J has no gameplay binding");
+        }
+        [Test] public void ReleaseKeepsBoundedApproachAndCommitsExactlyOnceAtActualOrigin() {
+            var s=Fixture(Rules.Sword1);s.Player.Position=new Point(19,.8);double mp=s.Player.Mp;
+            s.Combat.Press("1",1);s.Combat.Release("1");Assert.That(s.Combat.HasPendingCast,Is.True);Assert.That(s.Player.Mp,Is.EqualTo(mp));
+            for(int i=0;i<20;i++){s.Player.Position=new Point(s.Player.Position.X+s.Combat.AssistAxis*.10,.8);s.Tick(.02);}
+            Assert.That(s.Combat.StartedCount,Is.EqualTo(1));Assert.That(s.Combat.HasPendingCast,Is.False);Assert.That(s.Player.Mp,Is.EqualTo(mp-2));
+            Advance(s,3);Assert.That(s.Combat.StartedCount,Is.EqualTo(1));
+        }
+        [Test] public void PendingTargetDeathNeverCastsAtReplacementAndLowMpNeverRuns() {
+            var s=Fixture(Rules.Sword1);s.Player.Position=new Point(19,.8);s.Combat.Press("1",1);s.Mobs[0].Hp=0;s.Mobs[0].RespawnAt=100;
+            s.Mobs[1].Map=Map.Academy;s.Mobs[1].Position=new Point(20,.8);Advance(s,.2);Assert.That(s.Combat.StartedCount,Is.Zero);Assert.That(s.Combat.HasPendingCast,Is.False);
+            s.Player.Mp=0;s.Combat.Press("1",1);Assert.That(s.Combat.AssistAxis,Is.Zero);Assert.That(s.Combat.Cooldowns,Is.Empty);
+        }
+        [Test] public void DummyAndCatchupRouteMatchesRevisionWithoutDowngradingLateCharacters() {
+            var s=new SliceSession();Assert.That(s.Mobs.Count(x=>x.Dummy),Is.GreaterThanOrEqualTo(3));
+            foreach(var pair in new[]{(3,3),(4,4),(5,5)}){
+                s.Quest=pair.Item1;s.QuestState=QuestState.Ready;s.Player.Map=pair.Item1==3?Map.Academy:Map.Village;s.Player.Position=SliceSession.Anchors.First(x=>x.Id==s.QuestNpc).Position;
+                if(pair.Item1==3)s.Player.AddExp(250);Assert.That(s.TurnIn(),Is.True);Assert.That(s.Player.Level,Is.EqualTo(pair.Item2));
+            }
+            Assert.That(s.Player.Unspent,Is.EqualTo(20));s.Player.AddExp(450);s.Quest=4;s.Receipts.Remove("Q4.completed");s.QuestState=QuestState.Ready;s.Player.Position=new Point(10,.8);Assert.That(s.TurnIn(),Is.True);Assert.That(s.Player.Level,Is.EqualTo(6));Assert.That(s.Player.Unspent,Is.EqualTo(25));
+        }
+        [Test] public void TutorialSupplyOnlyExistsAtRelevantActiveStep() {
+            foreach(bool active in new[]{false,true}){
+                var s=PrototypePresets.Create(PrototypeStart.FirstLoot);s.Player.Map=Map.Mist;s.Player.Position=new Point(15,.8);s.QuestState=active?QuestState.InProgress:QuestState.Available;
+                var mob=s.Mobs.First(x=>x.Slot=="DS2.slot1");mob.Dummy=true;
+                for(int i=0;i<6&&mob.Alive;i++){s.Combat.Press("1",1);Advance(s,1.1);}
+                Assert.That(mob.Alive,Is.False);Assert.That(s.Loot.Count(x=>x.Tutorial),Is.EqualTo(active?2:0));Assert.That(s.Receipts.Contains("Q4.supply"),Is.EqualTo(active));
+            }
+        }
+        [Test] public void EdgeOverlapTransitionsOnceWithoutInteractAndResetIsFresh() {
+            var s=new SliceSession();s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Academy));int revision=s.WorldRevision;
+            for(int i=0;i<10;i++)s.ObservePosition(s.Player.Position,true);Assert.That(s.WorldRevision,Is.EqualTo(revision));
+            var debug=PrototypePresets.Create(PrototypeStart.SwordTraining);Assert.That(debug.Player.Level,Is.EqualTo(5));Assert.That(debug.Combat.Unlocked.ContainsKey(1),Is.True);Assert.That(debug.DebugPreset,Is.Not.Null);
+            var fresh=PrototypePresets.Create(PrototypeStart.Fresh);Assert.That(fresh.Quest,Is.EqualTo(1));Assert.That(fresh.Player.Level,Is.EqualTo(1));Assert.That(fresh.Receipts,Is.Empty);Assert.That(fresh.Combat.Cooldowns,Is.Empty);Assert.That(fresh.DebugPreset,Is.Null);
+        }
+        [Test] public void MeleePhaseOffsetsAndRecoveryDoNotChangeAttackInterval(){
+            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(30,.65);s.Player.InvulnerableUntil=100;
+            var a=s.Mobs.First(x=>x.Id==30);var b=s.Mobs.First(x=>x.Id==31);a.Position=new Point(29.5,.65);b.Position=new Point(30.5,.65);
+            s.Tick(.02);double first=a.HitAt;Assert.That(a.Windup,Is.True);Assert.That(b.Windup,Is.False);Advance(s,.08);
+            Assert.That(b.Windup,Is.True);Assert.That(b.HitAt,Is.GreaterThan(first));Assert.That(a.NextAttack-(first-.35),Is.EqualTo(a.Interval).Within(.001));
+            double x=a.Position.X;Advance(s,.38);Assert.That(a.Position.X,Is.Not.EqualTo(x),"Recovery should visibly reposition without a new cooldown");
         }
         [Test] public void ExpInvariantAndHalfUpDamage() {
             Assert.That(Rules.Exp.Last(),Is.EqualTo(53100));Assert.That(19*5,Is.EqualTo(95));Assert.That(Rules.Round(2.5),Is.EqualTo(3));

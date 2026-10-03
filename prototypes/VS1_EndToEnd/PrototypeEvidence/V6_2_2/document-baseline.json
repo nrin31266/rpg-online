@@ -1,0 +1,38 @@
+{
+  "docs/design/README.md": {
+    "lines": 90,
+    "pipes": 45,
+    "headings": 6,
+    "sha256": "4f5c65b4904057f40484c6b14ca832932d5a5bb92aa770e5d2a30c54b7c126fd"
+  },
+  "docs/design/1_HUYEN_LO_GDD.md": {
+    "lines": 785,
+    "pipes": 336,
+    "headings": 26,
+    "sha256": "97b26c46af6822c7e16fa05b234bba01a50d94dc2e78fbf4b78424eaf2c9b744"
+  },
+  "docs/design/2_HUYEN_LO_TECHNICAL.md": {
+    "lines": 410,
+    "pipes": 124,
+    "headings": 17,
+    "sha256": "bc3eaf1734c1df52ee6eeba6b3ea980abd5e59196c88ea93c507c8090dfc54e9"
+  },
+  "docs/design/3_HUYEN_LO_DESIGN_ANALYSIS.md": {
+    "lines": 532,
+    "pipes": 273,
+    "headings": 24,
+    "sha256": "d9469c8c0e7f64c24c1e634a1401e7482b180c74fbdc6ec8801681bcce758c45"
+  },
+  "docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md": {
+    "lines": 858,
+    "pipes": 401,
+    "headings": 46,
+    "sha256": "66e84b0995d74c1a2ae8cfbeee0a65040a53bcf64986d333f710d82f2693db3a"
+  },
+  "docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md": {
+    "lines": 315,
+    "pipes": 139,
+    "headings": 16,
+    "sha256": "eba7fb5c91761bae59da488934a511a5ae8e7ea9eca5f43efaf31df81cf4bfdf"
+  }
+}

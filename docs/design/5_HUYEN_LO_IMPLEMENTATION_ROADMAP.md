@@ -12,7 +12,9 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED và điều kiện mở
 
 **CURRENT** là harvest VS-1 mock đã chạy → sửa docs → movement/UI/art/rig probe → thiết kế production base → implement core base/local slice revision mới → G-N Dedicated với hai client sớm. Không nối network thẳng vào throwaway classes hoặc xem cấu trúc prototype là base đã duyệt. `Offline/local-first` là cách triển khai để kiểm sớm, không đổi game đích thành single-player. `CURRENT` không có nghĩa đã code hoặc đã pass.
 
-**Evidence 2026-10-03:** [VS-1 disposable/reference](../../game/README.md) tại checkpoint `46006c4` có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
+**Evidence lịch sử 2026-10-03:** [VS-1 disposable/reference](../../prototypes/VS1_EndToEnd/README.md) tại checkpoint `46006c4` có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
+
+**Prototype update 2026-10-04:** mock V6.2.2 thử flow/controls mới, keyboard menus, debug mốc/reset và EdgeExit. Evidence revision mới ở prototype README; đây vẫn là probe trước G-B, không production base hoặc manual art/UX pass.
 
 **DEFERRED** là phần đã thiết kế và vẫn phải làm trong TARGET, nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung thuộc TARGET P0, **không phải feature P1**. Mọi bảng Cung, projectile, gear, pose/VFX và balance được giữ. Q6/lore vẫn giới thiệu hai phái; trong bản thử sớm, Kiếm chơi được, Cung ghi “Chưa mở trong bản thử nghiệm”. Không dùng nhãn này trong sản phẩm cuối.
 
@@ -106,7 +108,7 @@ G-C/F/P có thể ghép hạng mục độc lập sau gate phụ thuộc, không
 
 # 5. Art cho người chưa thạo vẽ và kỷ luật giao việc
 
-Dùng quy trình nhỏ trong [Art §23.3](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-tool-workflow): chọn mẫu, sửa palette/outline/pivot/grip bằng editor pixel, nhập Unity rồi đo.
+Dùng quy trình nhỏ trong [Art §23.1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-tool-workflow): chọn mẫu, sửa palette/outline/pivot/grip bằng editor pixel, nhập Unity rồi đo.
 
 **TOOL CANDIDATE / CURRENT PROBE:** có thể thử PixelLab bằng Free/free trial trước; nếu không đạt, đổi tool hoặc workflow. Contract visual/import và architecture không phụ thuộc PixelLab.
 
@@ -237,6 +239,21 @@ Các replacement sau theo review được user duyệt 2026-10-03; không giữ 
 
 CURRENT control acceptance V6.2.1: A/D+arrows OR; Space/↑ jump và S/↓ drop; 1–3 select/one-press approach+cast, no J/no-repeat mọi skill, locked slots2/3 trong route. One-action/snapshot/latest buffer, AUTO/EXPLICIT, pending không đổi target; release giữ one-shot, manual/focus/UI/Esc/map cancel. E candidate độc lập; EdgeExit auto không E. Manual feel/usability và revision-matched evidence bắt buộc. S2/S3/Cung production DEFERRED. Không tăng số balance để làm button đẹp; giữ role/sustain gate.
 
+<a id="editorial-source-destination"></a>
+
+## Keyboard prototype và operational art — 2026-10-04
+
+Mock project ở `prototypes/VS1_EndToEnd/`, tương lai `game/` là Unity production Client/Dedicated, `backend/` là Spring/PostgreSQL; chưa dựng các codebase đó. Prototype tiếp tục dùng để thử nhanh, không mở G-B/G-N chỉ vì build mới chạy. Debug mốc/reset chỉ cho dev, route acceptance bắt đầu fresh và không dùng preset. Manual keyboard usability/feel và rig/art import vẫn cần người chơi review ở tốc độ thường.
+
+| SOURCE | DESTINATION | Nội dung thực |
+| --- | --- | --- |
+| Review §2/§4 | [First Art Probe](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#first-art-probe) | Tám module/pose probe, source→export→import→runtime, pass/fail |
+| Review §3/§5/§6 | [Art setup](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#first-art-probe), [DoD](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-validation) | Minimum manifest, socket A/B, asset QA |
+| Review §7/§8 | [Art setup](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#first-art-probe) | Mini style sample và provenance |
+| Review §9/§10/§15/§16 | [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#working-spec-end), [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md#keyboard-prototype-review) | Version hiện hành, base trước mạng, numbering và history marker |
+| Review §12 | [GDD quest](1_HUYEN_LO_GDD.md#quests-story), [Technical quest](2_HUYEN_LO_TECHNICAL.md#combat-data) | Active-step-only tutorial supply, không future entitlement |
+| User keyboard/debug/mock | [GDD UX](1_HUYEN_LO_GDD.md#ux-art), [Technical input](2_HUYEN_LO_TECHNICAL.md#shared-combat-input), [prototype](../../prototypes/VS1_EndToEnd/README.md) | Menu keyboard/mouse cùng command, debug mốc/reset, project tách biệt |
+
 <a id="feedback-source-destination"></a>
 
 ## Feedback → canonical và migration prototype
@@ -250,12 +267,12 @@ Mốc trước sửa `46006c4`; request feedback 2026-10-03 cho phép sửa tạ
 | F03 | Bỏ J/hold, tap thông minh | [GDD input](1_HUYEN_LO_GDD.md#focus-input), [Technical input](2_HUYEN_LO_TECHNICAL.md#shared-combat-input) | One-shot pending/approach, no-repeat/no-cost/cancel/expiry/revalidate |
 | F04 | Jump/drop mapping/feel | [GDD UX](1_HUYEN_LO_GDD.md#ux-art), [Technical movement](2_HUYEN_LO_TECHNICAL.md#movement-feel) | OR aliases; coyote/buffer/variable-height/acceleration chưa khóa số |
 | F05 | Melee pile/reposition | [GDD mob](1_HUYEN_LO_GDD.md#world-farm), [Technical AI](2_HUYEN_LO_TECHNICAL.md#combat-data) | Cluster đọc được, soft separation/recovery offsets; không lock ring slots |
-| F06 | Prototype không codebase | [Technical discipline](2_HUYEN_LO_TECHNICAL.md#architecture-discipline), [Roadmap gates](#phase-gates), [prototype README](../../game/README.md) | Tách folder giữ meta; evidence cũ không pass revision mới; G-B trước G-N |
+| F06 | Prototype không codebase | [Technical discipline](2_HUYEN_LO_TECHNICAL.md#architecture-discipline), [Roadmap gates](#phase-gates), [prototype README](../../prototypes/VS1_EndToEnd/README.md) | Tách folder giữ meta; evidence cũ không pass revision mới; G-B trước G-N |
 | F07 | Q3 waiting | [GDD quest](1_HUYEN_LO_GDD.md#quests-story), [Art Dummy](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#mob-visual) | ≥3 placements cùng pool; HP60/25s giữ, contention OPEN |
 | F08 | UI keys/usability/navigation | [Art UI](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#icons-ui), [GDD UX](1_HUYEN_LO_GDD.md#ux-art) | I/C/Q default, edge arrow/name + NPC marker P0, manual UX review |
 | F09 | Class Normal reasoning stale | [Analysis feedback](3_HUYEN_LO_DESIGN_ANALYSIS.md#prototype-feedback-review), [legacy timing](3_HUYEN_LO_DESIGN_ANALYSIS.md#balance-baselines) | Giữ bảng số, gắn LEGACY/SUPERSEDED trực tiếp reasoning; không restore Normal |
 
-Script đếm trước/sau lines/pipe rows/headings/critical values và hash ở `game/PrototypeEvidence/VS1_EndToEnd/verify_feedback.py`; baseline từ commit checkpoint, audit là documentation evidence của lượt này, tách build/test/video cũ. Lấy mẫu ngẫu nhiên 8 mục và kiểm snippet đích thực; không dùng agent đếm. Không xóa bảng combat/gear/journey/Boss/art scenarios để “cleanup”.
+Script đếm trước/sau lines/pipe rows/headings/critical values và hash ở `prototypes/VS1_EndToEnd/PrototypeEvidence/VS1_EndToEnd/verify_feedback.py`; baseline từ commit checkpoint, audit là documentation evidence của lượt này, tách build/test/video cũ. Lấy mẫu ngẫu nhiên 8 mục và kiểm snippet đích thực; không dùng agent đếm. Không xóa bảng combat/gear/journey/Boss/art scenarios để “cleanup”.
 
 <a id="no-loss-audit"></a>
 

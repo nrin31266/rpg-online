@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-04",
+  "revision": "V6.2.2",
+  "checkpoint": "54350dd",
+  "scope": "disposable VS1 Q1–Q6 Sword, keyboard UI, debug mốc/reset, movement/AI probes",
+  "editor": "6000.5.9f1",
+  "production_base": "NOT STARTED",
+  "dedicated_backend": "NOT STARTED",
+  "persistence": "RAM; debug presets/reset instead of JSON save",
+  "editmode": {
+    "result": "Passed",
+    "passed": 43,
+    "failed": 0,
+    "file": "editmode.xml"
+  },
+  "playmode": {
+    "result": "Passed",
+    "passed": 4,
+    "failed": 0,
+    "file": "playmode.xml"
+  },
+  "build": {
+    "status": "PASS",
+    "platform": "Linux x86_64 Development",
+    "output": "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64",
+    "executable_sha256": "a7ad5b156bd9a1232544ff6fc12e5f863d8f1f2348c5b141f5c3d4230e5be292"
+  },
+  "standalone": {
+    "status": "PASS",
+    "route_result": "route-result.txt",
+    "log": "continuous-route.log",
+    "video": "continuous-route.mp4",
+    "speed": "timeScale4, capture approx10FPS",
+    "input": "physics + keyboard menu adapter; separate real Input System tests",
+    "debug_preset": "NONE; fresh Q1–Q6, no quest/EXP/HP/position injection",
+    "log_sha256": "832bb2fafd768028ae554217e1fc32ab63249c6a307aee1eac2bcfe40f5124af",
+    "frames": 372
+  },
+  "manual_usability_art_acceptance": "NOT DONE; G-L PARTIAL; requires normal-speed human/rig/art review",
+  "source_hashes": {
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs": "e062ebfb4b972fc6595a97696cd71ab9789a510870462bd7fccc74cad68c7d4f",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs": "aadf7a6e8516d1cac499c191edd904098389a5d1e84193c3fb5183785cf86346",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/CombatController.cs": "2e086a6fc8078d1fc4940ac9c565cd14e48793bc94a5b389cb2e5e776b3cf5aa",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/PrototypePresets.cs": "035e01ded0f77aa9a95a89dfd37b1755fd5e27692df895d23ba2ab0ee8db38d1",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHost.cs": "98002a739c712527c455f7b71c7cd1390c8f15b0b5465085e34f76d3174b06c6",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs": "8709800b44d7360a43c99e17914b9a33684e1e9fcdc68623b323f5920347689b",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceRouteProbe.cs": "e91284a8bbdda87e2fbe946bfb640f03b0a0e1d16a6e0ce5f72f6999e4d24f5f",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Editor/SliceBuild.cs": "166d926353b9a14cb21c9b7acbacba098873fb533631b3c83c3d82bf5770bd65",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/DomainTests.cs": "95ffb213d0793c8821329035b528c66631ac7f2b441932b1a48c3472239c98ba",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/ContinuousRouteTests.cs": "3ef516a8971fe1b96ae4e383d847d9981589618ccc8be3a3441d2025a4e02e11",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/InputPhysicsTests.cs": "bfe7b50ba0515817f41b0b0f8570de74eb7d40cc0f7e1c63450f836b141d6790"
+  },
+  "assembly_hashes": {
+    "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo_Data/Managed/HuyenLo.Domain.dll": "b02fd0d84149b8e73a1d45800e639a06f0faed555f9f24d508c00a35c3702d16",
+    "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo_Data/Managed/HuyenLo.Runtime.dll": "24e7efb8f6472a40655011eb2982b6e72f1cdef64772e03873ae4311efd2938a"
+  }
+}

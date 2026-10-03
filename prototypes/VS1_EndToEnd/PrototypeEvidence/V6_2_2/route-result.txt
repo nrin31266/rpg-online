@@ -1,0 +1,5 @@
+PASS
+
+Quest=7, School=Sword, Lv=5, receipts=25
+Q1..Q6 completed=True,True,True,True,True,True
+Actual Rigidbody2D movement; no editor teleport/quest/EXP injection. UI keyboard navigation adapter + auto EdgeExit; speed-up timeScale=4; no debug preset.

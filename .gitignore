@@ -17,3 +17,13 @@ research/notes/*
 *.csproj
 *.sln
 *.slnx
+
+# Disposable Unity projects, separate from the future production project
+/prototypes/**/Library/
+/prototypes/**/Temp/
+/prototypes/**/Obj/
+/prototypes/**/Logs/
+/prototypes/**/UserSettings/
+/prototypes/**/Builds/
+/prototypes/**/MemoryCaptures/
+/prototypes/**/.vs/

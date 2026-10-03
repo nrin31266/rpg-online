@@ -4,9 +4,9 @@
 
 <a id="huyền-lộ--phân-tích-art-hình-ảnh-và-production"></a>
 
-**Đối chiếu:** toàn bộ GDD V6.2.0, Technical và Design Analysis hiện tại.
+**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md), Technical và Design Analysis.
 
-**Ngày:** 2026-10-03 · **Vai trò:** tài liệu sống chính thức ART / VISUAL / PRODUCTION. Nguyên tắc được chấp nhận, baseline và proposal OPEN được phân biệt dưới đây; đã có [VS-1 primitive blockout](../../game/README.md), chưa có rig/asset production đã nghiệm thu.
+**Ngày:** 2026-10-04 · **Vai trò:** tài liệu sống chính thức ART / VISUAL / PRODUCTION. Nguyên tắc được chấp nhận, baseline và proposal OPEN được phân biệt dưới đây; đã có [VS-1 primitive blockout](../../prototypes/VS1_EndToEnd/README.md), chưa có rig/asset production đã nghiệm thu.
 
 File này sở hữu chi tiết visual/pose/weapon/animation/map/UI/import và production accounting. [GDD](1_HUYEN_LO_GDD.md) sở hữu gameplay; [Technical](2_HUYEN_LO_TECHNICAL.md) sở hữu runtime/data/physics; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) sở hữu evidence/quyết định; [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md) sở hữu thứ tự làm. Các kết luận đã sync có phạm vi rõ; proposal gameplay và các con số production chưa kiểm vẫn chưa được duyệt.
 
@@ -17,7 +17,7 @@ File này sở hữu chi tiết visual/pose/weapon/animation/map/UI/import và p
 - [Phạm vi/trạng thái](#art-review), [player/layer/pose](#player-visual), [weapon/equipment](#weapon-visual).
 - [Combat/VFX](#combat-visual), [mob/death/Dummy](#mob-visual), [NPC](#npc-visual).
 - [Map/terrain/building/environment](#map-visual), [icon/UI](#icons-ui), [online/Select](#online-presentation).
-- [Technical art contract](#art-integration), [accounting/workflow](#production-accounting), [CURRENT validation](#art-validation).
+- [First Art Probe](#first-art-probe), [Technical art contract](#art-integration), [accounting/workflow](#production-accounting), [CURRENT validation](#art-validation).
 - Tra sâu: [rationale](#art-rationale), [derived scenarios](#derived-production-scenarios), [historical trace](#art-historical-trace), [bản đồ MOVE](#cleanup-source-destination).
 
 <a id="art-review"></a>
@@ -595,7 +595,7 @@ Một rig preview reuse Body/Hair/outfit/weapon assets, không sprite-sheet riê
 
 ## 22. Technical Art Contract — baseline và phần cần kiểm
 
-**Owner:** Art sở hữu contract visual/import; Technical §8 giữ cách tích hợp runtime/physics. Bảng sau giữ đầy đủ baseline/proposals trước review; đọc cùng phân loại §0. Canvas/PPU/pivot theo GDD, các lựa chọn exact technique/import/camera chưa qua prototype vẫn NEED VALIDATION; không importer/code được tạo trong lượt này.
+**Owner:** Art sở hữu contract visual/import; Technical §8 giữ cách tích hợp runtime/physics. Bảng sau giữ đầy đủ baseline/proposals trước review; đọc cùng phân loại §0. Canvas/PPU/pivot theo GDD, các lựa chọn exact technique/import/camera chưa qua prototype vẫn NEED VALIDATION; importer production chưa được dựng.
 
 | Contract | Giữ / đề xuất | Căn cứ và cách kiểm |
 | --- | --- | --- |
@@ -618,11 +618,47 @@ Một rig preview reuse Body/Hair/outfit/weapon assets, không sprite-sheet riê
 | Atlas | Khởi điểm padding 4 px; UI tắt packing rotation; pixel/module QA cân nhắc tắt tight packing để dễ kiểm | Padding chống bleed; packing không đổi pivot/pose semantics |
 | Camera | Asset PPU32, integer output scaling/render snapping nếu pipeline đã chọn hỗ trợ | Không snap physics/server positions; test camera/interpolation/Cinemachine và screen ratios trước khóa resolution |
 
-Unity hướng dẫn cùng PPU, Point filter và Compression None cho sprite pixel; atlas có padding mặc định4 và setting rotation/texture riêng. Đây là cơ sở kiểm import, **không tự pin phiên bản Unity/URP**; spike chọn supported LTS/package như Technical. [Nguồn Unity — chuẩn bị sprite pixel](https://docs.unity.com/en-us/engine/6000.6/manual/unity2d/2d-urp/2d-pixelperfect/prep-sprites), [Sprite Atlas reference](https://docs.unity3d.com/6000.3/Documentation/Manual/sprite/atlas/sprite-atlas-reference.html).
+Unity hướng dẫn cùng PPU, Point filter và Compression None cho sprite pixel; atlas có padding mặc định4 và setting rotation/texture riêng. Đây là cơ sở kiểm import, **không tự pin phiên bản Unity/URP**; spike pin Editor/package thực dùng theo Technical. [Nguồn Unity — chuẩn bị sprite pixel](https://docs.unity.com/en-us/engine/6000.6/manual/unity2d/2d-urp/2d-pixelperfect/prep-sprites), [Sprite Atlas reference](https://docs.unity3d.com/6000.3/Documentation/Manual/sprite/atlas/sprite-atlas-reference.html).
 
 ObjectPool cung cấp cơ chế reuse object, còn reset/dedup/generation ở trên là contract đề xuất của Huyền Lộ, không engine tự bảo đảm. [Nguồn Unity — ObjectPool](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Pool.ObjectPool_1.html). Không thêm lighting stack, Addressables hay skeletal package chỉ để đạt contract này.
 
 Pipeline và phép đếm trước review nằm tại [Phụ lục C — pipeline](#legacy-visual-flow) / [accounting cũ](#legacy-art-accounting). Contract đang dùng ở §22; các anchor lịch sử vẫn được giữ.
+
+<a id="first-art-probe"></a>
+
+### 22.1. First Art Probe — Sword01
+
+**Mục tiêu:** mở Unity và kiểm một nhân vật Kiếm với thay đồ/hai hướng trước khi vẽ cả catalog. Đây là subset để thử rig; không tự đổi contract 26 frame hoặc count outcomes trong accounting.
+
+1. Chuẩn bị tám module: BodyBase, Hair, DefaultArmor, DefaultLower, ArmorI, LowerI, Mộc Kiếm, Kiếm I. Dùng cùng canvas/palette/mốc chân; module chưa có dùng placeholder có nhãn.
+2. Vẽ theo thứ tự `Idle_p00`, `Run_p00`, `Jump_p00`, `Attack_p00` (chuẩn bị), `Attack_p01` (release), `Attack_p02` (trả thế), `Skill_p00` (tụ), `Skill_p01` (phát). Giữ spriteRef dùng lại nếu hợp lệ; đây là tám pose probe, không full animation set mới.
+3. Xuất PNG alpha thật, cell cố định 64×64 cho body/parts, weapon renderer riêng khi cần. Đặt tên theo §22; ghi rõ module/pose thiếu, không dùng `final2/fix_final`.
+4. Import Sprite, PPU32/Point/Compression None/no mipmap; slice theo grid cell, Bottom-Center chung, kiểm max-size/platform override không làm nhỏ sheet. Tạo test rig/prefab nhỏ từ refs thật; physics root tách visual.
+5. Gắn pose/socket hai phương án ở mục dưới; chạy Idle/Run/Jump/Attack/S1, flip, unequip/mix outfit và gear swap khi action đang chạy. Dùng cùng authority clock hiện có, không AnimationEvent damage.
+6. Ghi manifest refs dùng lại/ảnh mới, thời gian source→export→socket→import→QA và tỷ lệ output dùng được. Pass khi DoD §24 đạt; nếu fail, sửa đúng grip/pivot/pose/import trước mass production. A01/A02/A12 phải có kết quả/quyết định trước nhân rig.
+
+### 22.2. File lifecycle và pose/socket data
+
+**Đường đi của file:** editable source ở `ArtSource/Probes/Sword01/` → PNG export vào `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` → Unity import tạo sprite refs + `.meta` → definition/prefab tham chiếu refs. PNG export chính là imported asset; không chép thêm một bản PNG “runtime”. Cache Library không version. Khi production base đã duyệt, chuyển asset được chọn sang `game/Assets/GameArt/`, giữ GUID khi move và đưa refs vào presentation definition; prototype source không tự thành production architecture.
+
+Mỗi export có stable asset ID, source path và revision. Sửa source rồi export đè đúng file; retain `.meta` khi rename/move. Sheet layout đổi thì kiểm lại slice refs, không chỉ tên PNG. Font/license và file gốc của asset ngoài được giữ cùng nguồn.
+
+**Minimum pose manifest — presentation only:** `PoseKey`, `SpriteRefsByLayer`, `Duration/phase mapping`, `Grip`, `Muzzle`, `WeaponOrder`; thêm `Foot/Head/Tip` hoặc `HeadOffset` khi pose cần. Missing optional socket có fallback được ghi rõ; poseKey và spriteRef có thể reuse. Không có damage, MP, range, cooldown, gameplay hitbox hoặc authority hit moment trong manifest.
+
+**Socket probe A02:** so hai phương án trên cùng tám pose/hai hướng: (A) pose data lưu điểm/góc pixel rồi runtime đặt weapon; (B) author Transform socket trong rig/prefab rồi export bảng theo poseKey. Chọn một nguồn cuối, không sửa cả Transform và data độc lập. Trong mẫu A, tọa độ canvas gốc trái-dưới: điểm `(u,v)` đổi local thành `((u−32)/32,v/32)` theo Bottom-Center/PPU32; exporter từ gốc trái-trên phải đổi Y một lần. Weapon grip offset/góc và front/back per pose ghi cùng entry; mirror cả điểm/góc đúng một lần ở VisualRoot. P01/P02 kiểm tay không trượt, nock/release đọc đúng, equip không restart clip. Chưa pass/chọn phương án thì chưa nhân catalog.
+
+### 22.3. Visual language — mẫu đọc trong 30 giây
+
+Status: **style sample để kiểm**, dùng các baseline canvas/palette/readability hiện hành; chưa khóa technique/camera mới.
+
+- Character: body 44–48 px trong cell64, silhouette/hand-grip ưu tiên. Thử outline tối 1 px, ít mức sáng/tối và một hướng sáng thống nhất; không để palette gear che tay/vũ khí.
+- Environment: lane/edge đứng được tương phản rõ; background giảm contrast, foreground không che silhouette/telegraph. Cùng vật liệu vẫn phân biệt solid và one-way bằng cạnh/shape.
+- Kiếm/Cung: chém ấm, cung lạnh, Linh tím kèm hình/nhịp riêng; cue release/impact gọn và ăn clock. Không chỉ dùng màu để phân Freeze/Slow.
+- UI: panel dùng kit chung, text Việt đọc ở camera/output thực; selected focus và disabled/error khác nhau. Icon/slot/tooltip hỗ trợ thông tin, không thay bằng màn bitmap hoặc bắt click để chơi.
+
+### 22.4. Provenance tối thiểu
+
+Một record cho mỗi nguồn/pack với asset IDs liên quan: URL hoặc source hash, author/tool, license text/file, phạm vi sử dụng đã kiểm, modified/from-source revision, ngày lấy và người kiểm. Asset tự vẽ ghi tác giả; AI ghi tool/model nếu biết và reference nguồn. Thiếu thông tin thì đánh dấu chưa kiểm và dùng placeholder, không tính vào số asset sẵn sàng phát hành. Kiểm quyền tại lúc dùng/mua; không suy toàn pack có cùng quyền từ một ảnh mẫu.
 
 <a id="production-accounting"></a>
 
@@ -636,11 +672,11 @@ Tra đầy đủ [S0 player](#player-s0) và [các family/công sản xuất](#f
 
 <a id="art-tool-workflow"></a>
 
-### 23.3. Quy trình art nhỏ cho người chưa thạo vẽ
+### 23.1. Quy trình art nhỏ cho người chưa thạo vẽ
 
 **TOOL CANDIDATE / CURRENT PROBE:** PixelLab là công cụ ứng viên để thử chất lượng đầu vào bằng Free/free trial nếu phù hợp. Nếu mẫu không đạt hoặc thiếu tool, có thể đổi công cụ/workflow; art contract và architecture không phụ thuộc PixelLab. Không mua/generate full catalog theo S0.
 
-[FAQ chính thức](https://www.pixellab.ai/docs/faq) xác nhận trial giới hạn generation và không có mọi tool; kiểm quyền tool thực trên tài khoản, không giả animation/outfit/size/features đều miễn phí. Chưa có mẫu nào được tạo trong vòng này.
+Trước probe, kiểm [FAQ chính thức](https://www.pixellab.ai/docs/faq) và quyền tool thực trên tài khoản Free/trial; không giả animation/outfit/size/features đều miễn phí. Chưa có mẫu nào được tạo trong vòng này.
 
 Chọn mẫu nhỏ phục vụ CURRENT: cùng character/default outfit, Mộc/Kiếm/outfit I, pose Attack/Skill và một surface/icon/impact. Giữ reference/palette/canvas/pivot; xuất ảnh rồi sửa outline/transparent/palette/hand-grip/alignment trong editor pixel (ví dụ Pixelorama), slice/import và chạy room Unity ở camera thực. Nếu Free không hỗ trợ công đoạn cần kiểm, ghi thiếu evidence, dùng placeholder cho pipeline; không gọi thiếu tool là đã chứng minh hybrid đạt.
 
@@ -652,9 +688,24 @@ Dùng số đo để chọn tiếp tục tool, sửa tay nhiều hơn, giảm po
 
 ## 24. Prototype/validation trước production hàng loạt
 
-Đây là **ma trận validation visual**, thứ tự làm nằm ở Roadmap; quy trình mẫu/công cụ ứng viên ở §23.3, không kế hoạch tool hoặc generate asset riêng. Các ca dưới **CHƯA CHẠY**; dùng placeholder/fixture phù hợp khi làm Unity slice, chưa nghiệm thu bằng tài liệu. Các “dấu hiệu đủ” là câu hỏi để validate proposal: riêng P12 “Immediate local pose” kiểm phương án A11, không tự khóa anticipation. G-N cần result/life/phase đúng với chế độ đã thử, không buộc triển khai anticipation chưa duyệt hoặc thêm tentative projectile branch.
+Đây là **ma trận validation visual**, thứ tự làm nằm ở Roadmap; quy trình mẫu/công cụ ứng viên ở §23.1, không kế hoạch tool hoặc generate asset riêng. Các ca dưới **CHƯA CHẠY**; dùng placeholder/fixture phù hợp khi làm Unity slice, chưa nghiệm thu bằng tài liệu. Các “dấu hiệu đủ” là câu hỏi để validate proposal: riêng P12 “Immediate local pose” kiểm phương án A11, không tự khóa anticipation. G-N cần result/life/phase đúng với chế độ đã thử, không buộc triển khai anticipation chưa duyệt hoặc thêm tentative projectile branch.
 
-**Ưu tiên hiện tại:** P01/P02 phần Kiếm/default/I, P05 Nấm/Sói, P06 ground, P07 solo Q3/Q6, P08 room, P09 geometry nhỏ, P11 kit VS-1 và P15 chi phí Kiếm. P04 Arc/Line chỉ fixture hẹp nếu cần, không kéo hành trình ngoài Q1–Q6. P03 và phần Cung của P04/P08/P09/P13/P15 DEFERRED; P14/Boss/thác/full gear và stress full content cũng làm sau. P07 contention/P12 Dedicated hai client là phần G-N sau base review và G-L revision mới; G-N RAM fixture không thay test backend ACK/terminal-pending của P06/P12. Cột nội dung trong bảng dưới là toàn bộ ca TARGET được giữ, không buộc tất cả chạy trước VS-1.
+**Ưu tiên kiểm:**
+
+- Trước base: P01/P02 Kiếm/default/I, P05 Nấm/Sói, P06 ground, P07 solo Q3/Q6, P08 room, P09 geometry nhỏ, P11 kit và P15 công thực tế. P04 Arc/Line chỉ fixture hẹp khi cần.
+- Sau base và G-L mới: P07 contention, P12 Dedicated. RAM pass không thay backend ACK/terminal-pending ở P06/P12.
+- Sau core gate: Cung/P03, Boss/P14, thác/full gear và stress full content. Bảng dưới giữ toàn TARGET, không buộc chạy hết trước slice.
+
+**Asset Definition of Done — áp cho module nhập vào probe:**
+
+- [ ] Canvas/PPU/pivot/mốc chân đúng; alpha/palette sạch, không crop lệch cell hoặc bleed.
+- [ ] PoseKey/ref/duration có manifest; các layer khớp, không hở Body/Armor/Lower.
+- [ ] Hai hướng đúng grip/socket/front-back; không mirror text/physics hoặc mirror hai lần.
+- [ ] Import/slice/platform/atlas refs đúng; gear swap runtime giữ phase, Run không trượt chân.
+- [ ] Camera thực đọc silhouette/cue/UI; AnimationEvent/visual collision không gây damage.
+- [ ] Source/export/meta/revision/provenance đầy đủ; ghi pass/fail, công sửa và output bị loại.
+
+DoD là chất lượng asset probe. “Có PNG” hoặc “build chạy” chưa nghiệm thu art/UX toàn game.
 
 | Ca | Nội dung phải thử | Dấu hiệu đủ để ra quyết định |
 | --- | --- | --- |
@@ -683,6 +734,10 @@ Options, trade-off, recommendation và cách chốt của **A01–A17 đã chuy�
 A01/A02/A14 chi phối pose/modular và chi phí; A03 liên quan Boots; A04/A05/A06 liên quan concept/timing/Cung; A07 Dummy; A08/A15 death/corpse/loot; A09/A10 terrain/route/projectile; A11/A13 online/Select; A12 camera; A16 Boss; A17 accounting. CURRENT/DEFERRED do Roadmap sở hữu. Chưa prototype không biến recommendation thành LOCKED; giữ nguyên GDD baseline đến khi quyết định thay được duyệt.
 
 ---
+
+<a id="working-spec-end"></a>
+
+**CURRENT WORKING SPEC ENDS HERE.** Phần dưới là reasoning, accounting scenarios và lịch sử để tra khi cần; người làm probe bắt đầu ở §22.1, không phải đọc hết phụ lục. Các bảng được giữ nguyên để bảo toàn evidence.
 
 <a id="art-rationale"></a>
 
@@ -735,11 +790,11 @@ Phần này giữ các phát hiện và trade-off đã dẫn tới spec ở trê
 
 ## Phụ lục B. Kịch bản production suy ra
 
-Các giả định, phép cộng và giới hạn dưới đây được giữ nguyên. Nhãn §23.1/§23.2 giữ để tra lịch sử; đây là dữ liệu tính thử, chưa phải manifest hoặc budget đã được duyệt. [§23](#production-accounting) là điểm vào accounting hiện tại.
+Các giả định, phép cộng và giới hạn dưới đây được giữ nguyên. Đây là dữ liệu tính thử, chưa phải manifest hoặc budget đã được duyệt. [§23](#production-accounting) là điểm vào accounting hiện tại.
 
 <a id="player-s0"></a>
 
-### 23.1. Kịch bản player S0 có thể kiểm lại
+### B.1. Kịch bản player S0 có thể kiểm lại
 
 S0 giả định hybrid, 19 ô chung đều có body riêng; bảy ô action/class đều riêng upper body; locomotion dùng tay trung tính; các active trong cùng class reuse Skill4. Chưa cộng pose airborne bổ sung, hand-front slice hoặc idle cầm cung khác. Các tập Hair/LowerBody dưới đây là **giả định dedup công khai**, phải thay bằng manifest sau prototype; không claim đã chứng minh từ artwork chưa có.
 
@@ -761,7 +816,7 @@ Công vẽ mới tách khỏi export: Body33 pose; Armor33 template +3×33 lần
 
 <a id="family-scenarios"></a>
 
-### 23.2. Tổng quan các family còn lại
+### B.2. Tổng quan các family còn lại
 
 | Asset family | Unique frame/sprite trong kịch bản | Variants/reuse | Workload chưa thể quy thành số ảnh/giờ |
 | --- | --- | --- | --- |
@@ -795,7 +850,7 @@ Ma trận QA tối thiểu: mỗi Armor với Sword Attack và Bow draw/Skill; m
 
 <a id="legacy-visual-flow"></a>
 
-### 22.1. Pipeline trước consolidation — trace được giữ
+### C.1. Pipeline trước consolidation — trace được giữ
 
 Bảng sau chuyển nguyên từ GDD §9 để bảo toàn trình tự production cũ. Chi tiết art do file này sở hữu; cách gắn runtime/physics do Technical sở hữu. Cụm `slice 26 frames` là shorthand lịch sử của contract; **không giải quyết A01 hoặc buộc mỗi part có 26 PNG**. Dùng §1/§22 và gate A01/A02 trước production.
 
@@ -815,7 +870,7 @@ Phép tính 12 đúng cho ba band × bốn loại, nhưng chưa bao gồm Mộc 
 
 <a id="sync-history"></a>
 
-## 26. Trace đề xuất sync V6.1 và điều kiện còn lại
+### C.2. Trace đề xuất sync V6.1 và điều kiện còn lại
 
 Bảng đề xuất sync trước consolidation được giữ nguyên dưới đây để không mất dependency/history. **Không phải mọi dòng đã áp dụng.** Các nguyên tắc/owner/routing đã sync theo §0; phần đổi gameplay/26-frame/hybrid/camera/Dummy/Boots vẫn theo trạng thái Analysis Axx. Di chuyển nội dung thực tế có bảng [SOURCE → DESTINATION](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#source-destination) và audit ở file 5. Các tham chiếu §10/§25 trong bảng lịch sử chỉ evidence/decision cũ, nay đã chuyển Analysis; GDD/Technical vẫn giữ baseline nếu option chưa duyệt.
 

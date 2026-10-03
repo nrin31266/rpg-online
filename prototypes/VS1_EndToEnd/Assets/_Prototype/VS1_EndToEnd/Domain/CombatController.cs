@@ -45,11 +45,10 @@ namespace HuyenLo.Domain
         public int AssistAxis {get;private set;}
         public double BufferUntil {get;private set;}
         public long StartedCount {get;private set;}
-        private string owner;
-        private long pressToken,consumedToken=-1;
-        private double pressedAt,approachStarted=-1,approachX,lastProgressAt,lastX;
-        private Skill heldSkill,bufferSkill;
-        private double nextAcquireAt;
+        private Skill pendingSkill, bufferSkill;
+        private TargetKey pendingTarget, bufferTarget;
+        private double approachStarted, approachX, lastProgressAt, lastX;
+        public bool HasPendingCast => pendingSkill != null;
         public CombatController(SliceSession value){session=value;}
         public Mob Focus => session.Find(FocusId,FocusGeneration);
         public Skill Selected => P.School==School.Novice?Rules.Novice:Unlocked.TryGetValue(SelectedSlot,out var s)?s:null;
@@ -57,42 +56,44 @@ namespace HuyenLo.Domain
         public double Remaining(Skill skill) => skill!=null&&Cooldowns.TryGetValue(skill.Id,out var end)?Math.Max(0,end-session.Now):0;
         public void Explicit(Mob target) {
             CancelIntent();
-            if(!P.Alive||target==null||!target.Alive||target.Map!=P.Map)return;
+            if(!P.Alive||target==null||!target.Alive||target.Map!=P.Map||target.Returning)return;
             FocusId=target.Id;FocusGeneration=target.Generation;FocusKind=FocusKind.Explicit;session.Emit("Focus EXPLICIT "+target.Slot);
         }
-        public void ClearFocus(){FocusId=FocusGeneration=0;FocusKind=FocusKind.None;}
+        public void ClearFocus(){CancelIntent();FocusId=FocusGeneration=0;FocusKind=FocusKind.None;}
         private void Acquire(Skill skill) {
-            if(session.Now<nextAcquireAt)return;
             double search=(skill?.Range??1.7)+ApproachBudget(skill);
-            var target=session.Mobs.Where(x=>x.Alive&&x.Map==P.Map&&!x.Returning&&x.Position.Distance(P.Position)<=search&&Math.Abs(x.Position.Y-P.Position.Y)<=1.6)
+            var target=session.Mobs.Where(x=>x.Alive&&x.Map==P.Map&&!x.Returning&&x.Position.Distance(P.Position)<=search&&Math.Abs(x.Position.Y-P.Position.Y)<=skill.Vertical)
                 .OrderBy(x=>x.Position.Distance(P.Position)).ThenBy(x=>x.Id).FirstOrDefault();
-            if(target==null){ClearFocus();nextAcquireAt=session.Now+.1;return;}nextAcquireAt=0;FocusId=target.Id;FocusGeneration=target.Generation;FocusKind=FocusKind.Auto;
+            if(target==null){FocusId=FocusGeneration=0;FocusKind=FocusKind.None;return;}
+            FocusId=target.Id;FocusGeneration=target.Generation;FocusKind=FocusKind.Auto;
         }
+        // Probe values only; the production gate measures distance/progress at the real scale.
         private static double ApproachBudget(Skill s) => s==null?1:Math.Max(1,Math.Min(3,s.Range*1.5));
+        private void Reject(string reason){CancelIntent();session.Feedback=reason;}
         public void Press(string key,int slot=0) {
-            CancelIntent();owner=key;pressToken++;pressedAt=session.Now;
-            if(slot>0){
-                if(!Unlocked.ContainsKey(slot)){session.Emit("Slot "+slot+" chưa mở trong VS-1.");owner=null;return;}
-                SelectedSlot=slot;
-            }
-            heldSkill=Selected;
-            if(!P.Alive||!Available(heldSkill)){session.Emit("Cần mặc vũ khí và học kỹ năng.");owner=null;return;}
-            if(Focus==null)Acquire(heldSkill);
+            if(!int.TryParse(key,out var digit)||digit<1||digit>3)return;
+            if(slot==0)slot=digit;
+            if(P.School==School.Novice?slot!=1:!Unlocked.ContainsKey(slot)) {session.Feedback="Kỹ năng chưa mở: cần cấp, bí kíp và nhiệm vụ.";return;}
+            SelectedSlot=slot;
+            var skill=Selected;
+            CancelIntent();
+            if(!P.Alive||!Available(skill)){Reject("Cần mặc vũ khí và học kỹ năng.");return;}
+            if(P.Mp<skill.Mp){Reject("Không đủ Linh lực. Dùng bình hoặc Food.");return;}
+            if(Focus==null)Acquire(skill);
+            if(Focus==null||Focus.Returning){Reject("Không có mục tiêu hợp lệ — không tiêu MP/CD.");return;}
             if(Running!=null){
-                double recoveryLeft=Running.EndAt-session.Now;
-                if(recoveryLeft<=.15 && Remaining(heldSkill)<=recoveryLeft && P.Mp>=heldSkill.Mp){bufferSkill=heldSkill;BufferUntil=session.Now+.15;}
+                double left=Running.EndAt-session.Now;
+                if(left>0&&left<=.15&&Remaining(skill)<=left){bufferSkill=skill;bufferTarget=new TargetKey(Focus);BufferUntil=session.Now+.15;}
+                else session.Feedback="Đang thực hiện đòn; bấm lại gần cuối recovery.";
                 return;
             }
-            if(Remaining(heldSkill)>0)return;
-            TryStart(heldSkill);
+            if(Remaining(skill)>0){Reject("Kỹ năng đang hồi. Không tự chờ để cast.");return;}
+            BeginOrApproach(skill,Focus);
         }
-        public void Release(string key){
-            if(owner!=key)return;
-            owner=null;heldSkill=null;AssistAxis=0;approachStarted=-1;
-            // A valid short recovery tap may survive release; held approach/repeat never does.
-        }
+        // A physical release never repeats or cancels the one-shot pending intent.
+        public void Release(string key) { }
         public void ManualOverride(){CancelIntent();}
-        public void CancelIntent(){owner=null;heldSkill=bufferSkill=null;BufferUntil=0;AssistAxis=0;approachStarted=-1;}
+        public void CancelIntent(){pendingSkill=bufferSkill=null;BufferUntil=0;AssistAxis=0;}
         public void Cancel(){Running=null;CancelIntent();}
         private bool InRange(Skill skill,Mob m,Point origin,int facing) {
             double dx=m.Position.X-origin.X,dy=m.Position.Y-origin.Y;
@@ -101,13 +102,28 @@ namespace HuyenLo.Domain
             if(skill.Shape==Shape.Arc)return m.Position.Distance(origin)<=skill.Range && dx*facing>=Math.Abs(dy)/Math.Sqrt(3);
             return m.Position.Distance(origin)<=skill.Range;
         }
+        private IEnumerable<Mob> Eligible(Skill skill,Point origin,int facing) => session.Mobs.Where(x=>x.Alive&&x.Map==P.Map&&!x.Returning&&InRange(skill,x,origin,facing));
+        private bool Witness(Skill skill,Mob focus,Point origin,int facing) => skill.Shape==Shape.Line||skill.Shape==Shape.Arc?Eligible(skill,origin,facing).Any():InRange(skill,focus,origin,facing);
+        private void BeginOrApproach(Skill skill,Mob focus) {
+            int facing=focus.Position.X<P.Position.X?-1:1;
+            if(Witness(skill,focus,P.Position,facing)){TryStart(skill);return;}
+            double dy=focus.Position.Y-P.Position.Y;
+            double horizontal=Math.Sqrt(Math.Max(0,skill.Range*skill.Range-dy*dy))-.12;
+            double missing=Math.Abs(focus.Position.X-P.Position.X)-horizontal;
+            var prospective=new Point(P.Position.X+facing*Math.Max(0,missing),P.Position.Y);
+            if(Math.Abs(dy)>Math.Min(1.3,skill.Vertical)||missing<=0||missing>ApproachBudget(skill)||!Witness(skill,focus,prospective,facing)){
+                Reject("Quá xa hoặc khác tầng — hãy tự di chuyển.");return;
+            }
+            pendingSkill=skill;pendingTarget=new TargetKey(focus);approachStarted=lastProgressAt=session.Now;approachX=lastX=P.Position.X;
+            AssistAxis=facing;session.Feedback="Đang tiếp cận — hướng/nhảy/Esc để hủy.";
+        }
         private bool TryStart(Skill skill) {
             if(!P.Alive||!Available(skill)||Running!=null||Remaining(skill)>0||P.Mp<skill.Mp)return false;
             var focus=Focus;
-            if(focus==null||focus.Returning){session.Feedback="Không có mục tiêu hợp lệ — không tiêu MP/CD.";return false;}
+            if(focus==null||focus.Returning)return false;
             var stats=P.Stats;int facing=focus.Position.X<P.Position.X?-1:1;
-            if(!InRange(skill,focus,P.Position,facing)){session.Feedback="Mục tiêu ngoài tầm. Tap không tự đi; giữ phím để tiếp cận ngang.";return false;}
-            var eligible=session.Mobs.Where(x=>x.Alive&&x.Map==P.Map&&!x.Returning&&InRange(skill,x,P.Position,facing));
+            if(!Witness(skill,focus,P.Position,facing))return false;
+            var eligible=Eligible(skill,P.Position,facing);
             TargetKey[] targets;
             if(skill.Shape==Shape.Line)targets=eligible.OrderBy(x=>(x.Position.X-P.Position.X)*facing).ThenBy(x=>x.Id).Take(5).Select(x=>new TargetKey(x)).ToArray();
             else if(skill.Shape==Shape.Arc)targets=eligible.OrderBy(x=>x.Id==focus.Id?0:1).ThenBy(x=>x.Position.Distance(P.Position)).ThenBy(x=>x.Id).Take(3).Select(x=>new TargetKey(x)).ToArray();
@@ -117,12 +133,15 @@ namespace HuyenLo.Domain
             if(targets.Length==0)return false;
             Facing=facing;P.Mp-=skill.Mp;Cooldowns[skill.Id]=session.Now+skill.Cooldown;
             Running=new CombatAction(++StartedCount,skill,P.Position,facing,stats,session.Now,targets);
-            consumedToken=pressToken;AssistAxis=0;approachStarted=-1;bufferSkill=null;BufferUntil=0;
+            CancelIntent();
             session.Emit($"Action {Running.Id} {skill.Id}; target {focus.Id}@{focus.Generation}; MP {P.Mp:F2}");session.ActionStarted(skill);return true;
         }
         public void Tick(bool manualContext) {
             var previous=FocusKind;
-            if(Focus==null&&previous!=FocusKind.None){ClearFocus();if(previous==FocusKind.Auto)Acquire(Selected);}
+            if(Focus==null&&previous!=FocusKind.None){
+                bool hadPending=HasPendingCast;ClearFocus();if(hadPending)session.Feedback="Mục tiêu đã mất — cần bấm mới.";
+                if(previous==FocusKind.Auto)Acquire(Selected);
+            }
             if(FocusKind==FocusKind.Auto&&Focus!=null&&manualContext&&
                 (Focus.Position.Distance(P.Position)>(Selected?.Range??1.7)+ApproachBudget(Selected)||Math.Abs(Focus.Position.Y-P.Position.Y)>2)){ClearFocus();Acquire(Selected);}
             if(Running!=null){
@@ -130,20 +149,19 @@ namespace HuyenLo.Domain
                 if(!Running.Resolved&&session.Now>=Running.ResolveAt){Resolve(Running);Running.Resolved=true;}
                 if(session.Now>=Running.EndAt)Running=null;
             }
-            if(bufferSkill!=null){if(session.Now>BufferUntil){bufferSkill=null;BufferUntil=0;}
-                else if(Running==null&&TryStart(bufferSkill))bufferSkill=null;}
-            if(owner==null||heldSkill==null||!P.Alive||session.Now-pressedAt<.18||(!heldSkill.Repeat&&consumedToken==pressToken))return;
-            if(Running!=null||Remaining(heldSkill)>0||P.Mp<heldSkill.Mp){AssistAxis=0;return;}
-            if(Focus==null)Acquire(heldSkill);
-            if(TryStart(heldSkill))return;
-            var target=Focus;if(target==null||target.Returning){AssistAxis=0;return;}
-            double missing=Math.Abs(target.Position.X-P.Position.X)-heldSkill.Range;
-            if(Math.Abs(target.Position.Y-P.Position.Y)>1.3||missing>ApproachBudget(heldSkill)||missing<=0){AssistAxis=0;return;}
-            if(approachStarted<0){approachStarted=session.Now;approachX=lastX=P.Position.X;lastProgressAt=session.Now;}
+            if(bufferSkill!=null){
+                var skill=bufferSkill;var target=session.Find(bufferTarget.Id,bufferTarget.Generation);
+                if(session.Now>BufferUntil||target==null||target.Returning||FocusId!=target.Id||FocusGeneration!=target.Generation){bufferSkill=null;BufferUntil=0;}
+                else if(Running==null){bufferSkill=null;BufferUntil=0;BeginOrApproach(skill,target);}
+            }
+            if(pendingSkill==null)return;
+            var mob=session.Find(pendingTarget.Id,pendingTarget.Generation);
+            if(!P.Alive||mob==null||mob.Returning||mob.Id!=FocusId||mob.Generation!=FocusGeneration){Reject("Mục tiêu không còn hợp lệ — cần bấm mới.");return;}
+            if(P.Mp<pendingSkill.Mp||Remaining(pendingSkill)>0||!Available(pendingSkill)){Reject("Kỹ năng chưa sẵn — tiếp cận đã hủy.");return;}
+            if(TryStart(pendingSkill))return;
             if(Math.Abs(P.Position.X-lastX)>.04){lastX=P.Position.X;lastProgressAt=session.Now;}
-            if(session.Now-approachStarted>ApproachBudget(heldSkill)/5+1 ||session.Now-lastProgressAt>.4||Math.Abs(P.Position.X-approachX)>ApproachBudget(heldSkill)){
-                session.Emit("Tiếp cận dừng: hết budget/blocked. Cần input mới.");CancelIntent();return;}
-            AssistAxis=target.Position.X<P.Position.X?-1:1;
+            if(session.Now-approachStarted>ApproachBudget(pendingSkill)/5+1||session.Now-lastProgressAt>.45||Math.Abs(P.Position.X-approachX)>ApproachBudget(pendingSkill)||Math.Abs(mob.Position.Y-P.Position.Y)>1.3){Reject("Tiếp cận dừng: blocked/hết giới hạn. Bấm mới để thử lại.");return;}
+            AssistAxis=mob.Position.X<P.Position.X?-1:1;
         }
         private void Resolve(CombatAction a) {
             if(a.Skill.Shape==Shape.Explosion){

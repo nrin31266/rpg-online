@@ -1,10 +1,10 @@
 # RPG Online: Huyền Lộ
 ## Tài liệu thiết kế game
 
-**Current Design Version:** V6.2.1
+**Current Design Version:** V6.2.2
 
 **Status:** DESIGN + PROTOTYPE VALIDATION; production codebase chưa bắt đầu
-**Last Reviewed:** 2026-10-03 (feedback prototype; onboarding/control/navigation baseline đã sửa)
+**Last Reviewed:** 2026-10-04 (feedback prototype; onboarding/control/navigation baseline đã sửa)
 
 <a id="gdd-0"></a>
 
@@ -432,6 +432,8 @@ Q1 catch-up Lv 2, Q2 Lv 3, Q3 không EXP (giữ Lv 3), Q4 Nấm/loot catch-up Lv
 | Q11 — Mở Lối Huyền Môn / 17 | Tạ Minh: “Nối lại từng chỗ. Đừng chạm cổng khi dòng khí chưa yên.” Tạ Minh → Tạ Minh. | Tương tác `XN4_SealA` + hạ **3 Thạch Lv 16 tại XN4** → Mảnh 1; Tương tác `XN5_SealB` + **3 tại XN5** → Mảnh 2; Tương tác `XN6_SealC` + **4 tại XN6** → Mảnh 3; Tương tác `XN_HuyenMon_Outer` kiểm đủ mảnh/kích hoạt → báo Tạ Minh. | 670 EXP + Rare III weapon + bí kíp đại chiêu đúng class | Chỉ **Completed** mới mở Huyền Tích; Q12 thêm Lv 20; hết Chương II |
 | Q12 — Tiếng gọi từ Huyền Tích / 20 | Tạ Minh: “Giúp nó buông gánh cũ. Đường tu luyện của ngươi còn dài.” Tạ Minh → Tạ Minh. | `HT4_GuardRoute`: hạ **6 Cổ Vệ Lv 20 tại HT4 + HT5** → tới `HT_BossLandmark` → đóng góp ≥10% HP trong **một life Boss** ở death khi đúng step → báo Tạ Minh. | 1.000 Vàng một lần; 0 EXP, không thêm Boss pile | Main Story/Chương III complete; Dư Ảnh và farm tiếp tục |
 
+**Tutorial supply active-step only:** kill/grant chỉ tạo đồ tutorial/quest-bound và entitlement khi QuestId, InProgress, active step và source hợp lệ. Ngoài bước đó, quái chỉ roll loot thường; không spawn áo/sample tutorial hoặc tạo quyền nhận cho quest tương lai. Entitlement đã tạo hợp lệ vẫn giữ cùng instance để retry claim khi hết hạn/túi đầy; không dùng recovery này để hồi tố kill cũ.
+
 **Recovery chung:** talk/visit/kill chỉ credit sau Game Server event hợp lệ; lưu step/counter sau commit, death/reconnect không xóa. Ngã ở Q2 thì thử lại, không giả credit chỉ vì bấm phím. Mộc Kiếm Q3 không bán/vứt, grant pending nếu túi đầy. Q5 không cấp lại 320 Vàng khi replay; dùng bình lúc đầy HP bị từ chối mà không tiêu thuốc. Q4 áo giữ binding tới lúc mặc, sample chỉ bán đúng step; hết hạn ground/full bag/reconnect giữ entitlement chưa claim với cùng itemInstanceId. Quest reward chỉ trao tại đúng NPC sau capacity preflight.
 
 | Quest cần xử lý riêng | Contract không lặp lại trong bảng objectives |
@@ -669,7 +671,7 @@ Sau kết quả, người còn phiên trở về Vân Khê với HP/MP trước 
 
 Luồng màn hình P0: Boot/Main Menu → Login tài khoản được cấp → chọn nhân vật → overlay kết nối → map/điểm khôi phục hợp lệ. Nhân vật mới bắt đầu ở Vân Khê. Không có Register cho player; không cần Loading Scene riêng.
 
-Một Move action: A/← và D/→ là alternate bindings, không cộng đôi tốc độ; không full remapping P0. Jump/DropThrough là actions riêng; cùng frame trên one-way thì Drop ưu tiên. Text input chặn gameplay; Esc cancel / đóng cửa sổ.
+Một Move action: A/← và D/→ là alternate bindings, không cộng đôi tốc độ; không full remapping P0. Jump/DropThrough là actions riêng; cùng frame trên one-way thì Drop ưu tiên. Text input chặn gameplay; Esc cancel / đóng cửa sổ. Toàn bộ vòng chơi và menu P0 phải dùng được bằng bàn phím; chuột là một cách thao tác bổ sung.
 
 | Phím | Action | Phím | Action |
 | --- | --- | --- | --- |
@@ -684,6 +686,8 @@ Một Move action: A/← và D/→ là alternate bindings, không cộng đôi t
 | Esc | Cancel | — | — |
 
 **Binding baseline cho prototype tiếp theo:** I Inventory, C Character (gồm skill tab), Q Quest; không B/K/L panel bindings song song. Đây là bộ mặc định để kiểm usability, chưa cam kết tối ưu hoặc thêm key-remapping P0. Space/↑ và S/↓ là OR action; drop chỉ trên one-way đang đứng, không crouch/đi xuyên solid. Nếu Jump + Drop cùng frame trên one-way thì Drop ưu tiên; trên solid Jump vẫn hợp lệ.
+
+**Menu bằng bàn phím:** Interact mở NPC với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: ↑/↓ hoặc W/S, Tab/Shift+Tab đổi lựa chọn; Enter hoặc Interact xác nhận; Esc đóng. Arrow/Space/1–3 không lọt thành movement/cast khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở đây là UI navigation, không thêm combat target cycling. Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Click explicit focus vẫn tùy chọn; auto-acquire và clear focus đủ cho route keyboard.
 
 **Movement Feel gate:** coyote time, jump input buffer, variable height theo release, ground acceleration/deceleration và fall tuning là PROTOTYPE; không khóa số trước collider/scale/map/art sample. Không thêm double-jump/dash. Drop không hưởng coyote để nhảy bật ngược lên sàn; authority và client phải dùng cùng semantics. Xem contract/probe Technical.
 

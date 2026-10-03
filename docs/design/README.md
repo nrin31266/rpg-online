@@ -16,7 +16,7 @@ TARGET P0 giữ Kiếm + Cung và Dedicated + Spring/PostgreSQL online. CURRENT 
 
 Nếu Analysis / Technical mâu thuẫn GDD, GDD thắng. Deterministic defect đã xác minh phải sửa đồng bộ; proposal không tự đổi luật.
 
-Feedback V6.2.1 đã sync: ba skill tích lũy/class, 1–3 one-press bounded approach/cast, logical ranged và focus/interaction riêng; luật chi tiết ở owner. Prototype cũ không production codebase hoặc evidence pass cho revision mới; harvest/probe → production base → G-L mới → G-N sớm theo Roadmap. Chi tiết luật ở GDD, contract ở Technical, rationale/gates ở Analysis; review artifact tạm được dọn sau audit. User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
+Feedback V6.2.2 đã sync: ba skill tích lũy/class, keyboard-complete menus, 1–3 one-press bounded approach/cast, logical ranged và focus/interaction riêng; luật chi tiết ở owner. Prototype cũ không production codebase hoặc evidence pass cho revision mới; harvest/probe → production base → G-L mới → G-N sớm theo Roadmap. Chi tiết luật ở GDD, contract ở Technical, rationale/gates ở Analysis; review artifact tạm được dọn sau audit. User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
 
 ## Quick Routing
 

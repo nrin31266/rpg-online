@@ -1,6 +1,6 @@
 # Huyền Lộ — Phân tích thiết kế
 
-**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-10-03 · **Vai trò:** evidence, simulation và quyết định mở.
+**Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-10-04 · **Vai trò:** evidence, simulation và quyết định mở.
 
 GDD là design authority; Technical là implementation contract. **DERIVED** là phép tính từ GDD; **SIMULATION** phụ thuộc giả định; **PROPOSAL** chưa thành luật. DESIGN LOCK SYNC 2026-10-03 thay progression/rotation/target resolution: các mô hình combat, sustain, status cadence, farm scheduler, journey, PvP và Boss bên dưới là **LEGACY SIMULATION**, giữ nguyên số để đối chiếu, cần chạy lại với ba skill tích lũy/CD độc lập và không class Normal. Stat/gear/EXP/enhance/payout arithmetic vẫn xác định theo luật không đổi. Chưa có Unity/runtime acceptance của các mô hình.
 
@@ -8,7 +8,7 @@ GDD là design authority; Technical là implementation contract. **DERIVED** là
 
 # 1. Phương pháp, đối chiếu và giới hạn
 
-Bộ power/MP/CD/gear làm control V6.2.1 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](../../game/README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
+Bộ power/MP/CD/gear làm control V6.2.2 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](../../prototypes/VS1_EndToEnd/README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
 
 **Nguồn đầu vào:** [nhân vật](1_HUYEN_LO_GDD.md#character-power), [kỹ năng/trạng thái](1_HUYEN_LO_GDD.md#class-combat), [quái và bãi](1_HUYEN_LO_GDD.md#world-farm), [trang bị/thưởng](1_HUYEN_LO_GDD.md#gear-economy), [Food/Bình](1_HUYEN_LO_GDD.md#consumables-death). Analysis không giữ catalog thứ hai.
 
@@ -415,7 +415,7 @@ TECH-01/SAVE-01 và A15 còn cần chốt thứ tự Potion–hit–checkpoint, 
 
 **Rủi ro kiến trúc V6.1:** auth/ticket/lease, checkpoint ordering/validation, reconnect grace, escrow orphan recovery, transaction N recipients, backend downtime và dedicated build/headless physics cần integration tests. Mốc giờ player-host/JSON cũ không còn dùng để cam kết lịch; spike đầu đo integration/latency, sau đó Technical mới đặt lại ngân sách. Quest, gear, combat PvE và world balance giữ số hiện tại; các luật PvP/recovery trên là user lock, không Open Decision.
 
-[Review Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT kiểm Kiếm/Q1–Q6 local rồi gate Dedicated hai Client trước production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
+[Review Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT thu hoạch mock, probe feel/art/UI rồi review/dựng production base; G-L revision mới trước gate Dedicated hai Client và production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
 
 Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST/SPIKE ghi rõ phải đo gì. Không tăng NeedEXP, HP quái hoặc tạo hệ thống mới từ mô hình thiếu cảnh thật.
 
@@ -497,6 +497,14 @@ User approval lần này là nguồn của các thay đổi; NSO research chỉ 
 Kiếm S1 có trade-off đơn mục tiêu rõ, S2 group max3. Cung AAA hơn S1 khoảng 4,35% power/MP và 22,76% power/CD, thêm proc; S1 vẫn ít MP/cast, CD/commitment ngắn hơn. Đây là **balance risk**, chưa chứng minh S1 dead button/domination mọi chiều; không gọi S1 PvP-only hoặc tự sửa số. Test isolated/group/overkill/MP thiếu/Food/Potion và weave S1 trong CD S2/S3. Bỏ class Normal miễn MP khiến sustain/journey phải chạy lại; không restore fallback để che thiếu evidence.
 
 Research claims về CPU/GPRS/T9 motive là HISTORICAL INFERENCE; “1000 mobs <3% CPU”, deterministic/anti-cheat tuyệt đối hoặc số dòng recipe là UNSUPPORTED, không justification. Client/server splash thresholds khác nhánh, map parse chưa xác minh không khóa geometry. Ba báo cáo giữ ở [research notes](../../research/README.md), không design authority. Không triển khai navigation/DropLink/universal ranged fallback/Auto/Tab/rich UI/rollback để kế thừa NSO.
+
+<a id="keyboard-prototype-review"></a>
+
+## Keyboard UX và editorial review — 2026-10-04
+
+Bản mẫu mới kiểm one-press approach/cast, Nấm→Sói, EdgeExit và menu bằng bàn phím. Debug preset giúp tái hiện một đoạn mà không replay cả hành trình; đây là fixture có nhãn, không save authority hoặc evidence route thật. G-L vẫn PARTIAL tới khi có rig/import và manual usability/feel review ở tốc độ thường. Production base và Dedicated/backend chưa bắt đầu.
+
+Editorial bổ sung First Art Probe, file lifecycle, pose/socket minimum schema, asset DoD, visual style sample và provenance ngay tại Art §22–24. Không chốt nghĩa 26 frame, technique/socket/camera hoặc sản xuất full catalog. Các bảng mô phỏng/accounting giữ để đối chiếu, không chuyển thành acceptance mới.
 
 <a id="prototype-feedback-review"></a>
 

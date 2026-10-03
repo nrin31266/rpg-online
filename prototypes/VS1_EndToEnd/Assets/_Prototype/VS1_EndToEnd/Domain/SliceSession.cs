@@ -9,9 +9,9 @@ namespace HuyenLo.Domain
         public readonly string Id,Name;
         public readonly Map Map;
         public readonly Point Position;
-        public readonly bool Portal;
-        public Anchor(string id,string name,Map map,double x,double y=.8,bool portal=false)
-        {Id=id;Name=name;Map=map;Position=new Point(x,y);Portal=portal;}
+        public readonly bool EdgeExit;
+        public Anchor(string id,string name,Map map,double x,double y=.8,bool exit=false)
+        {Id=id;Name=name;Map=map;Position=new Point(x,y);EdgeExit=exit;}
     }
     public sealed class SliceSession
     {
@@ -30,6 +30,8 @@ namespace HuyenLo.Domain
         public bool Complete => Quest>6;
         public string Feedback="Vân Khê — hãy nói chuyện với Lâm Bá (E).";
         public Action<string> OnEvent;
+        public string DebugPreset {get;internal set;}
+        private string exitLatch;
         public readonly HashSet<string> Purchased=new HashSet<string>();
         private long nextItem=1000;
         private readonly Dictionary<string,Item[]> pendingGrants=new Dictionary<string,Item[]>();
@@ -39,16 +41,16 @@ namespace HuyenLo.Domain
             new Anchor("Lam","Lâm Bá",Map.Village,0), new Anchor("Yen","Yên Thảo",Map.Village,5),
             new Anchor("Bach","Bách Luyện",Map.Village,10),new Anchor("Moc","Mộc An",Map.Village,15),
             new Anchor("Ta","Tạ Minh",Map.Village,20),
-            new Anchor("toAcademy","Học Viện →",Map.Village,25,portal:true),new Anchor("toMist","Đồng Sương →",Map.Village,30,portal:true),
-            new Anchor("toVillageA","← Vân Khê",Map.Academy,-4,portal:true),new Anchor("Phong","Phong Du",Map.Academy,0),
+            new Anchor("toAcademy","← Học Viện",Map.Village,-4,exit:true),new Anchor("toMist","Đồng Sương →",Map.Village,30,exit:true),
+            new Anchor("toVillageA","← Vân Khê",Map.Academy,-4,exit:true),new Anchor("Phong","Phong Du",Map.Academy,0),
             new Anchor("ClassHall","Chọn Kiếm / Cung",Map.Academy,3),
-            new Anchor("toVillageM","← Vân Khê",Map.Mist,-4,portal:true),
-            new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,110,portal:true)
+            new Anchor("toVillageM","← Vân Khê",Map.Mist,-4,exit:true),
+            new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,110,exit:true)
         };
         public SliceSession(int seed=731) {
             Random=new Random(seed);Combat=new CombatController(this);
             // Dummy DEF/EVA=0 are explicit VS-1 probe values: GDD only fixes its HP.
-            Mobs.Add(new Mob(10,"HV_Dummy","Bù Nhìn",Map.Academy,new Point(22,.8),3,60,0,0,0,0,0,0,0,true));
+            for(int i=0;i<3;i++)Mobs.Add(new Mob(10+i,"HV_Dummy.slot"+(i+1),"Bù Nhìn",Map.Academy,new Point(22+i*2,.8),3,60,0,0,0,0,0,0,0,true));
             Mobs.Add(new Mob(20,"DS1.slot1","Nấm Linh",Map.Mist,new Point(5,.65),2,48,9,4,68,24,1.2,.8,1.8));
             Mobs.Add(new Mob(21,"DS2.slot1","Nấm Linh",Map.Mist,new Point(15,.65),2,48,9,4,68,24,1.2,.8,1.8));
             int id=30;
@@ -64,11 +66,11 @@ namespace HuyenLo.Domain
             Receipts.Add(receipt);pendingGrants.Remove(receipt);Emit("Grant "+receipt);return true;
         }
         public Mob Find(int id,int generation) => Mobs.FirstOrDefault(x=>x.Id==id && x.Generation==generation && x.Map==Player.Map && x.Alive);
-        public Anchor NearAnchor() => Anchors.Where(x=>x.Map==Player.Map && Player.Position.Distance(x.Position)<=2)
+        public Anchor NearAnchor() => Anchors.Where(x=>!x.EdgeExit&&x.Map==Player.Map && Player.Position.Distance(x.Position)<=2)
             .OrderBy(x=>Player.Position.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
         public Loot LootCandidate() => Loot.Where(x=>x.Eligible(Player,Now)).OrderBy(x=>Player.Position.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
         public bool Near(string id) => Anchors.Any(x=>x.Id==id && x.Map==Player.Map && Player.Position.Distance(x.Position)<=2);
-        public string QuestNpc => Quest==1||Quest==2?"Lam":Quest==3?"Phong":Quest==4?"Yen":Quest==5?"Bach":"Ta";
+        public string QuestNpc => Quest==1||Quest==2?"Lam":Quest==3?"Phong":Quest==4?"Bach":Quest==5?"Yen":"Ta";
         public string Objective {
             get {
                 if(Complete)return "Q1–Q6 hoàn tất. Trúc Ảnh thuộc gate sau. Phiên local chỉ giữ RAM.";
@@ -76,11 +78,11 @@ namespace HuyenLo.Domain
                 if(QuestState==QuestState.Ready)return $"Q{Quest}: Báo lại {Anchors.First(x=>x.Id==QuestNpc).Name}";
                 string[][] steps={
                     new[]{"Nói chuyện Yên Thảo","Nói chuyện Bách Luyện","Nói chuyện Mộc An","Báo Lâm Bá"},
-                    new[]{"Tới HV_Entrance","Nhảy lên HV_JumpLedge (x8)","S + Space xuống HV_DropLanding","Qua portal thật về Vân Khê","Báo Lâm Bá"},
-                    new[]{"Mặc Mộc Kiếm trong túi (B)","Tới HV_DummyYard (x22)",$"Hạ Bù Nhìn {Kills}/3","Báo Phong Du"},
-                    new[]{"Mua Food I + Bình Máu I + Bình Linh Lực I","Dùng Food bằng F","Tới DS4_ExitTrail (x50)",$"Hạ Sói DS3–DS6 {Kills}/5","Báo Yên Thảo"},
-                    new[]{"Hạ Nấm tại DS2_MushroomPatch (x15)","E nhặt Áo + Nấm Sương tutorial","Mặc Áo Thanh Mộc","Bán Nấm Sương tutorial tại Bách Luyện","Báo Bách Luyện"},
-                    new[]{"Tới HV_ClassHall (x3)","E tại ClassHall, chọn Kiếm","Mặc Kiếm + cộng ≥1 điểm + dùng bí kíp","Cast S1 tại HV_DummyYard","Bấm M khi thiếu MP (đã cấp bình dự trữ)","Báo Tạ Minh"}
+                    new[]{"Tới HV_Entrance","Nhảy lên HV_JumpLedge (x8)","Đi xuống xuyên sàn tới HV_DropLanding","Đi qua mép trái về Vân Khê","Báo Lâm Bá"},
+                    new[]{"Mặc Mộc Kiếm trong hành trang","Tới HV_DummyYard (x22)",$"Hạ Bù Nhìn {Kills}/3","Báo Phong Du"},
+                    new[]{"Hạ Nấm tại DS2_MushroomPatch (x15)","Nhặt Áo + Nấm Sương tutorial","Mặc Áo Thanh Mộc","Bán Nấm Sương tutorial tại Bách Luyện","Báo Bách Luyện"},
+                    new[]{"Chuẩn bị Food I + Bình Máu I tại Yên Thảo","Dùng Food","Tới DS4_ExitTrail (x50)",$"Hạ Sói DS3–DS6 {Kills}/5","Báo Yên Thảo"},
+                    new[]{"Tới HV_ClassHall (x3)","Tương tác ClassHall, chọn Kiếm","Mặc Kiếm + cộng ≥1 điểm + dùng bí kíp","Cast S1 tại HV_DummyYard","Dùng Bình Linh lực khi thiếu MP (đã cấp dự trữ)","Báo Tạ Minh"}
                 };
                 return $"Q{Quest}: "+steps[Quest-1][Math.Min(Stage,steps[Quest-1].Length-1)];
             }
@@ -88,22 +90,23 @@ namespace HuyenLo.Domain
         public bool AcceptQuest() {
             if(Complete||QuestState!=QuestState.Available||!Player.Alive||!Near(QuestNpc))return false;
             if(Quest==3 && !Grant("Q3.wood",NewItem("wood",binding:"Q3")))return false;
-            if(Quest==4 && Receipts.Add("Q4.supply"))Player.Gold+=320;
-            QuestState=QuestState.InProgress;Stage=Kills=0;Emit($"Accepted Q{Quest}");return true;
+            if(Quest==5 && Receipts.Add("Q5.supply-gold"))Player.Gold+=320;
+            QuestState=QuestState.InProgress;Stage=Kills=0;CheckSupply();Emit($"Đã nhận Q{Quest}");return true;
         }
         public bool TurnIn() {
             if(Complete||QuestState!=QuestState.Ready||!Player.Alive||!Near(QuestNpc))return false;
             if(Quest==3 && !Grant("Q3.reward",NewItem("pants1")))return false;
             if(!Receipts.Add($"Q{Quest}.completed"))return false;
-            if(Quest<=4)Player.AddExp(Math.Max(0,Rules.Exp[Quest]-Player.TotalExp));
-            if(Quest==1)Player.Gold+=50;if(Quest==2)Player.Gold+=75;if(Quest==5)Player.AddExp(45);
+            int target=Quest==1?100:Quest==2?250:Quest==4?470:Quest==5?790:0;
+            Player.AddExp(Math.Max(0,target-Player.TotalExp));
+            if(Quest==1)Player.Gold+=50;if(Quest==2)Player.Gold+=75;
             Emit($"Completed Q{Quest}; Lv{Player.Level}");Quest++;Stage=Kills=0;
             QuestState=Complete?QuestState.Completed:QuestState.Available;return true;
         }
         public bool Interact(string id) {
             if(!Player.Alive || !Near(id))return false;
             var a=Anchors.First(x=>x.Id==id);
-            if(a.Portal)return Portal(id);
+            if(a.EdgeExit)return false;
             if(Quest==1 && QuestState==QuestState.InProgress && new[]{"Yen","Bach","Moc"}[Math.Min(Stage,2)]==id){Stage++;if(Stage==3)QuestState=QuestState.Ready;}
             Emit("Nói chuyện "+a.Name);return true;
         }
@@ -121,7 +124,7 @@ namespace HuyenLo.Domain
             if(Player.Inventory.Equipment.TryGetValue(d.Slot,out var old))Player.Inventory.Bag.Add(old);
             Player.Inventory.Equipment[d.Slot]=item;Player.Clamp();
             if(Quest==3 && Stage==0 && item.Id=="wood")Stage=1;
-            if(Quest==5 && Stage==2 && item.Instance==tutorialArmor){item.Binding=null;Stage=3;}
+            if(Quest==4 && Stage==2 && item.Instance==tutorialArmor){item.Binding=null;Stage=3;}
             CheckClassGroup();Emit("Mặc "+d.Name);return true;
         }
         public bool Unequip(GearSlot slot) {
@@ -137,7 +140,7 @@ namespace HuyenLo.Domain
             if(!Player.Alive||Combat.Running!=null||Player.School!=School.Sword||Player.Level<5||Combat.Unlocked.ContainsKey(1))return false;
             var book=Player.Inventory.Bag.FirstOrDefault(x=>x.Instance==instance&&x.Id=="manual1");if(book==null)return false;
             if(!Receipts.Add("learn.sword.s1"))return false;Player.Inventory.Consume(book);Combat.Unlocked[1]=Rules.Sword1;Combat.SelectedSlot=1;
-            CheckClassGroup();Emit("Đã học Phong Trảm; 1 chọn và cast, J dùng slot đang chọn.");return true;
+            CheckClassGroup();Emit("Đã học Phong Trảm; bấm 1 để tiếp cận và cast một lần.");return true;
         }
         private void CheckClassGroup() {
             if(Quest==6&&Stage==2&&Player.Allocated>0&&Combat.Unlocked.ContainsKey(1)&&
@@ -150,13 +153,13 @@ namespace HuyenLo.Domain
             if(!vendor||id=="sword1"&&Player.School!=School.Sword)return false;
             if(!Player.Inventory.Add(new[]{NewItem(id)})){Emit("Túi đầy — giao dịch chưa thực hiện.");return false;}
             Player.Gold-=d.Buy;
-            if(Quest==4&&Stage==0){Purchased.Add(id);if(new[]{"food1","hp1","mp1"}.All(x=>Purchased.Contains(x)))Stage=1;}
+            Purchased.Add(id);CheckSupply();
             Emit("Mua "+d.Name);return true;
         }
         public bool Sell(long instance) {
             if(!Player.Alive||!Near("Bach"))return false;
             var item=Player.Inventory.Bag.FirstOrDefault(x=>x.Instance==instance);if(item==null||Catalog.Get(item.Id).Sell<=0)return false;
-            bool tutorial=item.Instance==tutorialSample && Quest==5 && Stage==3;
+            bool tutorial=item.Instance==tutorialSample && Quest==4 && Stage==3 && QuestState==QuestState.InProgress;
             if(item.Binding!=null&&!tutorial)return false;
             double sellMultiplier=item.Quality>=1.25?3:item.Quality>=1.16?2:item.Quality>=1.08?1.5:1;
             Player.Gold+=(int)Math.Floor(Catalog.Get(item.Id).Sell*sellMultiplier);Player.Inventory.Consume(item);
@@ -171,7 +174,7 @@ namespace HuyenLo.Domain
         public bool UseFood() {
             if(!Player.Alive)return false;var item=Player.Inventory.Bag.FirstOrDefault(x=>x.Id=="food1");if(item==null)return false;
             Player.Inventory.Consume(item);FoodUntil=Now+600;NextFood=Now+2;
-            if(Quest==4&&Stage==1)Stage=2;Emit("Food I: 2% HP / 1,5% MP mỗi 2 giây, 10 phút.");return true;
+            if(Quest==5&&Stage==1&&QuestState==QuestState.InProgress)Stage=2;Emit("Food I: 2% HP / 1,5% MP mỗi 2 giây, 10 phút.");return true;
         }
         public bool Potion(bool hp) {
             if(!Player.Alive||Now<(hp?HpPotionUntil:MpPotionUntil))return false;
@@ -187,17 +190,19 @@ namespace HuyenLo.Domain
             var value=Loot.FirstOrDefault(x=>x.Id==lootId);if(value==null||!value.Eligible(Player,Now))return false;
             if(!Player.Inventory.Add(new[]{value.Item})){Emit("Túi đầy — đồ vẫn trên đất.");return false;}
             value.Claimed=true;Receipts.Add("claim."+value.Id);
-            if(Quest==5&&Stage==1&&Player.Inventory.Bag.Any(x=>x.Instance==tutorialArmor)&&Player.Inventory.Bag.Any(x=>x.Instance==tutorialSample))Stage=2;
+            if(Quest==4&&Stage==1&&Player.Inventory.Bag.Any(x=>x.Instance==tutorialArmor)&&Player.Inventory.Bag.Any(x=>x.Instance==tutorialSample))Stage=2;
             Emit("Nhặt "+Catalog.Get(value.Item.Id).Name);return true;
         }
         private void TutorialSupply(Point position) {
-            if(!Receipts.Add("Q5.supply"))return;
-            var armor=NewItem("armor1",binding:"Q5");var sample=NewItem("mushroom",binding:"Q5");tutorialArmor=armor.Instance;tutorialSample=sample.Instance;
+            if(Quest!=4||QuestState!=QuestState.InProgress||Stage!=0||!Receipts.Add("Q4.supply"))return;
+            var armor=NewItem("armor1",binding:"Q4");var sample=NewItem("mushroom",binding:"Q4");tutorialArmor=armor.Instance;tutorialSample=sample.Instance;
             foreach(var item in new[]{armor,sample})Loot.Add(new Loot{Id=item.Instance,Item=item,Map=Map.Mist,Position=position,Created=Now,Tutorial=true});
         }
         public void ObservePosition(Point position,bool grounded,bool jumped=false,bool dropped=false) {
             Player.Position=position;
-            if(!Player.Alive||QuestState!=QuestState.InProgress)return;
+            if(!Player.Alive)return;
+            ObserveExits();
+            if(QuestState!=QuestState.InProgress)return;
             if(Quest==2 && Player.Map==Map.Academy){
                 if(Stage==0 && position.Distance(new Point(0,.8))<=1.5){Stage=1;Emit("HV_Entrance");}
                 if(Stage==1 && grounded && position.Distance(new Point(8,3.8))<=1.5){Stage=2;Emit("HV_JumpLedge — đạt cao độ thật");}
@@ -205,19 +210,29 @@ namespace HuyenLo.Domain
                 if(Stage==2 && Receipts.Contains("Q2.dropped") && grounded && position.Distance(new Point(8,.8))<=1.5){Stage=3;Emit("HV_DropLanding — tiếp đất thật");}
             }
             if(Quest==3&&Stage==1&&Player.Map==Map.Academy&&position.Distance(new Point(22,.8))<=1.5)Stage=2;
-            if(Quest==4&&Stage==2&&Player.Map==Map.Mist&&position.Distance(new Point(50,.8))<=1.5)Stage=3;
+            if(Quest==5&&Stage==2&&Player.Map==Map.Mist&&position.Distance(new Point(50,.8))<=1.5)Stage=3;
             if(Quest==6&&Stage==0&&Player.Map==Map.Academy&&position.Distance(new Point(3,.8))<=1.5)Stage=1;
         }
-        public bool Portal(string id) {
-            if(!Player.Alive||!Near(id))return false;
+        private void CheckSupply() {
+            if(Quest==5&&QuestState==QuestState.InProgress&&Stage==0&&Player.Inventory.Count("food1")>0&&Player.Inventory.Count("hp1")>0)Stage=1;
+        }
+        private void ObserveExits() {
+            var exit=Anchors.FirstOrDefault(x=>x.EdgeExit&&x.Map==Player.Map&&Math.Abs(Player.Position.X-x.Position.X)<=.65&&Math.Abs(Player.Position.Y-x.Position.Y)<=1.6);
+            if(exit==null){exitLatch=null;return;}
+            if(exitLatch==exit.Id)return;
+            exitLatch=exit.Id;TryExit(exit.Id);
+        }
+        public bool TryExit(string id) {
+            var exit=Anchors.FirstOrDefault(x=>x.Id==id&&x.EdgeExit&&x.Map==Player.Map);
+            if(!Player.Alive||exit==null||Math.Abs(Player.Position.X-exit.Position.X)>.65||Math.Abs(Player.Position.Y-exit.Position.Y)>1.6)return false;
             if(id=="outOfSlice"){Emit(Complete?"Trúc Ảnh đã mở trong tiến trình, chưa có trong VS-1.":"Cần hoàn thành Q6.");return false;}
             Map destination=id=="toAcademy"?Map.Academy:id=="toMist"?Map.Mist:Map.Village;
             if(Quest==2&&Stage==3&&Player.Map==Map.Academy&&destination==Map.Village){Stage=4;QuestState=QuestState.Ready;}
-            ChangeMap(destination,destination==Map.Village?new Point(id=="toVillageA"?25:30,.8):new Point(-3,.8));return true;
+            ChangeMap(destination,destination==Map.Village?new Point(id=="toVillageA"?-1:27,.8):new Point(-1,.8));return true;
         }
         private void ChangeMap(Map map,Point spawn){
             foreach(var m in Mobs.Where(x=>x.Map==Player.Map&&x.Alive&&!x.Dummy)){m.Windup=false;m.ReturnSince=Now;}
-            Combat.Cancel();Combat.ClearFocus();Player.Map=map;Player.Position=spawn;WorldRevision++;Emit("Portal → "+map);
+            Combat.Cancel();Combat.ClearFocus();Player.Map=map;Player.Position=spawn;WorldRevision++;Emit("Chuyển vùng → "+map);
         }
         public bool Rest() {if(!Player.Alive||!Near("Moc"))return false;Player.Hp=Player.Stats.Hp;Player.Mp=Player.Stats.Mp;Emit("Mộc An hồi đầy HP/MP.");return true;}
         public bool Revive(bool village) {
@@ -245,8 +260,8 @@ namespace HuyenLo.Domain
             int tag=Quest*100+Stage;
             if(qualified&&m.QuestTag==tag&&QuestState==QuestState.InProgress){
                 if(Quest==3&&Stage==2&&m.Dummy){Kills++;if(Kills==3){Stage=3;QuestState=QuestState.Ready;}}
-                if(Quest==4&&Stage==3&&m.Slot.StartsWith("DS")&&m.Level==4){Kills++;if(Kills==5){Stage=4;QuestState=QuestState.Ready;}}
-                if(Quest==5&&Stage==0&&m.Slot=="DS2.slot1"){Stage=1;TutorialSupply(m.Position);}
+                if(Quest==5&&Stage==3&&m.Slot.StartsWith("DS")&&m.Level==4){Kills++;if(Kills==5){Stage=4;QuestState=QuestState.Ready;}}
+                if(Quest==4&&Stage==0&&m.Slot=="DS2.slot1"){TutorialSupply(m.Position);Stage=1;}
             }
             int atDeath=Player.Level;
             if(!m.Dummy&&Math.Abs(atDeath-m.Level)<=3){
@@ -273,7 +288,7 @@ namespace HuyenLo.Domain
             }
             Combat.Tick(manualContext);
             foreach(var m in Mobs){
-                if(!m.Alive){if(Now>=m.RespawnAt){m.Generation++;m.Hp=m.MaxHp;m.Position=m.Home;m.QuestDamage=0;m.Returning=false;m.ReturnSince=-1;m.NextAttack=Now;Emit("Respawn "+m.Slot+"@"+m.Generation);}continue;}
+                if(!m.Alive){if(Now>=m.RespawnAt){m.Generation++;m.Hp=m.MaxHp;m.Position=m.Home;m.QuestDamage=0;m.Engaged=false;m.Returning=false;m.ReturnSince=-1;m.NextAttack=Now+(m.Id%5)*.07;Emit("Respawn "+m.Slot+"@"+m.Generation);}continue;}
                 if(m.Dummy)continue;
                 if(m.Map!=Player.Map){
                     m.Windup=false;
@@ -297,7 +312,7 @@ namespace HuyenLo.Domain
             bool reachable=Math.Abs(m.Position.Y-Player.Position.Y)<1.6;
             if(m.Returning){
                 double dx=m.Home.X-m.Position.X;m.Position=new Point(m.Position.X+Math.Sign(dx)*Math.Min(Math.Abs(dx),m.Speed*dt),m.Home.Y);
-                if(Math.Abs(dx)<.05){m.Returning=false;m.Hp=m.MaxHp;m.QuestDamage=0;m.ReturnSince=-1;m.Windup=false;}return;
+                if(Math.Abs(dx)<.05){m.Returning=false;m.Engaged=false;m.Hp=m.MaxHp;m.QuestDamage=0;m.ReturnSince=-1;m.Windup=false;}return;
             }
             // VS-1 probe: 2s no reachable progress -> Return + reset. This is NOT a production lock.
             // Resolve on the original hit clock, even when the player has left reach.
@@ -314,10 +329,23 @@ namespace HuyenLo.Domain
             }
             m.ReturnSince=-1;
             if(m.Windup)return;
+            if(Now>=m.HitAt&&Now<m.HitAt+.28&&m.NextAttack>Now){
+                double side=m.Position.X<Player.Position.X?-1:1;
+                m.Position=new Point(Math.Max(m.Home.X-8,Math.Min(m.Home.X+8,m.Position.X+side*m.Speed*.35*dt)),m.Home.Y);return;
+            }
             if(dist>5 && m.Hp==m.MaxHp)return;
             double delta=Player.Position.X-m.Position.X;
             if(Math.Abs(delta)>m.Range*.9){m.Position=new Point(m.Position.X+Math.Sign(delta)*Math.Min(Math.Abs(delta)-m.Range*.8,m.Speed*dt),m.Home.Y);}
-            else if(Now>=m.NextAttack){m.Facing=delta<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;}
+            else {
+                if(!m.Engaged){m.Engaged=true;m.NextAttack=Math.Max(m.NextAttack,Now+(m.Id%5)*.07);}
+                if(Now>=m.NextAttack){m.Facing=delta<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;}
+            }
+            if(!m.Windup){
+                foreach(var other in Mobs.Where(x=>x.Id!=m.Id&&x.Alive&&!x.Dummy&&x.Map==m.Map)){
+                    double dx=m.Position.X-other.Position.X;
+                    if(Math.Abs(dx)<.48){double direction=Math.Abs(dx)<.01?(m.Id<other.Id?-1:1):Math.Sign(dx);m.Position=new Point(Math.Max(m.Home.X-8,Math.Min(m.Home.X+8,m.Position.X+direction*(.48-Math.Abs(dx))*dt*3)),m.Home.Y);}
+                }
+            }
             if(Math.Abs(m.Position.X-m.Home.X)>8){m.Returning=true;m.Windup=false;}
         }
     }
