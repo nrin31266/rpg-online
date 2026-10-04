@@ -139,14 +139,14 @@ namespace HuyenLo.Tests
             Assert.That(s.Grant("pending",s.NewItem("wood")),Is.True);Assert.That(s.Player.Inventory.Bag.Count,Is.EqualTo(1));
         }
         [Test] public void StorageTransferIsAtomicAndDoesNotCopyInstances() {
-            var s=new SliceSession();s.Player.Position=new Point(15,.8);var item=s.NewItem("fang",2);s.Player.Inventory.Add(new[]{item});s.Player.Storage.Capacity=0;
+            var s=new SliceSession();s.Player.Position=SliceSession.Anchors.First(x=>x.Id=="Moc").Position;var item=s.NewItem("fang",2);s.Player.Inventory.Add(new[]{item});s.Player.Storage.Capacity=0;
             Assert.That(s.Store(item.Instance,true),Is.False);Assert.That(s.Player.Inventory.Count("fang"),Is.EqualTo(2));
             s.Player.Storage.Capacity=40;Assert.That(s.Store(item.Instance,true),Is.True);Assert.That(s.Player.Inventory.Count("fang"),Is.Zero);
             Assert.That(s.Store(item.Instance,true),Is.False);Assert.That(s.Store(item.Instance,false),Is.True);Assert.That(s.Player.Storage.Bag,Is.Empty);
             Assert.That(s.Player.Inventory.Bag.Single().Instance,Is.EqualTo(item.Instance));
         }
         [Test] public void RarityVendorMultiplierUsesFloorAndEquippedCannotBeSold() {
-            var s=new SliceSession();s.Player.Position=new Point(10,.8);var item=s.NewItem("armor1",quality:1.08);s.Player.Inventory.Add(new[]{item});
+            var s=new SliceSession();s.Player.Position=SliceSession.Anchors.First(x=>x.Id=="Bach").Position;var item=s.NewItem("armor1",quality:1.08);s.Player.Inventory.Add(new[]{item});
             Assert.That(s.Sell(item.Instance),Is.True);Assert.That(s.Player.Gold,Is.EqualTo(82));
             item=s.NewItem("armor1");s.Player.Inventory.Add(new[]{item});s.Equip(item.Instance);Assert.That(s.Sell(item.Instance),Is.False);
         }
@@ -188,7 +188,7 @@ namespace HuyenLo.Tests
                 s.Quest=pair.Item1;s.QuestState=QuestState.Ready;s.Player.Map=pair.Item1==3?Map.Academy:Map.Village;s.Player.Position=SliceSession.Anchors.First(x=>x.Id==s.QuestNpc).Position;
                 if(pair.Item1==3)s.Player.AddExp(250);Assert.That(s.TurnIn(),Is.True);Assert.That(s.Player.Level,Is.EqualTo(pair.Item2));
             }
-            Assert.That(s.Player.Unspent,Is.EqualTo(20));s.Player.AddExp(450);s.Quest=4;s.Receipts.Remove("Q4.completed");s.QuestState=QuestState.Ready;s.Player.Position=new Point(10,.8);Assert.That(s.TurnIn(),Is.True);Assert.That(s.Player.Level,Is.EqualTo(6));Assert.That(s.Player.Unspent,Is.EqualTo(25));
+            Assert.That(s.Player.Unspent,Is.EqualTo(20));s.Player.AddExp(450);s.Quest=4;s.Receipts.Remove("Q4.completed");s.QuestState=QuestState.Ready;s.Player.Position=SliceSession.Anchors.First(x=>x.Id==s.QuestNpc).Position;Assert.That(s.TurnIn(),Is.True);Assert.That(s.Player.Level,Is.EqualTo(6));Assert.That(s.Player.Unspent,Is.EqualTo(25));
         }
         [Test] public void TutorialSupplyOnlyExistsAtRelevantActiveStep() {
             foreach(bool active in new[]{false,true}){
@@ -205,8 +205,8 @@ namespace HuyenLo.Tests
             var fresh=PrototypePresets.Create(PrototypeStart.Fresh);Assert.That(fresh.Quest,Is.EqualTo(1));Assert.That(fresh.Player.Level,Is.EqualTo(1));Assert.That(fresh.Receipts,Is.Empty);Assert.That(fresh.Combat.Cooldowns,Is.Empty);Assert.That(fresh.DebugPreset,Is.Null);
         }
         [Test] public void MeleePhaseOffsetsAndRecoveryDoNotChangeAttackInterval(){
-            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(30,.65);s.Player.InvulnerableUntil=100;
-            var a=s.Mobs.First(x=>x.Id==30);var b=s.Mobs.First(x=>x.Id==31);a.Position=new Point(29.5,.65);b.Position=new Point(30.5,.65);
+            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(30,2.45);s.Player.InvulnerableUntil=100;
+            var a=s.Mobs.First(x=>x.Id==30);var b=s.Mobs.First(x=>x.Id==31);a.Position=new Point(29.5,2.45);b.Position=new Point(30.5,2.45);
             s.Tick(.02);double first=a.HitAt;Assert.That(a.Windup,Is.True);Assert.That(b.Windup,Is.False);Advance(s,.08);
             Assert.That(b.Windup,Is.True);Assert.That(b.HitAt,Is.GreaterThan(first));Assert.That(a.NextAttack-(first-.35),Is.EqualTo(a.Interval).Within(.001));
             double x=a.Position.X;Advance(s,.38);Assert.That(a.Position.X,Is.Not.EqualTo(x),"Recovery should visibly reposition without a new cooldown");
@@ -226,17 +226,54 @@ namespace HuyenLo.Tests
             s.ObservePosition(new Point(30,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Mist));Assert.That(s.Player.Position.X,Is.EqualTo(-1));
             s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(27));
         }
-        [Test] public void FourWolvesStaySeparatedWithContinuousStepsAndIndependentAttacks(){
-            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(103,.65);s.Player.InvulnerableUntil=100;
-            var pack=s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")).OrderBy(x=>x.Id).ToArray();double minGap=100;
-            for(int i=0;i<400;i++){
-                var before=pack.Select(x=>x.Position.X).ToArray();s.Tick(.02);
-                for(int j=0;j<4;j++)Assert.That(Math.Abs(pack[j].Position.X-before[j]),Is.LessThanOrEqualTo(pack[j].Speed*.02+.0001),"No teleport/separation shove");
-                for(int j=1;j<4;j++)minGap=Math.Min(minGap,pack[j].Position.X-pack[j-1].Position.X);
+        [TestCase(1,107)] [TestCase(2,107)] [TestCase(4,107)] [TestCase(4,104.6)] [TestCase(4,120.8)]
+        public void EveryWolfCanReengageWithoutFrontDeathOrTeleport(int count,double playerX){
+            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(playerX,1.45);s.Player.InvulnerableUntil=100;
+            var pack=s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")).OrderBy(x=>x.Id).ToArray();
+            for(int j=0;j<4;j++){pack[j].Home=pack[j].Position=new Point(Math.Max(104.45,Math.Min(121.55,playerX+(playerX>115?-1:1)*(1+j))),1.45);if(j>=count){pack[j].Hp=0;pack[j].RespawnAt=100;}}
+            double maxOverlapRun=0;var runs=new double[4,4];
+            for(int i=0;i<800;i++){
+                var before=pack.Select(x=>x.Position.X).ToArray();var windup=pack.Select(x=>x.Windup).ToArray();var facing=pack.Select(x=>x.Facing).ToArray();s.Tick(.02);
+                for(int j=0;j<count;j++){
+                    Assert.That(Math.Abs(pack[j].Position.X-before[j]),Is.LessThanOrEqualTo(pack[j].Speed*.02+.0001),"No teleport or separation shove");
+                    if(windup[j]&&pack[j].Windup){Assert.That(pack[j].Facing,Is.EqualTo(facing[j]));Assert.That(pack[j].Position.X,Is.EqualTo(before[j]));}
+                    Assert.That(pack[j].Position.X,Is.InRange(pack[j].LaneMin,pack[j].LaneMax));
+                    for(int k=j+1;k<count;k++){runs[j,k]=Math.Abs(pack[j].Position.X-pack[k].Position.X)<.5?runs[j,k]+.02:0;maxOverlapRun=Math.Max(maxOverlapRun,runs[j,k]);}
+                }
             }
-            Assert.That(minGap,Is.GreaterThanOrEqualTo(.93));Assert.That(pack[0].NextAttack,Is.GreaterThan(0));
-            // Removing the front wolf opens space. A rear wolf advances and attacks without a group mutex.
-            pack[0].Hp=0;pack[0].RespawnAt=100;Advance(s,3);Assert.That(pack[1].Position.X,Is.LessThan(104.1));Assert.That(pack[1].NextAttack,Is.GreaterThan(8));
+            Assert.That(pack.Take(count).All(x=>x.BiteAttempts>=2),Is.True,"Every wolf must get actual in-range attempts without removing the front mob: "+string.Join(",",pack.Take(count).Select(x=>x.Id+":"+x.BiteAttempts+" "+x.Motion+" goal="+x.DesiredX)));
+            Assert.That(maxOverlapRun,Is.LessThan(2),"Crossings may be brief; no persistent blob");
+        }
+        [Test] public void PackLeavesBoundaryThenResumesPatrolWithoutNewLifeOrCredit(){
+            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(107,1.45);s.Player.InvulnerableUntil=100;
+            var pack=s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")).ToArray();Advance(s,3);
+            Assert.That(pack.All(x=>x.Engaged),Is.True);pack[0].Hp-=10;pack[0].QuestDamage=10;
+            s.Player.Position=new Point(125,1.45);Advance(s,12);
+            Assert.That(pack.All(x=>!x.Engaged&&!x.Windup&&!x.Returning),Is.True);
+            var previous=pack.Select(x=>x.Position.X).ToArray();Advance(s,2.5);
+            Assert.That(pack.Where((m,i)=>Math.Abs(m.Position.X-previous[i])>.2).Any(),Is.True,"They must patrol, not stare forever at the leash edge");
+            Assert.That(pack.All(x=>x.Position.X>=x.ActivityMin&&x.Position.X<=x.ActivityMax&&x.Generation==1),Is.True);
+            Assert.That(pack[0].Hp,Is.EqualTo(pack[0].MaxHp));Assert.That(pack[0].QuestDamage,Is.Zero);Assert.That(s.Loot,Is.Empty);
+            Assert.That(pack.Select(x=>x.ActivityMin).Distinct().Count(),Is.EqualTo(1));
+        }
+        [Test] public void WaterContactSlowsFeetButNotBridgeAirOrDryGround(){
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Village,new Point(3,-.35)),Is.EqualTo(.85));
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Village,new Point(3,.2)),Is.EqualTo(1));
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,-2)),Is.EqualTo(.85));
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,.1)),Is.EqualTo(1));
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Academy,new Point(3,0)),Is.EqualTo(1));
+        }
+        [Test] public void TrackerDirectionsFollowCurrentQuestStepAndMap(){
+            var s=new SliceSession();s.QuestState=QuestState.InProgress;
+            Assert.That(s.Objective,Does.Contain("Vân Khê · ở map hiện tại"));Assert.That(s.Objective,Does.Not.Contain("Đồng Sương"));
+            s.Quest=4;s.Stage=3;s.Player.Map=Map.Mist;Assert.That(s.Objective,Does.Contain("Cổng tây Đồng Sương → Vân Khê"));
+            s.Quest=5;s.Stage=0;s.Player.Map=Map.Village;Assert.That(s.Objective,Does.Contain("Vân Khê · ở map hiện tại"));
+            s.Quest=6;s.Stage=3;s.Player.Map=Map.Academy;Assert.That(s.Objective,Does.Contain("Học Viện · ở map hiện tại"));
+            s.Stage=5;Assert.That(s.Objective,Does.Contain("Cổng đông Học Viện → Vân Khê"));
+        }
+        [Test] public void TerrainHasSolidElevationAndFewIntentionalOneWayDecks(){
+            foreach(Map map in Enum.GetValues(typeof(Map))){var surfaces=BlockoutLayout.Surfaces(map).ToArray();Assert.That(surfaces.Where(x=>!x.OneWay).Select(x=>x.Y+x.Height/2).Distinct().Count(),Is.GreaterThan(1));Assert.That(surfaces.Count(x=>x.OneWay),Is.InRange(1,2));}
+            var s=new SliceSession();foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist&&!x.Slot.StartsWith("PROBE8")))Assert.That(m.Home.Y,Is.EqualTo(BlockoutLayout.GroundTop(m.Map,m.Home.X)+.65));
         }
         [Test] public void ProbePocketsDoNotGrantQ5KillCredit(){
             var s=PrototypePresets.Create(PrototypeStart.Crowd);s.Quest=5;s.Stage=3;s.QuestState=QuestState.InProgress;

@@ -38,12 +38,12 @@ namespace HuyenLo.Domain
         public double LastHurtAt {get;private set;}=-100;
         private long tutorialArmor,tutorialSample;
         public static readonly Anchor[] Anchors={
-            new Anchor("Lam","Lâm Bá",Map.Village,0), new Anchor("Yen","Yên Thảo",Map.Village,5),
-            new Anchor("Bach","Bách Luyện",Map.Village,10),new Anchor("Moc","Mộc An",Map.Village,15),
-            new Anchor("Ta","Tạ Minh",Map.Village,20),
+            new Anchor("Lam","Lâm Bá",Map.Village,0), new Anchor("Yen","Yên Thảo",Map.Village,6),
+            new Anchor("Bach","Bách Luyện",Map.Village,13,1.4),new Anchor("Moc","Mộc An",Map.Village,20),
+            new Anchor("Ta","Tạ Minh",Map.Village,26),
             new Anchor("toAcademy","← Học Viện",Map.Village,-4,exit:true),new Anchor("toMist","Đồng Sương →",Map.Village,30,exit:true),
             new Anchor("toVillageA","Vân Khê →",Map.Academy,34,exit:true),new Anchor("Phong","Phong Du",Map.Academy,0),
-            new Anchor("Diep","Diệp Lam",Map.Academy,6),
+            new Anchor("Diep","Diệp Lam",Map.Academy,-12),
             new Anchor("toVillageM","← Vân Khê",Map.Mist,-4,exit:true),
             new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,126,exit:true)
         };
@@ -59,6 +59,17 @@ namespace HuyenLo.Domain
             // Two extra mock pockets are explicitly probes, outside the release DS1–DS6 budget/quest credit.
             for(int i=0;i<4;i++)Mobs.Add(new Mob(60+i,"PROBE7.slot"+(i+1),"Sói Sương",Map.Mist,new Point(106+i*1.5,.65),4,107,13,5,76,28,2.4,1,1.3){Lane=7,LaneMin=101,LaneMax=121});
             for(int i=0;i<3;i++)Mobs.Add(new Mob(70+i,"PROBE8.slot"+(i+1),"Sói Sương",Map.Mist,new Point(51+i*1.5,3.85),4,107,13,5,76,28,2.4,1,1.3){Lane=8,LaneMin=49.5,LaneMax=58.5});
+            foreach(var mob in Mobs.Where(x=>x.Map==Map.Mist&&!x.Slot.StartsWith("PROBE8"))){
+                double y=BlockoutLayout.GroundTop(mob.Map,mob.Home.X)+.65;
+                mob.Home=mob.Position=mob.PreviousPosition=new Point(mob.Home.X,y);
+                var lane=BlockoutLayout.Surfaces(Map.Mist).First(x=>!x.OneWay&&mob.Home.X>x.X-x.Width/2&&mob.Home.X<x.X+x.Width/2);
+                mob.LaneMin=lane.X-lane.Width/2+.45;mob.LaneMax=lane.X+lane.Width/2-.45;
+            }
+            foreach(var group in Mobs.Where(x=>!x.Dummy).GroupBy(x=>x.Slot.Split('.')[0])){
+                double low=group.Max(x=>x.LaneMin),high=group.Min(x=>x.LaneMax);
+                if(!group.Key.StartsWith("PROBE")){low=Math.Max(low,group.Min(x=>x.Home.X)-6);high=Math.Min(high,group.Max(x=>x.Home.X)+6);}
+                foreach(var mob in group){mob.ActivityMin=low;mob.ActivityMax=high;mob.PatrolDirection=mob.Id%2==0?1:-1;mob.PatrolGoal=mob.Home.X;mob.PatrolPauseUntil=(mob.Id%5)*.35;}
+            }
         }
         public void Emit(string value){Feedback=value;Events.Add($"{Now:F2} {value}");OnEvent?.Invoke(Events[Events.Count-1]);}
         public Item NewItem(string id,int count=1,string binding=null,double quality=1) => new Item(++nextItem,id,count,binding,quality);
@@ -74,11 +85,18 @@ namespace HuyenLo.Domain
         public Loot LootCandidate() => Loot.Where(x=>x.Eligible(Player,Now)).OrderBy(x=>Player.Position.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
         public bool Near(string id) => Anchors.Any(x=>x.Id==id && x.Map==Player.Map && Player.Position.Distance(x.Position)<=2);
         public string QuestNpc => Quest==1||Quest==2?"Lam":Quest==3?"Phong":Quest==4?"Bach":Quest==5?"Yen":"Ta";
+        private string RouteTo(Map destination){
+            string name=destination==Map.Village?"Vân Khê":destination==Map.Academy?"Học Viện":"Đồng Sương";
+            if(Player.Map==destination)return name+" · ở map hiện tại";
+            if(Player.Map==Map.Village)return destination==Map.Academy?"← Cổng tây Vân Khê → Học Viện":"Cổng đông Vân Khê → Đồng Sương";
+            return (Player.Map==Map.Academy?"Cổng đông Học Viện → Vân Khê":"← Cổng tây Đồng Sương → Vân Khê")+(destination==Map.Village?"":destination==Map.Academy?" → Học Viện":" → Đồng Sương");
+        }
         public string Objective {
             get {
                 if(Complete)return "Q1–Q6 hoàn tất. Trúc Ảnh thuộc gate sau. Phiên local chỉ giữ RAM.";
-                if(QuestState==QuestState.Available)return $"Q{Quest}: Nhận nhiệm vụ tại {Anchors.First(x=>x.Id==QuestNpc).Name}";
-                if(QuestState==QuestState.Ready)return $"Q{Quest}: Báo lại {Anchors.First(x=>x.Id==QuestNpc).Name}";
+                var owner=Anchors.First(x=>x.Id==QuestNpc);
+                if(QuestState==QuestState.Available)return $"Q{Quest}: Nhận nhiệm vụ tại {owner.Name}\n"+RouteTo(owner.Map);
+                if(QuestState==QuestState.Ready)return $"Q{Quest}: Báo lại {owner.Name}\n"+RouteTo(owner.Map);
                 string[][] steps={
                     new[]{"Nói chuyện Yên Thảo","Nói chuyện Bách Luyện","Nói chuyện Mộc An","Báo Lâm Bá"},
                     new[]{"Tới HV_Entrance ở mép đông","Nhảy lên HV_JumpLedge (x8)","Đi xuống xuyên sàn tới HV_DropLanding","Đi qua mép phải về Vân Khê","Báo Lâm Bá"},
@@ -87,7 +105,9 @@ namespace HuyenLo.Domain
                     new[]{"Chuẩn bị Food I + Bình Máu I tại Yên Thảo","Dùng Food","Tới DS4_ExitTrail (x50)",$"Hạ Sói DS3–DS6 {Kills}/5","Báo Yên Thảo"},
                     new[]{"Tới HV_ClassHall (x3)","Tháo Mộc Kiếm (C → Trang bị), nói chuyện Phong Du để chọn Kiếm","Mặc Kiếm + cộng ≥1 điểm + dùng bí kíp","Cast S1 tại HV_DummyYard","Dùng Bình Linh lực khi thiếu MP (đã cấp dự trữ)","Báo Tạ Minh"}
                 };
-                return $"Q{Quest}: "+steps[Quest-1][Math.Min(Stage,steps[Quest-1].Length-1)];
+                Map destination=Quest==1?Map.Village:Quest==2?(Stage<3?Map.Academy:Map.Village):Quest==3?Map.Academy:Quest==4?(Stage<3?Map.Mist:Map.Village):Quest==5?(Stage<2||Stage>=4?Map.Village:Map.Mist):(Stage<5?Map.Academy:Map.Village);
+                string next=Quest==1?" · gặp: "+Anchors.First(x=>x.Id==new[]{"Yen","Bach","Moc","Lam"}[Math.Min(Stage,3)]).Name:Quest==6&&Stage==1?" · gặp: Phong Du":"";
+                return $"Q{Quest}: "+steps[Quest-1][Math.Min(Stage,steps[Quest-1].Length-1)]+"\n"+RouteTo(destination)+next;
             }
         }
         public bool AcceptQuest() {
@@ -293,7 +313,7 @@ namespace HuyenLo.Domain
             }
             Combat.Tick(manualContext);
             foreach(var m in Mobs){
-                if(!m.Alive){if(Now>=m.RespawnAt){m.Generation++;m.Hp=m.MaxHp;m.Position=m.Home;m.QuestDamage=0;m.Engaged=false;m.ApproachSide=0;m.Returning=false;m.ReturnSince=-1;m.NextAttack=Now+(m.Id%5)*.07;Emit("Respawn "+m.Slot+"@"+m.Generation);}continue;}
+                if(!m.Alive){if(Now>=m.RespawnAt){m.Generation++;m.Hp=m.MaxHp;m.Position=m.PreviousPosition=m.Home;m.QuestDamage=0;m.Engaged=false;m.ApproachSide=0;m.Returning=false;m.ReturnSince=-1;m.RepositionUntil=0;m.NextAttack=Now+(m.Id%5)*.07;Emit("Respawn "+m.Slot+"@"+m.Generation);}continue;}
                 if(m.Dummy)continue;
                 if(m.Map!=Player.Map){
                     m.Windup=false;
@@ -312,51 +332,88 @@ namespace HuyenLo.Domain
                 else l.Claimed=true;
             }
         }
-        private static void MoveMob(Mob m,double goal,double dt,Mob[] peers) {
-            goal=Math.Max(Math.Max(m.Home.X-8,m.LaneMin),Math.Min(Math.Min(m.Home.X+8,m.LaneMax),goal));
-            double dx=goal-m.Position.X,step=Math.Sign(dx)*Math.Min(Math.Abs(dx),m.Speed*dt);
-            foreach(var p in peers){
-                double gap=p.Position.X-m.Position.X;
-                if(gap*step>0&&Math.Abs(gap)<Math.Abs(step)+.94)step=Math.Sign(step)*Math.Max(0,Math.Abs(gap)-.94);
+        private static void MoveMob(Mob m,double goal,double dt,Mob[] peers,double speedFactor=1) {
+            double speed=m.Speed*speedFactor;
+            m.DesiredX=Math.Max(Math.Max(m.ActivityMin,m.LaneMin),Math.Min(Math.Min(m.ActivityMax,m.LaneMax),goal));
+            double dx=m.DesiredX-m.Position.X,velocity=Math.Sign(dx)*Math.Min(Math.Abs(dx)/dt,speed);
+            double separation=0;
+            foreach(var p in peers){double gap=m.Position.X-p.Position.X;if(Math.Abs(gap)<.85)separation+=(Math.Abs(gap)<.001?Math.Sign(m.Id-p.Id):Math.Sign(gap))*(.85-Math.Abs(gap))/.85*speed*.8;}
+            // One velocity integration, bounded correction; no post-chase displacement or hard blocker.
+            velocity=Math.Max(-speed,Math.Min(speed,velocity+Math.Max(-speed*.8,Math.Min(speed*.8,separation))));
+            double step=velocity*dt;
+            step=Math.Max(Math.Max(m.ActivityMin,m.LaneMin)-m.Position.X,Math.Min(Math.Min(m.ActivityMax,m.LaneMax)-m.Position.X,step));
+            // Player/mob and mob/mob have no physical blocking. Brief crossings are allowed;
+            // occupancy changes destination rather than permanently clipping rear velocity to zero.
+            m.VelocityX=step/dt;m.Position=new Point(m.Position.X+step,m.Home.Y);
+        }
+        private void Patrol(Mob m,double dt){
+            m.Engaged=false;m.Windup=false;m.Occupancy="clear";m.ReturnSince=-1;
+            if(Now<m.PatrolPauseUntil){m.Motion="idle";m.VelocityX=0;return;}
+            if(Math.Abs(m.Position.X-m.PatrolGoal)<.08){
+                m.PatrolDirection=-m.PatrolDirection;
+                double radius=1.5+(m.Id%3)*.4;
+                m.PatrolGoal=Math.Max(m.ActivityMin+.3,Math.Min(m.ActivityMax-.3,m.Home.X+m.PatrolDirection*radius));
+                m.PatrolPauseUntil=Now+.6+(m.Id%5)*.17;m.Motion="idle";m.VelocityX=0;return;
             }
-            m.Position=new Point(m.Position.X+step,m.Home.Y);
+            m.Motion="patrol";
+            var peers=Mobs.Where(x=>x!=m&&x.Alive&&!x.Dummy&&x.Map==m.Map&&Math.Abs(x.Home.Y-m.Home.Y)<.3&&Math.Abs(x.Home.X-m.Home.X)<8).ToArray();
+            MoveMob(m,m.PatrolGoal,dt,peers,.35);if(Math.Abs(m.VelocityX)>.001)m.Facing=m.VelocityX<0?-1:1;
         }
         private void TickMob(Mob m,double dt) {
             double dist=m.Position.Distance(Player.Position);
             bool reachable=Math.Abs(m.Position.Y-Player.Position.Y)<1.6;
+            bool inActivity=Player.Position.X>=m.ActivityMin&&Player.Position.X<=m.ActivityMax;
             if(m.Returning){
-                double dx=m.Home.X-m.Position.X;m.Position=new Point(m.Position.X+Math.Sign(dx)*Math.Min(Math.Abs(dx),m.Speed*dt),m.Home.Y);
-                if(Math.Abs(dx)<.05){m.Returning=false;m.Engaged=false;m.Hp=m.MaxHp;m.QuestDamage=0;m.ReturnSince=-1;m.Windup=false;}return;
+                m.Motion="return";double dx=m.Home.X-m.Position.X;if(Math.Abs(dx)>.01)m.Facing=dx<0?-1:1;m.VelocityX=Math.Sign(dx)*Math.Min(Math.Abs(dx)/dt,m.Speed);m.Position=new Point(m.Position.X+Math.Sign(dx)*Math.Min(Math.Abs(dx),m.Speed*dt),m.Home.Y);
+                if(Math.Abs(dx)<.05){m.Returning=false;m.Engaged=false;m.Hp=m.MaxHp;m.QuestDamage=0;m.ReturnSince=-1;m.Windup=false;m.PatrolGoal=m.Home.X;m.PatrolPauseUntil=Now+.4;m.Motion="idle";m.VelocityX=0;}return;
             }
             // VS-1 probe: 2s no reachable progress -> Return + reset. This is NOT a production lock.
             // Resolve on the original hit clock, even when the player has left reach.
             // Reachability grace must never postpone an old hit until the player returns.
             if(m.Windup&&Now>=m.HitAt){
-                m.Windup=false;
+                m.Windup=false;m.ApproachSide=-m.ApproachSide;
+                double retreat=1.8+(m.Id%4)*.8;
+                double low=Math.Max(m.ActivityMin,m.LaneMin),high=Math.Min(m.ActivityMax,m.LaneMax);
+                if(Player.Position.X+m.ApproachSide*retreat<low||Player.Position.X+m.ApproachSide*retreat>high)m.ApproachSide=-m.ApproachSide;
+                m.RepositionUntil=m.NextAttack;
                 if(Player.Alive&&Math.Abs(Player.Position.X-m.Position.X)<=m.Range && Math.Abs(Player.Position.Y-m.Position.Y)<1.3 && Math.Sign(Player.Position.X-m.Position.X)==m.Facing){
                     var s=Player.Stats;if(Random.NextDouble()>=Rules.Evade(m.Acc,s.Eva))HurtPlayer(Rules.Damage(m.Atk,1,1,s.Def,false,.95+Random.NextDouble()*.1));else Emit("NÉ đòn "+m.Name);
                 }
             }
-            if(!Player.Alive||dist>8||!reachable){
-                if(m.Hp<m.MaxHp||m.Position.Distance(m.Home)>.1){if(m.ReturnSince<0)m.ReturnSince=Now;if(Now-m.ReturnSince>2){m.Returning=true;m.Windup=false;}}
+            if(!Player.Alive||dist>8||!reachable||!inActivity){
+                if(m.Engaged||m.Hp<m.MaxHp){
+                    if(m.ReturnSince<0)m.ReturnSince=Now;
+                    m.Motion="disengage";m.VelocityX=0;
+                    if(Now-m.ReturnSince>2){m.Returning=true;m.Windup=false;}
+                }else Patrol(m,dt);
                 return;
             }
             m.ReturnSince=-1;
-            if(m.Windup)return;
-            if(dist>5 && m.Hp==m.MaxHp&&!m.Engaged)return;
+            if(m.Windup){m.Motion="windup";m.VelocityX=0;return;}
+            if(dist>5&&m.Hp==m.MaxHp&&!m.Engaged){Patrol(m,dt);return;}
             double delta=Player.Position.X-m.Position.X;
             if(!m.Engaged){m.Engaged=true;m.ApproachSide=delta>0?-1:1;m.NextAttack=Math.Max(m.NextAttack,Now+((m.Id+m.Generation-1)%6)*.07);}
-            if(Math.Abs(delta)>m.Range+1.2&&Math.Sign(delta)==m.ApproachSide)m.ApproachSide=-m.ApproachSide;
-            // Stable ordering along a lane, with continuous movement toward free space.
-            // Rear mobs wait outside bite range; no attack token/formation or body shove.
-            var peers=Mobs.Where(x=>x!=m&&x.Alive&&!x.Dummy&&!x.Returning&&x.Map==m.Map&&x.Lane==m.Lane&&Math.Abs(x.Home.Y-m.Home.Y)<.3&&Math.Abs(x.Home.X-m.Home.X)<8).ToArray();
-            int rank=peers.Count(x=>x.Engaged&&x.ApproachSide==m.ApproachSide&&x.Id<m.Id);
-            double goal=Player.Position.X+m.ApproachSide*(m.Range*.82+rank*.96);
-            if(Now>=m.HitAt&&Now<m.HitAt+.22&&m.NextAttack>Now)goal+=m.ApproachSide*.30;
+            if(Now>=m.RepositionUntil&&Math.Abs(delta)>m.Range+1.2&&Math.Sign(delta)==m.ApproachSide)m.ApproachSide=-m.ApproachSide;
+            var peers=Mobs.Where(x=>x!=m&&x.Alive&&!x.Dummy&&!x.Returning&&x.Map==m.Map&&Math.Abs(x.Home.Y-m.Home.Y)<.3&&Math.Abs(x.Home.X-m.Home.X)<8).ToArray();
+            double goal=Player.Position.X+m.ApproachSide*m.Range*.82;
+            bool reposition=Now<m.RepositionUntil;
+            m.Occupancy="clear";
+            if(reposition){goal=Player.Position.X+m.ApproachSide*(1.8+(m.Id%4)*.8);m.Motion="reposition";}
+            else {
+                // A peer occupying the intended bite point makes us cross to free space. Never
+                // reserve an offset/rank outside range, nor use another wolf as a permanent wall.
+                if(peers.Any(x=>x.Windup&&Math.Abs(x.Position.X-goal)<.85)){
+                    m.ApproachSide=-m.ApproachSide;goal=Player.Position.X+m.ApproachSide*1.65;
+                    m.RepositionUntil=Now+.38;m.Occupancy="bite point occupied: cross";reposition=true;
+                }
+                m.Motion=reposition?"cross":"approach";
+            }
             MoveMob(m,goal,dt,peers);
             delta=Player.Position.X-m.Position.X;
-            if(Math.Abs(delta)<=m.Range && Now>=m.NextAttack){m.Facing=delta<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;}
-            if(Math.Abs(m.Position.X-m.Home.X)>8){m.Returning=true;m.Windup=false;}
+            if(!reposition&&inActivity&&Math.Abs(delta)<=m.Range&&Now>=m.NextAttack){
+                m.Facing=delta<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;m.BiteAttempts++;m.Motion="windup";m.VelocityX=0;
+            } else if(!m.Windup&&Math.Abs(m.VelocityX)>.001)m.Facing=m.VelocityX<0?-1:1;
+
         }
     }
 }

@@ -41,6 +41,30 @@ namespace HuyenLo.Tests
             }finally {Object.Destroy(go);}
             yield return null;
         }
+        [UnityTest] public IEnumerator WalkableBasinAndBridgeHaveDistinctMovementSpeeds(){
+            var go=new GameObject("Water feet fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;
+            try {
+                host.Body.position=new Vector2(3,.37f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.LessThan(.5));
+                host.ExternalAxis=1;for(int i=0;i<4;i++)yield return new WaitForFixedUpdate();
+                Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*.85f).Within(.05));
+                host.ResetPrototype(PrototypeStart.Crowd);host.ExternalAxis=1;
+                host.Body.position=new Vector2(73,.82f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<8;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);
+                Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*(float)host.Session.Player.Stats.Speed).Within(.05),"Bridge over water remains dry");
+            }finally{Object.Destroy(go);}yield return null;
+        }
+        [UnityTest] public IEnumerator SolidTerraceBlocksWalkAndDropButJumpCanTraverse(){
+            var go=new GameObject("Solid terrace fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;
+            try {
+                host.Body.position=new Vector2(6,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=1;
+                for(int i=0;i<35;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.x,Is.LessThan(8),"Solid step must block, not act as a one-way");
+                host.ExternalDrop=true;for(int i=0;i<12;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.x,Is.LessThan(8));
+                host.ExternalJumpHeld=true;host.ExternalJump=true;for(int i=0;i<35;i++)yield return new WaitForFixedUpdate();
+                Assert.That(host.Body.position.x,Is.GreaterThan(9),"Ordinary jump must cross the hub step");
+            }finally {Object.Destroy(go);}yield return null;
+        }
         [UnityTest] public IEnumerator KeyboardNpcShopInventoryAndDebugResetNeedNoMouse(){
             var go=new GameObject("Keyboard UI fixture");var host=go.AddComponent<SliceHost>();
             var oldBackground=InputSystem.settings.backgroundBehavior;var oldEditor=InputSystem.settings.editorInputBehaviorInPlayMode;
@@ -52,7 +76,7 @@ namespace HuyenLo.Tests
                 Assert.That(host.Hud.Panel,Is.EqualTo("npc"));Assert.That(host.Hud.SelectedActionId,Is.EqualTo("quest.accept"));
                 yield return Tap(keyboard,Key.Enter);Assert.That(host.Session.QuestState,Is.EqualTo(QuestState.InProgress));yield return Tap(keyboard,Key.Escape);
                 host.ResetPrototype(PrototypeStart.Wolves);yield return new WaitForFixedUpdate();yield return Tap(keyboard,Key.E);yield return Tap(keyboard,Key.Enter);
-                Assert.That(host.Session.Quest,Is.EqualTo(5));Assert.That(host.Hud.SelectedActionId,Is.EqualTo("service.buy"));
+                Assert.That(host.Session.Quest,Is.EqualTo(5));Assert.That(host.Hud.Panel,Is.Null);yield return Tap(keyboard,Key.E);Assert.That(host.Hud.SelectedActionId,Is.EqualTo("service.buy"));
                 yield return Tap(keyboard,Key.Enter);Assert.That(host.Hud.Panel,Is.EqualTo("buy"));Assert.That(host.Hud.SelectedActionId,Is.EqualTo("buy.food1"));
                 yield return Tap(keyboard,Key.Enter);yield return Tap(keyboard,Key.DownArrow);Assert.That(host.Hud.SelectedActionId,Is.EqualTo("buy.hp1"));
                 yield return Tap(keyboard,Key.Enter);Assert.That(host.Session.Stage,Is.EqualTo(1));yield return Tap(keyboard,Key.Escape);Assert.That(host.Hud.Panel,Is.EqualTo("npc"));yield return Tap(keyboard,Key.Escape);yield return Tap(keyboard,Key.F);
@@ -61,7 +85,12 @@ namespace HuyenLo.Tests
                 yield return Tap(keyboard,Key.I);Assert.That(host.Hud.SelectedActionId,Is.EqualTo("item."+armor.Instance));yield return Tap(keyboard,Key.Enter);Assert.That(host.Hud.Panel,Is.EqualTo("item"));
                 Assert.That(host.Hud.SelectedActionId,Is.EqualTo("equip."+armor.Instance));yield return Tap(keyboard,Key.Enter);
                 Assert.That(host.Session.Player.Inventory.Equipment.ContainsKey(GearSlot.Armor),Is.True);Assert.That(host.Hud.Panel,Is.EqualTo("bag"));yield return Tap(keyboard,Key.Escape);
-                yield return Tap(keyboard,Key.C);yield return Tap(keyboard,Key.Enter);Assert.That(host.Hud.Panel,Is.EqualTo("equipment"));
+                yield return Tap(keyboard,Key.C);Assert.That(host.Hud.Panel,Is.EqualTo("equipment"));
+                yield return Tap(keyboard,Key.Tab);Assert.That(host.Hud.Panel,Is.EqualTo("attributes"));
+                yield return Tap(keyboard,Key.Tab);Assert.That(host.Hud.Panel,Is.EqualTo("stats"));
+                yield return Tap(keyboard,Key.Tab);Assert.That(host.Hud.Panel,Is.EqualTo("skills"));
+                yield return Tap(keyboard,Key.Tab);Assert.That(host.Hud.Panel,Is.EqualTo("bag"));
+                yield return Tap(keyboard,Key.Tab);Assert.That(host.Hud.Panel,Is.EqualTo("equipment"));Assert.That(host.Hud.SelectedActionId,Is.EqualTo("slot.Weapon"));
                 yield return Tap(keyboard,Key.Enter);Assert.That(host.Hud.SelectedActionId,Is.EqualTo("unequip.Weapon"));yield return Tap(keyboard,Key.Enter);
                 Assert.That(host.Session.Player.Inventory.Equipment.ContainsKey(GearSlot.Weapon),Is.False);yield return Tap(keyboard,Key.Escape);yield return Tap(keyboard,Key.Escape);
                 host.Session.HurtPlayer(9999);yield return Tap(keyboard,Key.F8);yield return Tap(keyboard,Key.DownArrow);yield return Tap(keyboard,Key.Enter);

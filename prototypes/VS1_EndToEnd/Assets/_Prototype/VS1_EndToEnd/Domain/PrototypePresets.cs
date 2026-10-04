@@ -23,12 +23,13 @@ namespace HuyenLo.Domain
             if(start>=PrototypeStart.Class){s.Player.Inventory.Add(new[]{s.NewItem("food1",2),s.NewItem("hp1",3)});s.Receipts.Add("Q5.supply-gold");s.Player.Gold=200;}
             s.Player.Map=start==PrototypeStart.Dummy||start==PrototypeStart.SwordTraining?Map.Academy:Map.Village;
             s.Player.Position=new Point(start==PrototypeStart.FirstLoot?10:start==PrototypeStart.Wolves?5:start==PrototypeStart.Class?20:0,.8);
+            if(start==PrototypeStart.FirstLoot||start==PrototypeStart.Wolves||start==PrototypeStart.Class)s.Player.Position=Array.Find(SliceSession.Anchors,x=>x.Id==s.QuestNpc).Position;
             if(start>=PrototypeStart.SwordTraining){
                 s.Player.School=School.Sword;s.Player.Inventory.Equipment[GearSlot.Weapon]=s.NewItem("sword1");
                 s.Combat.Unlocked[1]=Rules.Sword1;s.Player.Inventory.Add(new[]{s.NewItem("mp1",3)});
                 s.Player.Position=new Point(20,.8);
             }
-            if(start==PrototypeStart.Crowd){s.Player.Map=Map.Mist;s.Player.Position=new Point(103,.72);s.Player.Inventory.Add(new[]{s.NewItem("hp1",20),s.NewItem("food1",4)});}
+            if(start==PrototypeStart.Crowd){s.Player.Map=Map.Mist;s.Player.Position=new Point(105,1.52);s.Player.Inventory.Add(new[]{s.NewItem("hp1",20),s.NewItem("food1",4)});}
             s.Player.Hp=s.Player.Stats.Hp;s.Player.Mp=s.Player.Stats.Mp;
             s.Emit("DEBUG preset "+start+" — không là evidence hành trình.");return s;
         }

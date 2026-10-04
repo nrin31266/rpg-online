@@ -1,0 +1,69 @@
+{
+  "KEEP_TRACKED": [
+    "canonical docs 1–5 + routing README",
+    "prototype Domain/Runtime/Editor/Tests/scene/project settings/README",
+    "all existing .meta GUIDs and historical evidence, byte-preserved"
+  ],
+  "KEEP_EVIDENCE": {
+    "pngs": [
+      {
+        "path": "prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_4/basin-runtime.png",
+        "bytes": 57166,
+        "sha256": "cfe49aacb8b990e955e0e170a28e305e27b248d95d832607659c3c292cdf7c5a"
+      },
+      {
+        "path": "prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_4/equipment-runtime.png",
+        "bytes": 87301,
+        "sha256": "ad21fb1d41ca6fc32df04b22ba4f411a05a65aa99aa40100845fb27912927968"
+      },
+      {
+        "path": "prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_4/map-layout.png",
+        "bytes": 291957,
+        "sha256": "9c498826ae58888cd8d01996185678cbb7b7e1591778935f123560d5619ddb57"
+      },
+      {
+        "path": "prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_4/ui-layout.png",
+        "bytes": 341618,
+        "sha256": "e5a97a7ee3556dc81c91d8e439775b576b70eb3d46c5d9eecea98fcae554a60d"
+      }
+    ],
+    "reports": [
+      "document-baseline.json",
+      "document-audit.json",
+      "source-destination-sample.json",
+      "verify_revision.py",
+      "validation.json",
+      "validation.md",
+      "cleanup-audit.json",
+      "build-summary.txt",
+      "route-result.txt"
+    ]
+  },
+  "GITIGNORE": [
+    "prototype Library/Temp/Logs/UserSettings/Builds",
+    "new InitTestScene* and raw test XML/log/video",
+    "all task /tmp scripts/downloads/render caches/raw captures outside repo"
+  ],
+  "DELETE_TEMP": [
+    {
+      "path": "/tmp/huyenlo-v624/manual-build",
+      "bytes": 165624338,
+      "reason": "obsolete isolated build / extracted package download; reproducible task temp only"
+    },
+    {
+      "path": "/tmp/huyenlo-v624/xorg-x11-server-Xvfb-1.20.11-32.el9.aarch64.rpm",
+      "bytes": 894564,
+      "reason": "obsolete isolated build / extracted package download; reproducible task temp only"
+    },
+    {
+      "path": "/tmp/huyenlo-v624/xorg-x11-server-Xvfb-21.1.24-1.fc44.x86_64.rpm",
+      "bytes": 899122,
+      "reason": "obsolete isolated build / extracted package download; reproducible task temp only"
+    }
+  ],
+  "unchanged_out_of_scope": [
+    "ignored research/start_all.sh and research source/assets",
+    "existing .github directory"
+  ],
+  "tracked_files_deleted": []
+}

@@ -27,3 +27,9 @@ research/notes/*
 /prototypes/**/Builds/
 /prototypes/**/MemoryCaptures/
 /prototypes/**/.vs/
+
+# Disposable test/capture output: curated summaries and doc-linked PNGs are tracked instead.
+/prototypes/**/Assets/InitTestScene*
+/prototypes/**/PrototypeEvidence/**/*.xml
+/prototypes/**/PrototypeEvidence/**/*.log
+/prototypes/**/PrototypeEvidence/**/*.mp4

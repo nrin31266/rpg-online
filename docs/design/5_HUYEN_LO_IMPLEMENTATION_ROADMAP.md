@@ -14,7 +14,7 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED và điều kiện mở
 
 **Evidence lịch sử 2026-10-03:** [VS-1 disposable/reference](../../prototypes/VS1_EndToEnd/README.md) tại checkpoint `46006c4` có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
 
-**Prototype update 2026-10-04:** mock V6.2.3 thử flow/controls mới, keyboard menus, debug mốc/reset và EdgeExit. Evidence revision mới ở prototype README; đây vẫn là probe trước G-B, không production base hoặc manual art/UX pass.
+**Prototype update 2026-10-04:** mock V6.2.4 thử flow/controls mới, keyboard menus, debug mốc/reset và EdgeExit. Evidence revision mới ở prototype README; đây vẫn là probe trước G-B, không production base hoặc manual art/UX pass.
 
 **DEFERRED** là phần đã thiết kế và vẫn phải làm trong TARGET, nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung thuộc TARGET P0, **không phải feature P1**. Mọi bảng Cung, projectile, gear, pose/VFX và balance được giữ. Q6/lore vẫn giới thiệu hai phái; trong bản thử sớm, Kiếm chơi được, Cung ghi “Chưa mở trong bản thử nghiệm”. Không dùng nhãn này trong sản phẩm cuối.
 
@@ -31,7 +31,7 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED và điều kiện mở
 | PvP/Q9/escrow/settlement | DEFERRED khỏi VS-1, TARGET P0 | G-D trước G-P; Q9 optional cho người chơi không có nghĩa được bỏ hệ PvP |
 | Buff R, shield/groggy, QoL/P1/P2 | Chưa duyệt triển khai | Chỉ xét sau core; proposal vẫn ở Analysis, không chen vào VS-1 |
 
-**Probe map/UI V6.2.3:** ba map có backdrop/landmark/route cao-thấp, reciprocal exits; hai NPC class và manual unequip; NPC dialogue/service submenus, bag grid + detail, paper doll sáu slot. Hai extra wolf pockets chỉ workload mock, không tăng release spawn budget. G-L vẫn PARTIAL đến khi người chơi thử normal-speed navigation/4-mob crowd/đường cao, camera ổn định và UI Việt đọc được. G-N/G-D/production base chưa bắt đầu. [Sơ đồ và ca kiểm](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#mock-map-ui).
+**Probe map/UI V6.2.4:** ba map có solid terrace/steps/depression và ít wooden one-way, backdrop/landmark/route cao-thấp, reciprocal exits; hai NPC class và manual unequip; NPC nhận/trả quest + dialogue/service submenus, RPG tabs/grid/context + paper doll geometric rig, skill bar, shallow-water ×0,85 contact probe/bridge/nhánh thác cosmetic, shared pack return→patrol và mouse mutation fix. Hai extra wolf pockets chỉ workload mock, không tăng release spawn budget. G-L vẫn PARTIAL đến khi người chơi thử normal-speed navigation/4-mob re-engage ở mép và đường cao, camera ổn định và UI Việt đọc được. G-N/G-D/production base chưa bắt đầu. [Sơ đồ và ca kiểm](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#mock-map-ui).
 
 <a id="vs-1"></a>
 

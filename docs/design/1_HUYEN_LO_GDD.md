@@ -1,7 +1,7 @@
 # RPG Online: Huyền Lộ
 ## Tài liệu thiết kế game
 
-**Current Design Version:** V6.2.3
+**Current Design Version:** V6.2.4
 
 **Status:** DESIGN + PROTOTYPE VALIDATION; production codebase chưa bắt đầu
 **Last Reviewed:** 2026-10-04 (feedback prototype; onboarding/control/navigation baseline đã sửa)
@@ -322,6 +322,11 @@ Level là nhận diện nội dung; không tạo thêm variant chỉ để mỗi
 | HT5 | Cổ Môn Vệ Binh | 20 | 3 |
 
 Safe Entrance 6–8 u → pockets → alternate path / vertical route → landmark → exit; không maze / moving platform / hazard P0. Aggro 5 u / leash 8 u, tâm cụm khoảng 18–20 u hoặc terrain tách tương đương. Trong pocket author sparse / line / split phù hợp shape; không áp spacing 0,8–1,5 u cho mọi cụm. Melee Sói tiếp cận thành cụm đọc được, không chồng cùng tọa độ thành một cục cắn liên tục; Ong giữ hover band reachable bằng Kiếm, không blob cố định. Hit alert chỉ đánh thức cụm, không truyền sang cụm khác; attack offset 0–0,35 s. Vượt leash kết thúc encounter; nguyên tắc không free-farm melee unreachable đã khóa. Exact grace/Return/regen/reset/untargetable/immunity là PROTOTYPE, không miễn sát thương tức thì chỉ vì một cú nhảy. Xét reachable threat khác trước; reset không loot/reroll/respawn life mới.
+
+**Vùng hoạt động cụm:** mỗi đàn/đơn có đoạn ngang đi được đã author trong pocket/home/leash. Idle tuần tra và nghỉ ngắn trong đoạn đó; chase/attack không kéo ra ngoài đoạn hoạt động. Mục tiêu rời đoạn thì kết thúc đuổi theo policy có grace, return rồi tuần tra lại, không đứng nhìn mãi ở mép. Không đổi range/nhịp cắn, không formation/pathfinding nhiều tầng. Exact chiều rộng, nhịp patrol và response/reset vẫn PROTOTYPE/TUNABLE.
+
+**Nước nông — direction mới của user:** basin có đáy solid đi được, mặt nước cao hơn đáy để nhân vật chìm phần chân khi lội; giảm nhẹ tốc di chuyển khi chân trong nước. Mock thử hệ số ×0,85, không stack nhiều water volumes; exact depth/factor là TUNABLE. Đi trên cầu hoặc nhảy ra khỏi mặt nước không giảm tốc. Vùng nước rộng có route cầu rõ, không buộc bơi; thác/flow/ripple chỉ presentation. Không swimming, breath, buoyancy hoặc water damage. Luật này thay baseline water visual-only trước feedback; không tự coi water slowdown là trạng thái Băng Hàn.
+
 
 Farm theo bãi gần level trong khoảng thưởng §6; mob cao hơn có reward nếu trong khoảng nhưng không đảm bảo an toàn. Mob identity/level quyết định gear band; map quyết định material/flavor. **[Farm Matrix Lv 1–20](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression)** giữ derived HP / EXP / Gold, không copy stats table vào GDD. Measure solo / 2 / 3 / 4 players, wait / crowd / CPU / network và run-back trước capacity claim; low-level pockets ít slot có thể cần rotate, không thêm Party / Channel.
 
@@ -752,6 +757,14 @@ Các overlay chỉ là presentation của status Game Server đã resolve; khôn
 Production accounting thuộc [Art §23](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#production-accounting); phép tính 12 modules trước review được giữ nguyên ở [trace](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#legacy-art-accounting), không là tổng asset đã duyệt.
 
 ---
+
+
+**RPG menu navigation:** I mở Hành trang, C mở Trang bị, Q mở Nhiệm vụ. Trong shell nhân vật có năm tab Hành trang / Trang bị / Thuộc tính / Thông số / Kỹ năng; Tab và Shift+Tab đổi view, mũi tên chọn ô/action, Enter/E xác nhận, Esc quay lại. Mouse gọi cùng command/validation. Trang bị có sáu slot + preview; Thuộc tính chỉ phân STR/VIT/INT/AGI và điểm chưa dùng; Thông số đọc HP/MP/ATK/DEF/ACC/EVA/Crit/MoveSpeed/Class/Lv/EXP. Bag detail có thao tác trực tiếp theo context; empty weapon slot vẫn mở hành trang lọc Vũ khí. Store/Take chỉ tại rương, Buy/Sell chỉ tại shop, không thêm command gameplay mới. Exact layout là UX probe.
+
+**Đóng giao diện theo thao tác:** nhận/trả quest, nhập phái và nghỉ thành công đóng hội thoại để tiếp tục đi; câu xác nhận vẫn hiện trên NPC/tracker. Lỗi/reject giữ view và reason. Buy/Sell/Store/Take giữ view để làm nhiều lần; Esc lùi một submenu, ở root thì đóng. Equip/Unequip/Learn thành công trở về view chứa item/slot; tab switch đi trực tiếp tới view mới, không giữ submenu cũ. Intro hiện trước khi nhận quest; không bỏ narrative chỉ vì auto-close.
+
+
+**Onboarding text:** Q1–Q6 dùng 1–3 câu nhận quest, phản hồi NPC trung gian và một câu khi trả; tracker nêu việc → khu vực/đường đi → NPC tiếp theo. Không thêm QuestId, số kill, EXP hay reward từ việc mở rộng hội thoại. Q4 tutorial supply vẫn chỉ đúng active step; Q6 giữ gate tự tháo Mộc Kiếm trước nhập phái.
 
 <a id="acceptance-routing"></a>
 <a id="gdd-13"></a>

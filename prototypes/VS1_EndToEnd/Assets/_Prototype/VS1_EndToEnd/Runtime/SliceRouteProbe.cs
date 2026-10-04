@@ -20,6 +20,7 @@ namespace HuyenLo.Runtime
         private bool capture,cli;
         private string evidence;
         private int frame;
+        private double releaseJumpAt;
         private float lastCapture;
         private void Start() {
             var args=Environment.GetCommandLineArgs();cli=args.Contains("--verify-route");if(!cli)return;
@@ -60,7 +61,7 @@ namespace HuyenLo.Runtime
         private IEnumerator Showcase(){
             yield return Shot("village");
             host.Hud.Toggle("bag");yield return Shot("bag-grid");host.Hud.Close();
-            host.Hud.Toggle("stats");Ui("tab.equipment");yield return Shot("equipment");host.Hud.Close();
+            host.Hud.Toggle("equipment");yield return Shot("equipment");host.Hud.Close();
             yield return Exit("toAcademy");yield return Move(3);host.Hud.OpenNpc("Phong");yield return Shot("class-npcs");host.Hud.Close();yield return Move(18);yield return Shot("academy");
             yield return Exit("toVillageA");yield return Exit("toMist");yield return Move(18);yield return Shot("mist-entrance");
             host.ResetPrototype(PrototypeStart.Fresh);yield return new WaitForFixedUpdate();yield return Shot("quest-marker");host.Interact();yield return Shot("npc-dialogue");host.Hud.Close();
@@ -72,9 +73,16 @@ namespace HuyenLo.Runtime
             host.Hud.Close();double started=S.Now;
             while(Math.Abs(host.Body.position.x-x)>.22){
                 Check(S.Player.Alive,"player died during walking");Check(S.Now-started<35,"walk timed out "+x);
-                host.ExternalAxis=host.Body.position.x<x?1:-1;HealIfNeeded();yield return new WaitForFixedUpdate();
+                host.ExternalAxis=host.Body.position.x<x?1:-1;JumpObstacle();HealIfNeeded();yield return new WaitForFixedUpdate();
             }
-            host.ExternalAxis=0;yield return new WaitForFixedUpdate();
+            host.ExternalAxis=0;host.ExternalJumpHeld=false;yield return new WaitForFixedUpdate();
+            double landing=S.Now;while(!host.Grounded){Check(S.Now-landing<3,"landing timed out");yield return new WaitForFixedUpdate();}
+        }
+        private void JumpObstacle(){
+            host.ExternalJumpHeld=S.Now<releaseJumpAt;
+            if(!host.Grounded)return;
+            var hit=Physics2D.Raycast(host.Body.position+new Vector2(0,-.6f),new Vector2(host.ExternalAxis,0),.95f,1<<6);
+            if(hit.collider!=null&&hit.normal.y<.5f&&hit.collider.GetComponent<PlatformEffector2D>()==null){host.ExternalJump=true;host.ExternalJumpHeld=true;releaseJumpAt=S.Now+.12;}
         }
         private void HealIfNeeded(){if(S.Player.Hp<S.Player.Stats.Hp*.45)S.Potion(true);}
         private void Check(bool ok,string message){if(!ok)throw new InvalidOperationException(message+"; "+S.Objective);}
@@ -96,7 +104,7 @@ namespace HuyenLo.Runtime
         private IEnumerator Exit(string id) {
             host.Hud.Close();var exit=SliceSession.Anchors.First(x=>x.Id==id&&x.Map==S.Player.Map);var from=S.Player.Map;
             double start=S.Now;
-            while(S.Player.Map==from){Check(S.Now-start<35,"auto exit stalled "+id);host.ExternalAxis=host.Body.position.x<exit.Position.X?1:-1;HealIfNeeded();yield return new WaitForFixedUpdate();}
+            while(S.Player.Map==from){Check(S.Now-start<35,"auto exit stalled "+id);host.ExternalAxis=host.Body.position.x<exit.Position.X?1:-1;JumpObstacle();HealIfNeeded();yield return new WaitForFixedUpdate();}
             host.ExternalAxis=0;yield return new WaitForFixedUpdate();yield return new WaitForFixedUpdate();
         }
         private IEnumerator Fight(Mob mob) {
@@ -117,9 +125,9 @@ namespace HuyenLo.Runtime
             Check(S.DebugPreset==null,"acceptance must start fresh, not from a debug preset");
             yield return Talk("Lam",accept:true);yield return Talk("Yen");yield return Talk("Bach");yield return Talk("Moc");yield return Talk("Lam",turnIn:true);
             Check(S.Quest==2&&S.Player.Level==2,"Q1 reward");yield return Talk("Lam",accept:true);yield return Exit("toAcademy");yield return Move(31);yield return WaitStage(1);
-            yield return Move(8);host.ExternalJump=true;yield return new WaitForFixedUpdate();
+            yield return Move(8);if(S.Stage<2){host.ExternalJumpHeld=true;host.ExternalJump=true;yield return new WaitForFixedUpdate();}
             double jumpStart=S.Now;while(S.Stage!=2){Check(S.Now-jumpStart<5,"jump ledge not reached by physics");yield return new WaitForFixedUpdate();}
-            host.ExternalDrop=true;yield return new WaitForFixedUpdate();yield return new WaitForFixedUpdate();Check(S.Receipts.Contains("Q2.dropped"),"drop input did not ignore platform");yield return WaitStage(3);
+            host.ExternalJumpHeld=false;host.ExternalDrop=true;yield return new WaitForFixedUpdate();yield return new WaitForFixedUpdate();Check(S.Receipts.Contains("Q2.dropped"),"drop input did not ignore platform");yield return WaitStage(3);
             yield return Exit("toVillageA");yield return Talk("Lam",turnIn:true);
             yield return Exit("toAcademy");yield return Talk("Phong",accept:true);Equip("wood");yield return Move(22);yield return WaitStage(2);
             foreach(var dummy in S.Mobs.Where(x=>x.Dummy).ToArray())yield return Fight(dummy);
@@ -139,15 +147,15 @@ namespace HuyenLo.Runtime
             yield return Exit("toVillageM");yield return Talk("Yen",turnIn:true);
             Check(S.Player.Level==5&&S.Player.ResetAtFive&&S.Player.Unspent==20,"Q5 Lv5 reset");
             yield return Talk("Ta",accept:true);yield return Exit("toAcademy");yield return Move(3);yield return WaitStage(1);
-            host.Hud.Toggle("stats");Ui("tab.equipment");Ui("slot.Weapon");Ui("unequip.Weapon");host.Hud.Close();
-            yield return Move(SliceSession.Anchors.First(x=>x.Id=="Phong").Position.X);host.Interact();Ui("class.sword");host.Hud.Close();Equip("sword1");host.Hud.Toggle("stats");Ui("allocate.STR");host.Hud.Close();
+            host.Hud.Toggle("equipment");Ui("slot.Weapon");Ui("unequip.Weapon");host.Hud.Close();
+            yield return Move(SliceSession.Anchors.First(x=>x.Id=="Phong").Position.X);host.Interact();Ui("class.sword");host.Hud.Close();Equip("sword1");host.Hud.Toggle("attributes");Ui("allocate.STR");host.Hud.Close();
             host.Hud.Toggle("bag");Ui("learn."+S.Player.Inventory.Bag.First(x=>x.Id=="manual1").Instance);host.Hud.Close();
             yield return Move(21.2);while(!S.Mobs.First(x=>x.Dummy).Alive)yield return new WaitForFixedUpdate();S.Combat.ClearFocus();host.CombatPress("1",1);host.CombatRelease("1");
             yield return WaitStage(4);Check(S.Potion(false),"Q6 reserved MP actual consumption");
             yield return Exit("toVillageA");yield return Talk("Ta",turnIn:true);
             Check(S.Complete&&S.Player.School==School.Sword,"continuous route did not complete");
             Check(Enumerable.Range(1,6).All(i=>S.Receipts.Contains($"Q{i}.completed")),"missing completion receipt");
-            S.Emit("VS1 V6.2.3 Q1→Q6 PASS — physics, auto EdgeExit, keyboard menu adapter, one-press combat; no debug injection.");
+            S.Emit("VS1 V6.2.4 Q1→Q6 PASS — physics, auto EdgeExit, keyboard menu adapter, one-press combat; no debug injection.");
         }
     }
 }

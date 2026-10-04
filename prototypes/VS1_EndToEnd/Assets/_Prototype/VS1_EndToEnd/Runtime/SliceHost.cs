@@ -33,7 +33,6 @@ namespace HuyenLo.Runtime
         private TextMesh speech;private double speechUntil;
         private GameObject world,playerVisual;
         private BoxCollider2D playerCollider;
-        private SpriteRenderer torso,pants,weapon;
         private readonly Dictionary<int,SpriteRenderer> mobViews=new Dictionary<int,SpriteRenderer>();
         private readonly Dictionary<long,SpriteRenderer> lootViews=new Dictionary<long,SpriteRenderer>();
         private readonly List<BoxCollider2D> platforms=new List<BoxCollider2D>();
@@ -41,6 +40,11 @@ namespace HuyenLo.Runtime
         private Map renderedMap;
         private int renderedRevision;
         private Sprite square;
+        private readonly Dictionary<string,SpriteRenderer> rig=new Dictionary<string,SpriteRenderer>();
+        private readonly List<(float left,float right,float top)> water=new List<(float,float,float)>();
+        private double nextRipple;
+        public string LastDialogue {get;private set;}
+
         private SpriteRenderer marker;
         private int feedbackResultCount;
         private readonly Dictionary<int,double> flashUntil=new Dictionary<int,double>();
@@ -67,10 +71,6 @@ namespace HuyenLo.Runtime
             playerVisual=new GameObject("PlayerPhysics");Body=playerVisual.AddComponent<Rigidbody2D>();Body.gravityScale=2;Body.freezeRotation=true;Body.interpolation=RigidbodyInterpolation2D.Interpolate;Body.collisionDetectionMode=CollisionDetectionMode2D.Continuous;
             playerVisual.layer=7;playerCollider=playerVisual.AddComponent<BoxCollider2D>();playerCollider.size=new Vector2(.55f,1.4f);
             var mat=new PhysicsMaterial2D("NoFriction"){friction=0,bounciness=0};playerCollider.sharedMaterial=mat;
-            torso=RectVisual("Torso",playerVisual.transform,new Vector2(0,.15f),new Vector2(.5f,.75f),new Color(.55f,.55f,.6f),10);
-            pants=RectVisual("Pants",playerVisual.transform,new Vector2(0,-.45f),new Vector2(.5f,.45f),new Color(.25f,.3f,.4f),10);
-            RectVisual("Head",playerVisual.transform,new Vector2(0,.65f),new Vector2(.4f,.4f),new Color(.8f,.67f,.5f),10);
-            weapon=RectVisual("Weapon",playerVisual.transform,new Vector2(.4f,0),new Vector2(.12f,.9f),new Color(.6f,.4f,.2f),11);
             marker=RectVisual("CombatFocus",null,Vector2.zero,new Vector2(.9f,.08f),Color.yellow,12);
             Hud=gameObject.AddComponent<SliceHud>();Hud.Host=this;
             BuildMap();
@@ -78,12 +78,13 @@ namespace HuyenLo.Runtime
             if (System.Environment.GetCommandLineArgs().Contains("--verify-route")) gameObject.AddComponent<SliceRouteProbe>();
 #endif
         }
+        private readonly List<(Transform sprite,float bottom,float top,float phase)> flowStreaks=new List<(Transform,float,float,float)>();
         private SpriteRenderer RectVisual(string name,Transform parent,Vector2 position,Vector2 size,Color color,int order=0) {
             var go=new GameObject(name);if(parent!=null)go.transform.SetParent(parent,false);go.transform.localPosition=position;
             go.transform.localScale=size;var sr=go.AddComponent<SpriteRenderer>();sr.sprite=square;sr.color=color;sr.sortingOrder=order;return sr;
         }
         private void Ground(string name,float x,float y,float width,float height,bool oneWay=false) {
-            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),oneWay?new Color(.36f,.55f,.58f):new Color(.21f,.3f,.34f));
+            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),oneWay?new Color(.55f,.39f,.23f):new Color(.44f,.38f,.27f));
             sr.gameObject.layer=6;var box=sr.gameObject.AddComponent<BoxCollider2D>();
             if(oneWay){var eff=sr.gameObject.AddComponent<PlatformEffector2D>();eff.useOneWay=true;eff.useOneWayGrouping=true;eff.surfaceArc=160;box.usedByEffector=true;platforms.Add(box);}
         }
@@ -94,35 +95,45 @@ namespace HuyenLo.Runtime
         private void BuildMap() {
             foreach(var v in floating)if(v.mesh!=null)Destroy(v.mesh.gameObject);floating.Clear();
             if(world!=null){world.SetActive(false);Destroy(world);}world=new GameObject("Map "+Session.Player.Map);mobViews.Clear();lootViews.Clear();platforms.Clear();ignored.Clear();renderedMap=Session.Player.Map;renderedRevision=Session.WorldRevision;
-            scenery.Clear();npcMarkers.Clear();speech=null;
+            scenery.Clear();npcMarkers.Clear();water.Clear();flowStreaks.Clear();speech=null;
             float min=(float)BlockoutLayout.MinX(renderedMap),max=(float)BlockoutLayout.MaxX(renderedMap);
             BuildBackdrop(min,max);
             foreach(var surface in BlockoutLayout.Surfaces(renderedMap)){
                 Ground(surface.Name,(float)surface.X,(float)surface.Y,(float)surface.Width,(float)surface.Height,surface.OneWay);
-                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,(float)(surface.Y+surface.Height/2)),new Vector2((float)surface.Width,.08f),new Color(.48f,.63f,.47f),1);
+                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,(float)(surface.Y+surface.Height/2)),new Vector2((float)surface.Width,.08f),surface.OneWay?new Color(.72f,.53f,.31f):new Color(.43f,.6f,.36f),1);
+                if(!surface.OneWay){
+                    float top=(float)(surface.Y+surface.Height/2);
+                    RectVisual("Soil upper band",world.transform,new Vector2((float)surface.X,top-.25f),new Vector2((float)surface.Width,.45f),new Color(.51f,.44f,.31f),0);
+                    for(float px=(float)(surface.X-surface.Width/2)+.6f;px<surface.X+surface.Width/2;px+=1.8f)
+                        for(float py=-6.5f;py<top-.5f;py+=1.4f)RectVisual("Soil grain",world.transform,new Vector2(px,py),new Vector2(.09f,.06f),new Color(.36f,.31f,.23f),1);
+                }
+                if(surface.OneWay)for(float peg=(float)(surface.X-surface.Width/2);peg<surface.X+surface.Width/2;peg+=.7f)RectVisual("Wood grain",world.transform,new Vector2(peg,(float)surface.Y),new Vector2(.035f,(float)surface.Height),new Color(.3f,.22f,.16f),2);
             }
             Ground("LeftBoundary",min,5,1,14);Ground("RightBoundary",max,5,1,14);
             if(renderedMap==Map.Academy){
                 Label("CỔNG ĐÔNG → VÂN KHÊ",new Vector3(31,3,0),world.transform,.07f);
                 Label("BẬC TẬP NHẢY\nS / ↓ để xuống",new Vector3(8,4.3f,0),world.transform,.07f);
                 Label("SÂN BÙ NHÌN",new Vector3(23,2.6f,0),world.transform,.08f);
-                Building("Đại sảnh nhập môn",3,12,6);Building("Võ đường phía tây",-18,11,5);Building("Kho binh khí",23,10,4);
+                Building("Đại sảnh Kiếm",0,7,5);Building("Cung đường",-12,6,4.5f);Building("Võ đường phía tây",-27,6,4);Building("Sân tập",24,9,3);
             }else if(renderedMap==Map.Village){
-                Building("Nhà thuốc",5,4,4);Building("Lò rèn",10,4,3.8f);Building("Quán nghỉ",15,4,5);Building("Nhà trưởng lão",20,5,5.5f);
+                Building("Nhà trưởng lão",0,5,4.5f);Building("Nhà thuốc",6,3,3.5f);Building("Lò rèn",13,5,4.8f);Building("Quán nghỉ / rương",20,5,4);Building("Đài nhập môn",26,3,5);
+
                 Label("← HỌC VIỆN     ·     ĐỒNG SƯƠNG →",new Vector3(24,5.6f,0),world.transform,.065f);
             }else {
                 Label("DS1 · NẤM",new Vector3(5,2.4f,0),world.transform,.06f);Label("DS2 · NẤM SƯƠNG",new Vector3(15,3,0),world.transform,.06f);
                 for(int i=3;i<=6;i++)Label("DS"+i+" · SÓI",new Vector3(30+(i-3)*20,2.2f,0),world.transform,.06f);
                 Label("ĐƯỜNG CAO · PROBE8",new Vector3(54,5.5f,0),world.transform,.06f);
                 Label("BÃI PHỤ · PROBE7 · 4 SÓI",new Vector3(110,2.7f,0),world.transform,.06f);
+                Waterfall(63.5f,.1f,-1.55f);
                 RectVisual("Ancient standing stone",world.transform,new Vector2(99,2.1f),new Vector2(1.5f,4.2f),new Color(.28f,.36f,.35f),-1);
             }
+            foreach(var region in BlockoutLayout.Waters(renderedMap))Puddle(region);
             foreach(var a in SliceSession.Anchors.Where(x=>x.Map==renderedMap)){
                 if(!a.EdgeExit){
-                    RectVisual(a.Id+" robe",world.transform,new Vector2((float)a.Position.X,.65f),new Vector2(.55f,1.1f),a.Id=="Diep"?new Color(.34f,.58f,.72f):new Color(.56f,.57f,.35f),7);
-                    RectVisual(a.Id+" head",world.transform,new Vector2((float)a.Position.X,1.35f),new Vector2(.35f,.38f),new Color(.8f,.67f,.5f),8);
-                    npcMarkers[a.Id]=Label("",new Vector3((float)a.Position.X,2.15f,0),world.transform,.17f);
-                    Label(a.Name,new Vector3((float)a.Position.X,1.8f,0),world.transform,.075f);
+                    RectVisual(a.Id+" robe",world.transform,new Vector2((float)a.Position.X,(float)a.Position.Y-.15f),new Vector2(.55f,1.1f),a.Id=="Diep"?new Color(.34f,.58f,.72f):new Color(.56f,.57f,.35f),7);
+                    RectVisual(a.Id+" head",world.transform,new Vector2((float)a.Position.X,(float)a.Position.Y+.55f),new Vector2(.35f,.38f),new Color(.8f,.67f,.5f),8);
+                    npcMarkers[a.Id]=Label("",new Vector3((float)a.Position.X,(float)a.Position.Y+1.85f,0),world.transform,.17f);
+                    Label(a.Name,new Vector3((float)a.Position.X,(float)a.Position.Y+1.3f,0),world.transform,.075f);
                 }else{
                     RectVisual("Road sign "+a.Id,world.transform,new Vector2((float)a.Position.X,1.1f),new Vector2(.12f,2.2f),new Color(.45f,.38f,.28f),2);
                     Label(a.Name,new Vector3((float)a.Position.X,3.1f,0),world.transform,.08f);
@@ -153,7 +164,7 @@ namespace HuyenLo.Runtime
             var visual=playerVisual.transform.position;
             float half=cameraView.orthographicSize*cameraView.aspect;
             float min=(float)BlockoutLayout.MinX(renderedMap)+half,max=(float)BlockoutLayout.MaxX(renderedMap)-half;
-            return new Vector3(Mathf.Clamp(visual.x,Mathf.Min(min,max),Mathf.Max(min,max)),Mathf.Max(3.4f,visual.y-1),-10);
+            return new Vector3(Mathf.Clamp(visual.x,Mathf.Min(min,max),Mathf.Max(min,max)),Mathf.Max(2.4f,visual.y+1.6f),-10);
         }
         private void BuildBackdrop(float min,float max){
             cameraView.backgroundColor=renderedMap==Map.Mist?new Color(.13f,.23f,.28f):new Color(.17f,.23f,.3f);
@@ -167,22 +178,39 @@ namespace HuyenLo.Runtime
             }
             for(float x=min+3;x<max-3;x+=5.5f){
                 if(renderedMap==Map.Mist){
-                    RectVisual("Tree trunk",world.transform,new Vector2(x,2.3f),new Vector2(.45f,4.6f),new Color(.21f,.28f,.23f),-3);
-                    RectVisual("Tree canopy",world.transform,new Vector2(x,5),new Vector2(4.5f,3),new Color(.19f,.34f,.28f),-4);
+                    RectVisual("Tree trunk",world.transform,new Vector2(x,(float)BlockoutLayout.GroundTop(renderedMap,x)+2.3f),new Vector2(.45f,4.6f),new Color(.21f,.28f,.23f),-3);
+                    RectVisual("Tree canopy",world.transform,new Vector2(x,(float)BlockoutLayout.GroundTop(renderedMap,x)+5),new Vector2(4.5f,3),new Color(.19f,.34f,.28f),-4);
                 }
-                RectVisual("Foreground grass",world.transform,new Vector2(x,-.1f),new Vector2(1.7f,.35f),new Color(.16f,.31f,.24f),13);
-                RectVisual("Rock",world.transform,new Vector2(x+1.8f,.22f),new Vector2(.8f,.4f),new Color(.3f,.4f,.4f),-1);
+                RectVisual("Foreground grass",world.transform,new Vector2(x,(float)BlockoutLayout.GroundTop(renderedMap,x)-.18f),new Vector2(1.7f,.35f),new Color(.16f,.31f,.24f),13);
+                RectVisual("Rock",world.transform,new Vector2(x+1.8f,(float)BlockoutLayout.GroundTop(renderedMap,x+1.8)+.22f),new Vector2(.8f,.4f),new Color(.3f,.4f,.4f),-1);
             }
         }
         private void Building(string name,float x,float width,float height){
-            RectVisual(name+" wall",world.transform,new Vector2(x,height/2),new Vector2(width,height),new Color(.27f,.32f,.36f),-5);
-            RectVisual(name+" roof",world.transform,new Vector2(x,height+.25f),new Vector2(width+1,.6f),new Color(.35f,.27f,.27f),-4);
-            for(float col=x-width/2+.4f;col<x+width/2;col+=2.5f)RectVisual("Pillar",world.transform,new Vector2(col,height/2),new Vector2(.22f,height),new Color(.38f,.39f,.36f),-3);
-            Label(name,new Vector3(x,height-.8f,0),world.transform,.065f);
+            float baseY=(float)BlockoutLayout.GroundTop(renderedMap,x);
+            RectVisual(name+" wall",world.transform,new Vector2(x,baseY+height/2),new Vector2(width,height),new Color(.27f,.32f,.36f),-5);
+            RectVisual(name+" roof",world.transform,new Vector2(x,baseY+height+.25f),new Vector2(width+1,.6f),new Color(.35f,.27f,.27f),-4);
+            for(float col=x-width/2+.4f;col<x+width/2;col+=2.5f)RectVisual("Pillar",world.transform,new Vector2(col,baseY+height/2),new Vector2(.22f,height),new Color(.38f,.39f,.36f),-3);
+            Label(name,new Vector3(x,baseY+height-.8f,0),world.transform,.065f);
         }
-        public void Speak(string id){
-            if(speech!=null)Destroy(speech.gameObject);var a=SliceSession.Anchors.First(x=>x.Id==id);
-            speech=Label(Hud.Dialogue(id),new Vector3((float)a.Position.X,3.3f,0),world.transform,.065f);speechUntil=Session.Now+4;
+        private void Puddle(WaterRegion region){
+            float x=(float)((region.Left+region.Right)/2),width=(float)(region.Right-region.Left),depth=(float)(region.Level-region.Bottom);
+            water.Add(((float)region.Left,(float)region.Right,(float)region.Level));
+            RectVisual("WaterBase cosmetic",world.transform,new Vector2(x,(float)region.Bottom+depth/2),new Vector2(width,depth),new Color(.22f,.48f,.61f,.75f),3);
+            RectVisual("WaterFrontOverlay cosmetic",world.transform,new Vector2(x,(float)region.Bottom+depth/2),new Vector2(width,depth),new Color(.38f,.68f,.76f,.22f),17);
+            RectVisual("Water surface",world.transform,new Vector2(x,(float)region.Level),new Vector2(width,.06f),new Color(.64f,.85f,.88f),18);
+        }
+        private void Waterfall(float x,float top,float bottom){
+            RectVisual("Waterfall behind lane",world.transform,new Vector2(x,(top+bottom)/2),new Vector2(.65f,top-bottom),new Color(.26f,.55f,.65f,.7f),-2);
+            for(float y=bottom+.2f;y<top;y+=.55f){var streak=RectVisual("Flow streak",world.transform,new Vector2(x+.13f,y),new Vector2(.12f,.18f),new Color(.5f,.76f,.8f,.7f),-1);flowStreaks.Add((streak.transform,bottom+.1f,top-.1f,y-bottom));}
+            RectVisual("Waterfall source rock",world.transform,new Vector2(x,top+.12f),new Vector2(1.3f,.3f),new Color(.3f,.39f,.38f),-3);
+            RectVisual("Fall splash",world.transform,new Vector2(x+.3f,bottom+.05f),new Vector2(1.3f,.12f),new Color(.64f,.85f,.88f,.8f),4);
+        }
+        public void Speak(string id)=>SpeakText(id,Hud.Dialogue(id));
+        public void SpeakText(string id,string text){
+            LastDialogue=text;if(speech!=null)Destroy(speech.gameObject);var a=SliceSession.Anchors.First(x=>x.Id==id);
+            var words=text.Split(' ');string wrapped="",line="";
+            foreach(var word in words){if(line.Length+word.Length>32){wrapped+=line+"\n";line="";}line+=word+" ";}wrapped+=line;
+            speech=Label(wrapped,new Vector3((float)a.Position.X,(float)a.Position.Y+3.3f,0),world.transform,.05f);speechUntil=Session.Now+7;
         }
         private void BindSession(){Session.OnEvent=x=>Debug.Log("[VS1] "+x);}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
@@ -194,16 +222,17 @@ namespace HuyenLo.Runtime
         }
 #endif
         public void HandleMenuKey(string key){
-            if(key=="up")Hud.Navigate(-1);else if(key=="down"||key=="tab")Hud.Navigate(1);else if(key=="left")Hud.Navigate(-1);else if(key=="right")Hud.Navigate(1);else if(key=="activate")Hud.ActivateSelected();else if(key=="escape")Hud.Close();
+            if(key=="up")Hud.Navigate(-1);else if(key=="down")Hud.Navigate(1);else if(key=="tab")Hud.ChangeTab(1);else if(key=="left")Hud.Navigate(-1);else if(key=="right")Hud.Navigate(1);else if(key=="activate")Hud.ActivateSelected();else if(key=="escape")Hud.Back();
         }
         private void Update() {
             if(ExternalInput){combatEvents.Clear();return;}var k=Keyboard.current;if(k==null){combatEvents.Clear();return;}
             if(k.escapeKey.wasPressedThisFrame){if(Modal){Hud.Back();axis=0;combatEvents.Clear();return;}Hud.Close();Session.Combat.ClearFocus();axis=0;combatEvents.Clear();return;}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if(k.f9Key.wasPressedThisFrame)Hud.ToggleTrace();
             if(k.f8Key.wasPressedThisFrame){Hud.Toggle("debug");axis=0;combatEvents.Clear();return;}
 #endif
             if(k.iKey.wasPressedThisFrame){Hud.Toggle("bag");axis=0;combatEvents.Clear();return;}
-            if(k.cKey.wasPressedThisFrame){Hud.Toggle("stats");axis=0;combatEvents.Clear();return;}
+            if(k.cKey.wasPressedThisFrame){Hud.Toggle("equipment");axis=0;combatEvents.Clear();return;}
             if(k.qKey.wasPressedThisFrame){Hud.Toggle("quest");axis=0;combatEvents.Clear();return;}
             if(Modal){
                 axis=0;Session.Combat.CancelIntent();combatEvents.Clear();
@@ -211,7 +240,7 @@ namespace HuyenLo.Runtime
                 if(k.leftArrowKey.wasPressedThisFrame||k.aKey.wasPressedThisFrame)Hud.NavigateGrid(-1,0);
                 if(k.rightArrowKey.wasPressedThisFrame||k.dKey.wasPressedThisFrame)Hud.NavigateGrid(1,0);
                 if(k.downArrowKey.wasPressedThisFrame||k.sKey.wasPressedThisFrame)Hud.NavigateGrid(0,1);
-                if(k.tabKey.wasPressedThisFrame)Hud.Navigate(k.shiftKey.isPressed?-1:1);
+                if(k.tabKey.wasPressedThisFrame)Hud.ChangeTab(k.shiftKey.isPressed?-1:1);
                 if(k.enterKey.wasPressedThisFrame||k.numpadEnterKey.wasPressedThisFrame||k.eKey.wasPressedThisFrame)HandleMenuKey("activate");
                 return;
             }
@@ -270,7 +299,7 @@ namespace HuyenLo.Runtime
                 if(!Grounded||Physics2D.Raycast(foot,Vector2.down,.5f,1<<6).collider==null||Physics2D.Raycast(Body.position,new Vector2(move,0),.65f,1<<6).collider!=null)move=0;
             }
             if(!Session.Player.Alive||Modal)move=0;
-            float targetSpeed=move*RunSpeed*(float)Session.Player.Stats.Speed;
+            float targetSpeed=move*RunSpeed*(float)Session.Player.Stats.Speed*(float)BlockoutLayout.WaterSpeed(renderedMap,new Point(Body.position.x,playerCollider.bounds.min.y));
             float acceleration=Grounded?(move==0?GroundDeceleration:GroundAcceleration):(move==0?AirDeceleration:AirAcceleration);
             Body.linearVelocity=new Vector2(Mathf.MoveTowards(Body.linearVelocity.x,targetSpeed,acceleration*Time.fixedDeltaTime),Body.linearVelocity.y);
             if(move!=0&&Session.Combat.Running==null)Session.Combat.Facing=move;
@@ -281,17 +310,23 @@ namespace HuyenLo.Runtime
             if(!Session.Player.Alive && Session.Player.Map==Map.Village && Body.position.y<-8)Body.position=new Vector2((float)Session.Player.Position.X,.8f);
             cameraView.transform.position=Vector3.SmoothDamp(cameraView.transform.position,CameraTarget(),ref cameraVelocity,.13f,100,Time.deltaTime);
             foreach(var layer in scenery)layer.root.position=layer.home+new Vector3(cameraView.transform.position.x*layer.factor,0,0);
+            foreach(var flow in flowStreaks){var pos=flow.sprite.localPosition;pos.y=flow.top-Mathf.Repeat((float)Session.Now*.9f+flow.phase,flow.top-flow.bottom);flow.sprite.localPosition=pos;}
             foreach(var pair in npcMarkers){pair.Value.text=Hud.Marker(pair.Key);pair.Value.color=pair.Value.text=="?"?Color.yellow:pair.Value.text=="!"?new Color(.7f,.9f,.55f):Color.white;}
             if(speech!=null&&Session.Now>speechUntil){Destroy(speech.gameObject);speech=null;}
-            var inv=Session.Player.Inventory;torso.color=inv.Equipment.ContainsKey(GearSlot.Armor)?new Color(.3f,.7f,.5f):new Color(.55f,.55f,.6f);
-            pants.color=inv.Equipment.ContainsKey(GearSlot.Pants)?new Color(.25f,.55f,.5f):new Color(.25f,.3f,.4f);
-            weapon.enabled=inv.Equipment.TryGetValue(GearSlot.Weapon,out var visibleWeapon);weapon.color=visibleWeapon!=null&&visibleWeapon.Id=="sword1"?new Color(.75f,.87f,.83f):new Color(.6f,.4f,.2f);
-            weapon.transform.localPosition=new Vector3(Session.Combat.Facing*.4f,0,0);
             var action=Session.Combat.Running;
             float phase=action==null?0:Mathf.Clamp01((float)((Session.Now-action.Started)/action.Skill.Lock));
-            weapon.transform.localEulerAngles=new Vector3(0,0,action==null?0:Session.Combat.Facing*Mathf.Sin(phase*Mathf.PI)*-75);
-            torso.transform.localPosition=new Vector3(action==null?0:Session.Combat.Facing*.07f,.15f,0);
-            if(!Session.Player.Alive){torso.color=Color.gray;pants.color=Color.gray;}else if(Session.Now-Session.LastHurtAt<.12)torso.color=Color.white;
+            var parts=GeometricRig.Pose(Session.Player,Session.Combat.Facing,Session.Now,phase,action!=null,Body.linearVelocity.x).ToArray();
+            foreach(var oldPart in rig.Values)oldPart.enabled=false;
+            foreach(var part in parts){
+                if(!rig.TryGetValue(part.Name,out var sprite)){sprite=RectVisual(part.Name,playerVisual.transform,part.Center,part.Size,part.Color,part.Layer);rig.Add(part.Name,sprite);}
+                sprite.enabled=true;sprite.transform.localPosition=part.Center;sprite.transform.localScale=part.Size;sprite.transform.localEulerAngles=new Vector3(0,0,part.Angle);
+                sprite.color=!Session.Player.Alive?Color.gray:Session.Now-Session.LastHurtAt<.12?Color.white:part.Color;
+            }
+            if(Session.Now>=nextRipple&&Mathf.Abs(Body.linearVelocity.x)>.5f){
+                foreach(var puddle in water)if(Body.position.x>puddle.left&&Body.position.x<puddle.right&&BlockoutLayout.WaterSpeed(renderedMap,new Point(Body.position.x,playerCollider.bounds.min.y))<1){
+                    var ripple=Label("≈",new Vector3(Body.position.x,puddle.top+.12f,0),null,.07f);ripple.color=new Color(.6f,.84f,.86f);floating.Add((ripple,Time.time+.35f));nextRipple=Session.Now+.25;break;
+                }
+            }
             foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap)){
                 var view=mobViews[m.Id];view.gameObject.SetActive(m.Alive);view.enabled=m.Alive;if(!m.Dummy&&m.Level==4)view.transform.localScale=new Vector3(-m.Facing*.8f,.7f,1);var rendered=Vector2.Lerp(new Vector2((float)m.PreviousPosition.X,(float)m.PreviousPosition.Y),new Vector2((float)m.Position.X,(float)m.Position.Y),Mathf.Clamp01((Time.time-Time.fixedTime)/Time.fixedDeltaTime));view.transform.localPosition=rendered;
                 view.color=flashUntil.TryGetValue(m.Id,out var until)&&Session.Now<until?Color.white:m.Returning?Color.gray:m.Windup?new Color(1,.5f,.3f):m.Dummy?new Color(.65f,.5f,.25f):m.Level==2?new Color(.7f,.35f,.45f):new Color(.55f,.65f,.78f);

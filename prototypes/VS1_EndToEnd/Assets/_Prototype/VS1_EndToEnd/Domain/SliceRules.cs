@@ -165,7 +165,13 @@ namespace HuyenLo.Domain
         public Point Position,Home,PreviousPosition;
         public int Lane,ApproachSide;
         public double LaneMin=-10000,LaneMax=10000;
+        public double ActivityMin=-10000,ActivityMax=10000,PatrolGoal,PatrolPauseUntil;
+        public int PatrolDirection;
         public double Hp,MaxHp,Atk,Def,Acc,Eva,Speed,Range,Interval,NextAttack,HitAt,RespawnAt,ReturnSince=-1,QuestDamage,LastDamage;
+        // Probe telemetry: no gameplay decisions depend on the view or trace consumer.
+        public double DesiredX,VelocityX,RepositionUntil;
+        public int BiteAttempts;
+        public string Motion="idle",Occupancy="clear";
         public int Facing=1,QuestTag;
         public bool Dummy,Returning,Windup,Engaged;
         public bool Alive => Hp>0;
