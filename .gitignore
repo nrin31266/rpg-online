@@ -28,8 +28,11 @@ research/notes/*
 /prototypes/**/MemoryCaptures/
 /prototypes/**/.vs/
 
-# Disposable test/capture output: curated summaries and doc-linked PNGs are tracked instead.
+# Disposable test/capture output: media and logs stay local only
 /prototypes/**/Assets/InitTestScene*
 /prototypes/**/PrototypeEvidence/**/*.xml
 /prototypes/**/PrototypeEvidence/**/*.log
 /prototypes/**/PrototypeEvidence/**/*.mp4
+/prototypes/**/PrototypeEvidence/**/*.png
+/game/Validation/
+/game/PrototypeEvidence/
