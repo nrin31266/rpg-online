@@ -450,3 +450,110 @@ Fresh Q1–Q6 trên binary mới, flags OFF: [route-result](PrototypeEvidence/In
 | README.md | 90 → 90 | 45 → 45 | 6 → 6 |
 
 Kiểm cuối: EditMode87/87, PlayMode16/16 (gồm58 EditMode và10 PlayMode cũ); all-OFF replay trùng baseline. XML/log của lượt kiểm lại giữ ngoài repo trong backup bền vững thay vì `/tmp`; hash/path ở validation. Chỉ10 TXT/JSON lịch sử được re-route qua chỉ mục; evidence nhỏ và bảng đo giữ Git. Source hash hiện tại trùng source đã kiểm, gồm thay đổi cảnh quan trước task.
+
+
+<a id="single-behavior-history-1"></a>
+
+## Historical source fragments — 1_HUYEN_LO_GDD.md
+
+Các đoạn dưới đây giữ nguyên văn trước đồng bộ luật được chủ dự án duyệt. Chỉ là lịch sử; không áp dụng làm luật hiện hành. Source: `docs/design/1_HUYEN_LO_GDD.md`.
+
+### Source fragment 1.1
+
+````text
+**Current Design Version:** V6.2.4
+````
+
+### Source fragment 1.2
+
+````text
+**Status:** DESIGN + PROTOTYPE VALIDATION; production codebase chưa bắt đầu
+**Last Reviewed:** 2026-10-04 (feedback prototype; onboarding/control/navigation baseline đã sửa)
+````
+
+### Source fragment 1.3
+
+````text
+| Giai đoạn | Combat action | Identity |
+| --- | --- | --- |
+| Tân Lữ, chưa chuyển class | Basic Mộc Kiếm 1,00 × / CD 1,00 s / cận chiến 1,2 u; MP 0 | Onboarding Q3–Q5; giữ được ở Lv 5+ trước Q6 |
+| Kiếm, sau chuyển class | S1 single → thêm S2 arc → thêm S3 line; ba slot tích lũy | Áp sát, Bỏng; không Normal Attack thứ tư |
+| Cung, sau chuyển class | S1 single → thêm S2 spread → thêm S3 primary/explosion | Tầm xa, Băng Hàn; không Normal Attack thứ tư |
+````
+
+### Source fragment 1.4
+
+````text
+CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. ACQUIRE → RETAIN → REACQUIRE: chọn nearest eligible trong search bounds, tie stable entity ID; selection độc lập facing rồi auto-face khi start action. Search/retention khác execution range; reward level-gap không cấm combat/quest.
+````
+
+### Source fragment 1.5
+
+````text
+AUTO giữ target alive/eligible/cùng MapId/life còn đúng và còn relevant trong context; quái hơi gần hơn không cướp focus. Chết/invalid có thể acquire con gần hợp lệ tiếp theo; người chơi chủ động chạy/nhảy sang combat context khác có thể mất relevance. Hysteresis/search/retention/vertical bounds là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa. EXPLICIT do click là pinned: nearest và đổi slot không thay nó; chỉ explicit replacement/clear hoặc lifecycle invalid (death/despawn/generation/map) mới clear. Focus tồn tại không bảo đảm skill đánh tới; ngoài range không âm thầm đổi target để cast.
+````
+
+### Source fragment 1.6
+
+````text
+Thả phím không hủy pending một lần bấm; manual move/jump/drop, click đổi/clear focus, UI/Esc/death/chuyển map hủy nó ngay. Input skill hợp lệ mới thay pending/buffer cũ, không chồng nhiều đường chạy; không sửa action đã start. Bị blocked/quá xa/hết deadline/target invalid thì clear + feedback, không retry vô hạn. Một latest input buffer thử 150 ms chỉ quanh recovery ngắn khi skill sẽ sẵn; không FIFO hoặc queue dài qua CD/MP reject. Common action lock chặn action mới, đổi slot không reset CD. Cast start mới commit MP/CD và action origin; approach chỉ là movement, không đảm bảo hit hoặc miễn sát thương.
+````
+
+### Source fragment 1.7
+
+````text
+| Action | Logical resolve | Action lock |
+| --- | --- | --- |
+| Basic Tân Lữ | +0,10 s | 0,26 s |
+| Nhập môn single (hai class) | +0,12 s | 0,30 s |
+| Phong Trảm tiến cảnh | +0,14 s | 0,30 s |
+| Linh Tiễn tiến cảnh | Ba logical hits cùng +0,12 s | 0,34 s |
+| Kiếm Khí | +0,16 s | 0,40 s |
+| Hàn Tiễn | +0,18 s | 0,40 s |
+````
+
+### Source fragment 1.8
+
+````text
+**Melee crowd feel — baseline nguyên tắc, exact behavior TUNABLE:** soft separation và mục tiêu đứng lệch nhau trên lane giúp 2–4 con còn trong tầm AoE nhưng không trùng một điểm. Sau đòn, có bước chỉnh vị trí/lùi ngắn khi hợp lệ; không bắt mọi loài lùi mỗi hit hoặc đồng bộ cả đàn. Reposition dùng recovery/interval hiện có, không tự giảm attack interval hoặc thêm guaranteed safe window. Windup/hit origin đã start không bị steering sửa; không knockback/body shove. Thử offset attack positions theo trái/phải cùng lane, ưu tiên khoảng trống + stable ID; **không khóa 3–4 slot**, vòng tròn bao player, group attack token hay formation subsystem. Cố định phase lệch nhau theo life để tránh đồng loạt cắn; spacing/time/offset kiểm PHY-01, không suy DPS mới từ mô hình cũ.
+````
+
+### Source fragment 1.9
+
+````text
+| Phím | Action | Phím | Action |
+| --- | --- | --- | --- |
+| A / ←, D / → | Move trái / phải | H | Quick HP Potion |
+| Space / ↑ | Jump | M | Quick MP Potion |
+| S / ↓ | Drop-through trên one-way đang đứng | F | Food |
+| — | — | E | Interact / Pickup (không dùng cho MapExit thường) |
+| 1 | Basic Tân Lữ / Select S1 + one-shot approach/cast | I | Inventory |
+| 2 | Select S2 + one-shot approach/cast | C | Character + skill tab |
+| 3 | Select S3 + one-shot approach/cast | Q | Quest |
+| R | Buff P1 | Enter | Chat |
+| Esc | Cancel | — | — |
+````
+
+### Source fragment 1.10
+
+````text
+**Binding baseline cho prototype tiếp theo:** I Inventory, C Character (gồm skill tab), Q Quest; không B/K/L panel bindings song song. Đây là bộ mặc định để kiểm usability, chưa cam kết tối ưu hoặc thêm key-remapping P0. Space/↑ và S/↓ là OR action; drop chỉ trên one-way đang đứng, không crouch/đi xuyên solid. Nếu Jump + Drop cùng frame trên one-way thì Drop ưu tiên; trên solid Jump vẫn hợp lệ.
+````
+
+### Source fragment 1.11
+
+````text
+**Menu bằng bàn phím:** Interact mở NPC với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: ↑/↓ hoặc W/S, Tab/Shift+Tab đổi lựa chọn; Enter hoặc Interact xác nhận; Esc đóng. Arrow/Space/1–3 không lọt thành movement/cast khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở đây là UI navigation, không thêm combat target cycling. Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Click explicit focus vẫn tùy chọn; auto-acquire và clear focus đủ cho route keyboard.
+````
+
+### Source fragment 1.12
+
+````text
+Phím H/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Phím F dùng Food bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. E tác động ngay candidate NPC/loot riêng, không thay CombatFocus.
+````
+
+### Source fragment 1.13
+
+````text
+**Đóng giao diện theo thao tác:** nhận/trả quest, nhập phái và nghỉ thành công đóng hội thoại để tiếp tục đi; câu xác nhận vẫn hiện trên NPC/tracker. Lỗi/reject giữ view và reason. Buy/Sell/Store/Take giữ view để làm nhiều lần; Esc lùi một submenu, ở root thì đóng. Equip/Unequip/Learn thành công trở về view chứa item/slot; tab switch đi trực tiếp tới view mới, không giữ submenu cũ. Intro hiện trước khi nhận quest; không bỏ narrative chỉ vì auto-close.
+````

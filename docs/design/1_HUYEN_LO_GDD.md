@@ -1,10 +1,18 @@
 # RPG Online: Huyền Lộ
+
+## Tóm tắt
+
+Luật game và scope TARGET do GDD quyết định. Ba active/class, input bàn phím đầy đủ, combat theo authority; prototype không nghiệm thu production. Số BASELINE/TUNABLE giữ đúng nhãn.
+
+## Tìm gì ở đâu
+
+- [CombatFocus / đổi mục tiêu](#focus-input), [pending / buffer / arrival](#pending-cast), [Esc](#escape-priority).
+- [Quái / bãi](#world-farm), [crowd melee](#melee-crowd), [Q1–Q12](#quests-story).
+- [Phím / dùng đồ nhanh](#ux-art), [Quick Potion / Food](#quick-items), [nghiệm thu](#acceptance-routing).
 ## Tài liệu thiết kế game
 
-**Current Design Version:** V6.2.4
-
 **Status:** DESIGN + PROTOTYPE VALIDATION; production codebase chưa bắt đầu
-**Last Reviewed:** 2026-10-04 (feedback prototype; onboarding/control/navigation baseline đã sửa)
+**Ngày đối chiếu:** 2026-10-05
 
 <a id="gdd-0"></a>
 
@@ -128,7 +136,7 @@ Tẩy Mạch Phù: 1.200 Vàng tại Tạ Minh, stock vô hạn; hoàn điểm v
 
 | Giai đoạn | Combat action | Identity |
 | --- | --- | --- |
-| Tân Lữ, chưa chuyển class | Basic Mộc Kiếm 1,00 × / CD 1,00 s / cận chiến 1,2 u; MP 0 | Onboarding Q3–Q5; giữ được ở Lv 5+ trước Q6 |
+| Tân Lữ, chưa chuyển class | Basic Mộc Kiếm 1,00 × / CD 0,70 s / cận chiến 1,2 u; MP 0 | Onboarding Q3–Q5; giữ được ở Lv 5+ trước Q6 |
 | Kiếm, sau chuyển class | S1 single → thêm S2 arc → thêm S3 line; ba slot tích lũy | Áp sát, Bỏng; không Normal Attack thứ tư |
 | Cung, sau chuyển class | S1 single → thêm S2 spread → thêm S3 primary/explosion | Tầm xa, Băng Hàn; không Normal Attack thứ tư |
 
@@ -176,9 +184,15 @@ Tầm đánh trong skill profiles là tầm thực, không cộng thêm nội t�
 
 ## CombatFocus, một lần bấm skill và interaction
 
-CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. ACQUIRE → RETAIN → REACQUIRE: chọn nearest eligible trong search bounds, tie stable entity ID; selection độc lập facing rồi auto-face khi start action. Search/retention khác execution range; reward level-gap không cấm combat/quest.
+CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. Selection chọn nearest eligible trong local envelope, tie stable entity ID, rồi mới auto-face khi start action. Search/retention khác execution range; reward level-gap không cấm combat/quest. Search/retention/vertical bounds và hysteresis là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa.
 
-AUTO giữ target alive/eligible/cùng MapId/life còn đúng và còn relevant trong context; quái hơi gần hơn không cướp focus. Chết/invalid có thể acquire con gần hợp lệ tiếp theo; người chơi chủ động chạy/nhảy sang combat context khác có thể mất relevance. Hysteresis/search/retention/vertical bounds là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa. EXPLICIT do click là pinned: nearest và đổi slot không thay nó; chỉ explicit replacement/clear hoặc lifecycle invalid (death/despawn/generation/map) mới clear. Focus tồn tại không bảo đảm skill đánh tới; ngoài range không âm thầm đổi target để cast.
+| Trạng thái / input | Luật giữ và đổi mục tiêu |
+| --- | --- |
+| NONE / AUTO | Acquire gần nhất hợp lệ; AUTO không cướp focus còn relevant vì con khác gần hơn. |
+| Click / world Tab / Shift+Tab | Chọn EXPLICIT; cycle tiến/lùi, wrap, chỉ eligible trong envelope. Thứ tự khoảng cách ngang rồi authored SpawnSlot ID ổn định. |
+| RETAIN AUTO / EXPLICIT | Giữ đúng ID/generation/life và MapId; focus ngoài execution range không tự đổi đích để cast. |
+| Esc clear / death / despawn / generation invalid / ra khỏi envelope / chuyển map | Clear focus, trở về chế độ auto-acquire; không tự tạo cast. AUTO mất relevance do đổi combat context cũng clear. |
+| Đổi / clear focus khi pending | Hủy pending/buffer cũ; lần bấm mới mới được cast vào đích mới. |
 
 1/2/3 chọn unlocked S1/S2/S3 và yêu cầu thực thi **đúng một lần cho mỗi physical press**; Tân Lữ dùng **1 = basic Mộc Kiếm** cùng pipeline, 2/3 khóa. Bỏ binding combat J và RepeatOnHold cho mọi profile. Giữ phím không lặp cast, không lặp approach, không sinh intent mới. Slot hợp lệ được chọn cả khi attempt reject; locked slot không đổi selection hoặc hủy action đã accepted. SelectedSlot là cue UX, không cần một phím execute khác. Running action giữ SkillId/profile snapshot.
 
@@ -186,7 +200,22 @@ Không focus: physical press acquire nearest eligible **trong local search/appro
 
 Hơi ngoài range: một press có thể tạo **một pending cast + bounded horizontal approach**, tới tầm thì revalidate và cast một lần. Target ID/generation + requested SkillId được giữ trong pending intent; không cast target khác khi con đó chết/invalid. Reacquire chỉ cho press mới. Budget tính quãng còn thiếu ngoài execution range từng profile, timeout/progress/blocked tolerance TUNABLE; không chạy sang bãi xa hoặc qua tầng khác. Không auto jump/drop/dash/pathfinding/vượt mép hoặc terrain không đi được. CD dài/thiếu MP/skill khóa reject trước approach, không đứng chờ hồi để tự nổ.
 
-Thả phím không hủy pending một lần bấm; manual move/jump/drop, click đổi/clear focus, UI/Esc/death/chuyển map hủy nó ngay. Input skill hợp lệ mới thay pending/buffer cũ, không chồng nhiều đường chạy; không sửa action đã start. Bị blocked/quá xa/hết deadline/target invalid thì clear + feedback, không retry vô hạn. Một latest input buffer thử 150 ms chỉ quanh recovery ngắn khi skill sẽ sẵn; không FIFO hoặc queue dài qua CD/MP reject. Common action lock chặn action mới, đổi slot không reset CD. Cast start mới commit MP/CD và action origin; approach chỉ là movement, không đảm bảo hit hoặc miễn sát thương.
+<a id="pending-cast"></a>
+
+| Điều kiện | Pending / buffer / commit |
+| --- | --- |
+| Press skill khi đang giữ phím chạy | Snapshot các phím ngang đang giữ. Trong pending, bỏ qua trục đó, kể cả đang giữ ngược hướng; cast/fail/cancel xong trả quyền cho trục đang giữ. |
+| Thả phím skill | Không hủy pending; giữ phím không tạo thêm intent. |
+| KeyDown mới của phím di chuyển / Jump / Drop / đổi hoặc clear focus / mở UI hoặc chat / death / chuyển map | Hủy pending/buffer ngay; không sửa action đã start. |
+| ActionLock hoặc CD chưa sẵn | Chỉ giữ một latest buffer **0,18 s**, nếu cả lock và CD sẽ sẵn trong cửa sổ; không bắt đầu approach trong lock. CD lâu hơn cửa sổ thì reject. Không FIFO hoặc queue dài. |
+| Press unlocked mới | Thay pending/buffer cũ, không chồng nhiều đường chạy; locked slot không thay intent đã accepted. |
+| Approach cắt vùng EdgeExit / blocked / quá xa / hết deadline | Hủy sạch + reason; không MP/CD, không retry vô hạn. Approach không kích hoạt EdgeExit. |
+| Arrival | Kiểm lại target alive, đúng ID/generation/life, không Returning, cùng MapId; player sống/không CC; skill unlocked/learned/weapon hợp lệ; đủ MP, CD sẵn, hết lock; range/shape ở origin thực. Fail trả enum reason, không MP/CD. |
+| Accepted cast start | Mới snapshot source/action origin và commit MP/CD. Approach không bảo đảm hit hoặc miễn sát thương; đổi slot không reset CD. |
+
+<a id="escape-priority"></a>
+
+**Esc, mỗi lần chỉ xử lý một tầng:** đóng/lùi modal hoặc chat → nếu đang pending/buffer thì hủy → nếu có focus thì clear → nếu không có gì thì no-op. Không rơi tiếp xuống thao tác gameplay trong cùng lần bấm.
 
 Gravity/horizontal momentum tiếp tục khi Novice/S1 cast trên không; airborne permissions S2/S3 còn prototype. Damage thường chỉ HP/flash/text/impact, không Hurt state/hit-stun/knockback/interrupt. Terminal/death → hard CC đúng category → unresolved action; không recovery cancel jump/dash P0.
 
@@ -206,7 +235,7 @@ Một action lock chung; CD / MP commit tại cast start, basic Tân Lữ cũng 
 
 | Action | Logical resolve | Action lock |
 | --- | --- | --- |
-| Basic Tân Lữ | +0,10 s | 0,26 s |
+| Basic Tân Lữ | +0,10 s | 0,32 s |
 | Nhập môn single (hai class) | +0,12 s | 0,30 s |
 | Phong Trảm tiến cảnh | +0,14 s | 0,30 s |
 | Linh Tiễn tiến cảnh | Ba logical hits cùng +0,12 s | 0,34 s |
@@ -349,7 +378,13 @@ TTK target cùng level + Common + 0: early 2–4 s, mid 3–6 s, late 4–8 s TE
 
 **Mob attack contract:** đi qua aggro radius vẫn bị acquire / chase, body overlap không gây damage. Melee: Acquire → Chase → attack range → Face → Windup / lock facing → HitMoment / front hitbox → Recovery / reposition ngắn khi có chỗ hợp lệ → tiếp cận lại. Target chạy xuyên ra sau / nhảy ra khỏi vertical range / rời hitbox trước HitMoment thì MISS; không guaranteed damage vì animation đã start, không quay 180° giữa swing. Ranged / Hybrid: Acquire → Aim / Windup → resolveMoment → authority logical target resolve → result → visual projectile; AnimationEvent chỉ visual. Mob normal attack power 1.0, CritChance 0 P0; formula Damage chung, exact hitbox / windup tại PHY-01 / ART-01.
 
-**Melee crowd feel — baseline nguyên tắc, exact behavior TUNABLE:** soft separation và mục tiêu đứng lệch nhau trên lane giúp 2–4 con còn trong tầm AoE nhưng không trùng một điểm. Sau đòn, có bước chỉnh vị trí/lùi ngắn khi hợp lệ; không bắt mọi loài lùi mỗi hit hoặc đồng bộ cả đàn. Reposition dùng recovery/interval hiện có, không tự giảm attack interval hoặc thêm guaranteed safe window. Windup/hit origin đã start không bị steering sửa; không knockback/body shove. Thử offset attack positions theo trái/phải cùng lane, ưu tiên khoảng trống + stable ID; **không khóa 3–4 slot**, vòng tròn bao player, group attack token hay formation subsystem. Cố định phase lệch nhau theo life để tránh đồng loạt cắn; spacing/time/offset kiểm PHY-01, không suy DPS mới từ mô hình cũ.
+<a id="melee-crowd"></a>
+
+**Melee crowd:** đứng lệch trên lane, ưu tiên khoảng trống trái/phải; hòa thì authored SpawnSlot ID ổn định. Không lật cánh ngay sau cắn. Chỉ đổi khi player chạy xuyên qua hoặc mép lane chặn phía hiện tại, rồi khóa đổi cánh **1,5 s**. Facing có deadband; exact deadband/spacing/offset là TUNABLE.
+
+- Soft separation là steering nhẹ, không đẩy body/shoving. Không khóa 3–4 slot, vòng tròn bao player, group attack token hay formation subsystem.
+- Reposition/lùi ngắn chỉ khi có chỗ hợp lệ, không bắt mọi loài lùi mỗi hit hoặc đồng bộ đàn. Dùng recovery/interval hiện có; không đổi range/tốc độ/interval/HP hoặc thêm guaranteed safe window.
+- Windup/hit origin đã start không bị steering sửa; không knockback. Giữ phase lệch nhau theo life; spacing/time/offset kiểm PHY-01, không suy DPS mới từ mô hình cũ.
 
 **Mob / Linh Biến threat:** một `Threat[playerId]` và `Contribution[playerId]` riêng mỗi mob. Initial acquire nearest valid player hoặc attacker đầu tiên; direct / DoT cộng ActualHpLost (cap overkill, dedup), không raw damage. Sticky target: challenger có threat>0 và ≥ 1,25 × current mới đổi; current invalid / dead / disconnect / khác MapId / out-of-leash thì chọn highest valid threat, tie playerId; nếu không có threat chọn nearest valid trong aggro. Báo động cụm chỉ wake, từng mob tự acquire / resolve. Return về spawn full HP, clear threat / contribution / status, hủy pending action; không giữ damage từ lượt kéo trước. Linh Biến dùng cùng resolver, không nearest-only sau acquire.
 
@@ -682,25 +717,27 @@ Một Move action: A/← và D/→ là alternate bindings, không cộng đôi t
 
 | Phím | Action | Phím | Action |
 | --- | --- | --- | --- |
-| A / ←, D / → | Move trái / phải | H | Quick HP Potion |
-| Space / ↑ | Jump | M | Quick MP Potion |
+| A / ←, D / → | Move trái / phải | 4 / H | Quick HP Potion |
+| Space / ↑ | Jump | 5 / M | Quick MP Potion |
 | S / ↓ | Drop-through trên one-way đang đứng | F | Food |
 | — | — | E | Interact / Pickup (không dùng cho MapExit thường) |
 | 1 | Basic Tân Lữ / Select S1 + one-shot approach/cast | I | Inventory |
 | 2 | Select S2 + one-shot approach/cast | C | Character + skill tab |
 | 3 | Select S3 + one-shot approach/cast | Q | Quest |
 | R | Buff P1 | Enter | Chat |
-| Esc | Cancel | — | — |
+| Esc | [Ưu tiên đóng/hủy/clear](#escape-priority) | Tab / Shift+Tab | World: cycle target; modal: đổi trang/lựa chọn |
 
-**Binding baseline cho prototype tiếp theo:** I Inventory, C Character (gồm skill tab), Q Quest; không B/K/L panel bindings song song. Đây là bộ mặc định để kiểm usability, chưa cam kết tối ưu hoặc thêm key-remapping P0. Space/↑ và S/↓ là OR action; drop chỉ trên one-way đang đứng, không crouch/đi xuyên solid. Nếu Jump + Drop cùng frame trên one-way thì Drop ưu tiên; trên solid Jump vẫn hợp lệ.
+**Bindings menu P0:** I Inventory, C Character (gồm skill tab), Q Quest; không B/K/L panel bindings song song. Đây là bộ mặc định để kiểm usability, chưa cam kết tối ưu hoặc thêm key-remapping P0. Space/↑ và S/↓ là OR action; drop chỉ trên one-way đang đứng, không crouch/đi xuyên solid. Nếu Jump + Drop cùng frame trên one-way thì Drop ưu tiên; trên solid Jump vẫn hợp lệ.
 
 **View inventory/NPC:** NPC hiện hội thoại ngắn và marker `!` khi Available, `?` khi Ready; chọn chức năng rồi mở submenu riêng (mua, bán, gửi/lấy rương), không trải mọi item/action trên một menu NPC. Hành trang 30 ô dùng lưới icon + stack count, một bảng chi tiết cho ô đang chọn; Enter/Interact mở thao tác của đúng instance. Trang bị nằm ở view Nhân vật với hình người và sáu slot quanh hình, tách khỏi bag grid. Arrow/WASD/Tab navigation, mouse click, Enter/Interact và Esc/back dùng cùng commands; không bắt click. Chi tiết bố cục ở [Art — map/UI blockout](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#icons-ui).
 
-**Menu bằng bàn phím:** Interact mở NPC với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: ↑/↓ hoặc W/S, Tab/Shift+Tab đổi lựa chọn; Enter hoặc Interact xác nhận; Esc đóng. Arrow/Space/1–3 không lọt thành movement/cast khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở đây là UI navigation, không thêm combat target cycling. Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Click explicit focus vẫn tùy chọn; auto-acquire và clear focus đủ cho route keyboard.
+**Menu bằng bàn phím:** Interact mở NPC với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: ↑/↓ hoặc W/S, Tab/Shift+Tab đổi lựa chọn; Enter hoặc Interact xác nhận; Esc đóng. Arrow/Space/1–3 không lọt thành movement/cast khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở modal là UI navigation; ở world dùng [CycleTarget](#focus-input). Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Đổi mục tiêu và vòng đời focus theo [§3](#focus-input); menu không nhận world CycleTarget.
 
 **Movement Feel gate:** coyote time, jump input buffer, variable height theo release, ground acceleration/deceleration và fall tuning là PROTOTYPE; không khóa số trước collider/scale/map/art sample. Không thêm double-jump/dash. Drop không hưởng coyote để nhảy bật ngược lên sàn; authority và client phải dùng cùng semantics. Xem contract/probe Technical.
 
-Phím H/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Phím F dùng Food bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. E tác động ngay candidate NPC/loot riêng, không thay CombatFocus.
+<a id="quick-items"></a>
+
+Phím 4/H và 5/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Phím F dùng Food bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. 4/5 chỉ dùng bình, không chọn skill. Q6 hiển thị glyph 5/M. E tác động ngay candidate NPC/loot riêng, không thay CombatFocus. [Approach không kích hoạt EdgeExit](#pending-cast).
 
 Target HUD tối giản: world marker + mini HP; screen name/level/current-max HP/bar, bind đúng focus ID/generation; không portrait/element/rarity/generic buff panel.
 
@@ -761,7 +798,7 @@ Production accounting thuộc [Art §23](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYS
 
 **RPG menu navigation:** I mở Hành trang, C mở Trang bị, Q mở Nhiệm vụ. Trong shell nhân vật có năm tab Hành trang / Trang bị / Thuộc tính / Thông số / Kỹ năng; Tab và Shift+Tab đổi view, mũi tên chọn ô/action, Enter/E xác nhận, Esc quay lại. Mouse gọi cùng command/validation. Trang bị có sáu slot + preview; Thuộc tính chỉ phân STR/VIT/INT/AGI và điểm chưa dùng; Thông số đọc HP/MP/ATK/DEF/ACC/EVA/Crit/MoveSpeed/Class/Lv/EXP. Bag detail có thao tác trực tiếp theo context; empty weapon slot vẫn mở hành trang lọc Vũ khí. Store/Take chỉ tại rương, Buy/Sell chỉ tại shop, không thêm command gameplay mới. Exact layout là UX probe.
 
-**Đóng giao diện theo thao tác:** nhận/trả quest, nhập phái và nghỉ thành công đóng hội thoại để tiếp tục đi; câu xác nhận vẫn hiện trên NPC/tracker. Lỗi/reject giữ view và reason. Buy/Sell/Store/Take giữ view để làm nhiều lần; Esc lùi một submenu, ở root thì đóng. Equip/Unequip/Learn thành công trở về view chứa item/slot; tab switch đi trực tiếp tới view mới, không giữ submenu cũ. Intro hiện trước khi nhận quest; không bỏ narrative chỉ vì auto-close.
+**Đóng giao diện theo thao tác:** nhận/trả quest, nhập phái và nghỉ thành công đóng hội thoại để tiếp tục đi; câu xác nhận vẫn hiện trên NPC/tracker. Lỗi/reject giữ view và reason. Buy/Sell/Store/Take giữ view để làm nhiều lần; Esc lùi một submenu, ở root thì đóng. Equip/Unequip/Learn thành công trở về view chứa item/slot; tab switch đi trực tiếp tới view mới, không giữ submenu cũ; [Esc ưu tiên theo context](#escape-priority). Intro hiện trước khi nhận quest; không bỏ narrative chỉ vì auto-close.
 
 
 **Onboarding text:** Q1–Q6 dùng 1–3 câu nhận quest, phản hồi NPC trung gian và một câu khi trả; tracker nêu việc → khu vực/đường đi → NPC tiếp theo. Không thêm QuestId, số kill, EXP hay reward từ việc mở rộng hội thoại. Q4 tutorial supply vẫn chỉ đúng active step; Q6 giữ gate tự tháo Mộc Kiếm trước nhập phái.
