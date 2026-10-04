@@ -1,5 +1,15 @@
 # Huyền Lộ — Phân tích thiết kế
 
+## Tóm tắt
+
+Giữ phép tính, mô hình và rationale với giới hạn rõ. Input/cadence đã được chủ dự án duyệt, không còn proposal riêng. Dùng findings có sẵn để ghi rủi ro; không chạy đo mới. Các open decisions thật nằm ở §5.
+
+## Tìm gì ở đâu
+
+- [Chỉ số / TTK](#character-evidence), [farm](#farm-progression), [kinh tế](#economy-analysis).
+- [Onboarding / áp lực nhận damage / câu hỏi còn mở](#novice-onboarding-evidence).
+- [Gate / quyết định](#open-decisions), [A01–A17](#art-open-decisions), [rationale combat](#design-lock-rationale).
+
 **Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md) · **Ngày:** 2026-10-04 · **Vai trò:** evidence, simulation và quyết định mở.
 
 GDD là design authority; Technical là implementation contract. **DERIVED** là phép tính từ GDD; **SIMULATION** phụ thuộc giả định; **PROPOSAL** chưa thành luật. DESIGN LOCK SYNC 2026-10-03 thay progression/rotation/target resolution: các mô hình combat, sustain, status cadence, farm scheduler, journey, PvP và Boss bên dưới là **LEGACY SIMULATION**, giữ nguyên số để đối chiếu, cần chạy lại với ba skill tích lũy/CD độc lập và không class Normal. Stat/gear/EXP/enhance/payout arithmetic vẫn xác định theo luật không đổi. Chưa có Unity/runtime acceptance của các mô hình.
@@ -8,7 +18,7 @@ GDD là design authority; Technical là implementation contract. **DERIVED** là
 
 # 1. Phương pháp, đối chiếu và giới hạn
 
-Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. Các mô hình dưới đây không nghiệm thu runtime; kết quả bản mẫu thuộc [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
+Bộ power/MP/CD/gear làm control giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. Các mô hình dưới đây không nghiệm thu runtime; kết quả bản mẫu thuộc [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
 
 **Nguồn đầu vào:** [nhân vật](1_HUYEN_LO_GDD.md#character-power), [kỹ năng/trạng thái](1_HUYEN_LO_GDD.md#class-combat), [quái và bãi](1_HUYEN_LO_GDD.md#world-farm), [trang bị/thưởng](1_HUYEN_LO_GDD.md#gear-economy), [Food/Bình](1_HUYEN_LO_GDD.md#consumables-death). Analysis không giữ catalog thứ hai.
 
@@ -31,7 +41,7 @@ Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve
 
 Mỗi cấp sau Lv 1 cho 5 điểm; Lv 20 có 95 điểm. Sau Q5 catch-up Lv 5, trước Q6 chọn phái có 20 điểm **chưa phân** sau lần hoàn điểm nhập môn; Q4 Nấm và Q5 Sói theo baseline route không yêu cầu đánh sau reset này; farm thêm có thể đạt Lv5 sớm, vẫn giữ basic Tân Lữ/quest supply và không reset lần hai. Bản cân bằng sau chọn phái chia gần đều: điểm dư lần lượt vào Sinh Lực, Linh Lực, Công Lực, rồi Thân Pháp; không mặc định dồn phần dư cho Thân Pháp.
 
-**Cách tính:** nền theo cấp + điểm + trang bị đã tính phẩm chất/cường hóa/Tinh Hoa, sau đó mới áp nội tại nền tảng một lần. Các hàng sau chọn phái dùng sáu món Common +0 theo mốc mặc, gồm Chí mạng trên Kiếm, Chính xác trên Cung và tốc chạy trên Giày (Lv 5/10 bậc I, Lv 13 bậc II, Lv 17/20 bậc III); đây là bộ kiểm chỉ số, không giả định người chơi đã mua đủ set. Trong các ô ghi hai số, thứ tự luôn là **Kiếm / Cung**. Hồ sơ Lv 5 trước chọn phái trong bảng là **stat fixture V6.2.0** với Mộc Kiếm + Quần I, chưa hưởng nội tại; không mô tả inventory route V6.2.1 đã nhận Áo từ Q4. Giữ số để đối chiếu, không tự cộng lại bảng này thành acceptance mới. Chính xác/Né tránh là chỉ số thô dùng trong công thức né, không phải phần trăm trúng/né; Cung được nhân Chính xác ×1,08 sau khi cộng điểm và trang bị. Tốc chạy tăng so với nền gồm +0,05% mỗi điểm Thân Pháp và bonus Giày cố định 1/2/3% theo bậc.
+**Cách tính:** nền theo cấp + điểm + trang bị đã tính phẩm chất/cường hóa/Tinh Hoa, sau đó mới áp nội tại nền tảng một lần. Các hàng sau chọn phái dùng sáu món Common +0 theo mốc mặc, gồm Chí mạng trên Kiếm, Chính xác trên Cung và tốc chạy trên Giày (Lv 5/10 bậc I, Lv 13 bậc II, Lv 17/20 bậc III); đây là bộ kiểm chỉ số, không giả định người chơi đã mua đủ set. Trong các ô ghi hai số, thứ tự luôn là **Kiếm / Cung**. Hồ sơ Lv 5 trước chọn phái trong bảng là **stat fixture ** với Mộc Kiếm + Quần I, chưa hưởng nội tại; không mô tả inventory route đã nhận Áo từ Q4. Giữ số để đối chiếu, không tự cộng lại bảng này thành acceptance mới. Chính xác/Né tránh là chỉ số thô dùng trong công thức né, không phải phần trăm trúng/né; Cung được nhân Chính xác ×1,08 sau khi cộng điểm và trang bị. Tốc chạy tăng so với nền gồm +0,05% mỗi điểm Thân Pháp và bonus Giày cố định 1/2/3% theo bậc.
 
 | Mốc / hồ sơ | Tổng điểm | Công Lực | Sinh Lực | Linh Lực | Thân Pháp | Chưa dùng | Máu Kiếm / Cung | Linh lực Kiếm / Cung | ATK | DEF Kiếm / Cung | Chính xác Kiếm / Cung | Né tránh | Chí mạng Kiếm / Cung | Tốc chạy tăng |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -77,7 +87,7 @@ Mô hình 24 hạt giống, timeline giả lập; một mục tiêu/ba mục ti�
 | Lv 20 chính tuyến / Cổ Vệ | 8,40 / 9,01 | 11,87 / 17,64 |
 | Lv 20 Epic III +8 / Cổ Vệ | 7,59 / 8,50 | 10,26 / 15,54 |
 
-Sói Sương Lv 4 tại Lv 5 là quái thấp cấp sau cú nhảy chọn phái, nên hạ trong ~1,4 s; Tân Lữ Lv 4 với Mộc Kiếm hạ trong ~3,9 s. Cụm ba/bốn con ở Lv 8+ còn sống qua nhiều action, cho kỹ năng đánh lan giá trị. Q8 Sói Trúc Linh Biến có **1.695 HP**, với đồ kỳ vọng mất **22,7/23,7 s** (Kiếm/Cung) solo. Q10 ở Lv 15 đánh ba Đạo Tặc mất **10,0/14,0 s**; Đạo Tặc Lv 13 còn thưởng đủ. Lv 15 đánh Thạch Lv 16 trước đại chiêu hơi chậm. Trước Q11, Lv 17 đánh ba Thạch bằng đồ II mất **8,8/13,3 s**; cần kiểm né và dùng thuốc trong cảnh thật để tránh kẹt khi ba quái cùng áp sát.
+Sói Sương Lv 4 tại Lv 5 là quái thấp cấp sau cú nhảy chọn phái, nên hạ trong ~1,4 s; Tân Lữ Lv 4 với Mộc Kiếm ~3,9 s là mốc mô hình cũ, không phải TTK của nhịp đã duyệt; xem [kiểm chứng onboarding](#novice-onboarding-evidence). Cụm ba/bốn con ở Lv 8+ còn sống qua nhiều action, cho kỹ năng đánh lan giá trị. Q8 Sói Trúc Linh Biến có **1.695 HP**, với đồ kỳ vọng mất **22,7/23,7 s** (Kiếm/Cung) solo. Q10 ở Lv 15 đánh ba Đạo Tặc mất **10,0/14,0 s**; Đạo Tặc Lv 13 còn thưởng đủ. Lv 15 đánh Thạch Lv 16 trước đại chiêu hơi chậm. Trước Q11, Lv 17 đánh ba Thạch bằng đồ II mất **8,8/13,3 s**; cần kiểm né và dùng thuốc trong cảnh thật để tránh kẹt khi ba quái cùng áp sát.
 
 | Hồ sơ Lv 20, Common III +0 | Linh lực Kiếm / Cung | Thiếu Linh lực mỗi giây Kiếm / Cung |
 | --- | ---: | ---: |
@@ -162,7 +172,7 @@ Winner đã nộp `W` nên lãi ròng `0,8W`; loser mất `W`. DRAW mỗi ngư�
 
 <a id="art-combat-timing-evidence"></a>
 
-**LEGACY TIMING/ROTATION EVIDENCE V6.1:** toàn bộ các bảng/phép tính trong nhóm timing/sustain/proc sau đây giả định class Normal + evolution overwrite. Giữ nguyên để đối chiếu; các recommendation cũ không còn luật. GDD §3 hiện dùng basic chỉ Tân Lữ, ba class SkillIds độc lập, logical ranged batch.
+**LEGACY TIMING/ROTATION EVIDENCE :** toàn bộ các bảng/phép tính trong nhóm timing/sustain/proc sau đây giả định class Normal + evolution overwrite. Giữ nguyên để đối chiếu; các recommendation cũ không còn luật. GDD §3 hiện dùng basic chỉ Tân Lữ, ba class SkillIds độc lập, logical ranged batch.
 
 
 ## Evidence timing từ Art — giữ baseline, chưa retune
@@ -182,7 +192,7 @@ Phần này chuyển đầy đủ từ Art §10/§10.1/§10.2 ngày 2026-10-03. 
 
 Timing contract là **anticipation → release/hit mốc server → recovery**, tách interval/CD/action lock/flight/VFX decay. Skill4 ở12 FPS dài0,333 s >lock nhập môn0,30 s: nếu giữ duration đều sẽ trễ pose return hoặc khóa người chơi ngoài luật. Đề xuất sampling theo normalized action phase, đặt release khớp mốc server, cắt/chuyển recovery khi action mới hợp lệ; main VFX có thể tan sau actor về Idle. Không queue thêm hit do frame skipped.
 
-**LEGACY / SUPERSEDED — class Normal V6.1, không phải reasoning hiện hành:** Normal từng không MP, lấp quãng CD/MP thiếu và gây damage ổn định. Trong giả định skill luôn sẵn đúng CD, Lv10 core chiếm lock khoảng0,30/1,5 hoặc0,34/1,7 =**20% thời gian**; Lv17 thêm0,40/7≈5,7%. Đây chỉ là occupancy suy ra, không bảo đảm normal đạt full attack rate vì mốc CD có thể đụng nhau. Cần log số normal/skill/idle do MP và action lock; không kết luận normal vô dụng từ CD1 s của Lv5.
+**LEGACY / SUPERSEDED — class Normal , không phải reasoning hiện hành:** Normal từng không MP, lấp quãng CD/MP thiếu và gây damage ổn định. Trong giả định skill luôn sẵn đúng CD, Lv10 core chiếm lock khoảng0,30/1,5 hoặc0,34/1,7 =**20% thời gian**; Lv17 thêm0,40/7≈5,7%. Đây chỉ là occupancy suy ra, không bảo đảm normal đạt full attack rate vì mốc CD có thể đụng nhau. Cần log số normal/skill/idle do MP và action lock; không kết luận normal vô dụng từ CD1 s của Lv5.
 
 <a id="art-sustain-evidence"></a>
 
@@ -395,7 +405,7 @@ Hồ sơ feedback và lỗi của mock được giữ tại [Roadmap](5_HUYEN_LO
 
 # 5. Quyết định đã chốt và cổng kiểm khi triển khai
 
-**Gameplay đã chốt:** GEAR-01 (trần +4/+6/+8, hai Tinh Hoa, chuyển giao); CONS-01 (hai hồi chiêu bình riêng); BOSS-02 (DEF25/ACC140/EVA60, ba vùng đá, một action/lịch ưu tiên). COOP-01, QUEST-02, BOSS-03, BOSS-01 và NAR-01 cũng đã chốt. **PVP-01 V6.1:** cược 1.000–10.000 bước 1.000, escrow cả hai trước MatchId, Food/Bình hợp lệ với quota 3+3, 120 s cả hai sống DRAW, fee/refund qua Spring receipt. **SAVE-01 V6.1:** PostgreSQL giữ tiến trình và MapId/HP/MP checkpoint; resume phiên còn trong RAM hoặc spawn SafeAnchor từ checkpoint. Stat/loot arithmetic giữ; TTK PvE và sustain/journey cần rerun; mô hình PvP chưa tính hồi phục mới.
+**Gameplay đã chốt:** GEAR-01 (trần +4/+6/+8, hai Tinh Hoa, chuyển giao); CONS-01 (hai hồi chiêu bình riêng); BOSS-02 (DEF25/ACC140/EVA60, ba vùng đá, một action/lịch ưu tiên). COOP-01, QUEST-02, BOSS-03, BOSS-01 và NAR-01 cũng đã chốt. **PVP-01 :** cược 1.000–10.000 bước 1.000, escrow cả hai trước MatchId, Food/Bình hợp lệ với quota 3+3, 120 s cả hai sống DRAW, fee/refund qua Spring receipt. **SAVE-01 :** PostgreSQL giữ tiến trình và MapId/HP/MP checkpoint; resume phiên còn trong RAM hoặc spawn SafeAnchor từ checkpoint. Stat/loot arithmetic giữ; TTK PvE và sustain/journey cần rerun; mô hình PvP chưa tính hồi phục mới.
 
 NAR-01: Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò mò và gỡ mâu thuẫn bối cảnh Xích Nham mà không tăng scope. Q9 tùy chọn, trang bị 18 dòng, bí kíp, không Party P0 và vòng Boss chung cũng đã có luật; không mở lại vì chưa chơi thử.
 
@@ -408,30 +418,41 @@ NAR-01: Đã tinh chỉnh Narrative theo hướng mở, gợi cảm giác tò m�
 | SCOPE-01 — PLAYTEST | Mật độ, respawn, contention | 28 cụm/66 điểm, hồi 25 s, Linh 5%/cap1 | 2 người thiếu quái rõ hoặc 3–4 người chờ nhiều; benchmark trước claim capacity |
 | GEAR-01 — BASELINE ĐÃ CHỐT | Chạy lại TTK, hit/crit, di chuyển giữa cụm, hành trình và Boss với Chí mạng Kiếm / Chính xác Cung / tốc chạy Giày; đo cảm giác +4/+6/+8 và preview | GDD §6, bảng kinh tế §4, hai Client + Dedicated Server playtest | Gear II/III, sức mạnh hai phái hoặc Tinh Hoa làm Boss/PvP/kinh tế lệch khi chơi thật |
 | CONS-01 — BASELINE ĐÃ CHỐT | Thử nhầm phím/bình/refresh Food | HP và MP hồi chiêu riêng; tier đủ bù nhỏ nhất, Food thay cũ | Người chơi thường xuyên phí bình hoặc tutorial Q6 kẹt |
-| SAVE-01 — V6.1 ĐÃ CHỐT | Checkpoint 30 s + portal/logout/death/revive/PvP; resume 15 s nếu phiên còn; mất phiên dùng SafeAnchor và HP/MP đã commit | Technical §5–7, sequence/generation, safe-zone coordinate validation | Checkpoint cũ đè mới, HP=0 hồi sinh miễn phí, load Arena hoặc mất Potion nhưng hồi máu không được checkpoint |
-| PVP-01 — V6.1 ĐÃ CHỐT | Escrow hai người trước MatchId; 10 mức cược; Food tick/Bình quota; outcome và payout idempotent | GDD §8, Technical §4/§6, bảng arithmetic ở trên | HELD/ACTIVE mắc kẹt tiền; hết 120 s vẫn so HP; FORFEIT sai thời điểm; result retry trả Vàng hai lần |
+| SAVE-01 — ĐÃ CHỐT | Checkpoint 30 s + portal/logout/death/revive/PvP; resume 15 s nếu phiên còn; mất phiên dùng SafeAnchor và HP/MP đã commit | Technical §5–7, sequence/generation, safe-zone coordinate validation | Checkpoint cũ đè mới, HP=0 hồi sinh miễn phí, load Arena hoặc mất Potion nhưng hồi máu không được checkpoint |
+| PVP-01 — ĐÃ CHỐT | Escrow hai người trước MatchId; 10 mức cược; Food tick/Bình quota; outcome và payout idempotent | GDD §8, Technical §4/§6, bảng arithmetic ở trên | HELD/ACTIVE mắc kẹt tiền; hết 120 s vẫn so HP; FORFEIT sai thời điểm; result retry trả Vàng hai lần |
 | BOSS-02 — BASELINE ĐÃ CHỐT | Độ rộng vùng/nhịp báo trước đòn | 32.000 HP, DEF25/ACC140/EVA60, ba vùng đá, một action | Không thể né bằng kỹ năng di chuyển thường, overlap khó đọc, thời gian 2 người lệch xa 90–150 s |
 | ART-01 — PLAYTEST | Đường đạn, aim, thời điểm hit, hình nhân vật | GDD/Technical art contract | Collider/hình lệch hoặc cảm giác chém/bắn khó đọc |
 | LOOT-01 — PLAYTEST | Đá/trang bị sinh ra so lượng nhặt và sink | 8% đá thường, giá shop 800, §3–4 | Người chơi hợp level không đủ nguồn cho +4, hoặc +8 quá dễ trước story |
 | QUEST-03 — PLAYTEST | Thời gian Lv1–20 và hồi phục khi lỗi | Mô hình ~115–131 phút, mục tiêu 150–240 phút | Playable journey vẫn quá nhanh/chậm sau tính đi lại, chết, UI và multiplayer |
 | TECH-01 — SPIKE | Login → Character Select → one-time ticket → dedicated join; lease/duplicate session, internal service credential và backend outage | Technical §5–6: Spring xác minh account/character; Game Server xác minh ticket, một writer/character | Spike hai Client + backend/DB thật, thử duplicate join, consumed ticket, timeout trước/sau commit và server crash |
-| INPUT-01 — PLAYTEST / PROPOSAL | So A/B stale held axis, Esc, approach × EdgeExit/arrival enum, latest buffer0,18s, aliases4/5 và keyboard target cycle A | GDD150ms, H/M; Tab chỉ UI. Recorder seed731: reject119/171, held cancel20/20, exit leak1/1; [phương pháp và giới hạn](../../prototypes/VS1_EndToEnd/CHANGELOG.md#phase-b--baseline-trước-sửa-hành-vi) | Mặc định giữ baseline; chỉ đề nghị sync sau review normal-speed/rollover và giải thích reject theo cadence. Không sửa AUTO hysteresis/ID tie từ probe |
-| CMB-01 — PLAYTEST / PROPOSAL | Chỉ basic Tân Lữ: CD1,00→0,70s, Lock0,26→0,32s, hit0,10s giữ; dead time74%→54,3% | GDD1,00/0,26; recorder TTK Lv4/1Sói4,96s, Lv3/3Dummy9,78s; S1/S2/S3 Kiếm, mob HP/EXP/speed/range giữ | Chạy lại TTK, ngân sách EXP và Q3–Q5; feel0,70s còn CHƯA ĐO. Không sửa bảng TTK cũ hoặc GDD chỉ vì test pass |
-| MOBAI-01 — PLAYTEST / PROPOSAL | Bỏ flip sau cắn; khoảng trống trái/phải0,9×range/tie SpawnSlot, hysteresis1,5s, reposition tùy loài0,8–1,0u/phase theo life, deadband facing và quadratic separation | GDD melee crowd không formation/slot/token/shoving; recorder3Sói:3,3333 flips/quái/5s, mất131HP/10s. Runtime baseline cũ giữ để đối chiếu, không dùng làm production contract | Đo áp lực ±10%, flips≤2/5s, crowd1/2/4 và mép. Không thêm interval/safe window hoặc sửa windup origin để ép metric; sai ngưỡng thì báo cáo |
+| INPUT-01 — LUẬT ĐÃ DUYỆT / FEEL CÒN MỞ | Input/focus/pending được chủ dự án duyệt; [GDD §3](1_HUYEN_LO_GDD.md#focus-input) là owner | Contract [Technical — input](2_HUYEN_LO_TECHNICAL.md#input-contract); kiểm hành vi một luồng, không flags/A/B | Rollover bàn phím thật, cảm giác ở tốc độ thường và envelope còn cần review |
+| CMB-01 — NHỊP ĐÃ DUYỆT | Basic Tân Lữ theo GDD; không đổi S1/S2/S3 | [Onboarding evidence](#novice-onboarding-evidence), số fixture cũ không thay fresh route | TTK Q3–Q5 và feel còn giới hạn; không tune EXP/HP để ép số |
+| MOBAI-01 — NGUYÊN TẮC ĐÃ DUYỆT | [GDD — melee crowd](1_HUYEN_LO_GDD.md#melee-crowd) | [Balance finding](#novice-onboarding-evidence); không formation/token/shoving hoặc range/speed/interval/HP mới | Readability/deadband/offset cần xem bằng người thật; không chỉnh damage để khớp một ngưỡng metric |
 
 <a id="input-combat-mob-proposals"></a>
+<a id="novice-onboarding-evidence"></a>
 
-**Phạm vi thử INPUT-01:** mỗi physical press vẫn một intent. Snapshot các phím ngang giữ lúc press; trong pending, bỏ qua chúng **kể cả đang giữ ngược hướng**, rồi trả quyền cho trục đang giữ khi cast/fail/cancel. KeyDown mới, Jump/Drop/Esc, đổi/clear focus, UI/chat/death/map hủy intent. Đây là thử nghiệm quyền điều khiển, không luật đã khóa. Không approach trong action lock; latest buffer0,18s chỉ nhận khi cooldown/lock sẽ sẵn trong cửa sổ, không FIFO hoặc long-CD queue. Approach cắt exit trigger thì blocked trước cost; chỉ manual input chuyển map. Arrival kiểm ID/generation (life), MapId, alive/notReturning, capability, weapon/learned, MP/CD/lock và geometry tại origin thực; thất bại có enum reason và không commit. Hard-CC chỉ fixture kiểm cancellation, không cấp Freeze cho player/Boss. Esc: modal/chat trước → pending/buffer → focus → no-op.
+## Kiểm chứng onboarding và rủi ro cân bằng
 
-**Keyboard target options:** **A thử sau flag:** Tab/Shift+Tab trong world cycle tiến/lùi, thứ tự khoảng cách ngang rồi SpawnSlot ID, EXPLICIT pinned và lifecycle clear; modal vẫn UI navigation. **B chỉ đề xuất:** action CycleTarget gắn phím riêng (không R, đã giữ cho Buff P1). **C chỉ ý tưởng, không code:** ưu tiên Threat/HP thấp thay AUTO; mâu thuẫn với hysteresis/tie-ID hiện tại và cần review riêng. Aliases4/5 nối HP/MP với H/M; cùng consumable command, không đổi quota/cost/CD. Tutorial/glyph đọc bindings của probe. GDD §9 chưa đổi.
+**DERIVED:** nhịp basic Tân Lữ đã duyệt cho occupancy lock 0,32 / 0,70 và phần còn lại 54,29% chu kỳ, so với 74% ở control cũ 1,00 / 0,26. Phần còn lại không đồng nghĩa mất điều khiển: locomotion/gravity vẫn hoạt động. Đây là phép tính, không bằng chứng cảm giác tay.
 
-**Câu hỏi giữ mở trong INPUT-01/CMB-01/MOBAI-01:** Dummy là training actor ngoài bảy combat identities/sáu mob rig, không tự cộng roster; cần kiểm wording/manifest. Học Viện an toàn có sân Bù Nhìn không gây damage, cần kiểm consistency với save/safe-zone. Không fast travel P0: đo chi phí đi bộ/turn-in, không thêm tiện ích tự động. Ngưỡng “sắp sẵn” của buffer chưa có số canonical;0,18s là giá trị probe. Rollover D+Space+1(+2), desktop/laptop, WASD/mũi tên với4/5 và feel0,70s: **CHƯA ĐO bởi người thật**. Các hành vi mới chỉ nằm sau ProbeConfig mặc định tắt; findings dùng để review Production Base G-B, không pass G-L.
+**EXISTING FIXTURE, không đo lại:** mẫu trước đã ghi Lv3/ba Dummy 9,78 → 6,42 s và Lv4/một Sói 4,96 → 3,98 s khi bật nhóm thay đổi. Nguồn và điều kiện nằm trong [CHANGELOG](../../prototypes/VS1_EndToEnd/CHANGELOG.md#phase-e--kết-quả-ab-và-giới-hạn). Những số này giúp đánh giá Q3 và Q5, nhưng gộp input/AI/cadence nên không chứng minh riêng tác động CD, không là TTK của build một-hành-vi mới. Q4 Nấm/loot/equip/sell chưa có thời gian fresh tương ứng; Q3–Q5 cần route chức năng mới. Không lấy mốc Q4 Sói của mô hình cũ thay Q4 Nấm hiện hành; reward/count đọc [GDD §5](1_HUYEN_LO_GDD.md#quests-story).
 
-**Findings của probe, chưa duyệt luật:** [báo cáo A/B và giới hạn](../../prototypes/VS1_EndToEnd/CHANGELOG.md#phase-e--kết-quả-ab-và-giới-hạn) giữ seed/kịch bản baseline. All ON cho flips3,3333→6,1667/quái/5s và damage131→166HP/10s (+26,7%): MOBAI-01 **chưa đạt**, không đổi baseline. Chỉ AI ON cho5,8333 flips/142HP; chỉ input ON cho3,3333 flips/122HP. Damage còn phụ thuộc life hữu hạn, target và RNG; không dùng một mẫu ±10% để chứng minh không có safe window. INPUT-01 giảm reject69,59→51,46%, chưa đạt10%; lịch press nhanh hơn cooldown cần được tách khỏi lỗi cancellation. CMB-01 đạt phép tính dead time54,29%, TTK mẫu3Dummy9,78→6,42s; đó chưa là kết quả fresh journey Q3–Q5 hoặc feel acceptance. Không cập nhật bảng TTK cũ từ các fixture này.
+**BALANCE FINDING:** cùng mẫu cũ ba Sói, mất 131 → 166 HP/10 s (+26,7%) khi bật toàn bộ nhóm; riêng AI là 142 HP (+8,4%), riêng input 122 HP (−6,9%). Phụ thuộc target/life/RNG và nhiều thay đổi gộp, chưa thể gán chênh lệch cho một luật chọn cánh. Ghi rủi ro áp lực nhận damage; không đổi HP/range/speed/interval, không thêm safe window để ép kết quả. Không chạy thêm harness, metric hoặc A/B trong lượt này.
+
+**Các câu hỏi thật còn mở:**
+
+- A07 / SCOPE-01: xác nhận wording và authoring của Dummy training actor ngoài “bảy identity/sáu rig”; không tự cộng một combat identity hay rig mới.
+- A07 / SAVE-01: Học Viện là khu an toàn nhưng có sân Dummy không gây damage; cần định nghĩa nhất quán safe-zone/checkpoint với training yard trước production.
+- QUEST-03 / BAL-02: chi phí chạy về làng/turn-in/mua đồ khi chưa có fast travel; không thêm teleport tiện ích từ ước lượng hành trình.
+- INPUT-01: cửa sổ latest buffer đã duyệt là 0,18 s. “Sắp sẵn” chỉ nhận readiness trong cửa sổ này; exact xử lý sát biên tick/latency trước production vẫn cần spike, không phải quyền đổi sang một window khác.
+- Feel/rollover thực trên desktop/laptop, WASD/mũi tên + 4/5 chưa được người thật nghiệm thu. Functional route/test không thay kết luận này.
+
+Luật hiện hành ở GDD; các phương án keyboard B/C và số A/B cũ chỉ giữ trong [lịch sử](../../prototypes/VS1_EndToEnd/CHANGELOG.md#single-behavior-history-3). Không còn hàng proposal riêng cho các luật đã được chủ dự án duyệt.
 
 TECH-01/SAVE-01 và A15 còn cần chốt thứ tự Potion–hit–checkpoint, definite reject khác timeout, deathUtc/cap release ở terminal-pending và neo clock phiên↔UTC. [Các chuỗi probe cụ thể](2_HUYEN_LO_TECHNICAL.md#pending-ordering-probes) bổ sung acceptance của spike, chưa bằng chứng runtime hoặc approval schema. Các gap này không chặn local Kiếm bằng RAM fixture, nhưng phải giải trước G-D/reliability.
 
-**Rủi ro kiến trúc V6.1:** auth/ticket/lease, checkpoint ordering/validation, reconnect grace, escrow orphan recovery, transaction N recipients, backend downtime và dedicated build/headless physics cần integration tests. Mốc giờ player-host/JSON cũ không còn dùng để cam kết lịch; spike đầu đo integration/latency, sau đó Technical mới đặt lại ngân sách. Quest, gear, combat PvE và world balance giữ số hiện tại; các luật PvP/recovery trên là user lock, không Open Decision.
+**Rủi ro kiến trúc :** auth/ticket/lease, checkpoint ordering/validation, reconnect grace, escrow orphan recovery, transaction N recipients, backend downtime và dedicated build/headless physics cần integration tests. Mốc giờ player-host/JSON cũ không còn dùng để cam kết lịch; spike đầu đo integration/latency, sau đó Technical mới đặt lại ngân sách. Quest, gear, combat PvE và world balance giữ số hiện tại; các luật PvP/recovery trên là user lock, không Open Decision.
 
 [Review Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) tách nguyên tắc đủ dùng và con số chưa duyệt; thứ tự probe/mở production được quản lý tại [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates).
 
@@ -487,9 +508,9 @@ DESIGN LOCK đã duyệt progression/controls/authority trong mục dưới; Art
 
 <a id="design-lock-rationale"></a>
 
-## DESIGN LOCK 2026-10-03 — rationale, delta và gates
+## Combat rationale, delta và gates
 
-User approval lần này là nguồn của các thay đổi; NSO research chỉ evidence. Basic Tân Lữ giữ theo trạng thái trước class, kể cả Q5 Lv5; không hard cutoff làm onboarding kẹt. Sau class chỉ S1/S2/S3 tích lũy, sáu class SkillIds/CD riêng; sáu books/bốn passives giữ. Control J/hold của lượt sync V6.2.0 đã **SUPERSEDED bởi feedback V6.2.1**: 1/2/3 one-press, bounded approach + cast một lần dùng một resolver/lock/clock; focus độc lập slot, AUTO sticky theo context, EXPLICIT pinned; loot candidate riêng E act ngay. Logical ranged result bỏ flight damage/interception, mất né visual tên sau resolve nhưng giữ melee/Boss geometry dodge. Movement/momentum không bị normal damage interrupt.
+Luật progression/input hiện hành đọc [GDD §3](1_HUYEN_LO_GDD.md#focus-input); NSO research chỉ evidence. Basic Tân Lữ trước class tránh hard cutoff làm Q5 Lv5 kẹt. Ba active tích lũy giữ lựa chọn skill/MP/CD riêng, thay vì thêm class Normal miễn MP; interaction riêng giúp thao tác loot không đổi combat target. Logical ranged result bỏ flight damage/interception, mất né visual tên sau resolve nhưng giữ melee/Boss geometry dodge. Movement/momentum không bị normal damage interrupt.
 
 | Review decision | Kết luận / trade-off | Gate còn phải đo |
 | --- | --- | --- |
@@ -500,7 +521,7 @@ User approval lần này là nguồn của các thay đổi; NSO research chỉ 
 | D14 | Giữ ba hybrid hiện hành; so 3/1/0, thử Cổ Vệ làm một đại diện; cắt ranged là đổi content identity | PROTOTYPE + user content approval; không tiết kiệm pose count trước duyệt |
 | D15/D15R | LOCK chống free-farm melee unreachable; exact grace/Return/regen/reset/untargetable/immune chưa chốt | Jump ngắn/perch/kite/2 players/reachable retarget; reset không reward/reroll/life mới |
 | D17/D18/D20 | LoS A/B PROTOTYPE; full geometry LoS DROP P0; 25 s/28 pockets/66 slots và rates giữ control | Room/playtest/benchmark workload thật; không CPU%/số dòng recipe proof |
-| D21/D23/D24 | Per-profile visuals; Tab/Auto/gamepad/hitstop/crit shake/material audio DEFER; 26 frame/A01/A02 giữ OPEN | Art imported rig/weapon/readability/hour/% usable; không 33 pose lock |
+| D21/D23/D24 | Per-profile visuals; Auto/gamepad/hitstop/crit shake/material audio DEFER; Tab theo input đã duyệt; 26 frame/A01/A02 giữ OPEN | Art imported rig/weapon/readability/hour/% usable; không 33 pose lock |
 | D25–D27/D29/D30 | Backend integrity giữ; VS-1 trước; ba accumulated slots/CD riêng, không zero-MP class fallback | Harvest/probe → production base → G-L mới → G-N/G-D; independent-CD weave đổi burst/resource |
 
 **DERIVED ROLE AUDIT:** chỉ direct hits đều land, trước INT/passives/DEF/Crit/rounding/status/overkill; power/CD không là full rotation DPS.
@@ -514,11 +535,11 @@ User approval lần này là nguồn của các thay đổi; NSO research chỉ 
 
 Kiếm S1 có trade-off đơn mục tiêu rõ, S2 group max3. Cung AAA hơn S1 khoảng 4,35% power/MP và 22,76% power/CD, thêm proc; S1 vẫn ít MP/cast, CD/commitment ngắn hơn. Đây là **balance risk**, chưa chứng minh S1 dead button/domination mọi chiều; không gọi S1 PvP-only hoặc tự sửa số. Test isolated/group/overkill/MP thiếu/Food/Potion và weave S1 trong CD S2/S3. Bỏ class Normal miễn MP khiến sustain/journey phải chạy lại; không restore fallback để che thiếu evidence.
 
-Research claims về CPU/GPRS/T9 motive là HISTORICAL INFERENCE; “1000 mobs <3% CPU”, deterministic/anti-cheat tuyệt đối hoặc số dòng recipe là UNSUPPORTED, không justification. Client/server splash thresholds khác nhánh, map parse chưa xác minh không khóa geometry. Ba báo cáo giữ ở [research notes](../../research/README.md), không design authority. Không triển khai navigation/DropLink/universal ranged fallback/Auto/Tab/rich UI/rollback để kế thừa NSO.
+Research claims về CPU/GPRS/T9 motive là HISTORICAL INFERENCE; “1000 mobs <3% CPU”, deterministic/anti-cheat tuyệt đối hoặc số dòng recipe là UNSUPPORTED, không justification. Client/server splash thresholds khác nhánh, map parse chưa xác minh không khóa geometry. Ba báo cáo giữ ở [research notes](../../research/README.md), không design authority. Không triển khai navigation/DropLink/universal ranged fallback/Auto/rich UI/rollback để kế thừa NSO.
 
 <a id="keyboard-prototype-review"></a>
 
-## Keyboard UX và editorial review — 2026-10-04
+## Keyboard UX và giới hạn art validation
 
 Trạng thái build, debug fixtures và kết quả kiểm VS-1 thuộc [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history); chúng không thay thế validation balance hoặc G-L production.
 
@@ -526,22 +547,11 @@ Editorial bổ sung First Art Probe, file lifecycle, pose/socket minimum schema,
 
 <a id="prototype-feedback-review"></a>
 
-## Feedback prototype 2026-10-03 — V6.2.1, quyết định tạm và giới hạn evidence
+## Onboarding, control và giới hạn kiểm chứng
 
-User yêu cầu sửa theo feedback và tự xử lý inconsistency là nguồn của lượt sửa design; NSO recommendation không tự thành luật. Lịch sử code/checkpoint được giữ tại [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
+Luật và counts Q1–Q12 ở [GDD §5](1_HUYEN_LO_GDD.md#quests-story); input/pending ở [GDD §3](1_HUYEN_LO_GDD.md#focus-input). Các quyết định F01–F08 và review theo phiên đã chuyển nguyên văn sang [CHANGELOG](../../prototypes/VS1_EndToEnd/CHANGELOG.md#single-behavior-history-3). Giữ các alias trên để tra evidence cũ, không giữ luật gameplay trùng tại Analysis.
 
-| ID / xử lý | Kết luận và lý do | Gate / chưa chốt |
-| --- | --- | --- |
-| F01 — BASELINE | Q3 Dummy → Q4 Nấm/loot/equip/sell → Q5 Food/HP supply/Sói → Q6 class. Giữ QuestIds, đổi nội dung Q4/Q5; Q3 0 EXP, Q4 catch-up Lv4, Q5 Lv5; EXP floor không downlevel người đã farm vượt mốc. Áo có trước Sói; 45 EXP Q5 cố định cũ được thay bằng catch-up, không cộng hai reward; MP tutorial ở Q6 tránh mua rồi chưa dùng | QUEST-03: normal-speed route/UI mock, độ khó Tân Lữ và shop load; không tăng NeedEXP/mob HP |
-| F02 — BASELINE | MapExit/EdgeExit thường auto-transition với edge arrow/name; SpecialGate cho Huyền Môn/Arena. Quest objectives lưu hành động, glyph theo bindings; validation/checkpoint giữ cho mọi transition | PHY-01: no ping-pong/stale trigger/locked-exit spam, destination safe spawn |
-| F03 — BASELINE | Bỏ J/combat repeat. Mỗi press 1–3 acquire/retain → bounded horizontal approach nếu hơi xa → cast một lần. Release không hủy intent một lần bấm; manual/focus/UI/map/expiry hủy, invalid target không reacquire cùng press | ART-01/PHY-01: pending phải đọc được; short buffer không queue dài; reject chưa ready/blocked/quá xa không cost/movement |
-| F04 — PROTOTYPE | Space/↑ jump, S/↓ drop trên one-way; I/C/Q panel default thống nhất. Coyote/buffer/variable height/acceleration/fall feel cần sample thật | Chưa khóa forces/duration hoặc hotkey tối ưu; không key-remapping/double-jump/dash P0 |
-| F05 — PRINCIPLE + TUNABLE | Melee cluster không pile; soft separation, lệch phase và recovery reposition hợp lệ trên lane. Không khóa 3–4 ring slots/group mutex; không kéo interval thêm hoặc sửa facing/hit origin lúc windup | PHY-01: 1/2/4 mobs, near wall/edge, nhiều player, AoE vẫn giữ group value; không dùng toy DPS để duyệt spacing |
-| F06 — CURRENT | Prototype folder/evidence tách khỏi production; harvest → docs/feel/art/UI probe → design/build base → G-L mới → network gate sớm | Không attach network vào throwaway base; reuse phải review/test theo contract, không dựng framework để thay prototype |
-| F07 — BASELINE | Yard ≥3 Dummy đồng thời, cùng pool/life/HP60/25s; tránh chờ có thể giải bằng placement trước đổi timer | A07: multiplayer contention vẫn OPEN; chưa đổi respawn farm hoặc thêm dummy identity |
-| F08 — PROTOTYPE | Edge arrow/name + NPC marker P0; quest navigation xuyên map vẫn P1. Text-heavy functional prototype không final UI | P11/P15: manual inventory/equip/shop/quest/pending review; automation route không UX pass |
-
-**Không tự chốt trong lượt này:** 26-frame interpretation/socket/front-back/camera/tile scale; LoS A/B/hybrid reduction/unreachable exact response; S2/S3 air permissions. Hành vi mới chưa có runtime evidence, không thay nhãn video/test cũ thành PASS mới. Những số power/MP/CD/gear/EXP/Boss/payout không liên quan được giữ nguyên.
+Không đổi art production contract, nghĩa 26 frame, LoS/hybrid/unreachable response hoặc airborne S2/S3 bằng lượt input này. Các bảng tính và mô hình còn nguyên; chưa trở thành nghiệm thu runtime.
 
 <a id="research-ideas"></a>
 <a id="legacy-provenance"></a>
