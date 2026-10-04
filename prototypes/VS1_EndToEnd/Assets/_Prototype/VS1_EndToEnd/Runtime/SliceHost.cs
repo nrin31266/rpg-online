@@ -216,7 +216,7 @@ namespace HuyenLo.Runtime
             }
         }
         private void Building(string name,float x,float width,float height){
-            float baseY=name=="Cung đường"?6.4f:(float)BlockoutLayout.BaseGroundTop(renderedMap,x);
+            float baseY=(float)BlockoutLayout.GroundTop(renderedMap,x);
             RectVisual(name+" plaster",world.transform,new Vector2(x,baseY+height/2),new Vector2(width,height),new Color(.56f,.49f,.36f),-7);
             // Openings and horizontal timbers read as two floors; only authored wood decks collide.
             float floor=0;bool upstairs=false;
@@ -370,7 +370,7 @@ namespace HuyenLo.Runtime
             foreach(var part in parts){
                 if(!rig.TryGetValue(part.Name,out var sprite)){sprite=RectVisual(part.Name,playerVisual.transform,part.Center,part.Size,part.Color,part.Layer);rig.Add(part.Name,sprite);}
                 sprite.enabled=true;sprite.transform.localPosition=part.Center;sprite.transform.localScale=part.Size;sprite.transform.localEulerAngles=new Vector3(0,0,part.Angle);
-                sprite.color=!Session.Player.Alive?Color.gray:Session.Now-Session.LastHurtAt<.12?Color.white:part.Color;
+                sprite.color=!Session.Player.Alive?Color.gray:Session.Now-Session.LastHurtAt<.12?Color.white:part.Color;sprite.sortingOrder=part.Layer;
             }
             if(Session.Now>=nextRipple&&Mathf.Abs(Body.linearVelocity.x)>.5f){
                 foreach(var puddle in water)if(Body.position.x>puddle.left&&Body.position.x<puddle.right&&BlockoutLayout.WaterSpeed(renderedMap,new Point(Body.position.x,playerCollider.bounds.min.y))<1){

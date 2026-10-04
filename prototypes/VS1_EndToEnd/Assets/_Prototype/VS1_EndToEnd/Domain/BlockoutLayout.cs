@@ -57,7 +57,7 @@ namespace HuyenLo.Domain
                 yield return Earth("Class entrance middle step",-7,-6,2.8);
                 yield return Earth("Class entrance high step",-8,-7,4.2);
                 yield return Earth("Class main hall route",-5,12,0);
-                yield return RearEarth("Bow hill walkable cap",-18,-10,6.4);
+                yield return RearEarth("Bow hill walkable cap",-18,-8,6.4);
                 yield return Earth("Practice approach step",12,14,.4);
                 yield return Earth("Practice terrace",14,17,.8);
                 yield return Earth("Practice descent",17,19,.4);
