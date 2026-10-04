@@ -41,23 +41,62 @@ namespace HuyenLo.Tests
             }finally {Object.Destroy(go);}
             yield return null;
         }
-        [UnityTest] public IEnumerator UpperFloorSupportsNpcAndKeyboardInteraction(){
-            var go=new GameObject("Upstairs NPC fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.SwordTraining);
+        private IEnumerator WalkLeftTo(SliceHost host,float x){
+            int guard=0;while(host.Body.position.x>x+.08f){
+                Assert.That(++guard,Is.LessThan(350),"Failed to reach authored stair "+x);
+                host.ExternalAxis=-1;
+                if(host.Grounded){var hit=Physics2D.Raycast(host.Body.position+new Vector2(0,-.6f),Vector2.left,.7f,1<<6);
+                    if(hit.collider!=null&&hit.normal.y<.5f){host.ExternalJump=true;host.ExternalJumpHeld=true;}}
+                yield return new WaitForFixedUpdate();
+            }
+            host.ExternalAxis=0;for(int i=0;i<70;i++)yield return new WaitForFixedUpdate();
+        }
+        [UnityTest] public IEnumerator ClimbRealHillThenTalkToNpcWithKeyboard(){
+            var go=new GameObject("Climb NPC hill fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.SwordTraining);
             var oldBackground=InputSystem.settings.backgroundBehavior;var oldEditor=InputSystem.settings.editorInputBehaviorInPlayMode;
             InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
             InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             var keyboard=InputSystem.AddDevice<Keyboard>();keyboard.MakeCurrent();
             try{
-                host.Body.position=new Vector2(-12,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
-                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();
-                Assert.That(host.Session.NearAnchor(),Is.Null,"Upstairs service cannot be used from the ground floor");
-                host.ExternalJump=true;host.ExternalJumpHeld=true;
-                for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();
-                Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(3.52f).Within(.08));
+                host.Body.position=new Vector2(-4.6f,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();Assert.That(host.Session.NearAnchor(),Is.Null);
+                yield return WalkLeftTo(host,-6.6f);Assert.That(host.Body.position.y,Is.EqualTo(3.52f).Within(.1));
+                yield return WalkLeftTo(host,-7.45f);Assert.That(host.Body.position.y,Is.EqualTo(4.92f).Within(.1));
+                host.ExternalJump=true;host.ExternalJumpHeld=true;host.ExternalAxis=-1;
+                int guard=0;while(host.Body.position.x>-12){Assert.That(++guard,Is.LessThan(350));yield return new WaitForFixedUpdate();}host.ExternalAxis=0;
+                for(int i=0;i<75;i++)yield return new WaitForFixedUpdate();
+                Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(7.12f).Within(.1));
                 Assert.That(host.Session.NearAnchor().Id,Is.EqualTo("Diep"));
                 host.ExternalInput=false;yield return Tap(keyboard,Key.E);Assert.That(host.Hud.Panel,Is.EqualTo("npc"));
                 yield return Tap(keyboard,Key.Escape);Assert.That(host.Hud.Panel,Is.Null.Or.Empty);
             }finally{InputSystem.settings.backgroundBehavior=oldBackground;InputSystem.settings.editorInputBehaviorInPlayMode=oldEditor;InputSystem.RemoveDevice(keyboard);Object.Destroy(go);}yield return null;
+        }
+        [UnityTest] public IEnumerator ClimbUpperPackFromLowerRoute(){
+            var go=new GameObject("Reach upper eastern pack");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.Crowd);host.Session.Player.InvulnerableUntil=100;
+            try{
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();host.ExternalJump=true;host.ExternalJumpHeld=true;host.ExternalAxis=1;
+                while(host.Body.position.x<107)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
+                for(int i=0;i<70;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(3.22f).Within(.1));
+                host.ExternalJump=true;host.ExternalJumpHeld=true;host.ExternalAxis=1;int guard=0;
+                while(host.Body.position.x<112){Assert.That(++guard,Is.LessThan(150));yield return new WaitForFixedUpdate();}host.ExternalAxis=0;
+                for(int i=0;i<70;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(5.32f).Within(.1));
+                host.ExternalAxis=1;for(int i=0;i<140;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
+                Assert.That(host.Body.position.x,Is.GreaterThan(124),"Upper route must descend to eastern road without a dead end");
+            }finally{Object.Destroy(go);}yield return null;
+        }
+        [UnityTest] public IEnumerator EarthOverhangHasLowerPassageAndReachableUpperSurface(){
+            var go=new GameObject("Physical earth overhang fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.Crowd);host.Session.Player.InvulnerableUntil=100;
+            try{
+                host.Body.position=new Vector2(55.6f,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                host.ExternalAxis=1;for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
+                Assert.That(host.Body.position.x,Is.GreaterThan(61));Assert.That(host.Body.position.y,Is.EqualTo(.72f).Within(.08),"Must walk underneath real earth, not be placed on its roof");
+                host.Body.position=new Vector2(53.4f,3.12f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();host.ExternalJump=true;host.ExternalJumpHeld=true;host.ExternalAxis=1;
+                for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
+                for(int i=0;i<8;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);
+                Assert.That(host.Body.position.y,Is.EqualTo(5.32f).Within(.1),"Must land on the same solid earth's upper face");
+                host.ExternalDrop=true;for(int i=0;i<10;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.y,Is.GreaterThan(5),"Earth cannot be dropped through");
+            }finally{Object.Destroy(go);}yield return null;
         }
         [UnityTest] public IEnumerator WalkableBasinAndBridgeHaveDistinctMovementSpeeds(){
             var go=new GameObject("Water feet fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;
@@ -67,8 +106,9 @@ namespace HuyenLo.Tests
                 host.ExternalAxis=1;for(int i=0;i<4;i++)yield return new WaitForFixedUpdate();
                 Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*.85f).Within(.05));
                 host.ResetPrototype(PrototypeStart.Crowd);host.ExternalAxis=1;
-                host.Body.position=new Vector2(73,.82f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                host.Body.position=new Vector2(73,1.12f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
                 for(int i=0;i<8;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);
+                host.ExternalDrop=true;for(int i=0;i<12;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.y,Is.GreaterThan(1),"Wide-water bridge is solid; S must not reach the water");
                 Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*(float)host.Session.Player.Stats.Speed).Within(.05),"Bridge over water remains dry");
             }finally{Object.Destroy(go);}yield return null;
         }

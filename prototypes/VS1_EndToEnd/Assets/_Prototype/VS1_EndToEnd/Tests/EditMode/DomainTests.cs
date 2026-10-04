@@ -205,8 +205,8 @@ namespace HuyenLo.Tests
             var fresh=PrototypePresets.Create(PrototypeStart.Fresh);Assert.That(fresh.Quest,Is.EqualTo(1));Assert.That(fresh.Player.Level,Is.EqualTo(1));Assert.That(fresh.Receipts,Is.Empty);Assert.That(fresh.Combat.Cooldowns,Is.Empty);Assert.That(fresh.DebugPreset,Is.Null);
         }
         [Test] public void MeleePhaseOffsetsAndRecoveryDoNotChangeAttackInterval(){
-            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(30,2.45);s.Player.InvulnerableUntil=100;
-            var a=s.Mobs.First(x=>x.Id==30);var b=s.Mobs.First(x=>x.Id==31);a.Position=new Point(29.5,2.45);b.Position=new Point(30.5,2.45);
+            var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(30,4.25);s.Player.InvulnerableUntil=100;
+            var a=s.Mobs.First(x=>x.Id==30);var b=s.Mobs.First(x=>x.Id==31);a.Position=new Point(29.5,4.25);b.Position=new Point(30.5,4.25);
             s.Tick(.02);double first=a.HitAt;Assert.That(a.Windup,Is.True);Assert.That(b.Windup,Is.False);Advance(s,.08);
             Assert.That(b.Windup,Is.True);Assert.That(b.HitAt,Is.GreaterThan(first));Assert.That(a.NextAttack-(first-.35),Is.EqualTo(a.Interval).Within(.001));
             double x=a.Position.X;Advance(s,.38);Assert.That(a.Position.X,Is.Not.EqualTo(x),"Recovery should visibly reposition without a new cooldown");
@@ -259,7 +259,7 @@ namespace HuyenLo.Tests
         [Test] public void WaterContactSlowsFeetButNotBridgeAirOrDryGround(){
             Assert.That(BlockoutLayout.WaterSpeed(Map.Village,new Point(3,-.35)),Is.EqualTo(.85));
             Assert.That(BlockoutLayout.WaterSpeed(Map.Village,new Point(3,.2)),Is.EqualTo(1));
-            Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,-2)),Is.EqualTo(.85));
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,-2)),Is.EqualTo(1));
             Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,.1)),Is.EqualTo(1));
             Assert.That(BlockoutLayout.WaterSpeed(Map.Academy,new Point(3,0)),Is.EqualTo(1));
         }
@@ -269,8 +269,8 @@ namespace HuyenLo.Tests
                 foreach(double x in new[]{m.Home.X,m.ActivityMin,m.ActivityMax})
                     Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(x,m.Home.Y-.65)),Is.EqualTo(1),m.Slot+" must have a dry home and patrol/chase bounds");
             }
-            s.Player.InvulnerableUntil=200;s.Player.Position=new Point(58,1.52);Advance(s,8);
-            s.Player.Position=new Point(73,-1.28);
+            s.Player.InvulnerableUntil=200;s.Player.Position=new Point(58,5.25);Advance(s,8);
+            s.Player.Position=new Point(73,1.12);
             for(int tick=0;tick<600;tick++){
                 s.Tick(.02);
                 foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist))
@@ -278,11 +278,12 @@ namespace HuyenLo.Tests
             }
             Assert.That(s.Mobs.Where(x=>x.Slot.StartsWith("DS5")).All(x=>!x.Engaged&&!x.Returning),Is.True);
         }
-        [Test] public void MistBasinHasNoDryGapAndBridgeSpansBothBanks(){
-            for(double x=66.1;x<80;x+=.2)Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(x,BlockoutLayout.GroundTop(Map.Mist,x))),Is.LessThan(1),"Dry gap at "+x);
-            var bridge=BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="Valley wooden footbridge");
-            var volume=BlockoutLayout.Waters(Map.Mist).Single();
-            Assert.That(bridge.X-bridge.Width/2,Is.LessThan(volume.Left));Assert.That(bridge.X+bridge.Width/2,Is.GreaterThan(volume.Right));
+        [Test] public void WideWaterIsSceneryBehindContinuousSolidBridge(){
+            var bridge=BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="Valley solid wooden bridge");
+            var water=BlockoutLayout.Waters(Map.Mist).Single();
+            Assert.That(water.DecorativeOnly,Is.True);Assert.That(bridge.OneWay,Is.False);Assert.That(bridge.Wood,Is.True);
+            Assert.That(bridge.X-bridge.Width/2,Is.LessThanOrEqualTo(water.Left));Assert.That(bridge.X+bridge.Width/2,Is.GreaterThanOrEqualTo(water.Right));
+            for(double x=66.1;x<82;x+=.2)Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,x),Is.GreaterThan(water.Level));
         }
         [Test] public void TrackerDirectionsFollowCurrentQuestStepAndMap(){
             var s=new SliceSession();s.QuestState=QuestState.InProgress;
@@ -295,9 +296,10 @@ namespace HuyenLo.Tests
         [Test] public void TerrainHasSolidElevationAndFewIntentionalOneWayDecks(){
             foreach(Map map in Enum.GetValues(typeof(Map))){var surfaces=BlockoutLayout.Surfaces(map).ToArray();Assert.That(surfaces.Where(x=>!x.OneWay).Select(x=>x.Y+x.Height/2).Distinct().Count(),Is.GreaterThan(1));Assert.That(surfaces.Count(x=>x.OneWay),Is.InRange(1,3));}
             var s=new SliceSession();foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist)){
-                double support=m.Slot.StartsWith("PROBE8")?BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="PROBE8 wooden upper bridge").Y+.2:BlockoutLayout.GroundTop(m.Map,m.Home.X);
-                Assert.That(m.Home.Y,Is.EqualTo(support+.65).Within(.0001),m.Slot+" must stand above its real support");
+                var support=BlockoutLayout.MobSupport(m.Slot,m.Home.X);
+                Assert.That(m.Home.Y,Is.EqualTo(support.Y+support.Height/2+.65).Within(.0001),m.Slot+" must stand above its physical support");
             }
+
         }
         [Test] public void ProbePocketsDoNotGrantQ5KillCredit(){
             var s=PrototypePresets.Create(PrototypeStart.Crowd);s.Quest=5;s.Stage=3;s.QuestState=QuestState.InProgress;

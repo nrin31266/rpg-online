@@ -6,16 +6,17 @@ namespace HuyenLo.Domain
     {
         public readonly string Name;
         public readonly double X,Y,Width,Height;
-        public readonly bool OneWay;
-        public Surface(string name,double x,double y,double width,double height,bool oneWay=false)
-        {Name=name;X=x;Y=y;Width=width;Height=height;OneWay=oneWay;}
+        public readonly bool OneWay,Overhead,Wood;
+        public Surface(string name,double x,double y,double width,double height,bool oneWay=false,bool overhead=false,bool wood=false)
+        {Name=name;X=x;Y=y;Width=width;Height=height;OneWay=oneWay;Overhead=overhead;Wood=wood||oneWay;}
     }
     public readonly struct WaterRegion
     {
         public readonly double Left,Right,Bottom,Level,SpeedFactor;
-        public WaterRegion(double left,double right,double bottom,double level,double speedFactor=.85)
-        {Left=left;Right=right;Bottom=bottom;Level=level;SpeedFactor=speedFactor;}
-        public bool TouchesFeet(Point feet)=>feet.X>Left&&feet.X<Right&&feet.Y>=Bottom-.08&&feet.Y<Level;
+        public readonly bool DecorativeOnly;
+        public WaterRegion(double left,double right,double bottom,double level,double speedFactor=.85,bool decorativeOnly=false)
+        {Left=left;Right=right;Bottom=bottom;Level=level;SpeedFactor=speedFactor;DecorativeOnly=decorativeOnly;}
+        public bool TouchesFeet(Point feet)=>!DecorativeOnly&&feet.X>Left&&feet.X<Right&&feet.Y>=Bottom-.08&&feet.Y<Level;
     }
     public static class BlockoutLayout
     {
@@ -34,53 +35,79 @@ namespace HuyenLo.Domain
                 yield return Earth("Market step",8,9,.3);
                 yield return Earth("Forge terrace",9,17,.6);
                 yield return Earth("Inn step",17,18,.3);
-                yield return Earth("Ritual courtyard",18,32,0);
+                yield return Earth("Inn courtyard",18,21,0);
+                yield return Earth("Ritual foothill",21,22,1.2);
+                yield return Earth("Ritual upper step",22,23,2.4);
+                yield return Earth("Ritual hill",23,27,3.6);
+                yield return Earth("Ritual descent high",27,28,2.4);
+                yield return Earth("Ritual descent low",28,29,1.2);
+                yield return Earth("Eastern gate road",29,32,0);
                 yield return Earth("East lookout",32,40,1);
                 yield return new Surface("Wooden forge gallery",13,3,5,.25,true);
                 yield return new Surface("Elder house upper floor",0,2.875,5,.25,true);
             }else if(map==Map.Academy){
                 yield return Earth("West dojo terrace",-30,-24,4);
-                yield return Earth("Dojo upper stair",-24,-22,3);
-                yield return Earth("Dojo middle stair",-22,-20,2);
-                yield return Earth("Dojo low stair",-20,-18,1);
-                yield return Earth("Class courtyard",-18,12,0);
+                yield return Earth("Dojo upper shoulder",-24,-22,4.4);
+                yield return Earth("Dojo ridge step",-22,-20,5.4);
+                yield return Earth("Dojo ridge",-20,-18,6.4);
+                yield return Earth("Class courtyard",-18,-8,0);
+                yield return Earth("Class entrance low step",-6,-5,1.4);
+                yield return Earth("Class entrance middle step",-7,-6,2.8);
+                yield return Earth("Class entrance high step",-8,-7,4.2);
+                yield return Earth("Class main hall route",-5,12,0);
+                yield return new Surface("Bow hill walkable cap",-14,5.8,8,1.2,false,true);
                 yield return Earth("Practice approach step",12,14,.4);
                 yield return Earth("Practice terrace",14,17,.8);
                 yield return Earth("Practice descent",17,19,.4);
                 yield return Earth("Dummy yard and gate",19,40,0);
                 yield return new Surface("HV_JumpLedge wooden deck",8,2.8,4,.4,true);
                 yield return new Surface("West dojo gallery",-27,6.1,5,.25,true);
-                yield return new Surface("Bow hall upper floor",-12,2.675,6,.25,true);
+                yield return new Surface("Bow hall upper floor",-12,9.075,6,.25,true);
             }else {
                 yield return Earth("Mist entrance and mushrooms",-10,18,0);
-                yield return Earth("DS3 low stair",18,20,.6);
-                yield return Earth("DS3 upper stair",20,22,1.2);
-                yield return Earth("DS3 solid terrace",22,38,1.8);
-                yield return Earth("DS4 upper descent",38,41,1.2);
-                yield return Earth("DS4 low descent",41,44,.6);
-                yield return Earth("DS4 valley",44,56,0);
-                yield return Earth("DS5 dry shore",56,64,.8);
-                yield return Earth("Stream bank",64,66,-.5);
-                yield return Earth("Walkable stream basin",66,80,-2);
-                yield return Earth("DS6 lower stair",80,82,-1.25);
-                yield return Earth("DS6 upper stair",82,86,-.5);
+                yield return Earth("DS3 low stair",18,20,1.2);
+                yield return Earth("DS3 upper stair",20,22,2.4);
+                yield return Earth("DS3 solid hill",22,38,3.6);
+                yield return Earth("DS4 upper descent",38,41,2.4);
+                yield return Earth("DS4 low descent",41,44,1.2);
+                yield return Earth("DS4 valley entry",44,46,0);
+                yield return Earth("DS4 jumping approach",46,48,1.2);
+                yield return Earth("DS4 takeoff plateau",48,55,2.4);
+                yield return Earth("DS5 lower passage",55,65,0);
+                yield return new Surface("DS5 walkable earth overhang",59,3.4,10,2.4,false,true);
+                yield return Earth("Stream high bank",65,66,2.2);
+                // Wide water is inaccessible scenery: a solid wooden bridge is the only route.
+                yield return new Surface("Valley solid wooden bridge",74,.25,16,.3,false,false,true);
+                yield return Earth("DS6 bridge landing",82,84,1.2);
+                yield return Earth("DS6 descent",84,86,0);
                 yield return Earth("DS6 clearing",86,100,0);
                 yield return Earth("Eastern ridge step",100,104,.4);
                 yield return Earth("PROBE7 ridge",104,122,.8);
-                yield return Earth("Eastern road",122,132,0);
-                yield return new Surface("PROBE8 wooden upper bridge",54,3.2,10,.4,true);
-                yield return new Surface("Valley wooden footbridge",73,-.025,18,.25,true);
+                yield return new Surface("PROBE8 timber climbing step",107,2.4,2,.2,true);
+                yield return new Surface("PROBE8 earth lookout",114,3.9,10,1.4,false,true);
+                yield return new Surface("PROBE8 climbing ledge",120.5,2.5,3,1.4,false,true);
+                yield return Earth("Eastern climbing shoulder",122,124,2);
+                yield return Earth("Eastern road",124,132,0);
             }
         }
         // Feet contact, not XY overlap: bridge/air actors must remain dry. No water physics.
         public static IEnumerable<WaterRegion> Waters(Map map){
             if(map==Map.Village)yield return new WaterRegion(2.4,4,-.35,0);
             if(map==Map.Mist){
-                yield return new WaterRegion(66,80,-2,-1.45);
+                yield return new WaterRegion(66,82,-8,.08,1,true);
             }
         }
         public static double WaterSpeed(Map map,Point feet){
             double factor=1;foreach(var w in Waters(map))if(w.TouchesFeet(feet))factor=System.Math.Min(factor,w.SpeedFactor);return factor;
+        }
+        public static double BaseGroundTop(Map map,double x){
+            double top=-4;foreach(var s in Surfaces(map))if(!s.OneWay&&!s.Overhead&&x>=s.X-s.Width/2&&x<=s.X+s.Width/2)top=System.Math.Max(top,s.Y+s.Height/2);return top;
+        }
+        public static Surface MobSupport(string slot,double x){
+            string roof=slot.StartsWith("DS5.")?"DS5 walkable earth overhang":slot.StartsWith("PROBE8.")?"PROBE8 earth lookout":null;
+            Surface best=default;double top=-100;
+            foreach(var s in Surfaces(Map.Mist))if(!s.OneWay&&x>s.X-s.Width/2&&x<s.X+s.Width/2&&(roof!=null?s.Name==roof:!s.Overhead)&&s.Y+s.Height/2>top){best=s;top=s.Y+s.Height/2;}
+            if(top==-100)throw new System.InvalidOperationException("Missing authored support for "+slot);return best;
         }
         public static double GroundTop(Map map,double x){
             double top=-4;

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Unity / tooling:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-tooling-history",
+    "sha256": "cfbd2b3f3552d3b7e10a85f81077209d1ee7e7dac92c9e9365cbb0bcf3943b46",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Water contact:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "9a50b94aa223dc1abb87f3c655d9d96f2785e0779b058cafb39ea5d2aeee889d",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "source_marker": "Bộ power/MP/CD/gear làm control",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
+    "sha256": "f39b09609c130bfd5853f8ea12ac2100ee86ab25af6e58256c90e12a54255566",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Melee lane probe V6.2.4:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "4b363ee03d025079eb79ce2505258d2af89601923554495731d5f41a11959ff9",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "1_HUYEN_LO_GDD.md",
+    "source_marker": "**Nước nông",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-water-history",
+    "sha256": "c20e35a8738da3a1eb07619eb7dc01760989cd1c1c5abb6e3cc7db092f05d03f",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Pack activity / patrol probe:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "47ae9c6f05782d290ba335e37b41889e3bbc2f1c3672fbc778922fc5402a4da7",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "source_marker": "Bản mẫu mới kiểm one-press",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
+    "sha256": "24e7a5d9adb0e7329f5a36c4eb2c222f4a55c376379014e4cf83c3082f1f2945",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Mock/dev boundary:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "8a80ddcf7d750e98ec4b6dc143ec10d54ed52813e20084661f7da5563148636a",
+    "checked": true,
+    "method": "Root script reconstructs exact source text from prior checkpoint and checks full destination block"
+  }
+]

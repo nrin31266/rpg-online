@@ -83,9 +83,9 @@ namespace HuyenLo.Runtime
             var go=new GameObject(name);if(parent!=null)go.transform.SetParent(parent,false);go.transform.localPosition=position;
             go.transform.localScale=size;var sr=go.AddComponent<SpriteRenderer>();sr.sprite=square;sr.color=color;sr.sortingOrder=order;return sr;
         }
-        private void Ground(string name,float x,float y,float width,float height,bool oneWay=false) {
-            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),oneWay?new Color(.55f,.39f,.23f):new Color(.44f,.38f,.27f));
-            if(oneWay)sr.sortingOrder=6;
+        private void Ground(string name,float x,float y,float width,float height,bool oneWay=false,bool wood=false) {
+            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),wood||oneWay?new Color(.55f,.39f,.23f):new Color(.44f,.38f,.27f));
+            if(oneWay||wood)sr.sortingOrder=6;
             sr.gameObject.layer=6;var box=sr.gameObject.AddComponent<BoxCollider2D>();
             if(oneWay){var eff=sr.gameObject.AddComponent<PlatformEffector2D>();eff.useOneWay=true;eff.useOneWayGrouping=true;eff.surfaceArc=160;box.usedByEffector=true;platforms.Add(box);}
         }
@@ -100,17 +100,17 @@ namespace HuyenLo.Runtime
             float min=(float)BlockoutLayout.MinX(renderedMap),max=(float)BlockoutLayout.MaxX(renderedMap);
             BuildBackdrop(min,max);
             foreach(var surface in BlockoutLayout.Surfaces(renderedMap)){
-                Ground(surface.Name,(float)surface.X,(float)surface.Y,(float)surface.Width,(float)surface.Height,surface.OneWay);
+                Ground(surface.Name,(float)surface.X,(float)surface.Y,(float)surface.Width,(float)surface.Height,surface.OneWay,surface.Wood);
                 bool riverbed=!surface.OneWay&&BlockoutLayout.Waters(renderedMap).Any(w=>surface.X>w.Left&&surface.X<w.Right&&surface.Y+surface.Height/2<w.Level);
-                var cap=surface.OneWay?new Color(.72f,.53f,.31f):riverbed?new Color(.55f,.48f,.33f):new Color(.43f,.6f,.36f);
-                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,(float)(surface.Y+surface.Height/2)),new Vector2((float)surface.Width,.08f),cap,surface.OneWay?7:1);
-                if(!surface.OneWay){
+                var cap=surface.Wood?new Color(.72f,.53f,.31f):riverbed?new Color(.55f,.48f,.33f):new Color(.43f,.6f,.36f);
+                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,(float)(surface.Y+surface.Height/2)),new Vector2((float)surface.Width,.08f),cap,surface.Wood?7:1);
+                if(!surface.Wood){
                     float top=(float)(surface.Y+surface.Height/2);
                     RectVisual("Soil upper band",world.transform,new Vector2((float)surface.X,top-.25f),new Vector2((float)surface.Width,.45f),new Color(.51f,.44f,.31f),0);
                     for(float px=(float)(surface.X-surface.Width/2)+.6f;px<surface.X+surface.Width/2;px+=1.8f)
-                        for(float py=-6.5f;py<top-.5f;py+=1.4f)RectVisual("Soil grain",world.transform,new Vector2(px,py),new Vector2(.09f,.06f),new Color(.36f,.31f,.23f),1);
+                        for(float py=(float)(surface.Y-surface.Height/2)+.4f;py<top-.5f;py+=1.4f)RectVisual("Soil grain",world.transform,new Vector2(px,py),new Vector2(.09f,.06f),new Color(.36f,.31f,.23f),1);
                 }
-                if(surface.OneWay)for(float peg=(float)(surface.X-surface.Width/2);peg<surface.X+surface.Width/2;peg+=.7f)RectVisual("Wood grain",world.transform,new Vector2(peg,(float)surface.Y),new Vector2(.035f,(float)surface.Height),new Color(.3f,.22f,.16f),7);
+                if(surface.Wood)for(float peg=(float)(surface.X-surface.Width/2);peg<surface.X+surface.Width/2;peg+=.7f)RectVisual("Wood grain",world.transform,new Vector2(peg,(float)surface.Y),new Vector2(.035f,(float)surface.Height),new Color(.3f,.22f,.16f),7);
             }
             Ground("LeftBoundary",min,5,1,14);Ground("RightBoundary",max,5,1,14);
             if(renderedMap==Map.Academy){
@@ -125,11 +125,13 @@ namespace HuyenLo.Runtime
             }else {
                 Label("DS1 · NẤM",new Vector3(5,2.4f,0),world.transform,.06f);Label("DS2 · NẤM SƯƠNG",new Vector3(15,3,0),world.transform,.06f);
                 foreach(float x in new[]{30f,50f,59f,90f})Label("BÃI SÓI",new Vector3(x,(float)BlockoutLayout.GroundTop(renderedMap,x)+2.2f,0),world.transform,.06f);
-                Label("ĐƯỜNG CAO · PROBE8",new Vector3(54,5.5f,0),world.transform,.06f);
+                Label("MỎM ĐẤT CAO · NHẢY LÊN",new Vector3(60,6.4f,0),world.transform,.06f);
+                Label("ĐƯỜNG DƯỚI",new Vector3(59,1.8f,0),world.transform,.055f);
+                Label("PROBE8 · ĐƯỜNG CAO",new Vector3(114,6.4f,0),world.transform,.06f);
                 Label("BÃI PHỤ · PROBE7 · 4 SÓI",new Vector3(110,2.7f,0),world.transform,.06f);
                 // Rear stream ends at the same edge as the fall; the fall meets the continuous basin.
-                RectVisual("Rear stream source",world.transform,new Vector2(64.7f,3.5f),new Vector2(3.1f,.15f),new Color(.39f,.7f,.79f),2);
-                Waterfall(66.325f,3.5f,-1.45f);
+                RectVisual("Rear stream source",world.transform,new Vector2(65.65f,2.2f),new Vector2(1.35f,.12f),new Color(.39f,.7f,.79f),2);
+                Waterfall(66.325f,2.2f,.08f);
                 RectVisual("Ancient standing stone",world.transform,new Vector2(99,2.1f),new Vector2(1.5f,4.2f),new Color(.28f,.36f,.35f),-1);
             }
             foreach(var region in BlockoutLayout.Waters(renderedMap))Puddle(region);
@@ -171,40 +173,12 @@ namespace HuyenLo.Runtime
             float min=(float)BlockoutLayout.MinX(renderedMap)+half,max=(float)BlockoutLayout.MaxX(renderedMap)-half;
             return new Vector3(Mathf.Clamp(visual.x,Mathf.Min(min,max),Mathf.Max(min,max)),Mathf.Max(2.4f,visual.y+1.6f),-10);
         }
-        // Authored rear terraces: earth rises behind the route, rather than floating blocks.
-        // They are presentation only. Fixed world positions keep the stream/fall join aligned.
+        // Far scenery has no grass-capped earth silhouettes. Every apparent earth ledge
+        // comes from the same solid Surface definitions that the player stands on.
         private void BuildBackdrop(float min,float max){
-            cameraView.backgroundColor=new Color(.16f,.23f,.26f);
-            float[] far,mid;
-            if(renderedMap==Map.Village){
-                far=new[]{-10f,2,6.6f, 2,14,8, 14,25,6.8f, 25,40,8.8f};
-                mid=new[]{-10f,-3,3.6f, -3,10,3, 10,18,4.1f, 18,30,2.7f, 30,40,4.7f};
-            }else if(renderedMap==Map.Academy){
-                far=new[]{-30f,-16,10, -16,-5,8, -5,14,7.2f, 14,40,6.4f};
-                mid=new[]{-30f,-22,6.3f, -22,-16,4.8f, -16,-5,4.2f, -5,10,3.8f, 10,20,3, 20,40,3};
-            }else{
-                far=new[]{-10f,18,6.5f, 18,36,8.3f, 36,56,7, 56,66,7.8f, 66,88,6, 88,104,8.1f, 104,132,9};
-                mid=new[]{-10f,18,3, 18,36,4.8f, 36,56,3.6f, 56,66,3.5f, 66,82,1.8f, 82,100,4, 100,132,5};
-            }
-            RearTerraces(far,new Color(.29f,.34f,.31f),new Color(.3f,.42f,.33f),-20);
-            RearTerraces(mid,new Color(.38f,.39f,.3f),new Color(.37f,.49f,.33f),-14);
-            if(renderedMap==Map.Mist){
-                foreach(float x in new[]{2f,13,26,34,45,54,60,85,96,108,118,128}){
-                    float y=0;for(int i=0;i<mid.Length;i+=3)if(x>=mid[i]&&x<mid[i+1])y=mid[i+2];
-                    Bamboo(x,y,3+(Mathf.Abs(x)%3)*.35f);
-                }
-            }else foreach(float x in renderedMap==Map.Village?new[]{-7f,33,37}:new[]{-24f,17,36}){
-                float y=0;for(int i=0;i<mid.Length;i+=3)if(x>=mid[i]&&x<mid[i+1])y=mid[i+2];Bamboo(x,y,3);
-            }
-        }
-        private void RearTerraces(float[] profile,Color soil,Color grass,int order){
-            for(int i=0;i<profile.Length;i+=3){
-                float left=profile[i],right=profile[i+1],top=profile[i+2];
-                RectVisual("Rear earth terrace",world.transform,new Vector2((left+right)/2,(top-8)/2),new Vector2(right-left,top+8),soil,order);
-                RectVisual("Rear terrace lip",world.transform,new Vector2((left+right)/2,top-.16f),new Vector2(right-left,.32f),grass,order+1);
-                for(float x=left+.8f;x<right;x+=2.4f)for(float y=top-.8f;y>-6;y-=1.8f)
-                    RectVisual("Rear earth grain",world.transform,new Vector2(x,y),new Vector2(.1f,.05f),soil*.87f,order+1);
-            }
+            cameraView.backgroundColor=new Color(.1f,.18f,.22f);
+            foreach(float x in renderedMap==Map.Mist?new[]{13f,26,34,50,61,91,114}:renderedMap==Map.Village?new[]{-7f,23,34}:new[]{-23f,-15,17,36})
+                Bamboo(x,(float)BlockoutLayout.GroundTop(renderedMap,x),3);
         }
         private void Bamboo(float x,float baseY,float height){
             for(int stem=0;stem<3;stem++){
@@ -218,7 +192,7 @@ namespace HuyenLo.Runtime
             }
         }
         private void Building(string name,float x,float width,float height){
-            float baseY=(float)BlockoutLayout.GroundTop(renderedMap,x);
+            float baseY=name=="Cung đường"?6.4f:(float)BlockoutLayout.BaseGroundTop(renderedMap,x);
             RectVisual(name+" plaster",world.transform,new Vector2(x,baseY+height/2),new Vector2(width,height),new Color(.56f,.49f,.36f),-7);
             // Openings and horizontal timbers read as two floors; only authored wood decks collide.
             float floor=0;bool upstairs=false;

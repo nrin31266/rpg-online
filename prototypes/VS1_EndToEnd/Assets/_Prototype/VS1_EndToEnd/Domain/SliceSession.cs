@@ -40,10 +40,10 @@ namespace HuyenLo.Domain
         public static readonly Anchor[] Anchors={
             new Anchor("Lam","Lâm Bá",Map.Village,0), new Anchor("Yen","Yên Thảo",Map.Village,6),
             new Anchor("Bach","Bách Luyện",Map.Village,13,1.4),new Anchor("Moc","Mộc An",Map.Village,20),
-            new Anchor("Ta","Tạ Minh",Map.Village,26),
+            new Anchor("Ta","Tạ Minh",Map.Village,26,4.4),
             new Anchor("toAcademy","← Học Viện",Map.Village,-4,exit:true),new Anchor("toMist","Đồng Sương →",Map.Village,30,exit:true),
             new Anchor("toVillageA","Vân Khê →",Map.Academy,34,exit:true),new Anchor("Phong","Phong Du",Map.Academy,0),
-            new Anchor("Diep","Diệp Lam",Map.Academy,-12,3.6),
+            new Anchor("Diep","Diệp Lam",Map.Academy,-12,7.2),
             new Anchor("toVillageM","← Vân Khê",Map.Mist,-4,exit:true),
             new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,126,exit:true)
         };
@@ -58,11 +58,10 @@ namespace HuyenLo.Domain
                 Mobs.Add(new Mob(id++,$"DS{pocket}.slot{slot}","Sói Sương",Map.Mist,new Point((pocket==5?58:30+(pocket-3)*20)+(slot-1)*2,.65),4,107,13,5,76,28,2.4,1,1.3));
             // Two extra mock pockets are explicitly probes, outside the release DS1–DS6 budget/quest credit.
             for(int i=0;i<4;i++)Mobs.Add(new Mob(60+i,"PROBE7.slot"+(i+1),"Sói Sương",Map.Mist,new Point(106+i*1.5,.65),4,107,13,5,76,28,2.4,1,1.3){Lane=7,LaneMin=101,LaneMax=121});
-            for(int i=0;i<3;i++)Mobs.Add(new Mob(70+i,"PROBE8.slot"+(i+1),"Sói Sương",Map.Mist,new Point(51+i*1.5,4.05),4,107,13,5,76,28,2.4,1,1.3){Lane=8,LaneMin=49.5,LaneMax=58.5});
-            foreach(var mob in Mobs.Where(x=>x.Map==Map.Mist&&!x.Slot.StartsWith("PROBE8"))){
-                double y=BlockoutLayout.GroundTop(mob.Map,mob.Home.X)+.65;
-                mob.Home=mob.Position=mob.PreviousPosition=new Point(mob.Home.X,y);
-                var lane=BlockoutLayout.Surfaces(Map.Mist).First(x=>!x.OneWay&&mob.Home.X>x.X-x.Width/2&&mob.Home.X<x.X+x.Width/2);
+            for(int i=0;i<3;i++)Mobs.Add(new Mob(70+i,"PROBE8.slot"+(i+1),"Sói Sương",Map.Mist,new Point(111+i*2,5.25),4,107,13,5,76,28,2.4,1,1.3){Lane=8,LaneMin=49.5,LaneMax=58.5});
+            foreach(var mob in Mobs.Where(x=>x.Map==Map.Mist)){
+                var lane=BlockoutLayout.MobSupport(mob.Slot,mob.Home.X);
+                mob.Home=mob.Position=mob.PreviousPosition=new Point(mob.Home.X,lane.Y+lane.Height/2+.65);
                 mob.LaneMin=lane.X-lane.Width/2+.45;mob.LaneMax=lane.X+lane.Width/2-.45;
             }
             foreach(var group in Mobs.Where(x=>!x.Dummy).GroupBy(x=>x.Slot.Split('.')[0])){
@@ -235,7 +234,7 @@ namespace HuyenLo.Domain
                 if(Stage==2 && Receipts.Contains("Q2.dropped") && grounded && position.Distance(new Point(8,.8))<=1.5){Stage=3;Emit("HV_DropLanding — tiếp đất thật");}
             }
             if(Quest==3&&Stage==1&&Player.Map==Map.Academy&&position.Distance(new Point(22,.8))<=1.5)Stage=2;
-            if(Quest==5&&Stage==2&&Player.Map==Map.Mist&&position.Distance(new Point(50,.8))<=1.5)Stage=3;
+            if(Quest==5&&Stage==2&&Player.Map==Map.Mist&&position.Distance(new Point(50,BlockoutLayout.BaseGroundTop(Map.Mist,50)+.8))<=1.5)Stage=3;
             if(Quest==6&&Stage==0&&Player.Map==Map.Academy&&position.Distance(new Point(3,.8))<=1.5)Stage=1;
         }
         private void CheckSupply() {
@@ -253,7 +252,8 @@ namespace HuyenLo.Domain
             if(id=="outOfSlice"){Emit(Complete?"Trúc Ảnh đã mở trong tiến trình, chưa có trong VS-1.":"Cần hoàn thành Q6.");return false;}
             Map destination=id=="toAcademy"?Map.Academy:id=="toMist"?Map.Mist:Map.Village;
             if(Quest==2&&Stage==3&&Player.Map==Map.Academy&&destination==Map.Village){Stage=4;QuestState=QuestState.Ready;}
-            ChangeMap(destination,destination==Map.Village?new Point(id=="toVillageA"?-1:27,.72):new Point(destination==Map.Academy?31:-1,.72));return true;
+            double spawnX=destination==Map.Village?(id=="toVillageA"?-1:27):(destination==Map.Academy?31:-1);
+            ChangeMap(destination,new Point(spawnX,BlockoutLayout.BaseGroundTop(destination,spawnX)+.72));return true;
         }
         private void ChangeMap(Map map,Point spawn){
             foreach(var m in Mobs.Where(x=>x.Map==Player.Map&&x.Alive&&!x.Dummy)){m.Windup=false;m.ReturnSince=Now;}
@@ -264,7 +264,7 @@ namespace HuyenLo.Domain
             if(Player.Alive)return false;
             if(!village){var scroll=Player.Inventory.Bag.FirstOrDefault(x=>x.Id=="scroll");if(scroll==null)return false;Player.Inventory.Consume(scroll);}
             Combat.Cancel();Combat.ClearFocus();
-            if(village)ChangeMap(Map.Village,new Point(15,.8));
+            if(village)ChangeMap(Map.Village,new Point(15,BlockoutLayout.BaseGroundTop(Map.Village,15)+.72));
             Player.Hp=Player.Stats.Hp*(village?1:.5);Player.Mp=Player.Stats.Mp*(village?1:.5);Player.InvulnerableUntil=Now+(village?0:2);Emit("Hồi sinh "+(village?"Vân Khê":"tại chỗ"));return true;
         }
         public void HurtPlayer(double damage) {

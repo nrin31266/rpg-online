@@ -229,7 +229,7 @@ namespace HuyenLo.Runtime
         private void OnGUI(){
             if(Host==null||S==null)return;Refresh();GUI.skin.font=font;GUI.skin.label.fontSize=15;GUI.skin.label.wordWrap=true;GUI.skin.button.fontSize=14;GUI.skin.button.wordWrap=true;
             var st=P.Stats;
-            GUI.Box(new Rect(8,8,325,180),"");GUILayout.BeginArea(new Rect(18,15,305,170));GUILayout.Label("Huyền Lộ · V6.2.5 · "+SliceHost.MapName(P.Map));
+            GUI.Box(new Rect(8,8,325,180),"");GUILayout.BeginArea(new Rect(18,15,305,170));GUILayout.Label("Huyền Lộ · V6.2.6 · "+SliceHost.MapName(P.Map));
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if(GUI.Button(new Rect(8,Screen.height-27,95,22),"DEV · F8")){Toggle("debug");GUIUtility.ExitGUI();}
 #endif

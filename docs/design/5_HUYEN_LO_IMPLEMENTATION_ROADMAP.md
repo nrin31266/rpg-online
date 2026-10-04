@@ -14,7 +14,7 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED, điều kiện mở pr
 
 **Evidence lịch sử 2026-10-03:** [VS-1 disposable/reference](../../prototypes/VS1_EndToEnd/README.md) tại checkpoint `46006c4` có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
 
-**Prototype update 2026-10-04:** V6.2.4 có route/tests nhưng bị user từ chối về hình địa hình: Sói trong lòng nước, dòng nước đứt, background chưa đúng lớp đất. V6.2.5 sửa blockout; kết quả kiểm ở [hồ sơ prototype](#prototype-visual-review), không tự pass G-L hoặc art production.
+**Prototype update 2026-10-04:** V6.2.4 có route/tests nhưng bị user từ chối về hình địa hình: Sói trong lòng nước, dòng nước đứt, background chưa đúng lớp đất. V6.2.5 bị user từ chối vì hiểu sai núi thành backdrop giả. V6.2.6 sửa địa hình chơi được; kết quả kiểm ở [hồ sơ prototype](#prototype-visual-review), không tự pass G-L hoặc art production.
 
 **DEFERRED** là phần đã thiết kế và vẫn phải làm trong TARGET, nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung thuộc TARGET P0, **không phải feature P1**. Mọi bảng Cung, projectile, gear, pose/VFX và balance được giữ. Q6/lore vẫn giới thiệu hai phái; trong bản thử sớm, Kiếm chơi được, Cung ghi “Chưa mở trong bản thử nghiệm”. Không dùng nhãn này trong sản phẩm cuối.
 
@@ -338,9 +338,26 @@ Reader Testing độc lập theo skill doc-coauthoring kiểm scope/gates, autho
 
 # 10. Hồ sơ bản mẫu — không phải luật production
 
-Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture và thông số thử. Docs 1–4 giữ luật, contract, reasoning balance và production visual requirements; không lấy một lần sửa mock để khóa design mới. V6.2.4 bị user từ chối về địa hình dù tests/route pass; các hình và mô tả cũ dưới đây chỉ là lịch sử, **không mô tả bản hiện tại và không phải visual acceptance**.
+Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture và thông số thử. Docs 1–4 giữ luật, contract, reasoning balance và production visual requirements; không lấy một lần sửa mock để khóa design mới. V6.2.4 và V6.2.5 bị user từ chối về địa hình dù tests/route pass; các hình và mô tả cũ dưới đây chỉ là lịch sử, **không mô tả bản hiện tại và không phải visual acceptance**.
 
-## V6.2.5 — sửa theo feedback địa hình
+## V6.2.6 — CURRENT: khối đất chơi được, không dùng backdrop giả làm núi
+
+User làm rõ: “núi” là các khối đất cao có mặt đứng được, có đoạn phải nhảy qua và đoạn có thể đi dưới rồi leo lên; ngoại cảnh sau cùng là lớp khác. Nước rộng có cầu là hình trang trí cao gần cầu vì người chơi không xuống đó. V6.2.5 giải sai vấn đề bằng lớp đất sau không collision; không kế thừa cách đó.
+
+- Mọi khối đất có grass cap nhìn như mặt đi đều lấy từ `Surface` và có solid collider. Bỏ toàn bộ rear earth terraces giả; ngoại cảnh chỉ nền xa/vegetation, không vẽ một tuyến đứng giả.
+- Vân Khê: đài nhập môn là đồi thật với bậc1,2/2,4 và đỉnh3,6 u; Tạ Minh đứng trên đỉnh. Gác nhà vẫn one-way gỗ, đất không drop-through. Đường xuống trở về cổng x30/top0, không đổi chiều liên kết map.
+- Học Viện: sống đất phía tây lên4,4/5,4/6,4 u; mỏm đất x−18…−10/top6,4/bottom5,2 nối sống đất. Cung đường/Diệp Lam ở mặt trên; gác nhà top9,2. Đường thấp bên dưới vẫn tồn tại; phía đông có bậc1,4/2,8/4,2 và khoảng nhảy2 u để lên mỏm. Phong Du và Q2/Q3 giữ tuyến chính.
+- Đồng Sương: DS3 là đồi3,6 u có bậc lên/xuống. DS4 đứng ở plateau2,4; nhảy từ plateau lên mỏm DS5 x54…64/top4,6/bottom2,2 nối khối đất bên trái, có hai Sói ở trên. Có thể đi dưới mỏm trên nền0 rồi ra khe bên phải. PROBE7 bốn Sói ở tuyến0,8; PROBE8 ba Sói ở mỏm thật x109…119/top4,6, từ đường dưới nhảy lên bậc gỗ x107/top2,5 rồi lên mỏm; bậc đất x119…122 nối vai đồi để xuống đường phía đông. Tổng vẫn17 slots mock, không tăng budget release10 hoặc thay stat/reward/quest credit.
+- Mob home/lane chọn đúng mặt nền được author, không dùng highest-Y để đẩy quái từ đường dưới lên roof. Không thêm AI nhảy/đa tầng; mob tuần tra và đánh trong mặt nền của đàn.
+- Suối rộng x66…82 có cầu **solid** top0,4, nước trang trí level0,08 nối nhánh thác bờ. S không drop qua cầu, không có route đi đáy suối hoặc slow ở nước rộng. Không swimming/drowning/hazard. Vũng nhỏ Vân Khê vẫn có đáy thật, đi qua và thử speed×0,85; đây là hai loại khác nhau.
+
+Test-driver của mock giữ jump đủ cao khi vượt cliff và dùng takeoff point để lên DS5; chỉ là điều khiển probe, không player auto-navigation. Q5 entry marker derive đúng cao độ bãi, không giữ waypoint Y cũ làm softlock. Spawn khi portal/về làng derive mặt nền + body offset; không đặt actor trong đồi rồi rơi khỏi map. Các tọa độ/tuning/capture ở mục này chỉ CURRENT PROBE; docs1–4 không đổi trong lượt sửa.
+
+**Kiểm revision:** EditMode57/57, PlayMode9/9; Linux development build V6.2.6 thành công. Fresh standalone Q1–Q6 PASS (Rigidbody2D, keyboard menu adapter, timeScale4, không preset hoặc set quest/EXP/HP/position). Physics fixtures kiểm leo đồi tới Diệp Lam bằng E, đi dưới/nhảy lên cùng mỏm đất, đất/cầu không drop-through và leo lên PROBE8 rồi xuống đường đông. Native1× dùng bàn phím, preset chỉ cho view riêng, không là route acceptance. [Kết quả và source/build hashes](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/validation.json) · [Build](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/build-summary.txt) · [Audit docs](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/document-audit.json).
+
+Ảnh native1× đã xem: [đồi Tạ Minh](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/village-real-hill.png), [Cung đường trên mỏm đất thật](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/academy-high-ground.png), [hội thoại Diệp Lam sau khi leo](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/academy-high-npc.png), [đàn trên/dưới PROBE8](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/mist-upper-pack.png), [mặt trên DS5](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/mist-upper-earth.png), [đường dưới cùng mỏm đất](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/mist-lower-passage.png), [nước trang trí sát cầu sau S](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_6/mist-solid-bridge-after-s.png). Art vẫn khối primitive; **G-L PARTIAL**, chờ user xem hình/cảm giác. Không suy từ test pass rằng hình đã đúng ý user hoặc G-N/G-D đã mở.
+
+## V6.2.5 — lịch sử bị từ chối: hiểu sai núi thành ngoại cảnh
 
 - Thay diamond silhouettes/khối cây rải đều bằng hai lớp đất bậc liền, cao dần phía sau tuyến chính. Cây tre đặt theo mặt đất của từng lớp; hậu cảnh không collision, không dùng để đánh lừa có sàn đứng.
 - DS5 chuyển lên bờ khô x58/60, activity nằm trong support x56…64. Giữ ID/slot/stat, DS1–DS6/10 slots và quest credit; PROBE7/8 vẫn riêng mock; PROBE8 centreY4,05 theo mặt sàn3,4 + offset0,65 để chân không bị sàn che. Không đặt quái hay props khô dưới lòng nước.

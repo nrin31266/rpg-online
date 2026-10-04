@@ -82,7 +82,7 @@ namespace HuyenLo.Runtime
             host.ExternalJumpHeld=S.Now<releaseJumpAt;
             if(!host.Grounded)return;
             var hit=Physics2D.Raycast(host.Body.position+new Vector2(0,-.6f),new Vector2(host.ExternalAxis,0),.95f,1<<6);
-            if(hit.collider!=null&&hit.normal.y<.5f&&hit.collider.GetComponent<PlatformEffector2D>()==null){host.ExternalJump=true;host.ExternalJumpHeld=true;releaseJumpAt=S.Now+.12;}
+            if(hit.collider!=null&&hit.normal.y<.5f&&hit.collider.GetComponent<PlatformEffector2D>()==null){host.ExternalJump=true;host.ExternalJumpHeld=true;releaseJumpAt=S.Now+(hit.collider.bounds.max.y-(host.Body.position.y-.72f)>.7f?.65:.12);}
         }
         private void HealIfNeeded(){if(S.Player.Hp<S.Player.Stats.Hp*.45)S.Potion(true);}
         private void Check(bool ok,string message){if(!ok)throw new InvalidOperationException(message+"; "+S.Objective);}
@@ -104,10 +104,14 @@ namespace HuyenLo.Runtime
         private IEnumerator Exit(string id) {
             host.Hud.Close();var exit=SliceSession.Anchors.First(x=>x.Id==id&&x.Map==S.Player.Map);var from=S.Player.Map;
             double start=S.Now;
-            while(S.Player.Map==from){Check(S.Now-start<35,"auto exit stalled "+id);host.ExternalAxis=host.Body.position.x<exit.Position.X?1:-1;JumpObstacle();HealIfNeeded();yield return new WaitForFixedUpdate();}
+            while(S.Player.Map==from){Check(S.Now-start<35,"auto exit stalled "+id);host.ExternalAxis=Math.Abs(host.Body.position.x-exit.Position.X)<.3?0:host.Body.position.x<exit.Position.X?1:-1;JumpObstacle();HealIfNeeded();yield return new WaitForFixedUpdate();}
             host.ExternalAxis=0;yield return new WaitForFixedUpdate();yield return new WaitForFixedUpdate();
         }
         private IEnumerator Fight(Mob mob) {
+            // Authored test-driver route onto the DS5 shelf; not player auto-navigation.
+            if(mob.Slot.StartsWith("DS5.")){
+                yield return Move(53.4);releaseJumpAt=S.Now+.7;host.ExternalJump=true;host.ExternalJumpHeld=true;
+            }
             yield return Move(mob.Position.X+(host.Body.position.x<mob.Position.X?-.8:.8));
             S.Combat.Explicit(mob);int life=mob.Generation;double start=S.Now;
             while(mob.Alive&&mob.Generation==life){
@@ -155,7 +159,7 @@ namespace HuyenLo.Runtime
             yield return Exit("toVillageA");yield return Talk("Ta",turnIn:true);
             Check(S.Complete&&S.Player.School==School.Sword,"continuous route did not complete");
             Check(Enumerable.Range(1,6).All(i=>S.Receipts.Contains($"Q{i}.completed")),"missing completion receipt");
-            S.Emit("VS1 V6.2.4 Q1→Q6 PASS — physics, auto EdgeExit, keyboard menu adapter, one-press combat; no debug injection.");
+            S.Emit("VS1 V6.2.6 Q1→Q6 PASS — physics, auto EdgeExit, keyboard menu adapter, one-press combat; no debug injection.");
         }
     }
 }
