@@ -837,3 +837,22 @@ Các đề xuất dưới đây được giữ để không mất thiết kế �
 **Legacy provenance compact:** NSO reference đã khai thác, không current authority. Trace từ `research/SRC NSOACE FIX/`: `Char.initMenu/finishTask` (NPC turn-in / bag checks), equip / use callbacks và `AbilityFromEquip` (onboarding / +4), `Mob.dead` (quest assist / loot input), Part / TileMap (modular / one-way). Availability instances là historical input; Boss hiện hành shared world. Không dùng reference chứng minh crash atomicity, rates hoặc balance. Lịch sử chi tiết nằm trong Git; pattern đã nhận là design Huyền Lộ.
 
 ````
+
+
+<a id="single-behavior-history-4"></a>
+
+## Historical source fragments — 4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md
+
+Các đoạn dưới đây giữ nguyên văn trước đồng bộ luật được chủ dự án duyệt. Chỉ là lịch sử; không áp dụng làm luật hiện hành. Source: `docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md`.
+
+### Source fragment 4.1
+
+````text
+**Player khác mob:** death camera/corpse phải còn tới revive/về làng; không áp auto-fade/despawn normal lên player. Corpse Boss contributor ≥10% còn trong area vẫn hợp lệ theo GDD, không pickup tới khi sống. Phiên mất HP0 khôi phục corpse ở SafeAnchor; trạng thái corpse art không quyết định quest eligibility. PvPDefeated dùng kết thúc trận, không mở lựa chọn Hồi Sinh Phù/PvE death.
+````
+
+### Source fragment 4.2
+
+````text
+Ba skill entries/class dùng selected/locked/CD/MP cues, ghi rõ chỉ là default prototype UX; Tân Lữ entry 1 Mộc Kiếm, 2/3 khóa; 1/2/3 one-press bounded approach/cast, không J/RepeatOnHold; pending tiếp cận có cue “Đang tiếp cận”, reject nêu blocked/quá xa/chưa sẵn, manual/Esc hủy. Release không cancel pending; không hiện accepted cast animation trước validation/commit. Accepted action presentation bind snapshotted SkillId, không selection mới.
+````

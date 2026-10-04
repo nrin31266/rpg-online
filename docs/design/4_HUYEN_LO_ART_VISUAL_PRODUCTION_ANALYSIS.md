@@ -1,5 +1,15 @@
 # Huyền Lộ — Art, hình ảnh và production
 
+## Tóm tắt
+
+Owner của visual/pose/weapon/map/UI/import và production accounting. Giữ nguyên quy định art, 26-frame contract, các bảng và scenarios. Gameplay/input dẫn về GDD; blockout tối giản của bản chạy thử không thay art production.
+
+## Tìm gì ở đâu
+
+- [Player / 26 frame](#player-visual), [weapon](#weapon-visual), [combat / mob](#combat-visual).
+- [Map / terrain / building](#map-visual), [icons / UI](#icons-ui).
+- [Import / First Art Probe](#art-integration), [accounting](#production-accounting), [validation](#art-validation).
+
 **PROJECT STATUS:** DESIGN + PROTOTYPE VALIDATION. VS-1 hiện có là disposable/reference integration prototype, production codebase chưa bắt đầu. Primitive/text UI và video revision cũ không production art/UX acceptance; prototype folders/classes không quyết architecture. CURRENT là harvest/feel/art/UI probe trước base theo Roadmap.
 
 <a id="huyền-lộ--phân-tích-art-hình-ảnh-và-production"></a>
@@ -281,7 +291,7 @@ ACK tới t0+30 s thì deadline 25 s đã qua: chỉ được spawn sau finalize
 
 **Flying death:** phương án rẻ là mất wing→trượt/rơi **visual-only** tới nền gần hợp lệ rồi tàn; fallback tan tại chỗ nếu dưới là hố/khác tầng. Không thêm Rigidbody corpse, collision loot hoặc hurtbox rơi qua player. Vị trí loot do server author/resolve điểm pickup đứng được; nếu hiện chưa có ground projection, ghi **OPEN A08**, không client raycast tự đổi vị trí loot đáng tin. Test Ong chết trên cầu, mép vực, giữa các tầng; loot không nằm ở điểm Kiếm không thể tới.
 
-**Player khác mob:** death camera/corpse phải còn tới revive/về làng; không áp auto-fade/despawn normal lên player. Corpse Boss contributor ≥10% còn trong area vẫn hợp lệ theo GDD, không pickup tới khi sống. Phiên mất HP0 khôi phục corpse ở SafeAnchor; trạng thái corpse art không quyết định quest eligibility. PvPDefeated dùng kết thúc trận, không mở lựa chọn Hồi Sinh Phù/PvE death.
+**Player khác mob:** death camera/corpse phải còn tới revive/về làng; không áp auto-fade/despawn normal lên player. Corpse Boss contributor ≥10% còn trong area vẫn hợp lệ theo GDD, không pickup tới khi sống. [Recovery gameplay](1_HUYEN_LO_GDD.md#consumables-death) quyết vị trí corpse/SafeAnchor; trạng thái corpse art không quyết định quest eligibility. PvPDefeated dùng kết thúc trận, không mở lựa chọn Hồi Sinh Phù/PvE death.
 
 ## 9. Bù Nhìn dùng chung tutorial và training
 
@@ -539,7 +549,7 @@ Nguồn icon dự kiến32×32 transparent, hiển thị scale nguyên và toolt
 | Dialogue/Rest/Death | NPC text/action, confirm heal/death choices khác PvP | Panel/buttons; Hồi Sinh icon, không tám portraits bắt buộc |
 | HUD/world UI/chat/map exits | Bars, quest tracker, food/bình, focus marker/mini HP + screen name/level/current-max HP, reward tooltip, bubble hai dòng, signpost, Boss timer/banner | Kit/typography/marker glyphs; edge arrow + destination name/NPC marker P0; không HP bars Party hoặc quest navigation xuyên map P0 |
 
-Ba skill entries/class dùng selected/locked/CD/MP cues, ghi rõ chỉ là default prototype UX; Tân Lữ entry 1 Mộc Kiếm, 2/3 khóa; 1/2/3 one-press bounded approach/cast, không J/RepeatOnHold; pending tiếp cận có cue “Đang tiếp cận”, reject nêu blocked/quá xa/chưa sẵn, manual/Esc hủy. Release không cancel pending; không hiện accepted cast animation trước validation/commit. Accepted action presentation bind snapshotted SkillId, không selection mới.
+Ba skill entries/class dùng selected/locked/CD/MP cues; Tân Lữ entry 1 Mộc Kiếm, 2/3 khóa. Input/pending/cancel theo [GDD §3](1_HUYEN_LO_GDD.md#pending-cast); Art chỉ thể hiện cue “Đang tiếp cận” và reason blocked/quá xa/chưa sẵn. Không hiện accepted cast animation trước validation/commit. Accepted action presentation bind snapshotted SkillId, không selection mới.
 
 **Navigation/controls/readability probe:** edge exit thường dùng arrow ở mép + tên đích khi tới gần, không vẽ teleport arch hoặc E prompt. Huyền Môn/Arena có SpecialGate cue khác; NPC marker cơ bản đủ thấy nơi nhận/trả. Quest arrow xuyên map vẫn P1. Tutorial glyph lấy Jump/DropThrough/UseFood/UsePotion/Interact binding, không bake S+Space/F/M vào dialogue/art. Default panels I/C/Q theo GDD; skill view trong C, không B/K/L overrides từ prototype.
 
