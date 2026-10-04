@@ -13,22 +13,22 @@ namespace HuyenLo.Tests
     {
         private const int Seed=731;
         private const double Dt=.02;
-        private static SliceSession Novice(Map map,int level) {
-            var s=new SliceSession(Seed);s.Player.Map=map;s.Player.Level=level;
+        private static SliceSession Novice(Map map,int level,ProbeConfig probes=null) {
+            var s=new SliceSession(Seed,probes);s.Player.Map=map;s.Player.Level=level;
             s.Player.Inventory.Equipment[GearSlot.Weapon]=s.NewItem("wood");
             s.Player.Hp=s.Player.Stats.Hp;s.Player.Mp=s.Player.Stats.Mp;return s;
         }
         private static void AdvanceMovement(SliceSession s,int manual=0) {
             var p=s.Player.Position;int move=manual!=0?manual:s.Combat.AssistAxis;
-            s.ObservePosition(new Point(p.X+move*5*Dt,p.Y),true);
+            s.ObservePosition(new Point(p.X+move*5*Dt,p.Y),true,false,false,manual!=0);
             s.Tick(Dt,manual!=0);
         }
         private static IEnumerable<double> PressTimes(double seconds) {
             var random=new System.Random(Seed);double time=0;
             while(time<seconds){yield return time;time+=.35+(random.NextDouble()*2-1)*.1;}
         }
-        private static (int presses,int rejected) Cadence() {
-            var s=Novice(Map.Academy,3);s.Player.Position=new Point(21,.8);
+        private static (int presses,int rejected) Cadence(ProbeConfig probes=null) {
+            var s=Novice(Map.Academy,3,probes);s.Player.Position=new Point(21,.8);
             var dummy=s.Mobs.First(x=>x.Dummy);foreach(var m in s.Mobs)if(m!=dummy)m.Map=Map.Mist;
             var times=PressTimes(60).ToArray();int next=0,rejected=0;
             while(s.Now<60){
@@ -44,8 +44,8 @@ namespace HuyenLo.Tests
             }
             return(next,rejected);
         }
-        private static (double flipRate,double damage,double ttk,int[] flips,bool alive) Crowd() {
-            var s=new SliceSession(Seed);s.Player.Map=Map.Mist;s.Player.School=School.Sword;s.Player.Level=5;
+        private static (double flipRate,double damage,double ttk,int[] flips,bool alive) Crowd(ProbeConfig probes=null) {
+            var s=new SliceSession(Seed,probes);s.Player.Map=Map.Mist;s.Player.School=School.Sword;s.Player.Level=5;
             s.Player.Str=s.Player.Vit=s.Player.Int=s.Player.Agi=5;
             foreach(var id in new[]{"sword1","armor1","pants1","boots1","ring1","neck1"})s.Player.Inventory.Equipment[Catalog.Get(id).Slot]=s.NewItem(id);
             s.Player.Hp=s.Player.Stats.Hp;s.Player.Mp=s.Player.Stats.Mp;s.Combat.Unlocked[1]=Rules.Sword1;
@@ -66,8 +66,8 @@ namespace HuyenLo.Tests
             }
             return(flips.Sum()/3.0/2,hp-s.Player.Hp,ttk,flips,s.Player.Alive);
         }
-        private static double Ttk(bool wolf) {
-            var s=Novice(wolf?Map.Mist:Map.Academy,wolf?4:3);
+        private static double Ttk(bool wolf,ProbeConfig probes=null) {
+            var s=Novice(wolf?Map.Mist:Map.Academy,wolf?4:3,probes);
             var targets=wolf?s.Mobs.Where(x=>x.Name=="Sói Sương").Take(1).ToArray():s.Mobs.Where(x=>x.Dummy).ToArray();
             foreach(var m in s.Mobs)if(!targets.Contains(m))m.Map=Map.Village;
             if(wolf)s.Player.Inventory.Equipment[GearSlot.Pants]=s.NewItem("pants1");
@@ -84,31 +84,45 @@ namespace HuyenLo.Tests
             }
             return killed.Count==targets.Length?s.Now:-1;
         }
-        private static (int attempts,int cancels) HeldApproach() {
+        private static (int attempts,int cancels) HeldApproach(ProbeConfig probes=null) {
             int cancelled=0;
             for(int i=0;i<20;i++){
-                var s=Novice(Map.Academy,3);s.Player.Position=new Point(19.8,.8);
+                var s=Novice(Map.Academy,3,probes);s.Player.Position=new Point(19.8,.8);
                 s.Combat.Press("1");Assert.That(s.Combat.HasPendingCast,Is.True);
                 // Mirror baseline Host: a held movement axis cancels in every FixedUpdate.
-                s.Combat.ManualOverride();if(!s.Combat.HasPendingCast)cancelled++;
+                var held=new HeldAxisProbe();held.Snapshot(4);
+                int axis=s.Probes.StaleHeldAxis?held.Axis(4,s.Combat.HasPendingCast):1;
+                if(axis!=0&&!s.Probes.StaleHeldAxis)s.Combat.ManualOverride();
+                if(!s.Combat.HasPendingCast)cancelled++;
             }
             return(20,cancelled);
         }
-        private static int ExitLeak() {
-            var s=Novice(Map.Mist,4);foreach(var m in s.Mobs)m.Map=Map.Academy;
+        private static int ExitLeak(ProbeConfig probes=null) {
+            var s=Novice(Map.Mist,4,probes);foreach(var m in s.Mobs)m.Map=Map.Academy;
             var target=s.Mobs.First(x=>x.Dummy);target.Map=Map.Mist;target.Position=new Point(-5.3,.8);s.Player.Position=new Point(-2.9,.8);
-            s.Combat.Explicit(target);s.Combat.Press("1");Assert.That(s.Combat.HasPendingCast,Is.True);
+            s.Combat.Explicit(target);s.Combat.Press("1");Assert.That(s.Combat.HasPendingCast,Is.EqualTo(!s.Probes.ApproachExitSafety));
             for(int i=0;i<100&&s.Player.Map==Map.Mist&&s.Combat.HasPendingCast;i++)AdvanceMovement(s);
             return s.Player.Map==Map.Mist?0:1;
         }
-        [Test] public void RecordBaselineBeforeBehaviorChanges() {
-            var c=Cadence();var crowd=Crowd();var held=HeldApproach();
-            var report=new BaselineMetrics {seed=Seed,dt=Dt,utc=DateTime.UtcNow.ToString("O"),presses=c.presses,rejected=c.rejected,rejectPercent=100.0*c.rejected/c.presses,
+        public static BaselineMetrics Measure(ProbeConfig probes=null) {
+            var c=Cadence(probes);var crowd=Crowd(probes);var held=HeldApproach(probes);
+            var basic=probes!=null&&probes.NoviceCadence?Rules.NoviceProbe:Rules.Novice;
+            return new BaselineMetrics {seed=Seed,dt=Dt,utc=DateTime.UtcNow.ToString("O"),presses=c.presses,rejected=c.rejected,rejectPercent=100.0*c.rejected/c.presses,
                 flipsPerWolfPer5s=crowd.flipRate,flipsPerWolf10s=crowd.flips,damageTaken10s=crowd.damage,playerSurvivedCrowd10s=crowd.alive,
-                crowdFirstKillSeconds=crowd.ttk,noviceCooldown=Rules.Novice.Cooldown,noviceActionLock=Rules.Novice.Lock,deadTimePercent=100*(Rules.Novice.Cooldown-Rules.Novice.Lock)/Rules.Novice.Cooldown,
-                noviceOneWolfTtk=Ttk(true),noviceThreeDummyTtk=Ttk(false),heldApproachAttempts=held.attempts,heldApproachCancelled=held.cancels,edgeExitLeaks=ExitLeak()};
-            string dir=Path.GetFullPath(Path.Combine(Application.dataPath,"../PrototypeEvidence/Baseline"));Directory.CreateDirectory(dir);
-            File.WriteAllText(Path.Combine(dir,"metrics.json"),JsonUtility.ToJson(report,true)+"\n");Debug.Log(JsonUtility.ToJson(report));
+                crowdFirstKillSeconds=crowd.ttk,noviceCooldown=basic.Cooldown,noviceActionLock=basic.Lock,deadTimePercent=100*(basic.Cooldown-basic.Lock)/basic.Cooldown,
+                noviceOneWolfTtk=Ttk(true,probes),noviceThreeDummyTtk=Ttk(false,probes),heldApproachAttempts=held.attempts,heldApproachCancelled=held.cancels,edgeExitLeaks=ExitLeak(probes)};
+        }
+        [Test] public void RecordBaselineBeforeBehaviorChanges() {
+            var report=Measure();string path=Path.GetFullPath(Path.Combine(Application.dataPath,"../PrototypeEvidence/Baseline/metrics.json"));
+            var original=JsonUtility.FromJson<BaselineMetrics>(File.ReadAllText(path));report.utc=original.utc;
+            Assert.That(JsonUtility.ToJson(report),Is.EqualTo(JsonUtility.ToJson(original)),"All probe flags OFF must reproduce the committed baseline; never overwrite it");
+        }
+        [Test] public void RecordExperimentalMetricsWithoutChangingBaseline() {
+            string dir=Path.GetFullPath(Path.Combine(Application.dataPath,"../PrototypeEvidence/InputProbes"));Directory.CreateDirectory(dir);
+            var all=ProbeConfig.Experimental();var input=ProbeConfig.Experimental();input.StableMelee=false;
+            foreach(var c in new[]{(name:"metrics",config:all),(name:"metrics-melee-only",config:new ProbeConfig{StableMelee=true}),(name:"metrics-input-only",config:input)}){
+                var report=Measure(c.config);File.WriteAllText(Path.Combine(dir,c.name+".json"),JsonUtility.ToJson(report,true)+"\n");Debug.Log(c.name+": "+JsonUtility.ToJson(report));
+            }
         }
     }
     [Serializable] public sealed class BaselineMetrics {

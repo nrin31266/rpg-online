@@ -1,0 +1,115 @@
+{
+  "code_commit": "cbd73f9",
+  "source_includes_preserved_pre_task_uncommitted_changes": true,
+  "default_flags": "all OFF",
+  "unity": "6000.5.9f1",
+  "machine": "Linux 6.19.10-300.fc44.x86_64",
+  "tests": [
+    {
+      "platform": "EditMode",
+      "total": "87",
+      "passed": "87",
+      "failed": "0",
+      "skipped": "0",
+      "duration": "0.3475144",
+      "sha256": "cf5f4db4828db30ec50750376cea2a65518c372d45e532156a04ab67b58e88fa",
+      "raw_result_local_only": "/tmp/huyenlo-input-probe-edit.xml"
+    },
+    {
+      "platform": "PlayMode",
+      "total": "16",
+      "passed": "16",
+      "failed": "0",
+      "skipped": "0",
+      "duration": "86.4209196",
+      "sha256": "53b62ea091fda25b815bd6fe957f99b98b3b33b1b56c17af2b23f418d9bfb34e",
+      "raw_result_local_only": "/tmp/huyenlo-input-probe-play.xml"
+    }
+  ],
+  "files": [
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/BlockoutLayout.cs",
+      "sha256": "53a74e7dadd2a92e23f5bdb15dafa1f049c5234a64aa6a81d6a985b5e91d7b16",
+      "bytes": 8302
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/CombatController.cs",
+      "sha256": "03f3f9875de9668423d97d4edf3089e72716012db27e55bbec6e961a34200cdc",
+      "bytes": 19367
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/ProbeConfig.cs",
+      "sha256": "a55bc4d7071b54b8dcb3efda6bede3dd8a30aca680fc0d1f9f654ed7bc7f9bea",
+      "bytes": 2353
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/PrototypePresets.cs",
+      "sha256": "4a1e6943ace8e802e4b14f1a55ca1cbc377b091c89d7427f3a1eb6159c655d17",
+      "bytes": 2813
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs",
+      "sha256": "588b67e932942dd155c057a3d8bf485920a18304376ad1c0cde82104373cbc2c",
+      "bytes": 11634
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs",
+      "sha256": "3ffe184fdd741771449b6ae156e126547218a98a48531d5d361592f4bd8bc9b4",
+      "bytes": 37167
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/GeometricRig.cs",
+      "sha256": "f7b045fc709af74237d988641999c61d3c590ed6b1b76b94aa2056c9d5fe134e",
+      "bytes": 8402
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHost.cs",
+      "sha256": "0d13b26eb31f8dc42c11f48a828f426f5fb2ce31a5a0f969231bbd24f73da138",
+      "bytes": 89484
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs",
+      "sha256": "fd1b4268bdb221def4d434878d5d79258cce3744efb9cdd123623fb5274198f9",
+      "bytes": 31521
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceRouteProbe.cs",
+      "sha256": "28e48758ba299046b440606c16f517cc5808cdb3069447695a05e1465fc3270a",
+      "bytes": 14176
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/DomainTests.cs",
+      "sha256": "fc7b8440adc592ccdd21b36c8b61b3f809e4a2266136d922c614f0a5be6031a3",
+      "bytes": 31600
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/ProbeBehaviorTests.cs",
+      "sha256": "80ecd450442bb18b0602cd186b4149b1a1cfb5efd95b47d62abad5e77409075f",
+      "bytes": 11976
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/ProbeMetricsTests.cs",
+      "sha256": "ab0c4a99fc33adf66ee1f8481595d7c35e1f8ac30ac619ed112f544e5bb1aaf5",
+      "bytes": 10181
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/ContinuousRouteTests.cs",
+      "sha256": "3ef516a8971fe1b96ae4e383d847d9981589618ccc8be3a3441d2025a4e02e11",
+      "bytes": 822
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/InputPhysicsTests.cs",
+      "sha256": "b78b17deb8cac516edcb5d397a75807da48ffe5229c6160a60de50ef20cdb75a",
+      "bytes": 22448
+    },
+    {
+      "file": "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/InputProbeTests.cs",
+      "sha256": "d9fdcdf3ac86c4643ebb03cf8e76c1db5b96238c3ac7e4a6b7bd11a0b44cad78",
+      "bytes": 8766
+    }
+  ],
+  "correctness_pass": true,
+  "metric_thresholds_pass": false,
+  "human_rollover_and_feel": "CHƯA ĐO",
+  "g_l_pass": false
+}

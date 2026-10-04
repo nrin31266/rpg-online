@@ -249,7 +249,7 @@ namespace HuyenLo.Runtime
             float barX=Screen.width/2-132;
             var slotText=new GUIStyle(GUI.skin.label){fontSize=12};
             for(int i=1;i<=3;i++){
-                bool unlocked=S.Combat.Unlocked.TryGetValue(i,out var skill);if(P.School==School.Novice&&i==1){skill=Rules.Novice;unlocked=true;}bool active=unlocked&&S.Combat.Selected==skill;
+                bool unlocked=S.Combat.Unlocked.TryGetValue(i,out var skill);if(P.School==School.Novice&&i==1){skill=S.Combat.Selected;unlocked=true;}bool active=unlocked&&S.Combat.Selected==skill;
                 var r=new Rect(barX+(i-1)*90,Screen.height-110,82,70);Fill(r,active?new Color(.22f,.4f,.35f):new Color(.12f,.2f,.25f));GUI.Box(r,"");
                 GUI.Label(new Rect(r.x+5,r.y+3,72,22),i+"   "+(unlocked?"◆":"×"));
                 GUI.Label(new Rect(r.x+5,r.y+26,72,23),unlocked?skill.Name.Replace(" nhập môn","").Replace(" tiến cảnh",""):"Chưa học",slotText);

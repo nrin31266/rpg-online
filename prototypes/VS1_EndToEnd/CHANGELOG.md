@@ -85,3 +85,44 @@ Media hiện tại đã không được track ở HEAD; các link cũ vẫn dùn
 Reject recorder dùng Dummy HP60, tạo life lab kế ngay sau chết để luôn có mục tiêu; không đổi HP catalog hoặc respawn world. Crowd dùng ba PROBE7 Sói với HP107, Lv5 cân bằng/Common I; player sống hết10s, có kill thực. TTK dùng cùng lịch press seed và đi giữa mục tiêu, không unlimited approach. Held/exit là replay thứ tự của Host trên domain, chưa là bằng chứng keyboard hardware.
 
 **CHƯA ĐO bởi người thật:** rollover D+Space+1(+2) trên desktop/laptop; WASD/mũi tên với4/5; feel0,70s normal speed. Rủi ro: cadence press0,35±0,1s nhanh hơn CD, reject≤10% có thể không khả thi; damage intake còn phụ thuộc thời điểm chết của quái, không riêng AI safe window. Không có luật/số GDD được thay.
+
+## Phase D — prototype sau flag, mặc định OFF
+
+Commit `cbd73f9`: ProbeConfig/domain/input adapter/HUD và presets. Buffer 0,18s chỉ nhận latest intent gần lúc skill sẵn; stale held axis bị bỏ qua trong pending rồi hoạt động lại; arrival có enum reason, không commit khi fail; approach chặn exit; Esc theo ngữ cảnh; 4/5 và Tab/Shift+Tab sau flag. Basic Tân Lữ thử0,70/0,32/hit0,10, không đổi S1/S2/S3 hoặc stat/EXP/speed/range quái. StableMelee thử free-space0,9×range, side hysteresis1,5s, phase SpawnSlot+life, wolf retreat0,8u trong recovery, Nấm không retreat và quadratic separation. Không token/slot/formation/shoving; windup không steering. Ranged giả đi cùng pipeline; chưa implement Cung hoặc PvP.
+
+F8 → mục cuối “A/B probes” → bật riêng từng flag hoặc tất cả; Enter/chuột cùng command. Fresh app mặc định mọi flag OFF; reset debug giữ lựa chọn A/B của phiên, vẫn có nhãn fixture. Mở panel debug tạm dừng mô phỏng local. Test adapter dùng thiết bị Input System ảo; không tự gọi đó là keyboard hardware.
+
+Các sửa cảnh quan có sẵn trong working tree được backup và giữ nguyên; phần code chồng file được stage riêng bằng diff với snapshot đầu task, kiểm residual khớp nguyên thay đổi trước task. Không đưa đại tu cảnh quan vào commit probe hoặc gọi nó là kết quả của task này. Sửa HUD Tân Lữ ở bước kiểm thử để highlight/CD đọc đúng profile A/B thay vì luôn trỏ profile baseline.
+
+## Phase E — kết quả A/B và giới hạn
+
+[So ngưỡng](PrototypeEvidence/InputProbes/comparison.json) · [All flags ON](PrototypeEvidence/InputProbes/metrics.json) · [Chỉ AI](PrototypeEvidence/InputProbes/metrics-melee-only.json) · [Chỉ input](PrototypeEvidence/InputProbes/metrics-input-only.json) · [Validation/source hashes](PrototypeEvidence/InputProbes/validation.json). Seed731/dt0,02 và kịch bản Phase B giữ nguyên; OFF replay trùng baseline. Test correctness và metric threshold là hai kết quả riêng: test PASS không làm các FAIL dưới thành PASS.
+
+| Chỉ số | Baseline OFF | All ON | Ngưỡng / kết quả |
+| --- | ---: | ---: | --- |
+| Facing hoặc velocity sign flip / quái /5s | 3,3333 | 6,1667 | ≤2: **FAIL, tệ hơn** |
+| Reject / press60s | 119/171 (69,5906%) | 88/171 (51,4620%) | ≤10%: **FAIL** |
+| Dead time basic Tân Lữ | 74% | 54,2857% | ≤55%: PASS arithmetic |
+| HP mất /10s, 3 Sói | 131 | 166 (+26,7176%) | ±10%: **FAIL** |
+| TTK Lv4/1 Sói | 4,96s | 3,98s (−19,7581%) | Báo cáo, không ngưỡng |
+| TTK Lv3/3 Dummy HP60 | 9,78s | 6,42s (−34,3558%) | Báo cáo, không ngưỡng |
+| Hủy do stale held axis | 20/20 | 0/20 | PASS domain replay + virtual adapter |
+| Auto-approach lọt exit | 1/1 | 0/1 | PASS domain fixture + virtual adapter |
+
+**Tách nguyên nhân:** chỉ StableMelee ON cho5,8333 flips/quái/5s và142HP (+8,397%); chỉ nhóm input ON cho3,3333 flips và122HP (−6,870%). AI candidate vẫn không ổn định về đổi dấu vận tốc dù không lật cánh ngay sau cắn. Retreat và separation correction có thể đổi dấu liên tục; deadband facing không bảo đảm velocity ổn định. Đây là hypothesis cần trajectory review, chưa causal proof. Với cả hai nhóm ON, damage lệch26,7% nên không duyệt package hoặc đổi baseline. Không chỉnh interval/speed/range/HP để ép đạt.
+
+**Reject theo cadence:** lịch171 press/60s nhanh hơn CD0,70s: kể cả target luôn hợp lệ, không thể thực thi tất cả press. Trần khoảng86 cast/60s nghĩa là reject hoặc không thực thi khoảng50% nếu không giữ queue dài; ngưỡng10% không phù hợp kịch bản spam này. Latest buffer có thể giảm hụt press nhưng không tạo cooldown bypass. Không đổi định nghĩa reject để tô đẹp kết quả.
+
+**Q3–Q5:** nhịp Tân Lữ mới rút ngắn mẫu3 Dummy khoảng3,36s; mẫu1 Sói nhanh hơn0,98s khi all ON. AI riêng lại kéo mẫu1 Sói4,96→7,38s; input riêng4,96→2,96s, cho thấy interaction không thể suy bằng cộng delta. HP60 Dummy, objective count, EXP0 Dummy/15 Nấm/22 Sói, level gap và quest top-up không đổi trong code. Chưa đo lại fresh toàn Q3–Q5 ở1× cho mỗi nhóm; không nhân TTK một Sói thành dự báo journey/EXP mỗi giờ hoặc cập nhật bảng balance cũ. Điều đó còn nằm trong CMB-01.
+
+**Giới hạn damage:** Sói có HP hữu hạn và chết thật; movement ảnh hưởng target/evade và thứ tự RNG. ±10% là kiểm cần thiết của probe, không đủ chứng minh “không thêm safe window”. Các deadline interval không bị kéo dài trong code nhưng áp lực thực và loop retreat cần playtest/trace bổ sung. Cung/PvP, backend/Dedicated và geometry production chưa được nghiệm thu.
+
+### Checklist cần người thật — CHƯA ĐO
+
+- Desktop và laptop: giữ D+Space+1, rồi thêm2; kiểm mỗi physical press có đúng một intent, không double/repeat hoặc mất phím. Phân biệt giới hạn keyboard rollover với cancellation đúng vì Jump/new KeyDown.
+- WASD và mũi tên: dùng4/5 lúc đang chạy/cần hồi; đo bấm nhầm, rời tay, có đọc được glyph4/H và5/M không.
+- 1× OFF/ON basic0,70s: thử3 Dummy, Q4 Nấm và Q5 Sói; đánh giá windup/recovery/di chuyển, không chỉ cảm giác spam nhanh hơn.
+- Crowd1/2/4, mép lane và player đi xuyên: xem silhouette, retreat/velocity jitter, pressure, side lock và target pinned bằng Tab.
+- Esc: NPC submenu/menu, pending, focus, no-op; mở/đóng UI không resume approach cũ. Thử blocked exit rồi manual chuyển map.
+
+Chưa có người thật thực hiện checklist; **G-L PARTIAL, không PASS**. Findings chuyển thành yêu cầu kiểm cho G-B, không mang throwaway classes vào production. Câu hỏi chủ dự án: giữ probe OFF và review AI/cadence trước mọi sync luật; Phase H còn cần duyệt riêng. Không sửa GDD/Technical/Art/README.

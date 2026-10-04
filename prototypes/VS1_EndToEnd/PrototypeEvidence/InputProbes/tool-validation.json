@@ -1,0 +1,60 @@
+[
+  {
+    "file": "small.xml",
+    "staged_bytes": 12,
+    "expected_allowed": true,
+    "pass": true
+  },
+  {
+    "file": "đường có khoảng.txt",
+    "staged_bytes": 500000,
+    "expected_allowed": true,
+    "pass": true
+  },
+  {
+    "file": "big.json",
+    "staged_bytes": 500001,
+    "expected_allowed": false,
+    "pass": true
+  },
+  {
+    "file": "clip.mp4",
+    "staged_bytes": 12,
+    "expected_allowed": false,
+    "pass": true
+  },
+  {
+    "file": "report.docx",
+    "staged_bytes": 12,
+    "expected_allowed": false,
+    "pass": true
+  },
+  {
+    "file": "run.log",
+    "staged_bytes": 12,
+    "expected_allowed": false,
+    "pass": true
+  },
+  {
+    "file": "proto/Assets/A/Fonts/font.ttf",
+    "staged_bytes": 500001,
+    "expected_allowed": true,
+    "pass": true
+  },
+  {
+    "file": "Assets/A/Art/texture.png",
+    "staged_bytes": 500001,
+    "expected_allowed": true,
+    "pass": true
+  },
+  {
+    "file": "Assets/A/Art/clip.mp4",
+    "staged_bytes": 12,
+    "expected_allowed": false,
+    "pass": true
+  },
+  {
+    "fixture": "link missing file and anchor",
+    "pass": true
+  }
+]
