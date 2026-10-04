@@ -33,6 +33,7 @@ namespace HuyenLo.Domain
     {
         public static readonly int[] Exp = {0,100,250,470,790,1240,1860,2690,3770,5150,6900,9100,11800,15100,19100,23900,29600,36300,44100,53100};
         public static readonly Skill Novice = new Skill("novice", "Mộc Kiếm", 1, 0, 1.2, 1, 1, .10, .26);
+        public static readonly Skill NoviceProbe = new Skill("novice", "Mộc Kiếm [PROBE]", 1, 0, 1.2, 1, .70, .10, .32);
         public static readonly Skill Sword1 = new Skill("sword.s1", "Phong Trảm nhập môn", 1, 2, 1.7, 1.2, 1, .12, .30);
         // Fixture definitions, not unlockable in VS-1. Same evaluator supports later gates.
         public static readonly Skill Sword2 = new Skill("sword.s2", "Phong Trảm tiến cảnh", 2, 4, 1.7, 1.35, 1.5, .14, .30, Shape.Arc, 3);
@@ -122,6 +123,7 @@ namespace HuyenLo.Domain
     }
     public sealed class Player
     {
+        public bool HardCc; // Strict-arrival fixture capability only; no player Freeze mechanic.
         public readonly long Id=1;
         public Map Map=Map.Village;
         public Point Position = new Point(0,.8);
@@ -164,6 +166,10 @@ namespace HuyenLo.Domain
         public Map Map;
         public Point Position,Home,PreviousPosition;
         public int Lane,ApproachSide;
+        public double SideLockedUntil,FacingCandidateSince,RepositionGoal,LastTargetX;
+        public bool SideSwitchPending;
+        public int FacingCandidate;
+        public bool RepositionAfterHit;
         public double LaneMin=-10000,LaneMax=10000;
         public double ActivityMin=-10000,ActivityMax=10000,PatrolGoal,PatrolPauseUntil;
         public int PatrolDirection;
@@ -176,7 +182,7 @@ namespace HuyenLo.Domain
         public bool Dummy,Returning,Windup,Engaged;
         public bool Alive => Hp>0;
         public Mob(int id,string slot,string name,Map map,Point home,int level,double hp,double atk,double def,double acc,double eva,double speed,double range,double interval,bool dummy=false)
-        {Id=id;Slot=slot;Name=name;Map=map;Home=Position=PreviousPosition=home;Level=level;Hp=MaxHp=hp;Atk=atk;Def=def;Acc=acc;Eva=eva;Speed=speed;Range=range;Interval=interval;Dummy=dummy;}
+        {Id=id;Slot=slot;Name=name;Map=map;Home=Position=PreviousPosition=home;Level=level;Hp=MaxHp=hp;Atk=atk;Def=def;Acc=acc;Eva=eva;Speed=speed;Range=range;Interval=interval;Dummy=dummy;RepositionAfterHit=name.StartsWith("Sói",StringComparison.Ordinal);}
     }
     public sealed class Loot
     {

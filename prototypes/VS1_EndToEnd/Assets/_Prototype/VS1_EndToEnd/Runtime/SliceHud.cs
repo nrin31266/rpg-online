@@ -83,7 +83,7 @@ namespace HuyenLo.Runtime
         }
         private void Refresh(){
             if(Host==null||S==null)return;string previous=SelectedActionId;actions.Clear();
-            if(!P.Alive&&panel!="debug"&&panel!="confirm"){
+            if(!P.Alive&&panel!="debug"&&panel!="confirm"&&panel!="probes"){
                 Add("revive.village","Về Vân Khê — miễn phí",()=>{Close();return S.Revive(true);});
                 Add("revive.scroll","Dùng phù — 50% HP/MP",()=>{bool ok=S.Revive(false);if(ok)Close();return ok;},P.Inventory.Count("scroll")>0,"Không có Hồi Sinh Phù.");
             }else if(panel=="bag"){
@@ -108,6 +108,14 @@ namespace HuyenLo.Runtime
             else if(panel=="debug"){
                 Add("debug.resume","Tiếp tục phiên hiện tại",()=>{Close();return true;});
                 foreach(PrototypeStart start in Enum.GetValues(typeof(PrototypeStart))){var value=start;string name=new[]{"Bắt đầu mới / reset","Q2 — movement","Q3 — Dummy","Q4 — Nấm / loot","Q5 — Sói / Food","Q6 — nhập môn","Sân tập Kiếm Lv5","Bãi phụ — đàn 4 Sói / đường cao"}[(int)value-1];Add("debug."+value,name,()=>{pendingStart=value;return Sub("confirm");});}
+                Add("debug.probes","A/B probes — mặc định baseline",()=>Sub("probes"));
+            }else if(panel=="probes"){
+                foreach(var field in typeof(ProbeConfig).GetFields()){
+                    if(field.FieldType!=typeof(bool))continue;var value=field;
+                    Add("probe."+value.Name,value.Name+": "+((bool)value.GetValue(S.Probes)?"ON [PROPOSAL]":"OFF [baseline]"),()=>{S.Combat.CancelIntent();value.SetValue(S.Probes,!(bool)value.GetValue(S.Probes));return true;});
+                }
+                Add("probe.off","Tắt tất cả — baseline",()=>{foreach(var field in typeof(ProbeConfig).GetFields())if(field.FieldType==typeof(bool))field.SetValue(S.Probes,false);return true;});
+                Add("probe.on","Bật tất cả — experimental",()=>{foreach(var field in typeof(ProbeConfig).GetFields())if(field.FieldType==typeof(bool))field.SetValue(S.Probes,true);return true;});
             }else if(panel=="confirm"){
                 Add("debug.cancel","Hủy — giữ phiên hiện tại",()=>{Back();return true;});
                 Add("debug.apply","Reset toàn phiên và mở mốc "+pendingStart,()=>{Host.ResetPrototype(pendingStart);Close();return true;});
@@ -233,7 +241,7 @@ namespace HuyenLo.Runtime
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if(GUI.Button(new Rect(8,Screen.height-27,95,22),"DEV · F8")){Toggle("debug");GUIUtility.ExitGUI();}
 #endif
-            GUILayout.Label($"Lv{P.Level} · {(P.School==School.Novice?"Tân Lữ":"Kiếm")} · Vàng {P.Gold}");GUILayout.Label($"HP {P.Hp:F0}/{st.Hp:F0} · MP {P.Mp:F0}/{st.Mp:F0}");GUILayout.Label($"EXP {P.TotalExp} · điểm {P.Unspent}");GUILayout.Label($"Food {(S.FoodUntil>S.Now?$"{S.FoodUntil-S.Now:F0}s":"chưa dùng")} · H:HP {Math.Max(0,S.HpPotionUntil-S.Now):F1}s · M:MP {Math.Max(0,S.MpPotionUntil-S.Now):F1}s");GUILayout.EndArea();
+            GUILayout.Label($"Lv{P.Level} · {(P.School==School.Novice?"Tân Lữ":"Kiếm")} · Vàng {P.Gold}");GUILayout.Label($"HP {P.Hp:F0}/{st.Hp:F0} · MP {P.Mp:F0}/{st.Mp:F0}");GUILayout.Label($"EXP {P.TotalExp} · điểm {P.Unspent}");GUILayout.Label($"Food {(S.FoodUntil>S.Now?$"{S.FoodUntil-S.Now:F0}s":"chưa dùng")} · {ProbeBindings.HpGlyph(S.Probes)}:HP {Math.Max(0,S.HpPotionUntil-S.Now):F1}s · {ProbeBindings.MpGlyph(S.Probes)}:MP {Math.Max(0,S.MpPotionUntil-S.Now):F1}s");GUILayout.EndArea();
             GUI.Box(new Rect(Screen.width-340,8,332,165),"");GUI.Label(new Rect(Screen.width-330,16,310,105),S.Objective);GUI.Label(new Rect(Screen.width-330,125,310,43),"E: tương tác · I: túi · C: nhân vật · Q: quest");
             var focus=S.Combat.Focus;if(focus!=null){GUI.Box(new Rect(345,8,250,90),"");GUI.Label(new Rect(355,14,230,27),$"{focus.Name} Lv{focus.Level}");GUI.Label(new Rect(355,42,230,24),$"{focus.Hp:F0} / {focus.MaxHp:F0}");Fill(new Rect(355,70,230*(float)(focus.Hp/focus.MaxHp),10),Color.green);var pt=Host.ScreenPoint(new Point(focus.Position.X,focus.Position.Y+1));Fill(new Rect(pt.x-25,Screen.height-pt.y,50*(float)(focus.Hp/focus.MaxHp),5),Color.red);}
             GUI.Label(new Rect(112,Screen.height-31,Screen.width-230,25),S.Feedback);
@@ -247,7 +255,7 @@ namespace HuyenLo.Runtime
                 GUI.Label(new Rect(r.x+5,r.y+26,72,23),unlocked?skill.Name.Replace(" nhập môn","").Replace(" tiến cảnh",""):"Chưa học",slotText);
                 if(unlocked)GUI.Label(new Rect(r.x+5,r.y+49,72,22),S.Combat.Remaining(skill)>0?"CD "+S.Combat.Remaining(skill).ToString("0.0"):"MP "+skill.Mp);
             }
-            GUI.Label(new Rect(barX+282,Screen.height-91,225,48),"H: HP · M: MP · F: Food\n"+(S.DebugPreset==null?"":"DEV preset: "+S.DebugPreset));
+            GUI.Label(new Rect(barX+282,Screen.height-91,225,48),ProbeBindings.HpGlyph(S.Probes)+": HP · "+ProbeBindings.MpGlyph(S.Probes)+": MP · F: Food\n"+(S.DebugPreset==null?"":"DEV preset: "+S.DebugPreset));
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if(showTrace){
                 float ty=110;foreach(var m in S.Mobs.Where(x=>x.Alive&&x.Map==P.Map&&x.Engaged).Take(7)){
@@ -262,7 +270,7 @@ namespace HuyenLo.Runtime
             }
             if(panel=="bag"){DrawInventory(area);return;}if(panel=="equipment"){DrawEquipment(area);return;}
             GUILayout.BeginArea(new Rect(area.x+20,area.y+12,area.width-40,area.height-24));
-            GUILayout.Label(!P.Alive&&panel!="debug"&&panel!="confirm"?"Đã chết":npc!=null?SliceSession.Anchors.First(x=>x.Id==npc).Name+" · "+(panel=="npc"?"Nói chuyện":panel=="buy"?"Mua hàng":panel=="sell"?"Bán đồ":panel=="store"?"Gửi rương":panel=="retrieve"?"Lấy rương":"Nhiệm vụ"):panel=="debug"?"DEBUG — mốc / reset":panel=="confirm"?"Reset sẽ xóa toàn phiên RAM":tabs.Contains(panel)?tabNames[Array.IndexOf(tabs,panel)]:ViewTitle);
+            GUILayout.Label(!P.Alive&&panel!="debug"&&panel!="confirm"?"Đã chết":npc!=null?SliceSession.Anchors.First(x=>x.Id==npc).Name+" · "+(panel=="npc"?"Nói chuyện":panel=="buy"?"Mua hàng":panel=="sell"?"Bán đồ":panel=="store"?"Gửi rương":panel=="retrieve"?"Lấy rương":"Nhiệm vụ"):panel=="probes"?"DEBUG — A/B proposals, chưa duyệt":panel=="debug"?"DEBUG — mốc / reset":panel=="confirm"?"Reset sẽ xóa toàn phiên RAM":tabs.Contains(panel)?tabNames[Array.IndexOf(tabs,panel)]:ViewTitle);
             GUILayout.Label(Rpg?"Tab / Shift+Tab đổi tab · mũi tên chọn · Enter/E dùng · Esc quay lại":"↑/↓ chọn · Enter/E thực hiện · Esc quay lại");
             if(panel=="npc")GUILayout.Label("“"+(Host.LastDialogue??Dialogue(npc))+"”",GUILayout.Height(85));
             if(panel=="quest"||panel=="npc")GUILayout.Label(S.Objective,GUILayout.Height(48));

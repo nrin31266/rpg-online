@@ -10,6 +10,11 @@ namespace HuyenLo.Runtime
     public sealed class SliceHost : MonoBehaviour
     {
         public SliceSession Session {get;private set;}
+        public ProbeConfig ProbeSettings=new ProbeConfig();
+        private readonly HeldAxisProbe heldAxisProbe=new HeldAxisProbe();
+        private int heldMask;
+        private InputAction cycleBinding;
+        private int cycleRequest;
         public Rigidbody2D Body {get;private set;}
         public bool Grounded {get;private set;}
         public bool Modal => Hud!=null && Hud.Modal;
@@ -23,7 +28,7 @@ namespace HuyenLo.Runtime
         private double lastGroundAt=-100,jumpBufferedUntil=-100;
         // Local feel probe only: durations/forces are not production locks.
         private const float GroundAcceleration=60,AirAcceleration=35,GroundDeceleration=80,AirDeceleration=20;
-        private readonly List<(string key,int slot,bool pressed,double time,long sequence)> combatEvents=new List<(string,int,bool,double,long)>();
+        private readonly List<(string key,int slot,bool pressed,double time,long sequence,int held)> combatEvents=new List<(string,int,bool,double,long,int)>();
         private InputAction[] combatBindings;
         private long inputSequence;
         private Camera cameraView;
@@ -54,16 +59,19 @@ namespace HuyenLo.Runtime
         public static string MapName(Map map) => map==Map.Village?"Vân Khê":map==Map.Academy?"Học Viện":"Đồng Sương";
         private void Awake() {
             Application.targetFrameRate=60;Time.fixedDeltaTime=.02f;Application.SetStackTraceLogType(LogType.Log,StackTraceLogType.None);
-            Session=new SliceSession();BindSession();
+            Session=new SliceSession(probes:ProbeSettings);BindSession();
             combatBindings=new InputAction[3];
             var keys=new[]{"1","2","3"};
             for(int i=0;i<keys.Length;i++){
                 int slot=i+1;string key=keys[i];
                 var binding=new InputAction("Combat "+key,InputActionType.Button,"<Keyboard>/"+keys[i]);
-                binding.started+=ctx=>combatEvents.Add((key,slot,true,ctx.time,++inputSequence));
-                binding.canceled+=ctx=>combatEvents.Add((key,slot,false,ctx.time,++inputSequence));
+                binding.started+=ctx=>combatEvents.Add((key,slot,true,ctx.time,++inputSequence,KeyboardMask()));
+                binding.canceled+=ctx=>combatEvents.Add((key,slot,false,ctx.time,++inputSequence,KeyboardMask()));
                 binding.Enable();combatBindings[i]=binding;
             }
+            cycleBinding=new InputAction("CycleTarget",InputActionType.Button,ProbeBindings.CycleTarget);
+            cycleBinding.started+=ctx=>cycleRequest=Keyboard.current!=null&&Keyboard.current.shiftKey.isPressed?-1:1;
+            cycleBinding.Enable();
             var texture=new Texture2D(2,2);texture.SetPixels(new[]{Color.white,Color.white,Color.white,Color.white});texture.Apply();
             square=Sprite.Create(texture,new Rect(0,0,2,2),new Vector2(.5f,.5f),2);
             cameraView=new GameObject("Camera").AddComponent<Camera>();cameraView.tag="MainCamera";cameraView.orthographic=true;cameraView.clearFlags=CameraClearFlags.SolidColor;cameraView.orthographicSize=6.5f;cameraView.backgroundColor=new Color(.055f,.09f,.13f);
@@ -184,7 +192,16 @@ namespace HuyenLo.Runtime
             spawn.y=Mathf.Max(spawn.y,.72f);playerVisual.transform.position=spawn;Body.position=spawn;Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();lastGroundAt=jumpBufferedUntil=-100;cameraVelocity=Vector3.zero;cameraView.transform.position=CameraTarget();
 
         }
-        public void CombatPress(string key,int slot=0){if(!Modal)Session.Combat.Press(key,slot);}
+        private static int KeyboardMask(){var k=Keyboard.current;if(k==null)return 0;return (k.aKey.isPressed?1:0)|(k.leftArrowKey.isPressed?2:0)|(k.dKey.isPressed?4:0)|(k.rightArrowKey.isPressed?8:0);}
+        public void CombatPress(string key,int slot=0,int? atPress=null){
+            if(Modal)return;
+            if(Session.Probes.StaleHeldAxis)heldAxisProbe.Snapshot(atPress??(ExternalInput?(ExternalAxis<0?1:ExternalAxis>0?4:0):KeyboardMask()));
+            Session.Combat.Press(key,slot);
+        }
+        public bool QuickKey(string key){if(Modal)return false;return ProbeBindings.IsHp(key,Session.Probes)?Session.Potion(true):ProbeBindings.IsMp(key,Session.Probes)&&Session.Potion(false);}
+        public void EscapeWorld(){if(Modal){Hud.Back();return;}Session.Combat.Escape();heldAxisProbe.Clear();}
+        private int EffectiveManual()=>ExternalInput?Session.Probes.StaleHeldAxis?heldAxisProbe.Axis(ExternalAxis<0?1:ExternalAxis>0?4:0,Session.Combat.HasPendingCast):ExternalAxis:
+            Session.Probes.StaleHeldAxis?heldAxisProbe.Axis(heldMask,Session.Combat.HasPendingCast):axis;
         public void CombatRelease(string key)=>Session.Combat.Release(key);
         public void Interact() {
             if(Modal||!Session.Player.Alive)return;
@@ -265,7 +282,7 @@ namespace HuyenLo.Runtime
         private void BindSession(){Session.OnEvent=x=>Debug.Log("[VS1] "+x);}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
         public void ResetPrototype(PrototypeStart start){
-            Session.OnEvent=null;Session=PrototypePresets.Create(start);BindSession();
+            Session.OnEvent=null;var probes=Session.Probes;Session=PrototypePresets.Create(start,probes);ProbeSettings=probes;BindSession();heldAxisProbe.Clear();heldMask=0;cycleRequest=0;
             combatEvents.Clear();feedbackResultCount=0;flashUntil.Clear();axis=ExternalAxis=0;
             ExternalJump=ExternalDrop=false;jumpBufferedUntil=lastGroundAt=-100;
             Hud.Close();BuildMap();Session.Emit(start==PrototypeStart.Fresh?"Phiên mới — bắt đầu Q1.":"DEBUG "+start+" — preset, không nghiệm thu route.");
@@ -276,7 +293,7 @@ namespace HuyenLo.Runtime
         }
         private void Update() {
             if(ExternalInput){combatEvents.Clear();return;}var k=Keyboard.current;if(k==null){combatEvents.Clear();return;}
-            if(k.escapeKey.wasPressedThisFrame){if(Modal){Hud.Back();axis=0;combatEvents.Clear();return;}Hud.Close();Session.Combat.ClearFocus();axis=0;combatEvents.Clear();return;}
+            if(k.escapeKey.wasPressedThisFrame){EscapeWorld();axis=0;combatEvents.Clear();cycleRequest=0;return;}
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             if(k.f9Key.wasPressedThisFrame)Hud.ToggleTrace();
             if(k.f8Key.wasPressedThisFrame){Hud.Toggle("debug");axis=0;combatEvents.Clear();return;}
@@ -285,7 +302,7 @@ namespace HuyenLo.Runtime
             if(k.cKey.wasPressedThisFrame){Hud.Toggle("equipment");axis=0;combatEvents.Clear();return;}
             if(k.qKey.wasPressedThisFrame){Hud.Toggle("quest");axis=0;combatEvents.Clear();return;}
             if(Modal){
-                axis=0;Session.Combat.CancelIntent();combatEvents.Clear();
+                cycleRequest=0;heldAxisProbe.Clear();axis=0;Session.Combat.CancelIntent();combatEvents.Clear();
                 if(k.upArrowKey.wasPressedThisFrame||k.wKey.wasPressedThisFrame)Hud.NavigateGrid(0,-1);
                 if(k.leftArrowKey.wasPressedThisFrame||k.aKey.wasPressedThisFrame)Hud.NavigateGrid(-1,0);
                 if(k.rightArrowKey.wasPressedThisFrame||k.dKey.wasPressedThisFrame)Hud.NavigateGrid(1,0);
@@ -295,20 +312,25 @@ namespace HuyenLo.Runtime
                 return;
             }
             axis=Rules.Axis(k.aKey.isPressed,k.leftArrowKey.isPressed,k.dKey.isPressed,k.rightArrowKey.isPressed);
-            if(axis!=0)Session.Combat.ManualOverride();
+            heldMask=KeyboardMask();
+            bool newDirection=k.aKey.wasPressedThisFrame||k.leftArrowKey.wasPressedThisFrame||k.dKey.wasPressedThisFrame||k.rightArrowKey.wasPressedThisFrame;
+            if(Session.Probes.StaleHeldAxis?newDirection:axis!=0){Session.Combat.ManualOverride();heldAxisProbe.Clear();}
             jumpHeld=k.spaceKey.isPressed||k.upArrowKey.isPressed;
             if(k.spaceKey.wasPressedThisFrame||k.upArrowKey.wasPressedThisFrame){ExternalJump=true;Session.Combat.ManualOverride();}
             if(k.sKey.wasPressedThisFrame||k.downArrowKey.wasPressedThisFrame){ExternalDrop=true;Session.Combat.ManualOverride();}
             foreach(var input in combatEvents.OrderBy(x=>x.time).ThenBy(x=>x.slot).ThenBy(x=>x.sequence)){
-                if(input.pressed)CombatPress(input.key,input.slot);else CombatRelease(input.key);
+                if(input.pressed)CombatPress(input.key,input.slot,input.held);else CombatRelease(input.key);
             }
             combatEvents.Clear();
-            if(k.eKey.wasPressedThisFrame)Interact();if(k.fKey.wasPressedThisFrame)Session.UseFood();if(k.hKey.wasPressedThisFrame)Session.Potion(true);if(k.mKey.wasPressedThisFrame)Session.Potion(false);
+            if(cycleRequest!=0){Session.Combat.CycleTarget(cycleRequest);cycleRequest=0;heldAxisProbe.Clear();}
+            if(k.eKey.wasPressedThisFrame)Interact();if(k.fKey.wasPressedThisFrame)Session.UseFood();
+            if(k.hKey.wasPressedThisFrame)QuickKey(ProbeBindings.HpMain);if(k.mKey.wasPressedThisFrame)QuickKey(ProbeBindings.MpMain);
+            if(k.digit4Key.wasPressedThisFrame)QuickKey(ProbeBindings.HpAlias);if(k.digit5Key.wasPressedThisFrame)QuickKey(ProbeBindings.MpAlias);
             if(Mouse.current!=null&&Mouse.current.leftButton.wasPressedThisFrame&&!Hud.IsOverUi(Mouse.current.position.ReadValue())){
                 var worldPos=cameraView.ScreenToWorldPoint(Mouse.current.position.ReadValue());var point=new Point(worldPos.x,worldPos.y);
                 var target=Session.Mobs.Where(x=>x.Alive&&x.Map==renderedMap&&point.Distance(x.Position)<1)
                     .OrderBy(x=>point.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
-                if(target!=null)Session.Combat.Explicit(target);
+                if(target!=null){Session.Combat.Explicit(target);heldAxisProbe.Clear();}
                 else {var loot=Session.LootCandidate();if(loot!=null&&point.Distance(loot.Position)<.8){Session.PickUp(loot.Id);return;}var anchor=Session.NearAnchor();if(anchor!=null&&point.Distance(anchor.Position)<1.2&&Session.Interact(anchor.Id)){Hud.OpenNpc(anchor.Id);Speak(anchor.Id);}}
             }
         }
@@ -320,15 +342,15 @@ namespace HuyenLo.Runtime
         }
         private void FixedUpdate() {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if(Hud.Panel=="debug"||Hud.Panel=="confirm"){if(Body.simulated)Body.simulated=false;Session.Combat.CancelIntent();return;}
+            if(Hud.Panel=="debug"||Hud.Panel=="confirm"||Hud.Panel=="probes"){if(Body.simulated)Body.simulated=false;Session.Combat.CancelIntent();return;}
 #endif
             if(!Body.simulated)Body.simulated=true;
             if(Session.WorldRevision!=renderedRevision)BuildMap();
             foreach(var p in ignored.Keys.ToArray())if(p==null||Session.Now>=ignored[p]||playerCollider.bounds.max.y<p.bounds.min.y-.02f){if(p!=null)Physics2D.IgnoreCollision(playerCollider,p,false);ignored.Remove(p);}
-            Grounded=IsGrounded();int manual=ExternalInput?ExternalAxis:axis;
+            Grounded=IsGrounded();int manual=EffectiveManual();
             bool jump=ExternalJump,drop=ExternalDrop;ExternalJump=ExternalDrop=false;
             if(Modal||!Session.Player.Alive){manual=0;jump=drop=false;jumpBufferedUntil=lastGroundAt=-100;Session.Combat.CancelIntent();}
-            if(manual!=0||jump||drop)Session.Combat.ManualOverride();
+            if((manual!=0&&!Session.Probes.StaleHeldAxis)||jump||drop){Session.Combat.ManualOverride();heldAxisProbe.Clear();}
             if(Grounded&&!Modal)lastGroundAt=Session.Now;
             if(jump)jumpBufferedUntil=Session.Now+.12;
             bool dropped=false,jumped=false;
@@ -340,13 +362,15 @@ namespace HuyenLo.Runtime
             if(!dropped&&Session.Now<=jumpBufferedUntil&&Session.Now-lastGroundAt<=.10&&!Modal){Body.linearVelocity=new Vector2(Body.linearVelocity.x,JumpSpeed);jumpBufferedUntil=lastGroundAt=-100;jumped=true;}
             if(!(ExternalInput?ExternalJumpHeld:jumpHeld)&&Body.linearVelocity.y>4)Body.linearVelocity=new Vector2(Body.linearVelocity.x,4);
             if(Body.linearVelocity.y<0)Body.linearVelocity=new Vector2(Body.linearVelocity.x,Mathf.Max(-18,Body.linearVelocity.y+Physics2D.gravity.y*Body.gravityScale*.35f*Time.fixedDeltaTime));
-            if(!Modal)Session.ObservePosition(new Point(Body.position.x,Body.position.y),Grounded,jumped,dropped);
+            if(!Modal)Session.ObservePosition(new Point(Body.position.x,Body.position.y),Grounded,jumped,dropped,manual!=0);
             else Session.Player.Position=new Point(Body.position.x,Body.position.y);
             Session.Tick(Time.fixedDeltaTime,manual!=0||jump||drop);
+            manual=EffectiveManual();
             int move=manual!=0?manual:Session.Combat.AssistAxis;
+            if(manual==0&&move!=0&&Session.Combat.ApproachCrossesExit(Session.Player.Position,new Point(Session.Player.Position.X+move*RunSpeed*Time.fixedDeltaTime,Session.Player.Position.Y))){Session.Combat.RejectBlocked();move=0;}
             if(move!=0&&manual==0){
                 var foot=new Vector2(Body.position.x+move*.6f,Body.position.y-.5f);
-                if(!Grounded||Physics2D.Raycast(foot,Vector2.down,.5f,1<<6).collider==null||Physics2D.Raycast(Body.position,new Vector2(move,0),.65f,1<<6).collider!=null)move=0;
+                if(!Grounded||Physics2D.Raycast(foot,Vector2.down,.5f,1<<6).collider==null||Physics2D.Raycast(Body.position,new Vector2(move,0),.65f,1<<6).collider!=null){move=0;if(Session.Probes.StrictArrival)Session.Combat.RejectBlocked();}
             }
             if(!Session.Player.Alive||Modal)move=0;
             float targetSpeed=move*RunSpeed*(float)Session.Player.Stats.Speed*(float)BlockoutLayout.WaterSpeed(renderedMap,new Point(Body.position.x,playerCollider.bounds.min.y));
@@ -398,6 +422,6 @@ namespace HuyenLo.Runtime
             for(int i=floating.Count-1;i>=0;i--)if(Time.time>=floating[i].expiry){Destroy(floating[i].mesh.gameObject);floating.RemoveAt(i);}else floating[i].mesh.transform.Translate(0,Time.deltaTime*.4f,0);
         }
         public Vector2 ScreenPoint(Point point)=>cameraView.WorldToScreenPoint(new Vector3((float)point.X,(float)point.Y,0));
-        private void OnDestroy(){foreach(var sprite in terrainSprites)Destroy(sprite);if(combatBindings!=null)foreach(var binding in combatBindings)binding.Dispose();if(world!=null)Destroy(world);if(playerVisual!=null)Destroy(playerVisual);if(cameraView!=null)Destroy(cameraView.gameObject);if(marker!=null)Destroy(marker.gameObject);foreach(var v in floating)if(v.mesh!=null)Destroy(v.mesh.gameObject);}
+        private void OnDestroy(){cycleBinding?.Dispose();foreach(var sprite in terrainSprites)Destroy(sprite);if(combatBindings!=null)foreach(var binding in combatBindings)binding.Dispose();if(world!=null)Destroy(world);if(playerVisual!=null)Destroy(playerVisual);if(cameraView!=null)Destroy(cameraView.gameObject);if(marker!=null)Destroy(marker.gameObject);foreach(var v in floating)if(v.mesh!=null)Destroy(v.mesh.gameObject);}
     }
 }

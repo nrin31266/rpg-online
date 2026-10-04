@@ -37,6 +37,9 @@ namespace HuyenLo.Domain
         public readonly Dictionary<int,Skill> Unlocked=new Dictionary<int,Skill>();
         public readonly Dictionary<string,double> Cooldowns=new Dictionary<string,double>();
         public readonly List<HitResult> Results=new List<HitResult>();
+        public readonly List<ActionRejection> Rejections=new List<ActionRejection>();
+        public ActionRejectReason LastReject {get;private set;}
+        public bool HasBufferedCast=>bufferSkill!=null;
         public CombatAction Running {get;private set;}
         public FocusKind FocusKind {get;private set;}
         public int FocusId {get;private set;}
@@ -51,7 +54,7 @@ namespace HuyenLo.Domain
         public bool HasPendingCast => pendingSkill != null;
         public CombatController(SliceSession value){session=value;}
         public Mob Focus => session.Find(FocusId,FocusGeneration);
-        public Skill Selected => P.School==School.Novice?Rules.Novice:Unlocked.TryGetValue(SelectedSlot,out var s)?s:null;
+        public Skill Selected => P.School==School.Novice?(session.Probes.NoviceCadence?Rules.NoviceProbe:Rules.Novice):Unlocked.TryGetValue(SelectedSlot,out var s)?s:null;
         private bool Available(Skill s) => s!=null && (P.School==School.Novice ? s.Id=="novice" && P.Inventory.Equipment.TryGetValue(GearSlot.Weapon,out var item) && item.Id=="wood":P.Inventory.Equipment.TryGetValue(GearSlot.Weapon,out var weapon) && weapon.Id=="sword1" && Unlocked.Values.Any(x=>x.Id==s.Id));
         public double Remaining(Skill skill) => skill!=null&&Cooldowns.TryGetValue(skill.Id,out var end)?Math.Max(0,end-session.Now):0;
         public void Explicit(Mob target) {
@@ -69,25 +72,74 @@ namespace HuyenLo.Domain
         }
         // Probe values only; the production gate measures distance/progress at the real scale.
         private static double ApproachBudget(Skill s) => s==null?1:Math.Max(1,Math.Min(3,s.Range*1.5));
-        private void Reject(string reason){CancelIntent();session.Feedback=reason;}
+        private void Reject(string reason,ActionRejectReason code=ActionRejectReason.None){
+            CancelIntent();session.Feedback=reason;LastReject=code;Rejections.Add(new ActionRejection(session.Now,code));
+        }
+        public void RejectBlocked(){Reject("Tiếp cận bị chặn bởi cổng/địa hình — không tiêu MP/CD.",ActionRejectReason.Blocked);}
+        public bool ApproachCrossesExit(Point from,Point to) {
+            if(!session.Probes.ApproachExitSafety)return false;
+            return SliceSession.Anchors.Any(x=>x.EdgeExit&&x.Map==P.Map&&Math.Abs(from.Y-x.Position.Y)<=1.6&&
+                Math.Min(from.X,to.X)<=x.Position.X+.65&&Math.Max(from.X,to.X)>=x.Position.X-.65);
+        }
+        public void Escape() {
+            if(!session.Probes.EscapePriority){ClearFocus();return;}
+            if(HasPendingCast||HasBufferedCast){Reject("Đã hủy thao tác.",ActionRejectReason.UserCancelled);return;}
+            if(FocusKind!=FocusKind.None)ClearFocus();
+        }
+        public bool CycleTarget(int direction) {
+            if(!session.Probes.TabCycleTarget||!P.Alive)return false;
+            var skill=Selected??Rules.Novice;
+            double search=skill.Range+ApproachBudget(skill);
+            var candidates=session.Mobs.Where(x=>x.Alive&&!x.Returning&&x.Map==P.Map&&x.Position.Distance(P.Position)<=search&&Math.Abs(x.Position.Y-P.Position.Y)<=skill.Vertical)
+                .OrderBy(x=>Math.Abs(x.Position.X-P.Position.X)).ThenBy(x=>x.Slot,StringComparer.Ordinal).ToArray();
+            if(candidates.Length==0)return false;
+            int current=Array.FindIndex(candidates,x=>x.Id==FocusId&&x.Generation==FocusGeneration);
+            int next=current<0?(direction<0?candidates.Length-1:0):(current+(direction<0?-1:1)+candidates.Length)%candidates.Length;
+            Explicit(candidates[next]);return true;
+        }
+        private ActionRejectReason Validate(Skill skill,TargetKey key,bool requireRange) {
+            if(!P.Alive)return ActionRejectReason.PlayerDead;
+            if(P.HardCc)return ActionRejectReason.HardCc;
+            var m=session.Mobs.FirstOrDefault(x=>x.Id==key.Id);
+            if(m==null)return ActionRejectReason.TargetMissing;
+            if(m.Generation!=key.Generation)return ActionRejectReason.TargetGeneration;
+            if(!m.Alive)return ActionRejectReason.TargetDead;
+            if(m.Map!=P.Map)return ActionRejectReason.WrongMap;
+            if(m.Returning)return ActionRejectReason.TargetReturning;
+            if(P.School==School.Novice?skill.Id!="novice":!Unlocked.Values.Any(x=>x.Id==skill.Id))return ActionRejectReason.NotLearned;
+            if(!Available(skill))return ActionRejectReason.WeaponRequired;
+            if(P.Mp<skill.Mp)return ActionRejectReason.InsufficientMp;
+            if(Remaining(skill)>0)return ActionRejectReason.Cooldown;
+            if(Running!=null)return ActionRejectReason.ActionLocked;
+            if(requireRange&&!Witness(skill,m,P.Position,m.Position.X<P.Position.X?-1:1))return ActionRejectReason.OutOfRange;
+            return ActionRejectReason.None;
+        }
+        private void ValidationReject(ActionRejectReason reason)=>Reject("Không thể thực hiện: "+reason+" — không tiêu MP/CD.",reason);
         public void Press(string key,int slot=0) {
+            LastReject=ActionRejectReason.None;
             if(!int.TryParse(key,out var digit)||digit<1||digit>3)return;
             if(slot==0)slot=digit;
-            if(P.School==School.Novice?slot!=1:!Unlocked.ContainsKey(slot)) {session.Feedback="Kỹ năng chưa mở: cần cấp, bí kíp và nhiệm vụ.";return;}
+            if(P.School==School.Novice?slot!=1:!Unlocked.ContainsKey(slot)) {if(session.Probes.StrictArrival)ValidationReject(ActionRejectReason.NotLearned);else session.Feedback="Kỹ năng chưa mở: cần cấp, bí kíp và nhiệm vụ.";return;}
             SelectedSlot=slot;
             var skill=Selected;
             CancelIntent();
-            if(!P.Alive||!Available(skill)){Reject("Cần mặc vũ khí và học kỹ năng.");return;}
-            if(P.Mp<skill.Mp){Reject("Không đủ Linh lực. Dùng bình hoặc Food.");return;}
+            if(session.Probes.StrictArrival&&(!P.Alive||P.HardCc)){ValidationReject(!P.Alive?ActionRejectReason.PlayerDead:ActionRejectReason.HardCc);return;}
+            if(!P.Alive||!Available(skill)){Reject("Cần mặc vũ khí và học kỹ năng.",!P.Alive?ActionRejectReason.PlayerDead:ActionRejectReason.WeaponRequired);return;}
+            if(P.Mp<skill.Mp){Reject("Không đủ Linh lực. Dùng bình hoặc Food.",ActionRejectReason.InsufficientMp);return;}
             if(Focus==null)Acquire(skill);
-            if(Focus==null||Focus.Returning){Reject("Không có mục tiêu hợp lệ — không tiêu MP/CD.");return;}
+            if(Focus==null||Focus.Returning){Reject("Không có mục tiêu hợp lệ — không tiêu MP/CD.",ActionRejectReason.NoTarget);return;}
+            if(session.Probes.Buffer180&&(Running!=null||Remaining(skill)>0)){
+                double ready=Math.Max(Remaining(skill),Running==null?0:Running.EndAt-session.Now);
+                if(ready>0&&ready<=session.Probes.BufferWindow){bufferSkill=skill;bufferTarget=new TargetKey(Focus);BufferUntil=session.Now+session.Probes.BufferWindow;return;}
+                Reject("Chưa sắp sẵn — cần bấm mới.",Running!=null?ActionRejectReason.ActionLocked:ActionRejectReason.Cooldown);return;
+            }
             if(Running!=null){
                 double left=Running.EndAt-session.Now;
                 if(left>0&&left<=.15&&Remaining(skill)<=left){bufferSkill=skill;bufferTarget=new TargetKey(Focus);BufferUntil=session.Now+.15;}
-                else session.Feedback="Đang thực hiện đòn; bấm lại gần cuối recovery.";
+                else {session.Feedback="Đang thực hiện đòn; bấm lại gần cuối recovery.";LastReject=ActionRejectReason.ActionLocked;Rejections.Add(new ActionRejection(session.Now,LastReject));}
                 return;
             }
-            if(Remaining(skill)>0){Reject("Kỹ năng đang hồi. Không tự chờ để cast.");return;}
+            if(Remaining(skill)>0){Reject("Kỹ năng đang hồi. Không tự chờ để cast.",ActionRejectReason.Cooldown);return;}
             BeginOrApproach(skill,Focus);
         }
         // A physical release never repeats or cancels the one-shot pending intent.
@@ -106,18 +158,27 @@ namespace HuyenLo.Domain
         private bool Witness(Skill skill,Mob focus,Point origin,int facing) => skill.Shape==Shape.Line||skill.Shape==Shape.Arc?Eligible(skill,origin,facing).Any():InRange(skill,focus,origin,facing);
         private void BeginOrApproach(Skill skill,Mob focus) {
             int facing=focus.Position.X<P.Position.X?-1:1;
+            if(Running!=null){ValidationReject(ActionRejectReason.ActionLocked);return;}
             if(Witness(skill,focus,P.Position,facing)){TryStart(skill);return;}
             double dy=focus.Position.Y-P.Position.Y;
             double horizontal=Math.Sqrt(Math.Max(0,skill.Range*skill.Range-dy*dy))-.12;
             double missing=Math.Abs(focus.Position.X-P.Position.X)-horizontal;
             var prospective=new Point(P.Position.X+facing*Math.Max(0,missing),P.Position.Y);
             if(Math.Abs(dy)>Math.Min(1.3,skill.Vertical)||missing<=0||missing>ApproachBudget(skill)||!Witness(skill,focus,prospective,facing)){
-                Reject("Quá xa hoặc khác tầng — hãy tự di chuyển.");return;
+                Reject("Quá xa hoặc khác tầng — hãy tự di chuyển.",ActionRejectReason.OutOfRange);return;
             }
+            if(ApproachCrossesExit(P.Position,prospective)){RejectBlocked();return;}
             pendingSkill=skill;pendingTarget=new TargetKey(focus);approachStarted=lastProgressAt=session.Now;approachX=lastX=P.Position.X;
             AssistAxis=facing;session.Feedback="Đang tiếp cận — hướng/nhảy/Esc để hủy.";
         }
         private bool TryStart(Skill skill) {
+            if(session.Probes.StrictArrival){
+                var raw=session.Mobs.FirstOrDefault(x=>x.Id==FocusId);
+                if(raw==null){ValidationReject(ActionRejectReason.TargetMissing);return false;}
+                var key=HasPendingCast?pendingTarget:new TargetKey(raw);
+                var reason=Validate(skill,key,false);
+                if(reason!=ActionRejectReason.None){ValidationReject(reason);return false;}
+            }
             if(!P.Alive||!Available(skill)||Running!=null||Remaining(skill)>0||P.Mp<skill.Mp)return false;
             var focus=Focus;
             if(focus==null||focus.Returning)return false;
@@ -137,6 +198,10 @@ namespace HuyenLo.Domain
             session.Emit($"Action {Running.Id} {skill.Id}; target {focus.Id}@{focus.Generation}; MP {P.Mp:F2}");session.ActionStarted(skill);return true;
         }
         public void Tick(bool manualContext) {
+            if(session.Probes.StrictArrival&&pendingSkill!=null){
+                var reason=Validate(pendingSkill,pendingTarget,false);
+                if(reason!=ActionRejectReason.None){ValidationReject(reason);return;}
+            }
             var previous=FocusKind;
             if(Focus==null&&previous!=FocusKind.None){
                 bool hadPending=HasPendingCast;ClearFocus();if(hadPending)session.Feedback="Mục tiêu đã mất — cần bấm mới.";
@@ -151,16 +216,24 @@ namespace HuyenLo.Domain
             }
             if(bufferSkill!=null){
                 var skill=bufferSkill;var target=session.Find(bufferTarget.Id,bufferTarget.Generation);
-                if(session.Now>BufferUntil||target==null||target.Returning||FocusId!=target.Id||FocusGeneration!=target.Generation){bufferSkill=null;BufferUntil=0;}
-                else if(Running==null){bufferSkill=null;BufferUntil=0;BeginOrApproach(skill,target);}
+                if(session.Now>BufferUntil||target==null||target.Returning||FocusId!=target.Id||FocusGeneration!=target.Generation){
+                    if(session.Probes.StrictArrival){var reason=Validate(skill,bufferTarget,false);ValidationReject(reason==ActionRejectReason.None?ActionRejectReason.BufferExpired:reason);}
+                    else {bufferSkill=null;BufferUntil=0;}
+                }
+                else if(Running==null&&(!session.Probes.Buffer180||Remaining(skill)<=0)){bufferSkill=null;BufferUntil=0;BeginOrApproach(skill,target);}
             }
             if(pendingSkill==null)return;
             var mob=session.Find(pendingTarget.Id,pendingTarget.Generation);
             if(!P.Alive||mob==null||mob.Returning||mob.Id!=FocusId||mob.Generation!=FocusGeneration){Reject("Mục tiêu không còn hợp lệ — cần bấm mới.");return;}
             if(P.Mp<pendingSkill.Mp||Remaining(pendingSkill)>0||!Available(pendingSkill)){Reject("Kỹ năng chưa sẵn — tiếp cận đã hủy.");return;}
-            if(TryStart(pendingSkill))return;
+            var active=pendingSkill;
+            if(TryStart(active)||pendingSkill==null)return;
+            if(session.Probes.ApproachExitSafety){
+                int nextAxis=mob.Position.X<P.Position.X?-1:1;
+                if(ApproachCrossesExit(P.Position,new Point(P.Position.X+nextAxis*.1,P.Position.Y))){RejectBlocked();return;}
+            }
             if(Math.Abs(P.Position.X-lastX)>.04){lastX=P.Position.X;lastProgressAt=session.Now;}
-            if(session.Now-approachStarted>ApproachBudget(pendingSkill)/5+1||session.Now-lastProgressAt>.45||Math.Abs(P.Position.X-approachX)>ApproachBudget(pendingSkill)||Math.Abs(mob.Position.Y-P.Position.Y)>1.3){Reject("Tiếp cận dừng: blocked/hết giới hạn. Bấm mới để thử lại.");return;}
+            if(session.Now-approachStarted>ApproachBudget(pendingSkill)/5+1||session.Now-lastProgressAt>.45||Math.Abs(P.Position.X-approachX)>ApproachBudget(pendingSkill)||Math.Abs(mob.Position.Y-P.Position.Y)>1.3){Reject("Tiếp cận dừng: blocked/hết giới hạn. Bấm mới để thử lại.",Math.Abs(mob.Position.Y-P.Position.Y)>1.3?ActionRejectReason.OutOfRange:ActionRejectReason.Blocked);return;}
             AssistAxis=mob.Position.X<P.Position.X?-1:1;
         }
         private void Resolve(CombatAction a) {
