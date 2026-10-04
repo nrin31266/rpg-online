@@ -14,7 +14,7 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED, điều kiện mở pr
 
 **Evidence lịch sử 2026-10-03:** [VS-1 disposable/reference](../../prototypes/VS1_EndToEnd/README.md) tại checkpoint `46006c4` có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
 
-**Prototype update 2026-10-04:** V6.2.4 có route/tests nhưng bị user từ chối về hình địa hình: Sói trong lòng nước, dòng nước đứt, background chưa đúng lớp đất. V6.2.5 bị user từ chối vì hiểu sai núi thành backdrop giả. V6.2.6 sửa địa hình chơi được; kết quả kiểm ở [hồ sơ prototype](#prototype-visual-review), không tự pass G-L hoặc art production.
+**Prototype update 2026-10-04:** V6.2.4 có route/tests nhưng bị user từ chối về hình địa hình: Sói trong lòng nước, dòng nước đứt, background chưa đúng lớp đất. V6.2.5 bị user từ chối vì hiểu sai núi thành backdrop giả. V6.2.6 cũng bị user từ chối: slab đất lơ lửng, cầu sát nước và bờ chắn. V6.2.7 sửa rear soil/pass-through và cầu; kết quả kiểm ở [hồ sơ prototype](#prototype-visual-review), không tự pass G-L hoặc art production.
 
 **DEFERRED** là phần đã thiết kế và vẫn phải làm trong TARGET, nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung thuộc TARGET P0, **không phải feature P1**. Mọi bảng Cung, projectile, gear, pose/VFX và balance được giữ. Q6/lore vẫn giới thiệu hai phái; trong bản thử sớm, Kiếm chơi được, Cung ghi “Chưa mở trong bản thử nghiệm”. Không dùng nhãn này trong sản phẩm cuối.
 
@@ -338,9 +338,27 @@ Reader Testing độc lập theo skill doc-coauthoring kiểm scope/gates, autho
 
 # 10. Hồ sơ bản mẫu — không phải luật production
 
-Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture và thông số thử. Docs 1–4 giữ luật, contract, reasoning balance và production visual requirements; không lấy một lần sửa mock để khóa design mới. V6.2.4 và V6.2.5 bị user từ chối về địa hình dù tests/route pass; các hình và mô tả cũ dưới đây chỉ là lịch sử, **không mô tả bản hiện tại và không phải visual acceptance**.
+Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture và thông số thử. Docs 1–4 giữ luật, contract, reasoning balance và production visual requirements; không lấy một lần sửa mock để khóa design mới. V6.2.4, V6.2.5 và V6.2.6 bị user từ chối về địa hình dù tests/route pass; các hình và mô tả cũ dưới đây chỉ là lịch sử, **không mô tả bản hiện tại và không phải visual acceptance**.
 
-## V6.2.6 — CURRENT: khối đất chơi được, không dùng backdrop giả làm núi
+## V6.2.7 — CURRENT: đất phía sau được fill đầy, cầu có khoảng hở và lối vào liên tục
+
+Feedback mới phân biệt **đất ở lớp sau của đường chơi** với ngoại cảnh xa. Thân đất lớp sau phải đầy xuống nền, nhìn tự nhiên; nhân vật đi xuyên thân, nhảy xuyên lên và đứng trên mặt cao. V6.2.6 đã nhầm thành slab solid có khoảng rỗng phía dưới và gọi test pass là đủ để chứng minh cấu trúc. Các hình V6.2.6 giữ nguyên làm lịch sử bị từ chối.
+
+- **Foreground solid:** đất sáng/contrast cao, mép cỏ liền, thân collider đầy; không S xuyên. Các cliff/bậc bắt buộc và đồi Tạ Minh vẫn kiểu này.
+- **Rear earth terrace:** thân đất trầm hơn được fill tới y−8 và render sau actor; không collider ở thân/sườn. Chỉ mặt trên có support one-way mỏng, cue mép cỏ đứt đoạn rõ. Nhảy từ dưới xuyên mặt, rơi từ trên thì đứng lại; S/↓ chủ động ignore đúng support đang đứng, rồi tiếp đất ở tuyến dưới. Không đổi toàn map thành pass-through hoặc auto-fall khi đi trên.
+- Cung đường x−18…−10/top6,4, DS5 x54…64/top4,6, vách thác sau x64…66/top3,4, PROBE8 x109…119/top4,6 và bậc sau x119…122/top3,2 dùng rear earth. Mob vẫn ở support riêng của đàn; không nhấc quái tầng dưới lên cao theo hình fill.
+- **Cầu:** x66…82, sàn solid top1,2; nước trang trí level−1,2, cách mặt đi2,4 u. Trụ/chống chéo và lan can nằm lớp sau, không collider chắn người. Đường thấp DS5 nối cùng cao độ vào đầu tây; đầu đông nối dốc solid x82…86 từ1,2 xuống0. Không vách ở miệng cầu, đi qua hai chiều không cần jump; S không xuyên sàn xuống nước.
+- Nguồn nước/thác ở rear cliff top3,4 nối nước−1,2; thác nằm sau sàn cầu. Vũng nhỏ Vân Khê giữ đáy đi được/speed×0,85. Không swimming/drowning/physics nước.
+
+Các màu/tọa độ/dốc/collider mỏng là CURRENT PROBE, không khóa production. Docs1–4 không đổi; luật visual solid/one-way/back/front đã có trong Art, revision này sửa mock để thể hiện được nó. G-L vẫn PARTIAL; cần người chơi đọc được cue trước khi xem là visual acceptance.
+
+**Kiểm V6.2.7:** EditMode **58/58**, PlayMode **10/10**; Linux development build đã build lại. [Fresh Q1–Q6](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/route-result.txt) PASS bằng Rigidbody2D và keyboard menu adapter, timeScale4; không preset hoặc inject position/quest/EXP/HP để bỏ bước. PlayMode kiểm riêng đi qua cầu hai chiều không jump, S không xuyên cầu, jump xuyên rear earth/landing/drop và leo tới NPC tầng cao. Hai lỗi xuất hiện khi thêm dốc (tọa độ mesh sprite và giả định collider chỉ là Box) đã sửa trước lượt kiểm cuối; không bỏ qua exception để lấy PASS.
+
+Ảnh **standalone 1×, input bàn phím thật**: [đường thấp trước đất sau](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/rear-earth-lower-lane.png) → [nhảy lên mặt cao](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/rear-earth-upper.png) → [S xuống lại](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/rear-earth-after-drop.png); [cầu và khoảng hở trên nước](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/bridge-clearance.png), [dốc đầu đông](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/bridge-east-ramp.png), [Cung đường trên đất fill đầy](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/academy-rear-earth.png). Capture dùng Crowd/SwordTraining **DEBUG preset** rồi đi/nhảy/drop bằng input thật, không teleport sau preset; đây là kiểm hình/traversal có giới hạn, không thay fresh route hoặc user visual acceptance.
+
+[Build/source hashes và phương pháp kiểm](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/validation.json) · [Build summary](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/build-summary.txt) · [Audit số dòng/bảng/heading/giá trị trọng yếu](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/document-audit.json). Script so với checkpoint `13035d3`, kiểm docs1–4 giữ byte, links/anchors và 17 nội dung di chuyển lịch sử; lấy mẫu ngẫu nhiên8 mục SOURCE→DESTINATION. Revision này không chuyển/xóa nội dung ở docs1–4.
+
+## V6.2.6 — lịch sử bị từ chối: slab đất solid và cầu sát nước
 
 User làm rõ: “núi” là các khối đất cao có mặt đứng được, có đoạn phải nhảy qua và đoạn có thể đi dưới rồi leo lên; ngoại cảnh sau cùng là lớp khác. Nước rộng có cầu là hình trang trí cao gần cầu vì người chơi không xuống đó. V6.2.5 giải sai vấn đề bằng lớp đất sau không collision; không kế thừa cách đó.
 

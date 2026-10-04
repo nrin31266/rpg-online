@@ -84,18 +84,18 @@ namespace HuyenLo.Tests
                 Assert.That(host.Body.position.x,Is.GreaterThan(124),"Upper route must descend to eastern road without a dead end");
             }finally{Object.Destroy(go);}yield return null;
         }
-        [UnityTest] public IEnumerator EarthOverhangHasLowerPassageAndReachableUpperSurface(){
+        [UnityTest] public IEnumerator RearEarthAllowsBodyTraversalUpwardJumpLandingAndDeliberateDrop(){
             var go=new GameObject("Physical earth overhang fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.Crowd);host.Session.Player.InvulnerableUntil=100;
             try{
-                host.Body.position=new Vector2(55.6f,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                host.Body.position=new Vector2(57.2f,1.92f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
                 host.ExternalAxis=1;for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
-                Assert.That(host.Body.position.x,Is.GreaterThan(61));Assert.That(host.Body.position.y,Is.EqualTo(.72f).Within(.08),"Must walk underneath real earth, not be placed on its roof");
-                host.Body.position=new Vector2(53.4f,3.12f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
-                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();host.ExternalJump=true;host.ExternalJumpHeld=true;host.ExternalAxis=1;
-                for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
+                Assert.That(host.Body.position.x,Is.GreaterThan(61));Assert.That(host.Body.position.y,Is.EqualTo(1.92f).Within(.08),"Rear visual fill must not push the actor onto its top");
+                host.Body.position=new Vector2(60,1.92f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();host.ExternalJump=true;host.ExternalJumpHeld=true;host.ExternalAxis=0;
+                for(int i=0;i<70;i++)yield return new WaitForFixedUpdate();host.ExternalAxis=0;
                 for(int i=0;i<8;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);
-                Assert.That(host.Body.position.y,Is.EqualTo(5.32f).Within(.1),"Must land on the same solid earth's upper face");
-                host.ExternalDrop=true;for(int i=0;i<10;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.y,Is.GreaterThan(5),"Earth cannot be dropped through");
+                Assert.That(host.Body.position.y,Is.EqualTo(5.32f).Within(.1),"Jump upward through rear fill and land on its top");
+                host.ExternalJumpHeld=false;host.ExternalDrop=true;for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(1.92f).Within(.1),"S drops through only the rear support and lands safely on the solid lower lane");
             }finally{Object.Destroy(go);}yield return null;
         }
         [UnityTest] public IEnumerator WalkableBasinAndBridgeHaveDistinctMovementSpeeds(){
@@ -106,10 +106,20 @@ namespace HuyenLo.Tests
                 host.ExternalAxis=1;for(int i=0;i<4;i++)yield return new WaitForFixedUpdate();
                 Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*.85f).Within(.05));
                 host.ResetPrototype(PrototypeStart.Crowd);host.ExternalAxis=1;
-                host.Body.position=new Vector2(73,1.12f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                host.Body.position=new Vector2(73,1.92f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
                 for(int i=0;i<8;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);
-                host.ExternalDrop=true;for(int i=0;i<12;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.y,Is.GreaterThan(1),"Wide-water bridge is solid; S must not reach the water");
+                host.ExternalDrop=true;for(int i=0;i<12;i++)yield return new WaitForFixedUpdate();Assert.That(host.Body.position.y,Is.GreaterThan(1.8),"Wide-water bridge is solid; S must not reach the water");
                 Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*(float)host.Session.Player.Stats.Speed).Within(.05),"Bridge over water remains dry");
+            }finally{Object.Destroy(go);}yield return null;
+        }
+        [UnityTest] public IEnumerator BridgeAndBanksCanBeWalkedBothWaysWithoutJump(){
+            var go=new GameObject("Continuous bridge route fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.Crowd);host.Session.Player.InvulnerableUntil=100;
+            try{
+                host.Body.position=new Vector2(60,1.92f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();int guard=0;host.ExternalAxis=1;
+                while(host.Body.position.x<88){Assert.That(++guard,Is.LessThan(500),"Eastbound crossing blocked");Assert.That(host.Body.position.y,Is.LessThan(2.15f),"Should not hop over a bank");yield return new WaitForFixedUpdate();}
+                host.ExternalAxis=-1;guard=0;while(host.Body.position.x>60){Assert.That(++guard,Is.LessThan(500),"Westbound crossing blocked");Assert.That(host.Body.position.y,Is.LessThan(2.15f));yield return new WaitForFixedUpdate();}
+                host.ExternalAxis=0;for(int i=0;i<10;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(1.92f).Within(.1));
             }finally{Object.Destroy(go);}yield return null;
         }
         [UnityTest] public IEnumerator SolidTerraceBlocksWalkAndDropButJumpCanTraverse(){

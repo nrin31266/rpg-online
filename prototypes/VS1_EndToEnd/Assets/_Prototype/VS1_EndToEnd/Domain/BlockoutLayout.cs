@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 namespace HuyenLo.Domain
 {
-    // Disposable blockout authoring. Solid terrace profiles are distinct from wooden one-way decks.
+    // Disposable blockout authoring. Foreground solid earth, rear earth with a one-way top, and wooden decks are distinct.
     public readonly struct Surface
     {
         public readonly string Name;
-        public readonly double X,Y,Width,Height;
-        public readonly bool OneWay,Overhead,Wood;
-        public Surface(string name,double x,double y,double width,double height,bool oneWay=false,bool overhead=false,bool wood=false)
-        {Name=name;X=x;Y=y;Width=width;Height=height;OneWay=oneWay;Overhead=overhead;Wood=wood||oneWay;}
+        public readonly double X,Y,Width,Height,Rise;
+        public readonly bool OneWay,Overhead,Wood,RearEarth;
+        public Surface(string name,double x,double y,double width,double height,bool oneWay=false,bool overhead=false,bool wood=false,bool rearEarth=false,double rise=0)
+        {Name=name;X=x;Y=y;Width=width;Height=height;Rise=rise;OneWay=oneWay;Overhead=overhead;RearEarth=rearEarth;Wood=wood||(oneWay&&!rearEarth);}
+        public double TopAt(double x)=>Y+Height/2-System.Math.Max(0,Rise)+Rise*(x-(X-Width/2))/Width;
     }
     public readonly struct WaterRegion
     {
@@ -23,6 +24,7 @@ namespace HuyenLo.Domain
         public static double MinX(Map map)=>map==Map.Academy?-30:-10;
         public static double MaxX(Map map)=>map==Map.Mist?132:40;
         private static Surface Earth(string name,double left,double right,double top)=>new Surface(name,(left+right)/2,(top-8)/2,right-left,top+8);
+        private static Surface RearEarth(string name,double left,double right,double top)=>new Surface(name,(left+right)/2,(top-8)/2,right-left,top+8,true,true,false,true);
         public static IEnumerable<Surface> Surfaces(Map map)
         {
             if(map==Map.Village){
@@ -55,7 +57,7 @@ namespace HuyenLo.Domain
                 yield return Earth("Class entrance middle step",-7,-6,2.8);
                 yield return Earth("Class entrance high step",-8,-7,4.2);
                 yield return Earth("Class main hall route",-5,12,0);
-                yield return new Surface("Bow hill walkable cap",-14,5.8,8,1.2,false,true);
+                yield return RearEarth("Bow hill walkable cap",-18,-10,6.4);
                 yield return Earth("Practice approach step",12,14,.4);
                 yield return Earth("Practice terrace",14,17,.8);
                 yield return Earth("Practice descent",17,19,.4);
@@ -73,19 +75,19 @@ namespace HuyenLo.Domain
                 yield return Earth("DS4 valley entry",44,46,0);
                 yield return Earth("DS4 jumping approach",46,48,1.2);
                 yield return Earth("DS4 takeoff plateau",48,55,2.4);
-                yield return Earth("DS5 lower passage",55,65,0);
-                yield return new Surface("DS5 walkable earth overhang",59,3.4,10,2.4,false,true);
-                yield return Earth("Stream high bank",65,66,2.2);
+                yield return Earth("DS5 lane descent",55,57,1.8);
+                yield return Earth("DS5 lower passage",57,66,1.2);
+                yield return RearEarth("DS5 walkable earth overhang",54,64,4.6);
+                yield return RearEarth("Stream rear cliff",64,66,3.4);
                 // Wide water is inaccessible scenery: a solid wooden bridge is the only route.
-                yield return new Surface("Valley solid wooden bridge",74,.25,16,.3,false,false,true);
-                yield return Earth("DS6 bridge landing",82,84,1.2);
-                yield return Earth("DS6 descent",84,86,0);
+                yield return new Surface("Valley solid wooden bridge",74,1.05,16,.3,false,false,true);
+                yield return new Surface("DS6 sloped bridge approach",84,-3.4,4,9.2,false,false,false,false,-1.2);
                 yield return Earth("DS6 clearing",86,100,0);
                 yield return Earth("Eastern ridge step",100,104,.4);
                 yield return Earth("PROBE7 ridge",104,122,.8);
                 yield return new Surface("PROBE8 timber climbing step",107,2.4,2,.2,true);
-                yield return new Surface("PROBE8 earth lookout",114,3.9,10,1.4,false,true);
-                yield return new Surface("PROBE8 climbing ledge",120.5,2.5,3,1.4,false,true);
+                yield return RearEarth("PROBE8 earth lookout",109,119,4.6);
+                yield return RearEarth("PROBE8 climbing ledge",119,122,3.2);
                 yield return Earth("Eastern climbing shoulder",122,124,2);
                 yield return Earth("Eastern road",124,132,0);
             }
@@ -94,24 +96,24 @@ namespace HuyenLo.Domain
         public static IEnumerable<WaterRegion> Waters(Map map){
             if(map==Map.Village)yield return new WaterRegion(2.4,4,-.35,0);
             if(map==Map.Mist){
-                yield return new WaterRegion(66,82,-8,.08,1,true);
+                yield return new WaterRegion(66,82,-8,-1.2,1,true);
             }
         }
         public static double WaterSpeed(Map map,Point feet){
             double factor=1;foreach(var w in Waters(map))if(w.TouchesFeet(feet))factor=System.Math.Min(factor,w.SpeedFactor);return factor;
         }
         public static double BaseGroundTop(Map map,double x){
-            double top=-4;foreach(var s in Surfaces(map))if(!s.OneWay&&!s.Overhead&&x>=s.X-s.Width/2&&x<=s.X+s.Width/2)top=System.Math.Max(top,s.Y+s.Height/2);return top;
+            double top=-4;foreach(var s in Surfaces(map))if(!s.OneWay&&!s.Overhead&&x>=s.X-s.Width/2&&x<=s.X+s.Width/2)top=System.Math.Max(top,s.TopAt(x));return top;
         }
         public static Surface MobSupport(string slot,double x){
             string roof=slot.StartsWith("DS5.")?"DS5 walkable earth overhang":slot.StartsWith("PROBE8.")?"PROBE8 earth lookout":null;
             Surface best=default;double top=-100;
-            foreach(var s in Surfaces(Map.Mist))if(!s.OneWay&&x>s.X-s.Width/2&&x<s.X+s.Width/2&&(roof!=null?s.Name==roof:!s.Overhead)&&s.Y+s.Height/2>top){best=s;top=s.Y+s.Height/2;}
+            foreach(var s in Surfaces(Map.Mist))if((!s.OneWay||s.RearEarth)&&x>s.X-s.Width/2&&x<s.X+s.Width/2&&(roof!=null?s.Name==roof:!s.Overhead)&&s.Y+s.Height/2>top){best=s;top=s.Y+s.Height/2;}
             if(top==-100)throw new System.InvalidOperationException("Missing authored support for "+slot);return best;
         }
         public static double GroundTop(Map map,double x){
             double top=-4;
-            foreach(var s in Surfaces(map))if(!s.OneWay&&x>=s.X-s.Width/2&&x<=s.X+s.Width/2)top=System.Math.Max(top,s.Y+s.Height/2);
+            foreach(var s in Surfaces(map))if((!s.OneWay||s.RearEarth)&&x>=s.X-s.Width/2&&x<=s.X+s.Width/2)top=System.Math.Max(top,s.TopAt(x));
             return top;
         }
     }

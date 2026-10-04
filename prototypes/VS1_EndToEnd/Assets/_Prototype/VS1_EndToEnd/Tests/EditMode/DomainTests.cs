@@ -282,6 +282,9 @@ namespace HuyenLo.Tests
             var bridge=BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="Valley solid wooden bridge");
             var water=BlockoutLayout.Waters(Map.Mist).Single();
             Assert.That(water.DecorativeOnly,Is.True);Assert.That(bridge.OneWay,Is.False);Assert.That(bridge.Wood,Is.True);
+            Assert.That(bridge.TopAt(74)-water.Level,Is.GreaterThanOrEqualTo(2),"The bridge needs visible air above water");
+            Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,65.9),Is.EqualTo(bridge.TopAt(74)).Within(.0001));
+            Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,82.01),Is.EqualTo(bridge.TopAt(74)).Within(.01));
             Assert.That(bridge.X-bridge.Width/2,Is.LessThanOrEqualTo(water.Left));Assert.That(bridge.X+bridge.Width/2,Is.GreaterThanOrEqualTo(water.Right));
             for(double x=66.1;x<82;x+=.2)Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,x),Is.GreaterThan(water.Level));
         }
@@ -293,8 +296,15 @@ namespace HuyenLo.Tests
             s.Quest=6;s.Stage=3;s.Player.Map=Map.Academy;Assert.That(s.Objective,Does.Contain("Học Viện · ở map hiện tại"));
             s.Stage=5;Assert.That(s.Objective,Does.Contain("Cổng đông Học Viện → Vân Khê"));
         }
+        [Test] public void RearEarthIsFilledBehindActorsWithAnExplicitOneWayTop(){
+            foreach(var map in new[]{Map.Academy,Map.Mist})foreach(var rear in BlockoutLayout.Surfaces(map).Where(x=>x.RearEarth)){
+                Assert.That(rear.OneWay,Is.True);Assert.That(rear.Wood,Is.False);Assert.That(rear.Overhead,Is.True);
+                Assert.That(rear.Y-rear.Height/2,Is.EqualTo(-8),"Rear soil must be filled to ground depth, not a floating slab");
+            }
+            Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,60),Is.EqualTo(1.2).Within(.0001));Assert.That(BlockoutLayout.GroundTop(Map.Mist,60),Is.EqualTo(4.6).Within(.0001));
+        }
         [Test] public void TerrainHasSolidElevationAndFewIntentionalOneWayDecks(){
-            foreach(Map map in Enum.GetValues(typeof(Map))){var surfaces=BlockoutLayout.Surfaces(map).ToArray();Assert.That(surfaces.Where(x=>!x.OneWay).Select(x=>x.Y+x.Height/2).Distinct().Count(),Is.GreaterThan(1));Assert.That(surfaces.Count(x=>x.OneWay),Is.InRange(1,3));}
+            foreach(Map map in Enum.GetValues(typeof(Map))){var surfaces=BlockoutLayout.Surfaces(map).ToArray();Assert.That(surfaces.Where(x=>!x.OneWay).Select(x=>x.Y+x.Height/2).Distinct().Count(),Is.GreaterThan(1));Assert.That(surfaces.Count(x=>x.OneWay&&x.Wood),Is.InRange(1,3));}
             var s=new SliceSession();foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist)){
                 var support=BlockoutLayout.MobSupport(m.Slot,m.Home.X);
                 Assert.That(m.Home.Y,Is.EqualTo(support.Y+support.Height/2+.65).Within(.0001),m.Slot+" must stand above its physical support");

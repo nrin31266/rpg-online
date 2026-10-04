@@ -1,0 +1,161 @@
+{
+  "revision": "V6.2.7",
+  "checkpoint_before": "13035d3",
+  "scope": "Disposable VS1_EndToEnd only; docs 1–4 byte-identical; prototype notes in Roadmap §10",
+  "unity": "6000.5.9f1",
+  "tests": {
+    "editmode": {
+      "total": 58,
+      "passed": 58,
+      "failed": 0,
+      "started_utc": "2026-10-04 06:55:46Z",
+      "finished_utc": "2026-10-04 06:55:46Z",
+      "xml_sha256": "3d1bd116592bec4eeb91a67b73f45d1dffd74c0c0643ffad390df975bf253175",
+      "test_names": [
+        "AlternateBindingsDoNotDoubleSpeed(True,True,False,False,-1)",
+        "AlternateBindingsDoNotDoubleSpeed(False,False,True,True,1)",
+        "AlternateBindingsDoNotDoubleSpeed(True,False,True,False,0)",
+        "ApproachIsBoundedHorizontalAndManualCancels",
+        "AutoFocusStickyThenDeathReacquires",
+        "ClassAdmissionRequiresManualUnequipAndHasTwoGuides",
+        "ClassSkillsRequireClassWeaponAndUnequipCannotBypass",
+        "ConsumablesRejectFullAndSeparateCooldownsFoodDoesNotResurrect",
+        "DeathCancelsUnresolvedWithoutRefund",
+        "DryPacksStayOnShoreWhilePlayerCrossesWater",
+        "DummyAndCatchupRouteMatchesRevisionWithoutDowngradingLateCharacters",
+        "EdgeOverlapTransitionsOnceWithoutInteractAndResetIsFresh",
+        "EverySkillNeedsAnotherPhysicalPress(1)",
+        "EverySkillNeedsAnotherPhysicalPress(2)",
+        "EverySkillNeedsAnotherPhysicalPress(3)",
+        "EveryWolfCanReengageWithoutFrontDeathOrTeleport(1,107)",
+        "EveryWolfCanReengageWithoutFrontDeathOrTeleport(2,107)",
+        "EveryWolfCanReengageWithoutFrontDeathOrTeleport(4,107)",
+        "EveryWolfCanReengageWithoutFrontDeathOrTeleport(4,104.6d)",
+        "EveryWolfCanReengageWithoutFrontDeathOrTeleport(4,120.8d)",
+        "ExpInvariantAndHalfUpDamage",
+        "FacingIndependentAcquireAndExplicitOutOfRangeDoesNotSubstitute",
+        "FullBagRejectDoesNotConsumeGroundAndStackMergeStillFits",
+        "LevelAtDeathSnapshotSurvivesLevelUpAndGapRejects",
+        "LevelFiveResetsExactlyOnceAndLaterPointsRemain",
+        "LockedSlotDoesNotSelectOrStart",
+        "LootImmediateIndependentAndNextCandidate",
+        "ManualContextChangesAutoButExplicitIsPinned",
+        "MeleePhaseOffsetsAndRecoveryDoNotChangeAttackInterval",
+        "MobWindupMissResolvesOnClockInsteadOfHittingAfterPlayerReturns",
+        "MultiHitLethalFirstIndexCannotCreditSameDeathAgain",
+        "NormalDamageDoesNotInterruptAction",
+        "NoTargetCommitsNothing",
+        "PackLeavesBoundaryThenResumesPatrolWithoutNewLifeOrCredit",
+        "PendingGrantKeepsInstanceAndReceiptAfterCapacityRetry",
+        "PendingTargetDeathNeverCastsAtReplacementAndLowMpNeverRuns",
+        "PlayerMovingAfterCastDoesNotDragOrigin",
+        "PortalCancelsMobWindupAndEmptyMapReturnsWithoutNewLifeOrLoot",
+        "ProbePocketsDoNotGrantQ5KillCredit",
+        "QuestStagedGrantRetryAndTurnInCapacityAreAtomic",
+        "RangedBatchResolvesExactlyOnceNoPresentationCallback",
+        "RarityVendorMultiplierUsesFloorAndEquippedCannotBeSold",
+        "RearEarthIsFilledBehindActorsWithAnExplicitOneWayTop",
+        "ReciprocalExitPreservesTravelDirection",
+        "RejectedPressDoesNotCreateLongQueue",
+        "ReleaseKeepsBoundedApproachAndCommitsExactlyOnceAtActualOrigin",
+        "ShopAndTurnInRequireLiveNearCorrectNpc",
+        "ShortRecoveryTapBuffersLatestSkillButCooldownTapDoesNotQueue",
+        "SlotPressExecutesImmediatelyAndSecondPhysicalPressStartsAgain",
+        "SourceSnapshotAndGenerationAreImmutable",
+        "SpamKeepsImmutableActionAndIndependentCooldowns",
+        "StorageTransferIsAtomicAndDoesNotCopyInstances",
+        "TerrainHasSolidElevationAndFewIntentionalOneWayDecks",
+        "TrackerDirectionsFollowCurrentQuestStepAndMap",
+        "TutorialSupplyOnlyExistsAtRelevantActiveStep",
+        "UltimateHoldConsumesOnePhysicalPress",
+        "WaterContactSlowsFeetButNotBridgeAirOrDryGround",
+        "WideWaterIsSceneryBehindContinuousSolidBridge"
+      ]
+    },
+    "playmode": {
+      "total": 10,
+      "passed": 10,
+      "failed": 0,
+      "started_utc": "2026-10-04 06:51:50Z",
+      "finished_utc": "2026-10-04 06:53:09Z",
+      "xml_sha256": "813ef25232eeb5addeccb6fbed89630ade17bcf791916e4310f3ae2d39c04955",
+      "test_names": [
+        "Q1ToQ6UsesRealPhysicsAndNoQuestOrPositionInjection",
+        "BridgeAndBanksCanBeWalkedBothWaysWithoutJump",
+        "ClimbRealHillThenTalkToNpcWithKeyboard",
+        "ClimbUpperPackFromLowerRoute",
+        "KeyboardAliasesModalCancellationAndAirCastFixture",
+        "KeyboardNpcShopInventoryAndDebugResetNeedNoMouse",
+        "MovementProbeVariableHeightCoyoteAndStandaloneDrop",
+        "RearEarthAllowsBodyTraversalUpwardJumpLandingAndDeliberateDrop",
+        "SolidTerraceBlocksWalkAndDropButJumpCanTraverse",
+        "WalkableBasinAndBridgeHaveDistinctMovementSpeeds"
+      ]
+    }
+  },
+  "build": {
+    "result": "Succeeded",
+    "bytes": 165635374,
+    "executable": "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64",
+    "executable_sha256": "a7ad5b156bd9a1232544ff6fc12e5f863d8f1f2348c5b141f5c3d4230e5be292",
+    "managed_assemblies": {
+      "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo_Data/Managed/HuyenLo.Domain.dll": "5e84feef9204c6ba03e7823da4fd15c62b41f4e296ae13c1a2a712e22f9d3488",
+      "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo_Data/Managed/HuyenLo.Runtime.dll": "84f0aa1488766bf4122ce1484507f0187538d1140219fa0296d9322267de2115"
+    },
+    "log_sha256": "7eb780e975a3898d16724c05b4d1448f31c8a73f3066d258e971a04ab945fe43"
+  },
+  "source_sha256": {
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/BlockoutLayout.cs": "1fc0e2ba155b67067031c45411d603244bca92280c1a3e90b1a284ccca3a132e",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/CombatController.cs": "2e086a6fc8078d1fc4940ac9c565cd14e48793bc94a5b389cb2e5e776b3cf5aa",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/PrototypePresets.cs": "4e7090533219f3fb96a310354aebf12ae75c6e22bb9de9d5158af1c3db7d0181",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs": "3269d67ca286801ce8f8624557109fc806cf679d8e0e2ed646bc78abbb8df316",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs": "f6f1fabd46276460d00cf133802ab6a65dba37723e9825dbbfde4a19a1a653ef",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Editor/SliceBuild.cs": "a20bbf73817b0d76960748875b9d091c9c59a511428962d56d4e6285692d430f",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/GeometricRig.cs": "24d061d017d2cfacd7e4b2148f02a0a4d8e1e5e61ebd98c3d3d558ba22e98508",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHost.cs": "0ae15599a287e334a3e85be62ce9e8be11fbdb3d12a3cc25284c0ed30489d493",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs": "19f6f5988cfd78cb029fe5a77ef1d5f0d2dc1f5a955b9de68db0a8e6fd3a0c9b",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceRouteProbe.cs": "81f6f696ad603eebf0aff8c757fa1bc12e9894f22f0106e8e87192299e2cdcf5",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/DomainTests.cs": "1871eaa9db0a568b2d9a394a04bc54f8fc219a52d9dc96e38760c86ad5d381f8",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/ContinuousRouteTests.cs": "3ef516a8971fe1b96ae4e383d847d9981589618ccc8be3a3441d2025a4e02e11",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/InputPhysicsTests.cs": "a84bfc473da9c4818aeb14fcd36f38c85ea65a02a6862c9839edf01ada59cdba"
+  },
+  "fresh_route": {
+    "result": "PASS",
+    "Q1_to_Q6": true,
+    "Quest": 7,
+    "school": "Sword",
+    "level": 5,
+    "receipts": 25,
+    "method": "Actual Rigidbody2D movement; keyboard menu adapter; no debug preset or position/quest/EXP/HP injection; timeScale=4",
+    "route_result_sha256": "1c3b52fbfcf1050ba54932357a73e25281af66de991eb7c1087759c5cce33622"
+  },
+  "native_1x_review": {
+    "method": "Linux standalone copied to isolated app; compiled assembly hashes match final build. Xvfb 1280×720, native XTest keyboard inputs, timeScale=1. Crowd/SwordTraining debug presets explicitly used for targeted layout views, not fresh route acceptance. Root viewed each retained image. No position injection after preset.",
+    "captures": {
+      "rear-earth-lower-lane.png": "718ee42f3b849ea69edb8c541025e20ac1fde56743c27bb92809c6075c9ee4ff",
+      "rear-earth-upper.png": "33a7079351e1441377e00b731a584e2921cb2b7ee453b135b96f9cee497e1654",
+      "rear-earth-after-drop.png": "d578be833d63321a4b23f9ceb5a915b4de495b05a9daafa447abcbd82794cac2",
+      "bridge-clearance.png": "7594270be654e3d4a90e0ddf53ba75eca39119eb2161fd5a7332064ba3321566",
+      "bridge-east-ramp.png": "b30a18fc90ff04fe38f363f2d41a3a76cca8e49bba75de21abac662eb0843f44",
+      "academy-rear-earth.png": "055d4691f7b0b3884b3279cd0f74d36b8b6a18a4c516b5f1aa4646f59d26e7ea"
+    },
+    "observed": [
+      "Mist lower lane: full rear soil behind player, solid foreground below, segmented rear landing lip distinct from continuous solid cap",
+      "Straight native jump from lower lane lands on DS5 rear terrace; S returns to the same solid lower lane",
+      "Bridge raised above water; west lane is flush with deck, east bank slopes down; native crossing and return used horizontal movement only",
+      "S on bridge keeps player dry above water; bridge piers/braces/rear rail are visible and do not block passage",
+      "Academy: native multi-step ascent reaches Diệp Lam on full rear earth; E opens her separate dialogue; upper wooden story remains distinct"
+    ],
+    "limitations": [
+      "Debug preset views are not end-to-end journey proof",
+      "Primitive blockout; visual readability and user acceptance remain pending",
+      "Production art/rig, networking and backend are not accepted by these probes"
+    ]
+  },
+  "resolved_validation_failures": [
+    "Initial slope sprite vertices incorrectly supplied in normalized coordinates; fixed to Sprite.rect pixels",
+    "Slope collider exposed a BoxCollider-only IsGrounded assumption; support lookup now handles PolygonCollider2D without a null dictionary key",
+    "Exact double comparison in domain fixture replaced by explicit numeric tolerance; final test runs are all green"
+  ],
+  "status": "G-L PARTIAL; G-N/G-D unopened; V6.2.4–V6.2.6 rejected historical visual evidence"
+}

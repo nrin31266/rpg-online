@@ -1,0 +1,12 @@
+V6.2.7 Linux development build — Succeeded
+Unity 6000.5.9f1
+Build size: 165635374 bytes
+Executable: prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64
+Executable SHA256: a7ad5b156bd9a1232544ff6fc12e5f863d8f1f2348c5b141f5c3d4230e5be292
+prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo_Data/Managed/HuyenLo.Domain.dll SHA256: 5e84feef9204c6ba03e7823da4fd15c62b41f4e296ae13c1a2a712e22f9d3488
+prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo_Data/Managed/HuyenLo.Runtime.dll SHA256: 84f0aa1488766bf4122ce1484507f0187538d1140219fa0296d9322267de2115
+EditMode 58/58; PlayMode 10/10; fresh standalone route Q1–Q6 PASS.
+Native 1× keyboard captures reviewed separately; debug presets are not route evidence.
+Rear soil: full visual fill, pass-through body, one-way upper support and deliberate S drop.
+Bridge: deck top1.2 / water−1.2, 2.4u clearance, continuous west bank and east solid slope; no endpoint collision barriers.
+G-L PARTIAL; primitive art and user visual acceptance pending.
