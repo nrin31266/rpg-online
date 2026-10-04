@@ -39,7 +39,7 @@ Lịch sử prototype ở [Phụ lục](#roadmap-history-appendix); G-L vẫn PA
 | PvP/Q9/escrow/settlement | DEFERRED khỏi VS-1, TARGET P0 | G-D trước G-P; Q9 optional cho người chơi không có nghĩa được bỏ hệ PvP |
 | Buff R, shield/groggy, QoL/P1/P2 | Chưa duyệt triển khai | Chỉ xét sau core; proposal vẫn ở Analysis, không chen vào VS-1 |
 
-**Bản chạy thử hiện tại:** một hành vi đã duyệt, không ProbeConfig/flag/F8/metric harness; dừng A/B, evidence work, hook/Git cleanup và Phase H. Các thông số/hồ sơ cũ chỉ ở [Phụ lục §10](#prototype-visual-review). Budget release, quest và các gate production không đổi. G-L vẫn PARTIAL; không dùng tests để kết luận layout/feel đã được người chơi duyệt.
+**Bản chạy thử hiện tại:** một hành vi đã duyệt, không ProbeConfig/flag/metric harness; F8/debug chọn giai đoạn và reset được khôi phục theo yêu cầu chủ dự án, chỉ trong bản mẫu local. Dừng A/B, evidence work, hook/Git cleanup và Phase H. Các thông số/hồ sơ cũ chỉ ở [Phụ lục §10](#prototype-visual-review). Budget release, quest và các gate production không đổi. G-L vẫn PARTIAL; không dùng tests để kết luận layout/feel đã được người chơi duyệt.
 
 <a id="vs-1"></a>
 
@@ -51,7 +51,7 @@ Hướng triển khai đã xác nhận là **Kiếm trước → local/offline t
 
 Khi review thay phạm vi slice, cập nhật mục này và phần G-L/validation liên quan; không âm thầm đổi quest/map trong GDD, dependency gate mạng hoặc final acceptance.
 
-**VS-1 là bản chạy thử đồ họa tối giản, thiết kế lại ở production.** Giữ layout/collision/spawn/EdgeExit/tuyến Q1–Q6; chỉ hộp/capsule màu, text/markers/bars. Đây là phạm vi prototype, không thay quy định art TARGET.
+**VS-1 là bản chạy thử đồ họa tối giản, thiết kế lại ở production.** Giữ tuyến/bố cục/spawn/EdgeExit Q1–Q6 và vai trò collision; lòng hố Vân Khê được làm trũng với hai bờ dốc. Hộp/capsule màu có silhouette tối giản, viền cỏ/mặt đá/ván cầu, nước nông theo lòng hố để đọc terrain, text/markers/bars và bảng phím đầy đủ. F8 chọn giai đoạn/reset chỉ dành cho prototype; không save hay mở cơ chế debug vào production. Đây là phạm vi prototype, không thay quy định art TARGET.
 
 Một đường đi revision mới: NPC → nhảy/drop-through/EdgeExit auto-transition → nhận/mặc Mộc Kiếm, hạ ba Dummy đồng thời → Nấm/nhặt supply/mặc Áo/bán sample → chuẩn bị Food/Bình Máu, đánh Sói → catch-up Lv5 → chọn Kiếm/cộng điểm/học bí kíp/S1 + dùng Bình MP → trả Q6. Quest objectives là hành động, tutorial glyph từ bindings. Cung giới thiệu nhưng chưa playable; Đồ và class vẫn hiện tên/slot/stat rõ; không yêu cầu art outfit trong bản chạy thử tối giản. Đồ II/III chỉ fixture hẹp, không route mới.
 
