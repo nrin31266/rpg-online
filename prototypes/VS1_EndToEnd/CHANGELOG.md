@@ -126,3 +126,327 @@ Các sửa cảnh quan có sẵn trong working tree được backup và giữ ng
 - Esc: NPC submenu/menu, pending, focus, no-op; mở/đóng UI không resume approach cũ. Thử blocked exit rồi manual chuyển map.
 
 Chưa có người thật thực hiện checklist; **G-L PARTIAL, không PASS**. Findings chuyển thành yêu cầu kiểm cho G-B, không mang throwaway classes vào production. Câu hỏi chủ dự án: giữ probe OFF và review AI/cadence trước mọi sync luật; Phase H còn cần duyệt riêng. Không sửa GDD/Technical/Art/README.
+
+## Chỉ mục evidence TXT/JSON lịch sử
+
+Các file nhỏ tiếp tục ở Git; link lịch sử đi qua chỉ mục để phân biệt hồ sơ với acceptance hiện tại.
+
+| File | SHA256 | Bytes | Vị trí trong repo |
+| --- | --- | ---: | --- |
+| <a id="evidence-small-ae3ddbad7ec4"></a>PrototypeEvidence/V6_2_5/document-audit.json | `ae3ddbad7ec4277f15e9033a888412fefa6ad4ae68d3d76246d2f7e3c525945c` | 5102 | [File](PrototypeEvidence/V6_2_5/document-audit.json) |
+| <a id="evidence-small-392f4b2e387b"></a>PrototypeEvidence/V6_2_5/source-destination-sample.json | `392f4b2e387bd74577ab54a5a454e8b60b073588beb898d30c0ade251cbd85c8` | 3181 | [File](PrototypeEvidence/V6_2_5/source-destination-sample.json) |
+| <a id="evidence-small-23d16d500d0e"></a>PrototypeEvidence/V6_2_5/validation.json | `23d16d500d0ede38dd229a94df46d26761657bff64eb80b89051b263eed66008` | 4985 | [File](PrototypeEvidence/V6_2_5/validation.json) |
+| <a id="evidence-small-080c1b72b86f"></a>PrototypeEvidence/V6_2_6/build-summary.txt | `080c1b72b86f094ef88b904cd100e2c9d23bd7d090532fd7c65756d1db8c49e0` | 808 | [File](PrototypeEvidence/V6_2_6/build-summary.txt) |
+| <a id="evidence-small-4f633c9d68cb"></a>PrototypeEvidence/V6_2_6/document-audit.json | `4f633c9d68cb0bacd63ee905c69f92106b8b7c1c9248b566d3fe992b72ca6d14` | 4341 | [File](PrototypeEvidence/V6_2_6/document-audit.json) |
+| <a id="evidence-small-ff856246be01"></a>PrototypeEvidence/V6_2_6/validation.json | `ff856246be01b9cbfa5b0dd383ca1ea1111cb891c4e468d977c9734e89def019` | 9721 | [File](PrototypeEvidence/V6_2_6/validation.json) |
+| <a id="evidence-small-257a28f6fc1a"></a>PrototypeEvidence/V6_2_7/build-summary.txt | `257a28f6fc1a11d942ecf68c7ea4c3b7cf9f71402fd519cba2929c106c231793` | 1029 | [File](PrototypeEvidence/V6_2_7/build-summary.txt) |
+| <a id="evidence-small-114942163ccf"></a>PrototypeEvidence/V6_2_7/document-audit.json | `114942163ccff28c392983d199784798089ac9cb7b3075513009592a7abb1793` | 4341 | [File](PrototypeEvidence/V6_2_7/document-audit.json) |
+| <a id="evidence-small-1c3b52fbfcf1"></a>PrototypeEvidence/V6_2_7/route-result.txt | `1c3b52fbfcf1050ba54932357a73e25281af66de991eb7c1087759c5cce33622` | 250 | [File](PrototypeEvidence/V6_2_7/route-result.txt) |
+| <a id="evidence-small-8a5466319cec"></a>PrototypeEvidence/V6_2_7/validation.json | `8a5466319cec56c3e29378e9f132b21fbf43f10f848e71be233c1eb86bbf391b` | 10435 | [File](PrototypeEvidence/V6_2_7/validation.json) |
+
+## Archive checkpoints — chỉ local
+
+| Hash lịch sử | Tag local | Trạng thái |
+| --- | --- | --- |
+| `46006c4` | `archive/checkpoint-46006c4` | Local-only archive, không có trên origin; chưa push |
+| `13035d3` | `archive/checkpoint-13035d3` | Local-only archive, không có trên origin; chưa push |
+| `52d7a4a` | `archive/checkpoint-52d7a4a` | Local-only archive, không có trên origin; chưa push |
+
+## Phase F — hồ sơ prototype chuyển từ Roadmap §10
+
+Giữ nguyên toàn bộ văn bản nguồn, chỉ đổi đường dẫn/hash sang routing archive. §10 có chỉnh sửa cảnh quan chưa commit từ trước task; chúng được bảo toàn tại đây cùng nhãn lịch sử, không được xem như kết quả triển khai/benchmark của task này. Mục có tiêu đề V6.2.8 là bản nháp chưa xác minh nằm trong nguồn V6.2.7; không nâng CURRENT hoặc công nhận các claim “zero allocation/triệt tiêu lag”. V6.2.4–V6.2.6 đã bị từ chối hình; các PASS cũ chỉ có nghĩa cho revision/phương pháp ghi kèm.
+
+<a id="prototype-visual-review"></a>
+
+# 10. Hồ sơ bản mẫu — không phải luật production
+
+Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture và thông số thử. Docs 1–4 giữ luật, contract, reasoning balance và production visual requirements; không lấy một lần sửa mock để khóa design mới. V6.2.4, V6.2.5 và V6.2.6 bị user từ chối về địa hình dù tests/route pass; các hình và mô tả cũ dưới đây chỉ là lịch sử, **không mô tả bản hiện tại và không phải visual acceptance**.
+
+## V6.2.7 — CURRENT: đất cùng màu tầng, mặt cỏ mượt, cầu mặt vuông nối liền hai bờ, đại tu cảnh quan 3 map và mô hình quái/nhân vật
+
+Feedback hoàn thiện: các phần đất dùng chung màu cho toàn bộ các tầng; mặt cỏ để đứng ở trên được làm mượt và liền mạch; cầu không dùng khối chéo (bỏ dốc nghiêng và thanh chống chéo xoay độ), sử dụng toàn bộ mặt vuông/chữ nhật phẳng và nối liền mạch hai bờ cùng cao độ để đi qua không bị chắn phải nhảy. Đại tu toàn diện phong cảnh, kiến trúc 3 map theo đúng lore GDD và Art spec, nâng cấp rig nhân vật và mô hình quái vật đa phần.
+
+- **Màu đất đồng nhất:** Tất cả các khối đất (tiền cảnh solid và đất tầng sau) dùng chung palette màu đất (`#706145`); thân đất tầng sau vẽ đầy xuống nền và nằm sau actor (sortingOrder −14); không collider ở thân/sườn, chỉ mặt trên đỡ nhân vật.
+- **Mặt cỏ mượt:** Bỏ mép đứt đoạn; toàn bộ các mặt đỡ nhân vật đều có thanh cỏ xanh mượt (`#6E9C5C`) kèm dải highlight (`#85B86B`) chạy liền suốt bề rộng, tạo cảm giác phẳng mịn và nhất quán giữa các tầng.
+- **Cầu mặt vuông nối liền hai bờ:** x66…82, sàn solid top1,2. Hai đầu cầu nối trực tiếp với đường hai bờ ở cùng cao độ (bờ tây `DS5 lower passage` top1,2 và bờ đông `DS6 clearing` top1,2), đi qua hai chiều hoàn toàn phẳng, không bị chắn, không cần nhảy. Trụ cầu, mũ trụ và xà ngang đều là các khối hình chữ nhật vuông vức, không góc chéo, không thanh chống xoay độ. Nước suối trang trí nằm sâu bên dưới (level−1,2), cách sàn cầu 2,4 u.
+- **Cổ và dáng nhân vật:** Bổ sung phần cổ (`BodyBase/neck`) cùng viền cổ áo (`BodyBase/collar`) nối liền đầu và thân, khép kín hoàn toàn khoảng hở cổ. Khi di chuyển, thay thế dịch chuyển tịnh tiến thẳng đứng `+gait` bằng cơ chế vung chân (swing angle $\pm 14^\circ$) và sải bước (stride); mép trên của chân luôn được thắt lưng che chắn hoàn toàn, không còn hiện tượng chân chọc lên trên thắt lưng đâm vào bụng. Thêm băng trán thiên thanh (`Head/band`), mắt có con ngươi biểu cảm (`Head/eye`), đôi ủng da sẫm (`Feet/left`, `Feet/right`) vung theo bước chạy.
+- **Bố cục địa hình nhất quán:** Mở rộng mỏm đất Cung đường (`Bow hill`) ở Học Viện thành $x = -18\dots-8$ (trước là $-18\dots-10$), giúp toàn bộ công trình Cung đường ($x = -15\dots-9$) nằm trọn trên mặt đất, mép nhà không còn chìa ra ngoài vực và tiếp nối liền mạch với các bậc thang dẫn lên từ sân chính ($x = -8\dots-5$). Sử dụng `GroundTop` tự động tính cao độ nền đất cho mọi công trình.
+- Cung đường x−18…−8/top6,4, DS5 x54…64/top4,6, vách thác sau x64…66/top3,4, PROBE8 x109…119/top4,6 và bậc sau x119…122/top3,2 dùng rear earth cùng màu và mặt cỏ mượt. Nhảy xuyên từ dưới lên mặt trên, S/↓ chủ động rơi xuống lại đường thấp.
+
+### Chi tiết kiến trúc & cảnh quan 3 Map:
+- **Thôn Vân Khê (Village):**
+  - Cổng thôn phía Tây đồ sộ ("CỔNG THÔN VÂN KHÊ") với cột gỗ lim, mái ngói dốc và chân tảng đá vững chãi.
+  - Nhà Trưởng Lão (Lâm Bá): Mái đao uốn cong nhiều tầng, cửa đỏ sơn then cài, ô cửa sổ hoa văn phát sáng ấm áp, lồng đèn đỏ treo hiên và chậu bonsai trang nghiêm trước thềm.
+  - Ao Sen làng: Bờ đá uốn lượn, lá sen xanh nổi trên mặt nước và hoa sen hồng hé nở.
+  - Tiệm Thuốc (Yên Thảo): Mái ngói xanh lục, giàn phơi thảo dược 3 tầng với các khay thuốc ngũ sắc, dãy bình hồ lô và hũ gốm ngọc chứa dược liệu.
+  - Lò Rèn (Bách Luyện): Lò gạch chịu lửa với than hồng rực sáng, ống khói cao tỏa khói, đe thép nặng trên gốc cây cổ thụ, máng nước tôi thép và giá vũ khí rèn thô.
+  - Quán Nghỉ & Rương đồ (Mộc An): Mái hiên kẻ sọc đỏ-kem, cờ rượu "TỬU", bàn trà ngoại cảnh với ấm chén sứ thanh nhã, rương chứa đồ nẹp đồng kiên cố trên thềm quán.
+  - Đài Nhập Môn: Bệ đá granite trang nghiêm, lư hương tế tổ nghi ngút khói đỏ linh thiêng, đôi cột trụ khắc phù văn cổ và đại kỳ phái tung bay.
+  - Cổng Thôn Đông: Biển chỉ đường đi Đồng Sương kèm đèn lồng treo dẫn lối.
+- **Thanh Vân Học Viện (Academy):**
+  - Cổng Paifang Đông ("THANH VÂN HỌC VIỆN") ngói thanh lam uy nghi, trụ đỏ son bề thế.
+  - Đại Sảnh Kiếm (Phong Du): Mái cung điện 2 tầng rực rỡ, 4 cột đại trụ uy nghi, hoành phi "ĐẠI SẢNH KIẾM", giá trưng bày kiếm thép sáng loáng hai bên.
+  - Cung Đường (Diệp Lam): Gian nhà mái dốc, 3 bia rơm tập bắn cung cắm mũi tên với các vòng tròn hồng tâm đỏ/trắng/xanh, giá treo trường cung và ống tên tập kích.
+  - Võ Đường Tây: Sàn tập gỗ thao trường, giá chiêng đồng huấn luyện võ sinh có khung gỗ chạm khắc tinh xảo.
+  - Bậc Tập Nhảy: Giàn giáo gỗ tập luyện với thanh giằng chéo chịu lực, thang leo và biển hướng dẫn thân công.
+  - Sân Bù Nhìn: Hàng rào gỗ bao quanh thao trường, các thùng gỗ chứa gậy luyện võ và khối tạ đá tập thể lực.
+- **Đồng Sương (Mist):**
+  - Các dải sương mù huyền ảo nhiều tầng lượn sóng dọc theo thung lũng.
+  - Rừng Nấm Phát Sáng (DS1 & DS2): Các cây nấm khổng lồ phát quang huyền ảo làm phông nền, các thân cây mục rỗng phủ rêu phong.
+  - Bãi Sói Sương (DS3 & DS4): Rừng thông vách đá hiểm trở, cột totem cảnh báo "⚠ BÃI SÓI SƯƠNG - CẨN TRỌNG" cùng tiêu bản đầu thú cảnh báo lữ khách.
+  - Hẻm Thác & Vực Nước (DS5): Thác nước nhiều tầng đổ bọt trắng xóa, ghềnh đá ngập dòng suối trong vắt.
+  - Cầu Thung Lũng: Hệ trụ giàn giáo gỗ đồ sộ, xà ngang kiên cố, thành cầu và đèn lồng cổ trấn giữ hai đầu cầu.
+  - Trận Pháp Cổ (DS6): 5 cột cự thạch khổng lồ khắc chữ phù văn phát sáng xanh lam, thạch trụ gãy đổ cổ xưa, tế đàn đá linh thiêng với ngọn linh hỏa thanh lam bất diệt.
+  - Tháp Canh PROBE8: Giàn giáo cao với thang leo gỗ dẫn lên cao nguyên bãi sói trên cao.
+  - Tiền Đồn Trúc Ảnh: Hàng rào cọc nhọn dã chiến trấn ải và biển báo chỉ hướng "TRÚC ẢNH → (Chưa mở)".
+
+### Chi tiết Mô hình Quái vật & Trang phục NPC:
+- **Bù Nhìn / Mộc Nhân (Lv1):** Chân đế chữ thập gỗ với 4 thanh giằng chéo, thân trụ gỗ đứng, lớp rơm quấn ngang lưng siết bằng dây thừng gai, tay đòn ngang ngực có chốt giữ, tay đòn chéo hông, nón rơm chóp nhọn trên đầu thắt dải khăn đỏ võ đạo. Rung lắc khi bị trúng đòn (`Mathf.Sin(Time.time * 45f) * 0.06f`).
+- **Nấm Linh (Lv2):** Cuống nấm ngà voi có đôi mắt to biểu cảm, tròng đen và gò má hồng dễ thương; gốc cuống xòe bám đất, lớp phiến sẫm màu; mũ nấm vòm đôi xanh ngọc/tím có 4 đốm bào tử phát sáng màu bạc hà. Hoạt ảnh nhấp nhô hít thở (`Mathf.Sin(Session.Now * 4.5f + m.Id) * 0.035f`).
+- **Sói Sương (Lv4):** Mô hình dã thú 4 chân hoàn chỉnh: Lưng và bờm màu xanh xám đá phiến cơ bắp, ngực và bụng bạc sáng, bờm lông dựng dọc gáy; mõm nhọn với mũi đen, tai nhọn lót hồng dựng đứng, mắt phát quang xanh băng; đuôi xù dài chóp bạc; 4 chân có khớp chân trước/sau và bóng râm chân xa. Lật hướng mượt mà, chân chạy nhịp nhàng ($\pm 18^\circ$). Đổi màu đồng bộ toàn bộ bộ phận khi trúng đòn (chớp trắng), tụ lực cắn (cam đỏ) và hồi về bãi (xám).
+- **Trang phục NPC:**
+  - `Lâm Bá` (Trưởng Lão): Áo Nho sinh nâu, râu dài trắng muốt, tóc bạc búi gọn, gậy trúc chống tay.
+  - `Yên Thảo` (Dược Sư): Áo lam ngọc y gia, trâm cài tóc thanh nhã, túi da chứa dược thảo bên hông.
+  - `Bách Luyện` (Thợ Rèn): Tạp dề da thợ rèn, cơ bắp lực lưỡng, khăn đỏ buộc đầu, búa rèn thép nặng.
+  - `Mộc An` (Chủ Quán): Áo choàng xanh lữ hành, đai vàng hoàng kim, mũ thương nhân lữ quán.
+  - `Tạ Minh` (Sứ Giả Tiên Môn): Phẩm phục tím triều đình tiên phái, mũ quan cao vút, cuộn phù chú ngọc.
+  - `Phong Du` (Kiếm Sư): Áo võ sư thiên thanh, tóc kiếm khách, thanh kiếm dài giắt ngang hông.
+  - `Diệp Lam` (Cung Thủ): Trang phục xạ thủ xanh rừng, cung tên dài đeo chéo sau lưng.
+  - Cột mốc / Biển chỉ đường: Trụ gỗ chạm khắc tinh xảo có viền gờ nổi và chữ chỉ hướng sắc nét.
+
+Các màu/tọa độ/mặt vuông là CURRENT PROBE, không khóa production. Docs 1–4 giữ nguyên 100%. G-L vẫn PARTIAL; cần người chơi xem hình thực tế để đánh giá.
+
+### Tái cấu trúc Địa hình 3 Map, Kết hợp Cao - Thấp & Bổ sung Vật liệu Đá (V6.2.7):
+- **Bổ sung Vật liệu Đá kết hợp Đất:**
+  - Thêm trường `bool Stone` vào struct `Surface` của `BlockoutLayout` và helper method `Stone(name, left, right, top)`.
+  - Phân tách rõ ràng giữa các khối đất tự nhiên (lớp cỏ xanh `#6E9C5C` trên thổ đài sẫm màu `#706145`, hạt đất lấm chấm) và các bề mặt bằng đá kiến tạo (sân đình, thềm thợ rèn, võ đường, thềm sảnh Kiếm, đài tế, bậc thang leo núi, bờ kè dốc sông) với chất liệu đá khối xanh xám (`#586470`), đường mạch vữa lát gạch ngang, vát gờ đá vát góc (`bevel`), và dải phản quang ánh sáng (`#758288`).
+- **Làng Vân Khê (Village):**
+  - Ao sen mở rộng dài 3m ($x \in [2.0, 5.0]$) với bờ thoải giật cấp chênh lệch chỉ $0.2\text{u}$ (bước đi hoàn toàn tự nhiên không cần nhảy). Máng trúc dẫn nước suối từ vách núi rót vào lòng ao, các phiến đá bước dạo bắc ngang mặt nước giữa hoa sen.
+  - Lò rèn Bách Luyện được đặt trên thềm đá kiên cố ($y = 0.6$).
+  - Giãn cách bố cục công trình và NPC rộng rãi, không còn tình trạng chồng lấn.
+- **Thanh Vân Học Viện (Academy):**
+  - Đại Sảnh Kiếm uy nghiêm lát sân đá phẳng phiu, hai hàng đại trụ uy nghi và bậc thang đá leo núi phía tây.
+  - Phân tách cao độ các phân khu: Thao trường bù nhìn ($y = 0$), Bậc tập nhảy giàn giáo gỗ ($y = 0.8 / 2.8$), Võ đường Tây ($y = 4.0$), Đỉnh đồi cung xạ ($y = 6.4$).
+- **Đồng Sương (Mist):**
+  - **Hẻm núi dòng sông dài và sâu:** Lòng sông trải dài 24m ($x \in [62, 86]$, đáy sông $y = -1.5$, mặt nước $y = -0.9$, độ sâu lội nước $0.6\text{u}$). Nước sông là vùng tương tác thực tế (`speed factor = 0.85×`, bọt nước sóng sánh), các tảng đá nhô trên sông có mặt khô ($y = -0.55$) cho phép nhảy dạo qua.
+  - **Cầu gỗ trên cao bắc qua sông:** Cầu gỗ kiên cố tại $y = 1.2$ (cách mặt nước $2.1\text{u} - 2.7\text{u}$ tĩnh không), có trụ giàn giáo chống sâu xuống đáy sông, xà ngang, thành cầu và đèn lồng dẫn lối. Cầu khô ráo, giữ tốc độ di chuyển bình thường ($1.0\times$).
+  - **Tuyệt đối không kẹt vĩnh viễn (Zero Softlocks):** Cả hai bờ sông đều bố trí dốc đá thoải bậc thang (bờ tây $x \in [58, 62]$, bờ đông $x \in [86, 88]$ với độ chênh mỗi bậc $\le 0.7\text{u}$), đảm bảo người chơi khi rơi hoặc nhảy xuống lòng sông đều có thể dễ dàng đi bộ hoặc nhảy nhẹ bước lên bờ từ cả hai hướng.
+  - **Thác nước nhiều tầng tự nhiên (Multi-tiered Cascading Waterfall):** Tái tạo lại thác nước 3 tầng hoành tráng ($x \in [42, 54]$):
+    - Tầng 1: Khe núi cao trên nền đá sẫm màu đổ dòng nước trắng xóa có gờ bọt nước trắng tinh ở đỉnh.
+    - Tầng 2: Tảng đá cản giữa vách núi tách dòng thác thành đôi dải lụa nước song song đổ dốc.
+    - Tầng 3: Vực xoáy chân thác với bọt nước cuồn cuộn nhiều lớp và làn sương mù nước mờ ảo bốc lên quanh chân cầu.
+    - Thác suối rừng nhỏ (Forest Cascade) tại $x = 18.5$ với bậc đá phủ rêu dẫn nước từ đồi sói róc rách đổ xuống đồng nấm.
+- **Khớp nối nhân vật & chuyển động:**
+  - Cổ nhân vật gắn kín khít vào thân áo tại $y = 0.53\text{u}$ (khoảng đè $0.06\text{u}$, tuyệt đối không hở cổ).
+  - Khớp háng xoay tự nhiên tại $y = -0.16\text{u}$ với hành trình góc $\pm 18^\circ$, chân không đâm xiên lên bụng khi chạy.
+
+### Tinh chỉnh Cảnh quan & Tối ưu Hiệu năng (V6.2.8):
+- **Sửa triệt để các vật thể lơ lửng & sai lệch vị trí:**
+  - *Cây thông Võ đường Tây (Học Viện):* Bỏ hoàn toàn cây thông lơ lửng bị kẹt tại $y = 5.4$ cấn vào mái hiên và bậc thang đá; chuyển thành hai cây thông cắm rễ vững chãi trên mặt đất thực `GroundTop`: một cây ở thềm Tây ($x = -27.2$) và một cây ở sườn Cung đường ($x = -16.5$).
+  - *Cột đèn lồng đá thềm tập võ (Học Viện):* Dọn sạch các cột đèn đặt lệch cọc, lệch bậc cắt ngang khóm trúc trên thềm tập võ; bố trí lại các cặp đèn lồng đá đối xứng trang nghiêm đặt trên mặt đất phẳng $y = 0$: đôi đèn chầu Đại Sảnh Kiếm ($x = \pm 5.2$), đèn dẫn lối vào thềm luyện võ ($x = 11.5$), và đèn trước cổng rào sân bù nhìn ($x = 19.2$).
+- **Phân tầng hiển thị & Lớp đất đồi thác nước (Đồng Sương):**
+  - Khắc phục xung đột sorting order khiến mảng đất sau bị vách núi cắt xén: tách biệt rõ các lớp render (Vách núi xa `sortingOrder = -16`, Khe vực thác `-15`, Dòng thác chảy `-14/-13`, Đất đồi sau `RearEarth` `-12`, Lớp cỏ `-10`, Nền solid `0..2`, Nhân vật & Quái vật `7..15`).
+  - Khối đất đồi sau (`RearEarth`) phủ kín toàn bộ phông nền sau lưng nhân vật khi đi dọc đường thấp đến tận $-7.5\text{m}$, cho phép nhân vật bước đi xuyên suốt qua đường hầm dưới đồi trước phông nền đất tự nhiên liền lạc, không còn vệt cắt cụt.
+- **Triệt tiêu hiện tượng lag giật & Tối ưu mượt mà:**
+  - *V-Sync & Framerate:* Tắt VSync (`QualitySettings.vSyncCount = 0`) và cố định `Application.targetFrameRate = 60`, loại bỏ hiện tượng driver đồ họa Mesa OpenGL trên Linux tự động drop FPS xuống 30 khi có biến thiên fillrate.
+  - *Camera lag:* Giảm hệ số trễ `SmoothDamp` của camera từ $0.13\text{s}$ xuống $0.045\text{s}$, loại bỏ triệt để hiện tượng giật cục / trễ dây thun (rubber-banding) khi nhân vật di chuyển và nhảy.
+  - *Zero-allocation per frame:* Chuyển hàm dựng khung xương `GeometricRig.Pose` sang dạng truyền danh sách tái sử dụng (`List<RigPart>`), loại bỏ toàn bộ các truy vấn LINQ `.Where()` / `.ToArray()` trong vòng lặp `FixedUpdate`, `LateUpdate`, và `OnGUI`, triệt tiêu rác bộ nhớ (GC spike) gây đứng hình định kỳ.
+  - *Build Tooling:* Thêm `EditorApplication.Exit()` vào `SliceBuild.cs` giúp quá trình build tự động trong batchmode thoát sạch sẽ ngay khi hoàn tất mà không bị treo tiến trình Editor.
+
+**Kiểm V6.2.7:** EditMode **58/58**, PlayMode **10/10**; Linux development build đã build lại và hoàn tất (`HuyenLo.Editor.SliceBuild.Linux()`). [Fresh Q1–Q6](#evidence-small-1c3b52fbfcf1) PASS bằng Rigidbody2D và keyboard menu adapter, timeScale4; không preset hoặc inject position/quest/EXP/HP để bỏ bước. PlayMode kiểm riêng đi qua cầu hai chiều không jump, S không xuyên cầu, jump xuyên rear earth/landing/drop, leo tới NPC tầng cao, và kiểm tra tốc độ lội nước dưới đáy sông/trên cầu.
+
+Ảnh **standalone 1×, input bàn phím thật**: [đường thấp trước đất sau](#evidence-v6-2-7-4cee9f818a65) → [nhảy lên mặt cao](#evidence-v6-2-7-7731401d7b12) → [S xuống lại](#evidence-v6-2-7-e5aa9e1ae645); [cầu và khoảng hở trên nước](#evidence-v6-2-7-7309e033940e), [dốc đầu đông](#evidence-v6-2-7-40e393301647), [Cung đường trên đất fill đầy](#evidence-v6-2-7-509cf70747f8); [Cầu thung lũng trên cao và thác nhiều tầng](#evidence-v6-2-7-c2a1915f388a), [Lội nước hẻm sông dưới chân cầu](#evidence-v6-2-7-17491543efd7).
+
+[Build/source hashes và phương pháp kiểm](#evidence-small-8a5466319cec) · [Build summary](#evidence-small-257a28f6fc1a) · [Audit số dòng/bảng/heading/giá trị trọng yếu](#evidence-small-114942163ccf). Script so với checkpoint `archive/checkpoint-13035d3` (local-only archive, không có trên origin), kiểm docs1–4 giữ byte, links/anchors và 17 nội dung di chuyển lịch sử; lấy mẫu ngẫu nhiên8 mục SOURCE→DESTINATION. Revision này không chuyển/xóa nội dung ở docs1–4.
+
+## V6.2.6 — lịch sử bị từ chối: slab đất solid và cầu sát nước
+
+User làm rõ: “núi” là các khối đất cao có mặt đứng được, có đoạn phải nhảy qua và đoạn có thể đi dưới rồi leo lên; ngoại cảnh sau cùng là lớp khác. Nước rộng có cầu là hình trang trí cao gần cầu vì người chơi không xuống đó. V6.2.5 giải sai vấn đề bằng lớp đất sau không collision; không kế thừa cách đó.
+
+- Mọi khối đất có grass cap nhìn như mặt đi đều lấy từ `Surface` và có solid collider. Bỏ toàn bộ rear earth terraces giả; ngoại cảnh chỉ nền xa/vegetation, không vẽ một tuyến đứng giả.
+- Vân Khê: đài nhập môn là đồi thật với bậc1,2/2,4 và đỉnh3,6 u; Tạ Minh đứng trên đỉnh. Gác nhà vẫn one-way gỗ, đất không drop-through. Đường xuống trở về cổng x30/top0, không đổi chiều liên kết map.
+- Học Viện: sống đất phía tây lên4,4/5,4/6,4 u; mỏm đất x−18…−10/top6,4/bottom5,2 nối sống đất. Cung đường/Diệp Lam ở mặt trên; gác nhà top9,2. Đường thấp bên dưới vẫn tồn tại; phía đông có bậc1,4/2,8/4,2 và khoảng nhảy2 u để lên mỏm. Phong Du và Q2/Q3 giữ tuyến chính.
+- Đồng Sương: DS3 là đồi3,6 u có bậc lên/xuống. DS4 đứng ở plateau2,4; nhảy từ plateau lên mỏm DS5 x54…64/top4,6/bottom2,2 nối khối đất bên trái, có hai Sói ở trên. Có thể đi dưới mỏm trên nền0 rồi ra khe bên phải. PROBE7 bốn Sói ở tuyến0,8; PROBE8 ba Sói ở mỏm thật x109…119/top4,6, từ đường dưới nhảy lên bậc gỗ x107/top2,5 rồi lên mỏm; bậc đất x119…122 nối vai đồi để xuống đường phía đông. Tổng vẫn17 slots mock, không tăng budget release10 hoặc thay stat/reward/quest credit.
+- Mob home/lane chọn đúng mặt nền được author, không dùng highest-Y để đẩy quái từ đường dưới lên roof. Không thêm AI nhảy/đa tầng; mob tuần tra và đánh trong mặt nền của đàn.
+- Suối rộng x66…82 có cầu **solid** top0,4, nước trang trí level0,08 nối nhánh thác bờ. S không drop qua cầu, không có route đi đáy suối hoặc slow ở nước rộng. Không swimming/drowning/hazard. Vũng nhỏ Vân Khê vẫn có đáy thật, đi qua và thử speed×0,85; đây là hai loại khác nhau.
+
+Test-driver của mock giữ jump đủ cao khi vượt cliff và dùng takeoff point để lên DS5; chỉ là điều khiển probe, không player auto-navigation. Q5 entry marker derive đúng cao độ bãi, không giữ waypoint Y cũ làm softlock. Spawn khi portal/về làng derive mặt nền + body offset; không đặt actor trong đồi rồi rơi khỏi map. Các tọa độ/tuning/capture ở mục này chỉ CURRENT PROBE; docs1–4 không đổi trong lượt sửa.
+
+**Kiểm revision:** EditMode57/57, PlayMode9/9; Linux development build V6.2.6 thành công. Fresh standalone Q1–Q6 PASS (Rigidbody2D, keyboard menu adapter, timeScale4, không preset hoặc set quest/EXP/HP/position). Physics fixtures kiểm leo đồi tới Diệp Lam bằng E, đi dưới/nhảy lên cùng mỏm đất, đất/cầu không drop-through và leo lên PROBE8 rồi xuống đường đông. Native1× dùng bàn phím, preset chỉ cho view riêng, không là route acceptance. [Kết quả và source/build hashes](#evidence-small-ff856246be01) · [Build](#evidence-small-080c1b72b86f) · [Audit docs](#evidence-small-4f633c9d68cb).
+
+Ảnh native1× đã xem: [đồi Tạ Minh](#evidence-v6-2-6-575d48207cfb), [Cung đường trên mỏm đất thật](#evidence-v6-2-6-be3216664c3c), [hội thoại Diệp Lam sau khi leo](#evidence-v6-2-6-502002a1cacd), [đàn trên/dưới PROBE8](#evidence-v6-2-6-4b8dfc4f604f), [mặt trên DS5](#evidence-v6-2-6-04ba9aaa398c), [đường dưới cùng mỏm đất](#evidence-v6-2-6-3bfed78f4223), [nước trang trí sát cầu sau S](#evidence-v6-2-6-6b6fe15b1f42). Art vẫn khối primitive; **G-L PARTIAL**, chờ user xem hình/cảm giác. Không suy từ test pass rằng hình đã đúng ý user hoặc G-N/G-D đã mở.
+
+## V6.2.5 — lịch sử bị từ chối: hiểu sai núi thành ngoại cảnh
+
+- Thay diamond silhouettes/khối cây rải đều bằng hai lớp đất bậc liền, cao dần phía sau tuyến chính. Cây tre đặt theo mặt đất của từng lớp; hậu cảnh không collision, không dùng để đánh lừa có sàn đứng.
+- DS5 chuyển lên bờ khô x58/60, activity nằm trong support x56…64. Giữ ID/slot/stat, DS1–DS6/10 slots và quest credit; PROBE7/8 vẫn riêng mock; PROBE8 centreY4,05 theo mặt sàn3,4 + offset0,65 để chân không bị sàn che. Không đặt quái hay props khô dưới lòng nước.
+- Lòng suối x66…80 có một vùng nước liên tục, đáy −2 u/mặt −1,45 u. Nguồn thác ở mép lớp đất sau, x66,325/top3,5, nối xuống cùng mặt nước. Cầu x64…82/top0,1 đi khô; tốc độ chân chạm nước thử ×0,85, không stack. Thác/ripple cosmetic, không water physics.
+- Cung đường có sàn gỗ thật top2,8 u; Diệp Lam đứng trên gác (centreY3,6), tiếp cận bằng jump và E/chuột đúng range. Phong Du/nhiệm vụ Kiếm giữ tầng chính. Nhà trưởng lão (sàn3 u)/lò rèn (sàn3,125 u), Cung đường/võ đường tây có gác thật, cửa/cột/dầm/mái đọc được; nhà không có deck chỉ vẽ một tầng. Không vẽ dầm tầng giả hoặc mái trang trí như sàn đứng.
+
+Đây là authoring probe, không cập nhật manifest map production. Không đổi stats/balance hoặc khóa spacing/grace chỉ từ hình tham khảo. Kiểm route tự động, chân chạm nước/cầu, quái trên nền khô, gác NPC và render thực; người chơi vẫn cần đánh giá chất lượng/feel ở tốc độ thường.
+
+**Kết quả kiểm V6.2.5:** 57 EditMode + 7 PlayMode pass; Linux Development build thành công, fresh Q1–Q6 route PASS bằng Rigidbody2D/menu keyboard adapter ở timeScale4. Capture bên dưới là input bàn phím thực ở 1×: Vân Khê fresh start, Học Viện dùng SwordTraining, Đồng Sương dùng Crowd có nhãn DEBUG. Đã kiểm nối nguồn/thác/suối, Sói trên nền khô, cầu khô/lội nước và E/Esc trên gác Diệp Lam. Không phải fresh journey playtest 1×, user visual approval, online capacity hoặc production art acceptance; **G-L vẫn PARTIAL**.
+
+[Evidence/build/hash](#evidence-small-23d16d500d0e) · [Audit số dòng/bảng/heading/chỉ số](#evidence-small-ae3ddbad7ec4) · [8 mục SOURCE → DESTINATION lấy mẫu bằng script](#evidence-small-392f4b2e387b).
+
+Ảnh build hiện tại: [Vân Khê](#evidence-v6-2-5-e1eaa0d076fc) · [Diệp Lam trên gác thật](#evidence-v6-2-5-1187d6f9f22b) · [Thác, suối và cầu](#evidence-v6-2-5-b3255faf4826) · [Lội nước dưới cầu](#evidence-v6-2-5-63769d2e524c) · [Sói trên bờ khô và sàn cao](#evidence-v6-2-5-cac531e206a4).
+
+<a id="prototype-technical-history"></a>
+
+## Technical — lịch sử probe V6.2.4
+
+**Melee lane probe V6.2.4:** trace target → desired X → occupied/blocked → velocity → actual range/windup. V6.2.3 rank offset + peer clipping đã làm Sói sau kẹt ngoài range; không giữ hành vi chờ con đầu chết. Probe mới dùng recovery/cross goal có chủ đích + bounded neighbor correction trong một lần tích phân velocity; không shove sau chase hoặc hard body blocker. Cắn giữ definition range/interval; windup origin/facing khóa. Recovery goals nằm trong support lane/home bounds, có phase lệch mỗi life và chọn phía đủ chỗ tại mép. Brief crossings hợp lệ vì no body blocking; không persistent blob, không attack token/formation. Test 1/2/4, tường/mép/khác cao độ và player đổi hướng; local pass không suy capacity online.
+
+**Blockout V6.2.4:** dữ liệu `BlockoutLayout` của mock tách solid terrain profile/wooden one-way/bounds khỏi drawing; GroundTop và support span cấp home/lane cho mob, không đặt mob lơ lửng trên cao độ cũ; reciprocal exit links + destination spawn nằm đúng mép, camera snap chỉ khi transition/reset. Physics body tiếp tục FixedUpdate, camera bám interpolated visual Transform tại LateUpdate với dead zone/damping/clamp; mob logical positions giữ previous/current cho visual interpolation, không snap simulation để cứu render. [Unity — Rigidbody2D interpolation](https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Rigidbody2D-interpolation.html) mô tả smoothing giữa physics updates; đây là căn cứ probe, không bảo đảm cảm giác mượt trên mọi máy.
+
+**Pack activity / patrol probe:** cả pocket dùng ActivityMin/Max chung, nằm trong support span; không từng con bị kẹt ở home clamp khác nhau. Chỉ start bite khi player trong vùng. Ngoài vùng/không reachable áp grace hiện có rồi Return; reset HP/contribution, không tạo life/reward/reroll. Sau return, goal patrol gần home có pause/phase riêng; cùng một bounded velocity integration. Windup đã bắt đầu vẫn resolve/cancel theo clock, không trì hoãn tới khi player quay lại. Exact bounds/speed/policy chỉ dữ liệu mock.
+
+**Water contact:** `BlockoutLayout.Waters` giữ bounds/bottom/level/factor; locomotion kiểm feet contact, nhân speed factor tối thiểu một lần. Collider là đáy đất/cầu hiện hành, nước không có fluid physics. Bridge/air phải dry; front overlay chỉ che phần thấp, ripple cosmetic dùng cùng contact predicate, không là authority của slow.
+
+**UI event boundary:** command có thể đổi panel và rebuild actions; mouse callback phải kết thúc IMGUI event ngay sau mutation (`GUIUtility.ExitGUI`), không tiếp tục index sáu slot cũ. Selection ID, breadcrumb và validation vẫn dùng chung keyboard/mouse; không catch/swallow lỗi list để che bug. Auto-close chỉ sau domain command thành công, batch services giữ context; Esc Back thống nhất cả input adapter và route driver.
+
+**Mock/dev boundary:** Unity project tham khảo nằm tại `prototypes/VS1_EndToEnd/`; production `game/` dự kiến dùng chung rules/content cho Client và Dedicated build, `backend/` dành Spring/PostgreSQL. Chưa scaffold hai phần production. Debug menu chỉ Editor/Development build, tạo session fixture mới từ mốc Q1–Q6/sân tập và reset đủ inventory/receipts/clock/food/cooldown/loot/focus. Preset có nhãn DEBUG, không dùng trong route acceptance. Chọn menu mốc thay save JSON; JSON hiện chỉ config/fixture/evidence, production persistence vẫn PostgreSQL.
+
+**Offset fixture cũ — lịch sử, chưa là production lock:** proposal 3–4 offsets được giữ để đối chiếu; response hiện tại đọc phần V6.2.5.
+
+**Melee separation/reposition prototype:** production phải đạt nguyên tắc cluster đọc được mà không pile; exact spacing/response vẫn PHY-01 TUNABLE. Disable body collisions Player–Monster và Monster–Monster; hurtbox/query riêng. Ground AI chọn desired X offsets trái/phải quanh reachable target trên cùng lane; thử một danh sách 3–4 offsets chỉ là fixture, không lock slot count hoặc formation system. Điểm bị tường/mép/actor gần chiếm thì chọn điểm hợp lệ khác hoặc hold có hạn; không teleport sang phía kia player, không group attack mutex. Threat target không đổi vì offset bị chiếm. N-player probe theo từng mob/target, không assume hai người.
+
+<a id="prototype-feedback-history"></a>
+
+## Analysis — lịch sử feedback V6.2.4
+
+**Feedback V6.2.4 — CURRENT PROBE:** mock trước gộp người hướng dẫn phái và đảo mép Học Viện, hai sai lệch đã được đưa về đúng contract. User yêu cầu manual unequip trước chọn class; reject không grant/đổi class. V6.2.3 có lỗi rank/peer clipping làm Sói sau kẹt; V6.2.4 thay bằng recovery/cross goals + bounded neighbor correction, trace eligibility và kiểm cả bốn có windup mà không phải giết con trước; không tăng stat/giảm interval. Đồng Sương mock giữ DS1–DS6/10 slots, thêm PROBE7/4 và PROBE8/3 ở hai lane riêng để kiểm crowd/vertical; 17 slots là workload mock, không thay budget release hoặc capacity promise. PROBE không credit Q5, vẫn level-gap loot thường. Terrain dùng khối solid bậc lớn, ít sàn gỗ one-way, nước nông giảm tốc nhẹ theo direction mới của user, thác/ripple cosmetic. RPG shell năm tab và geometric rig là UX/visual probe, không nghiệm thu art production. Bảng TTK/farm/hành trình trước chưa tính topology/crowd mới; vẫn là lịch sử đối chiếu, cần rerun khi gate tương ứng.
+
+**Feedback nối tiếp:** hai ảnh tham khảo cung cấp terrain grammar (khối đất liền, terraces, basin, cầu/thác), không scale pixel hoặc yêu cầu sao chép asset. Mock tăng depth basin và thử ×0,85 water contact; chưa đo ảnh hưởng travel/journey/endgame và không retune EXP/TTK từ đó. Shared activity bounds + return→patrol giải quyết đứng mãi ở mép; giữ combat hiện tại. Lỗi mouse equipment do action list đổi giữa render, khác với keyboard logic PASS; cần kiểm click thật trên build bên cạnh tests. Menu close policy tách terminal single action khỏi batch services. Review 1× phát hiện tracker Q1 chỉ sai sang cổng Đồng Sương; route hint nay theo step destination/current map, kiểm cả bước quay về NPC.
+
+<a id="prototype-map-history"></a>
+
+## Art — Tái cấu trúc hoàn toàn layout 3 map VS-1 V6.2.7 — CURRENT PROBE
+
+### 13.1. Thiết kế bố cục địa hình và cảnh quan 3 map mới
+
+Theo phản hồi từ người dùng, sơ đồ bản đồ cũ đã được gỡ bỏ hoàn toàn. Ba bản đồ được tái cấu trúc toàn diện theo các nguyên tắc:
+1. **Cổng chuyển vùng ở sát biên bản đồ (Edge Boundaries):** Cổng sang Học Viện (tây Vân Khê x = -10, biên -12), cổng sang Đồng Sương (đông Vân Khê x = 34, biên 36), cổng đông Học Viện (x = 34, biên 36), cổng tây Đồng Sương (x = -4, biên -6) và ranh giới Trúc Ảnh (x = 128, biên 130) được đặt tại sát biên của thế giới playable, loại bỏ tình trạng đi qua cổng rồi vẫn còn vùng đất trống thừa.
+2. **Loại bỏ hoàn toàn hố kẹt dưới Diệp Lam (Học Viện):** Xóa bỏ lòng sân trũng `Class courtyard` y = 0 dưới Diệp Lam. Toàn bộ sườn núi phía tây từ x = -18 đến -8 tại y = 6.4 là khối đất/đá solid nguyên vẹn chạy liền xuống nền móng, loại bỏ mọi hố sâu gây kẹt vĩnh viễn (softlock) cho người chơi.
+3. **Đài Tạ Minh vững chãi, bậc tam cấp (Village):** Móng đá được mở rộng thành khối tam cấp vững chắc x ∈ [21, 31], đỉnh đài x ∈ [23, 29] tại y = 3.6 rộng 6m; bệ thờ dài 4.8m và các cột tế đàn nằm hoàn toàn bên trong đế đá với gờ an toàn, không còn cảm giác chìa ra ngoài không trung sắp sập.
+4. **Khoảng cách thoáng giữa cổng và công trình:** Cổng tây cách Nhà trưởng lão > 5.6m, cổng đông cách Đài Tạ Minh > 4.8m; các công trình và dịch vụ (Lâm Bá, Hồ Sen, Nhà thuốc, Lò rèn, Quán nghỉ, Đài Nhập Môn) có vị trí mặt tiền riêng biệt, không chồng lấn.
+5. **Thác nước trung tâm và vách núi hùng vĩ (Đồng Sương):** Dời thác nước từ góc cầu về chính giữa hẻm vực (x = 74), dựng vách núi cao phía sau (y = 5.5 → 10.2) với dòng thác lớn đổ từ đỉnh núi cao y = 8.8 xuống thẳng xoáy nước hẻm sông y = -1.5, nhìn thấy phía sau cầu gỗ.
+6. **Toàn bộ trang trí cắm đất thực tế (Grounded Props):** Tất cả biển báo, nấm khổng lồ, cột cảnh báo, bia đầu lâu, đèn lồng đá, cây cối đều có thân/cột cắm xuống mặt đất thực `GroundTop(x)`, xóa sạch chữ bay lơ lửng giữa trời.
+7. **Hẻm sông có dốc thoải 2 bờ:** Lòng hẻm suối dưới cầu gỗ (y = -1.5) có nước nông, đá tảng và có dốc thoai thoải ở cả bờ tây (x = 58..62) và bờ đông (x = 86..88), đảm bảo người chơi có thể xuống khám phá và tự đi lên cả hai phía mà không bị kẹt.
+
+Ca kiểm: reciprocal exits giữ hướng/outside reverse trigger; Q2 thực sự đứng ledge rồi drop; Q4/5 không bị optional route chặn; Kiếm nhảy tới PROBE8 qua bậc; crowd2/3/4 giữ silhouette riêng, không steering đổi windup; camera không bám từng fixed tick hoặc rung theo bước landing. Chạy cả normal speed và route automation; chưa pass manual thì ghi G-L PARTIAL.
+
+<a id="prototype-ui-history"></a>
+
+## Art — hồ sơ UI/rig mock
+
+### 19.1. NPC, bag grid và equipment view — CURRENT PROBE
+
+NPC root hiện lời nói mộc mạc, quest action đúng state và các chức năng của chính NPC; chọn Mua/Bán/Gửi/Lấy mới mở danh sách đó. `!` là quest Available hoặc nhập phái đúng step; `?` là Ready, `…` là đang làm. Không đánh dấu Diệp Lam “sẵn để chọn Cung” nếu nhánh mock chưa mở. Khi Q6 đang có Mộc Kiếm, Phong Du nói rõ C → Trang bị → Vũ khí → Tháo; action class khóa đến khi ô trống. Không auto-unequip thưởng.
+
+Bag 30 ô dựng 6 cột ×5 hàng, icon + count + selected border; một bảng bên phải hiện tên/type/band/quality/stat/binding. Enter/Interact vào thao tác món; arrow chọn ô, Tab tuyến tính, Esc về grid giữ focus theo instance nếu còn. View equipment ở C → Trang bị có hình nam tạm ở giữa và sáu slot quanh; slot trống vẫn đọc được, slot có đồ mở detail/tháo. Không lặp toàn bộ action trang bị ở bag. Mock icons dùng khối/motif + nhãn; art final vẫn ItemDefinition visual/icon refs, rarity/stack là overlay.
+
+**RPG UX probe V6.2.4:** năm tab đổi trực tiếp bằng Tab/Shift+Tab hoặc click, arrows giữ navigation trong grid/action list. I/C/Q mở đúng view; selected action ID được giữ khi đổi tab, không callback vào item cũ. Bag có icon/stack/detail + dùng/trang bị nhanh + so món đang mặc; slot equipment mở bag lọc đúng slot, cả slot trống. Phân điểm riêng Thuộc tính, derived stats riêng Thông số; không bắt đóng menu để chuyển view.
+
+**Geometric rig:** BodyBase/Hair/Armor/LowerBody/Weapon dùng một module/pose/socket description cho world và equipment preview. Áo, Quần, Wood/Sword đổi silhouette/màu thật, grip và weapon angle theo action clock; walking sway cosmetic. Đây là layering probe, chưa art production hoặc chốt nghĩa 26 frame.
+
+**Normal HUD:** ba slot bottom-center có key/icon/selected/locked/CD/MP, H/M/F bên cạnh. DEV/F8 nhỏ riêng, preset vẫn có nhãn; không để menu debug định layout player HUD. Q1–Q6 có nhận/trả và phản hồi trung gian, marker/name/speech ở các cao độ tách nhau.
+
+**Water probe — feedback mới:** hub có basin nông, Mist có đáy suối thấp hơn main route 2 u, shallow pool và vùng nước rộng dưới cầu. WaterBase + FrontOverlay theo volume thật, chỉ che chân/phần thấp; waterfall nhỏ sau lane + mặt nước/splash readable. Feet chạm nước thử speed ×0,85, bridge/air dry; ripple cosmetic tối đa một lần/0,25 s. Không water collider/swimming/hazard; full Bạch waterfall production vẫn deferred. Đây thay water cosmetic-only của mock trước, theo user; depth/factor/tọa độ không production lock.
+
+[Capture blockout chạy thật](#evidence-v6-2-4-cfe49aacb8b9) · [Trang bị sau mouse unequip](#evidence-v6-2-4-ad21fb1d41ca). Đây là fixture 1×, không evidence fresh journey hoặc production art.
+
+
+<div style="max-width:860px;background:#ffffff;border-left:4px solid #0043ce;padding:18px;color:#1e1e1e"><p>RPG shell chung, năm view riêng; thao tác keyboard/mouse gọi cùng command.</p><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 300" role="img" aria-label="RPG tab shell">
+<rect x="10" y="10" width="800" height="275" fill="#e8e8e8" stroke="#787878"/>
+<rect x="20" y="20" width="152" height="36" fill="#c8d4ed" stroke="#003bb5"/>
+<text x="32" y="44" fill="#1e1e1e">I · Hành trang</text><text x="185" y="44" fill="#1e1e1e">C · Trang bị</text><text x="340" y="44" fill="#1e1e1e">Thuộc tính</text><text x="495" y="44" fill="#1e1e1e">Thông số</text><text x="650" y="44" fill="#1e1e1e">Kỹ năng</text>
+<rect x="24" y="75" width="330" height="162" fill="#ffffff" stroke="#787878"/><path d="M79,75v162M134,75v162M189,75v162M244,75v162M299,75v162M24,129h330M24,183h330" stroke="#787878"/>
+<text x="30" y="264" fill="#4a4a4a">Grid icon / stack · selected ID ổn định</text>
+<rect x="380" y="75" width="400" height="162" fill="#ffffff" stroke="#787878"/>
+<text x="398" y="101" fill="#0043ce">Tên / chỉ số / đang mặc</text><text x="398" y="133" fill="#1e1e1e">Trang bị / Dùng / Học + reason</text><text x="398" y="165" fill="#1e1e1e">Slot → bag lọc đúng GearSlot</text><text x="398" y="197" fill="#1e1e1e">Điểm chưa dùng → Thuộc tính</text><text x="380" y="264" fill="#4a4a4a">Tab / Shift+Tab · arrows · Enter/E · Esc</text></svg><p>Equipment: rig giữa sáu slot. Attributes: STR/VIT/INT/AGI. Stats: derived evaluator. Q mở Quest riêng; NPC mở từng dịch vụ.</p></div>
+
+[PNG bố cục UI đã render](#evidence-v6-2-4-e5a97a7ee355).
+
+DoD của view: hoàn tất Q1–Q6 không click, submenu không lọt movement/skill, disabled reason đọc được, consume/equip không giữ callback item cũ, reset xóa breadcrumb. Kiểm text Việt không crop ở720p và resize; 30/40 ô inventory/storage không tự biến thành hàng trăm actions trong NPC root. Icon/rig final và khả năng dùng nhanh bằng người thật còn qua art/UI gate.
+
+<a id="prototype-water-history"></a>
+
+## GDD — lịch sử tuning nước, đã tách khỏi luật
+
+**Nước nông — direction mới của user:** basin có đáy solid đi được, mặt nước cao hơn đáy để nhân vật chìm phần chân khi lội; giảm nhẹ tốc di chuyển khi chân trong nước. Mock thử hệ số ×0,85, không stack nhiều water volumes; exact depth/factor là TUNABLE. Đi trên cầu hoặc nhảy ra khỏi mặt nước không giảm tốc. Vùng nước rộng có route cầu rõ, không buộc bơi; thác/flow/ripple chỉ presentation. Không swimming, breath, buoyancy hoặc water damage. Luật này thay baseline water visual-only trước feedback; không tự coi water slowdown là trạng thái Băng Hàn.
+
+<a id="prototype-tooling-history"></a>
+
+## Technical — tooling của prototype
+
+**Unity / tooling:** prototype hiện có dùng Editor thực cài 6000.5.9f1; production base chưa được scaffold. Pin ProjectVersion/manifest/lock khi dựng base bằng Editor, không gọi bản này là LTS nếu chưa xác minh. Input System đã dùng trong prototype; NGO + Unity Transport là lựa chọn TARGET realtime, không claim đang có implementation trong prototype; Multiplayer Play Mode, Multiplayer Tools/Network Simulator và Unity Test Framework cho dev/QA; ObjectPool chỉ cho VFX/presentation; Cinemachine 3 cho camera client. Production dev test đầu dùng Local Session boundary ở §1.1, không mặc định kế thừa prototype; gate mạng và final online acceptance kết nối Dedicated Server. MPPM chỉ giúp mở nhiều Client khi lặp nhanh. Tránh DOTS/ECS, Addressables, Relay, prediction/rollback, cloud services và service framework nếu slice chưa chứng minh lợi ích.
+
+## SOURCE → DESTINATION của lượt này
+
+| SOURCE | DESTINATION | Bảo toàn |
+| --- | --- | --- |
+| 2_HUYEN_LO_TECHNICAL.md: `**Melee lane probe V6.2.4:**` | [Roadmap](#prototype-technical-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 2_HUYEN_LO_TECHNICAL.md: `**Blockout V6.2.4:**` | [Roadmap](#prototype-technical-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 2_HUYEN_LO_TECHNICAL.md: `**Pack activity / patrol probe:**` | [Roadmap](#prototype-technical-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 2_HUYEN_LO_TECHNICAL.md: `**Water contact:**` | [Roadmap](#prototype-technical-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 2_HUYEN_LO_TECHNICAL.md: `**UI event boundary:**` | [Roadmap](#prototype-technical-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 2_HUYEN_LO_TECHNICAL.md: `**Mock/dev boundary:**` | [Roadmap](#prototype-technical-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md: `**Feedback V6.2.4 — CURRENT PROBE:**` | [Roadmap](#prototype-feedback-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md: `**Feedback nối tiếp:**` | [Roadmap](#prototype-feedback-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md: `### 13.1.` | [Roadmap](#prototype-map-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md: `### 19.1.` | [Roadmap](#prototype-ui-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 1_HUYEN_LO_GDD.md: `**Nước nông` | [Roadmap](#prototype-water-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 2_HUYEN_LO_TECHNICAL.md: `**Unity / tooling:**` | [Roadmap](#prototype-tooling-history) | Chuyển nguyên nội dung lịch sử; không biến thành luật hiện tại |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md: `Bản mẫu mới kiểm one-press` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md: `User yêu cầu sửa theo feedback và tự xử lý inconsistency;` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md: `[Review Art]` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md: `Bộ power/MP/CD/gear làm control` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
+| 2_HUYEN_LO_TECHNICAL.md: `**Melee separation/reposition prototype:**` | [Roadmap](#prototype-technical-history) | Giữ offset fixture cũ, production chỉ giữ nguyên tắc |
+
+
+<a id="prototype-runtime-history"></a>
+
+## Analysis — lịch sử trạng thái runtime và sequencing
+
+Các snapshot sau mô tả thời điểm review trước; trạng thái mới đọc ở đầu §10. Không dùng chúng làm nghiệm thu layout hiện tại.
+
+Bản mẫu mới kiểm one-press approach/cast, Nấm→Sói, EdgeExit và menu bằng bàn phím. Debug preset giúp tái hiện một đoạn mà không replay cả hành trình; đây là fixture có nhãn, không save authority hoặc evidence route thật. G-L vẫn PARTIAL tới khi có rig/import và manual usability/feel review ở tốc độ thường. Production base và Dedicated/backend chưa bắt đầu.
+
+User yêu cầu sửa theo feedback và tự xử lý inconsistency; đây là nguồn của lượt sửa, không NSO recommendation tự thành luật. V6.2.0 prototype tại checkpoint `archive/checkpoint-46006c4` (local-only archive, không có trên origin) được giữ làm reference; build/tests/video cũ vẫn đúng cho revision đó, **không chứng minh V6.2.1 đạt G-L**. Production codebase chưa bắt đầu, không lấy các class prototype làm architecture authority.
+
+[Review Art](../../docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT thu hoạch mock, probe feel/art/UI rồi review/dựng production base; G-L revision mới trước gate Dedicated hai Client và production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
+
+Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
+
+## Phase F — báo cáo bảo toàn và SOURCE → DESTINATION
+
+262 dòng/73 khối từ Roadmap §10 đã chuyển đầy đủ; 8 khối lấy mẫu seed1004 kiểm lại nội dung tại đích và so từng chữ sau khi bỏ routing/tag. §7–9 không di chuyển/xóa; chỉ hash routing sang tag archive đã xác minh. Read-only GDD/Technical/Art và ba README giữ byte. Một occurrence `26 frame` rời Roadmap cùng đoạn geometric rig và còn nguyên trong CHANGELOG; 53.100/95 điểm/32.000 và arithmetic1.800/200 không mất. [Audit độc lập](PrototypeEvidence/InputProbes/document-audit.json) và [toàn bộ mapping/hash](PrototypeEvidence/InputProbes/source-destination.json).
+
+| Mẫu | SOURCE (Roadmap trước di chuyển) | DESTINATION kiểm thực |
+| --- | --- | --- |
+| 32 | §10, dòng484: **UI event boundary:** command có thể đổi panel và rebuild actions; mouse c… | [CHANGELOG](#prototype-technical-history) — kiểm actual content PASS |
+| 8 | §10, dòng395: Các màu/tọa độ/mặt vuông là CURRENT PROBE, không khóa production. Docs 1–4 … | [CHANGELOG](#prototype-visual-review) — kiểm actual content PASS |
+| 68 | §10, dòng590: Các snapshot sau mô tả thời điểm review trước; trạng thái mới đọc ở đầu §10… | [CHANGELOG](#prototype-runtime-history) — kiểm actual content PASS |
+| 53 | §10, dòng533: **Water probe — feedback mới:** hub có basin nông, Mist có đáy suối thấp hơ… | [CHANGELOG](#prototype-ui-history) — kiểm actual content PASS |
+| 48 | §10, dòng523: NPC root hiện lời nói mộc mạc, quest action đúng state và các chức năng của… | [CHANGELOG](#prototype-ui-history) — kiểm actual content PASS |
+| 63 | §10, dòng561: **Unity / tooling:** prototype hiện có dùng Editor thực cài 6000.5.9f1; pro… | [CHANGELOG](#prototype-tooling-history) — kiểm actual content PASS |
+| 57 | §10, dòng549: DoD của view: hoàn tất Q1–Q6 không click, submenu không lọt movement/skill,… | [CHANGELOG](#prototype-ui-history) — kiểm actual content PASS |
+| 43 | §10, dòng506: Theo phản hồi từ người dùng, sơ đồ bản đồ cũ đã được gỡ bỏ hoàn toàn. Ba bả… | [CHANGELOG](#prototype-map-history) — kiểm actual content PASS |
+
+`git diff --stat` đã kiểm: Analysis không bị cắt dòng; Art giữ nguyên. Link checker design284 local links,0 anchor gãy/0 file thiếu; các link trong CHANGELOG cũng được kiểm. Media48 payload và10 evidence TXT/JSON có chỉ mục, hash và vị trí rõ. Không upload/xóa media; thư mục lồng còn nguyên dù archive đã verify, chờ xác nhận mục0.6. Hook instruction ở CHANGELOG vì mục0 cấm sửa README; repo không có CI.
+
+Bản Linux mới đã build thành công, all9 flags OFF được kiểm trong scene đã serialize; [build hash/summary](PrototypeEvidence/InputProbes/build-summary.json). Scene/settings trước build được khôi phục đúng bytes; binary build vẫn là reference/probe. Các sửa visual đang dở trước task vẫn ngoài commit code probe; §10 lưu bản nháp V6.2.8 chứ không nâng CURRENT V6.2.7.
+
+Fresh Q1–Q6 trên binary mới, flags OFF: [route-result](PrototypeEvidence/InputProbes/route-result.txt) PASS bằng Rigidbody2D/menu keyboard adapter ở timeScale4, headless. Không preset hoặc inject quest/EXP/HP/position; không human feel/visual acceptance.
+
+| File | Dòng trước → sau | Dòng bắt đầu `|` | Heading |
+| --- | ---: | ---: | ---: |
+| 1_HUYEN_LO_GDD.md | 806 → 806 | 336 → 336 | 26 → 26 |
+| 2_HUYEN_LO_TECHNICAL.md | 437 → 437 | 124 → 124 | 18 → 18 |
+| 3_HUYEN_LO_DESIGN_ANALYSIS.md | 545 → 558 | 273 → 276 | 25 → 25 |
+| 4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md | 917 → 917 | 401 → 401 | 50 → 50 |
+| 5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md | 598 → 380 | 166 → 153 | 35 → 18 |
+| README.md | 90 → 90 | 45 → 45 | 6 → 6 |
+
+Kiểm cuối: EditMode87/87, PlayMode16/16 (gồm58 EditMode và10 PlayMode cũ); all-OFF replay trùng baseline. XML/log của lượt kiểm lại giữ ngoài repo trong backup bền vững thay vì `/tmp`; hash/path ở validation. Chỉ10 TXT/JSON lịch sử được re-route qua chỉ mục; evidence nhỏ và bảng đo giữ Git. Source hash hiện tại trùng source đã kiểm, gồm thay đổi cảnh quan trước task.

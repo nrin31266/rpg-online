@@ -11,9 +11,11 @@
       "passed": "87",
       "failed": "0",
       "skipped": "0",
-      "duration": "0.3475144",
-      "sha256": "cf5f4db4828db30ec50750376cea2a65518c372d45e532156a04ab67b58e88fa",
-      "raw_result_local_only": "/tmp/huyenlo-input-probe-edit.xml"
+      "duration": "0.3620489",
+      "sha256": "02c2a6806411249a69c74a37d671a5312bc9ff6b84acd190e4fcfddc2afee463",
+      "raw_result_local_only": "/home/nguyenvanrin/PersonalProjects/huyenlo_backup/2026-10-04-input-probes/input-probe-edit.xml",
+      "utc_start": "2026-10-04 16:15:00Z",
+      "utc_end": "2026-10-04 16:15:01Z"
     },
     {
       "platform": "PlayMode",
@@ -21,9 +23,11 @@
       "passed": "16",
       "failed": "0",
       "skipped": "0",
-      "duration": "86.4209196",
-      "sha256": "53b62ea091fda25b815bd6fe957f99b98b3b33b1b56c17af2b23f418d9bfb34e",
-      "raw_result_local_only": "/tmp/huyenlo-input-probe-play.xml"
+      "duration": "86.3289555",
+      "sha256": "99cecb81447243f7e214af065fd9d0dc92bba38f50865f9fb51289afb6a9fc60",
+      "raw_result_local_only": "/home/nguyenvanrin/PersonalProjects/huyenlo_backup/2026-10-04-input-probes/input-probe-play.xml",
+      "utc_start": "2026-10-04 16:17:06Z",
+      "utc_end": "2026-10-04 16:18:33Z"
     }
   ],
   "files": [
@@ -111,5 +115,7 @@
   "correctness_pass": true,
   "metric_thresholds_pass": false,
   "human_rollover_and_feel": "CHƯA ĐO",
-  "g_l_pass": false
+  "g_l_pass": false,
+  "raw_results_retained_outside_repo": true,
+  "raw_logs_note": "Re-recorded after interruption because /tmp evidence was lost; fixed-seed metrics match prior values except UTC timestamp."
 }
