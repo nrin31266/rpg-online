@@ -32,8 +32,7 @@ namespace HuyenLo.Domain
     public static class Rules
     {
         public static readonly int[] Exp = {0,100,250,470,790,1240,1860,2690,3770,5150,6900,9100,11800,15100,19100,23900,29600,36300,44100,53100};
-        public static readonly Skill Novice = new Skill("novice", "Mộc Kiếm", 1, 0, 1.2, 1, 1, .10, .26);
-        public static readonly Skill NoviceProbe = new Skill("novice", "Mộc Kiếm [PROBE]", 1, 0, 1.2, 1, .70, .10, .32);
+        public static readonly Skill Novice = new Skill("novice", "Mộc Kiếm", 1, 0, 1.2, 1, .70, .10, .32);
         public static readonly Skill Sword1 = new Skill("sword.s1", "Phong Trảm nhập môn", 1, 2, 1.7, 1.2, 1, .12, .30);
         // Fixture definitions, not unlockable in VS-1. Same evaluator supports later gates.
         public static readonly Skill Sword2 = new Skill("sword.s2", "Phong Trảm tiến cảnh", 2, 4, 1.7, 1.35, 1.5, .14, .30, Shape.Arc, 3);

@@ -5,10 +5,10 @@ using NUnit.Framework;
 
 namespace HuyenLo.Tests
 {
-    public sealed class ProbeBehaviorTests
+    public sealed class InputBehaviorTests
     {
         private static SliceSession Fixture(Skill skill=null) {
-            var s=new SliceSession(731,ProbeConfig.Experimental());s.Player.Map=Map.Academy;s.Player.School=School.Sword;s.Player.Level=5;
+            var s=new SliceSession(731);s.Player.Map=Map.Academy;s.Player.School=School.Sword;s.Player.Level=5;
             s.Player.Position=new Point(18.9,.8);s.Player.Inventory.Equipment[GearSlot.Weapon]=s.NewItem("sword1");s.Player.Mp=100;
             foreach(var m in s.Mobs)m.Map=Map.Mist;
             var target=s.Mobs.First(x=>x.Dummy);target.Map=Map.Academy;target.Position=new Point(22,.8);
@@ -21,9 +21,8 @@ namespace HuyenLo.Tests
             }
         }
         [Test] public void DefaultsAndClassSkillsKeepCanonicalNumbers() {
-            var s=new SliceSession();Assert.That(s.Probes.Any,Is.False);Assert.That(s.Combat.Selected,Is.SameAs(Rules.Novice));
-            var p=new SliceSession(probes:ProbeConfig.Experimental());Assert.That(p.Combat.Selected,Is.SameAs(Rules.NoviceProbe));
-            Assert.That(Rules.Novice.Cooldown,Is.EqualTo(1));Assert.That(Rules.NoviceProbe.HitDelay,Is.EqualTo(.10));
+            var s=new SliceSession();Assert.That(s.Combat.Selected,Is.SameAs(Rules.Novice));
+            Assert.That(Rules.Novice.Cooldown,Is.EqualTo(.70));Assert.That(Rules.Novice.Lock,Is.EqualTo(.32));Assert.That(Rules.Novice.HitDelay,Is.EqualTo(.10));
             Assert.That(Rules.Sword1.Cooldown,Is.EqualTo(1));Assert.That(Rules.Sword2.Cooldown,Is.EqualTo(1.5));Assert.That(Rules.Sword3.Cooldown,Is.EqualTo(7));
             Assert.That(s.Mobs.Where(m=>m.Name=="Sói Sương").All(m=>m.Speed==2.4&&m.Range==1&&m.MaxHp==107),Is.True);
         }
@@ -76,7 +75,7 @@ namespace HuyenLo.Tests
             s.ObservePosition(new Point(-4,.8),true,false,false,true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));
         }
         [Test] public void StaleHeldAxisIsIgnoredIncludingOppositeDirectionThenReturns() {
-            var s=Fixture();var held=new HeldAxisProbe();held.Snapshot(1);s.Combat.Press("1");
+            var s=Fixture();var held=new HeldMovementState();held.Snapshot(1);s.Combat.Press("1");
             Assert.That(s.Combat.AssistAxis,Is.EqualTo(1));Assert.That(held.Axis(1,s.Combat.HasPendingCast),Is.Zero);
             Advance(s,.4,true);Assert.That(s.Combat.StartedCount,Is.EqualTo(1));Assert.That(held.Axis(1,s.Combat.HasPendingCast),Is.EqualTo(-1));
         }
@@ -91,7 +90,7 @@ namespace HuyenLo.Tests
             for(int i=0;i<4;i++){Assert.That(s.Combat.CycleTarget(1),Is.True);Assert.That(s.Combat.FocusId,Is.EqualTo(order[i%3].Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Explicit));}
             s.Combat.CycleTarget(-1);Assert.That(s.Combat.FocusId,Is.EqualTo(order[2].Id));
             var focus=s.Combat.Focus;s.Mobs[0].Position=new Point(22,.8);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(focus.Id));
-            focus.Generation++;s.Tick(.02);Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.None));
+            focus.Generation++;s.Tick(.02);Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Auto));
         }
         [Test] public void RangedFixtureUsesSameApproachSnapshotAndBatchPipeline() {
             var ranged=new Skill("fixture.ranged", "Fixture only",1,2,6.5,.9,1.7,.12,.34,Shape.Spread,3);
@@ -100,7 +99,7 @@ namespace HuyenLo.Tests
             var key=action.Targets[0];s.Combat.Focus.Generation++;Advance(s,.2);Assert.That(action.Targets[0].Generation,Is.EqualTo(key.Generation));Assert.That(s.Combat.Results,Is.Empty);
         }
         private static (SliceSession session,Mob wolf) Wolf() {
-            var s=new SliceSession(731,ProbeConfig.Experimental());s.Player.Map=Map.Mist;s.Player.Level=5;
+            var s=new SliceSession(731);s.Player.Map=Map.Mist;s.Player.Level=5;
             var wolf=s.Mobs.First(x=>x.Name=="Sói Sương");foreach(var m in s.Mobs)if(m!=wolf)m.Map=Map.Academy;
             s.Player.Position=new Point(wolf.Home.X+.8,wolf.Home.Y+.07);s.Player.Hp=s.Player.Stats.Hp;return(s,wolf);
         }
@@ -113,11 +112,11 @@ namespace HuyenLo.Tests
             while(s.Now<hit)s.Tick(.02);Assert.That(wolf.ApproachSide,Is.EqualTo(side));Assert.That(wolf.NextAttack,Is.EqualTo(next));
         }
         [Test] public void FreeSpaceUsesSpawnSlotTieAndLifePhaseIgnoresRuntimeIds() {
-            var f=Wolf();int side=f.session.ProbeFreeSide(f.wolf);double phase=SliceSession.StablePhase(f.wolf);f.wolf.Id+=1001;
-            Assert.That(f.session.ProbeFreeSide(f.wolf),Is.EqualTo(side));Assert.That(SliceSession.StablePhase(f.wolf),Is.EqualTo(phase));
+            var f=Wolf();int side=f.session.FreeSide(f.wolf);double phase=SliceSession.StablePhase(f.wolf);f.wolf.Id+=1001;
+            Assert.That(f.session.FreeSide(f.wolf),Is.EqualTo(side));Assert.That(SliceSession.StablePhase(f.wolf),Is.EqualTo(phase));
             var phases=f.session.Mobs.Where(x=>x.Name=="Sói Sương").Take(3).Select(SliceSession.StablePhase).Distinct().Count();Assert.That(phases,Is.GreaterThan(1));
             var peer=f.session.Mobs.First(x=>x!=f.wolf);peer.Map=Map.Mist;peer.Dummy=false;peer.Home=new Point(f.wolf.Home.X,f.wolf.Home.Y);peer.Position=new Point(f.session.Player.Position.X-f.wolf.Range*.9,f.wolf.Home.Y);
-            Assert.That(f.session.ProbeFreeSide(f.wolf),Is.EqualTo(1));
+            Assert.That(f.session.FreeSide(f.wolf),Is.EqualTo(1));
         }
         [Test] public void SideSwitchIsLockedForOnePointFiveSeconds() {
             var f=Wolf();var s=f.session;var m=f.wolf;s.Tick(.02);int side=m.ApproachSide;double unlock=m.SideLockedUntil;
@@ -126,7 +125,7 @@ namespace HuyenLo.Tests
             m.SideSwitchPending=true;while(s.Now<unlock-.02){m.Position=new Point(m.Home.X,m.Home.Y);s.Tick(.02);Assert.That(m.ApproachSide,Is.EqualTo(side));}
         }
         [Test] public void MushroomsDoNotInheritWolfRepositionPolicy() {
-            var s=new SliceSession(731,ProbeConfig.Experimental());var m=s.Mobs.First(x=>x.Name=="Nấm Linh");Assert.That(m.RepositionAfterHit,Is.False);s.Player.Map=Map.Mist;s.Player.Position=new Point(m.Home.X+.5,m.Home.Y);
+            var s=new SliceSession(731);var m=s.Mobs.First(x=>x.Name=="Nấm Linh");Assert.That(m.RepositionAfterHit,Is.False);s.Player.Map=Map.Mist;s.Player.Position=new Point(m.Home.X+.5,m.Home.Y);
             foreach(var other in s.Mobs)if(other!=m)other.Map=Map.Academy;
             for(int i=0;i<120;i++)s.Tick(.02);Assert.That(m.BiteAttempts,Is.GreaterThan(0));Assert.That(m.RepositionUntil,Is.Zero);
         }

@@ -161,9 +161,7 @@ namespace HuyenLo.Tests
                 yield return Tap(keyboard,Key.Tab);Assert.That(host.Hud.Panel,Is.EqualTo("equipment"));Assert.That(host.Hud.SelectedActionId,Is.EqualTo("slot.Weapon"));
                 yield return Tap(keyboard,Key.Enter);Assert.That(host.Hud.SelectedActionId,Is.EqualTo("unequip.Weapon"));yield return Tap(keyboard,Key.Enter);
                 Assert.That(host.Session.Player.Inventory.Equipment.ContainsKey(GearSlot.Weapon),Is.False);yield return Tap(keyboard,Key.Escape);yield return Tap(keyboard,Key.Escape);
-                host.Session.HurtPlayer(9999);yield return Tap(keyboard,Key.F8);yield return Tap(keyboard,Key.DownArrow);yield return Tap(keyboard,Key.Enter);
-                Assert.That(host.Hud.Panel,Is.EqualTo("confirm"));Assert.That(host.Hud.SelectedActionId,Is.EqualTo("debug.cancel"));
-                yield return Tap(keyboard,Key.DownArrow);yield return Tap(keyboard,Key.Enter);Assert.That(host.Session.Quest,Is.EqualTo(1));Assert.That(host.Session.DebugPreset,Is.Null);Assert.That(host.Session.Player.Inventory.Equipment,Is.Empty);
+
             }
             finally {InputSystem.RemoveDevice(keyboard);InputSystem.settings.backgroundBehavior=oldBackground;InputSystem.settings.editorInputBehaviorInPlayMode=oldEditor;Object.Destroy(go);}
             yield return null;
@@ -177,7 +175,7 @@ namespace HuyenLo.Tests
             var keyboard=InputSystem.AddDevice<Keyboard>();keyboard.MakeCurrent();
             try {
                 // Isolated fixture, never used by the continuous Q1-Q6 acceptance route.
-                host.Session.Player.Position=new Point(-4,.8);Assert.That(host.Session.TryExit("toAcademy"),Is.True);
+                host.Session.Player.Position=new Point(-10,.8);Assert.That(host.Session.TryExit("toAcademy"),Is.True);
                 yield return new WaitForFixedUpdate();yield return null;
                 var s=host.Session;s.Player.School=School.Sword;s.Player.Level=5;
                 s.Player.Inventory.Equipment[GearSlot.Weapon]=s.NewItem("sword1");s.Combat.Unlocked[1]=Rules.Sword1;

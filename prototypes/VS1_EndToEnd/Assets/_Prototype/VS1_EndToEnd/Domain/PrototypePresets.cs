@@ -5,10 +5,10 @@ namespace HuyenLo.Domain
     public enum PrototypeStart { Fresh=1, Movement=2, Dummy=3, FirstLoot=4, Wolves=5, Class=6, SwordTraining=7, Crowd=8 }
     public static class PrototypePresets
     {
-        public static SliceSession Create(PrototypeStart start,ProbeConfig probes=null)
+        public static SliceSession Create(PrototypeStart start)
         {
             if(!Enum.IsDefined(typeof(PrototypeStart),start))throw new ArgumentOutOfRangeException(nameof(start));
-            var s=new SliceSession(probes:probes);if(start==PrototypeStart.Fresh)return s;
+            var s=new SliceSession();if(start==PrototypeStart.Fresh)return s;
             s.DebugPreset=start.ToString();s.Quest=(int)start;
             s.QuestState=start>=PrototypeStart.SwordTraining?QuestState.Completed:QuestState.Available;
             for(int i=1;i<s.Quest;i++)s.Receipts.Add($"Q{i}.completed");

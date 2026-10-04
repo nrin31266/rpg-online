@@ -11,7 +11,7 @@ using UnityEngine.TestTools;
 namespace HuyenLo.Tests
 {
     // Virtual InputSystem devices verify the adapter, NOT physical keyboard rollover or feel.
-    public sealed class InputProbeTests
+    public sealed class InputBehaviorTests
     {
         private GameObject root;
         private SliceHost host;
@@ -23,8 +23,7 @@ namespace HuyenLo.Tests
             InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
             InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
             keyboard=InputSystem.AddDevice<Keyboard>();keyboard.MakeCurrent();
-            root=new GameObject("Disposable InputProbes fixture");host=root.AddComponent<SliceHost>();
-            foreach(var f in typeof(ProbeConfig).GetFields())if(f.FieldType==typeof(bool))f.SetValue(host.Session.Probes,true);
+            root=new GameObject("Input behavior fixture");host=root.AddComponent<SliceHost>();
             host.ResetPrototype(PrototypeStart.SwordTraining);host.Session.Player.InvulnerableUntil=100;
             host.Body.position=new Vector2(19.3f,.72f);host.Body.transform.position=host.Body.position;
             host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
@@ -54,7 +53,7 @@ namespace HuyenLo.Tests
             }
         }
         [UnityTest] public IEnumerator NewDirectionJumpDropAndUiCancelPending(){
-            foreach(var key in new[]{Key.LeftArrow,Key.Space,Key.S,Key.I}){
+            foreach(var key in new[]{Key.LeftArrow,Key.Space,Key.S,Key.I,Key.Enter}){
                 host.ResetPrototype(PrototypeStart.SwordTraining);host.Session.Player.InvulnerableUntil=100;
                 host.Body.position=new Vector2(19.3f,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
                 for(int i=0;i<3;i++)yield return new WaitForFixedUpdate();
@@ -95,7 +94,7 @@ namespace HuyenLo.Tests
             s.Player.Hp-=40;s.Player.Mp-=30;host.Hud.Toggle("bag");hp=s.Player.Hp;mp=s.Player.Mp;
             yield return Tap(Key.Digit4);yield return Tap(Key.Digit5);Assert.That(s.Player.Hp,Is.EqualTo(hp));Assert.That(s.Player.Mp,Is.EqualTo(mp));
             host.Hud.Close();Assert.That(host.QuickKey("H"),Is.True);Assert.That(host.QuickKey("M"),Is.True);
-            Assert.That(ProbeBindings.HpGlyph(s.Probes),Is.EqualTo("4/H"));Assert.That(ProbeBindings.MpGlyph(s.Probes),Is.EqualTo("5/M"));
+            Assert.That(InputBindings.HpGlyph(),Is.EqualTo("4/H"));Assert.That(InputBindings.MpGlyph(),Is.EqualTo("5/M"));
         }
         [UnityTest] public IEnumerator StaleHeldKeyCannotCarryApproachThroughEdgeExit(){
             // Capture held D in a safe lane first, then author the exit fixture without a new KeyDown.

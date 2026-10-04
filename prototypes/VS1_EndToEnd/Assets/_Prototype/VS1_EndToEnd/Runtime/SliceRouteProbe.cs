@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using HuyenLo.Domain;
 using UnityEngine;
@@ -17,28 +16,14 @@ namespace HuyenLo.Runtime
         public bool Finished {get;private set;}
         private SliceHost host;
         private SliceSession S=>host.Session;
-        private bool capture,cli;
-        private string evidence;
-        private int frame;
         private double releaseJumpAt;
-        private float lastCapture;
         private void Start() {
-            var args=Environment.GetCommandLineArgs();cli=args.Contains("--verify-route");if(!cli)return;
-            capture=args.Contains("--capture-route");int i=Array.IndexOf(args,"--evidence-path");evidence=i>=0&&i+1<args.Length?args[i+1]:Path.Combine(Application.persistentDataPath,"VS1-validation");
-            Directory.CreateDirectory(evidence);if(capture)Directory.CreateDirectory(Path.Combine(evidence,"frames"));
-            StartCoroutine(Cli());
+            if(Environment.GetCommandLineArgs().Contains("--verify-route"))StartCoroutine(Cli());
         }
         private IEnumerator Cli() {
             yield return Run(GetComponent<SliceHost>());
-            File.WriteAllLines(Path.Combine(evidence,"continuous-route.log"),S.Events);
-            File.WriteAllText(Path.Combine(evidence,"route-result.txt"),$"{(Finished?"PASS":"FAIL")}\n{Failure}\nQuest={S.Quest}, School={S.Player.School}, Lv={S.Player.Level}, receipts={S.Receipts.Count}\nQ1..Q6 completed={string.Join(",",Enumerable.Range(1,6).Select(i=>S.Receipts.Contains($"Q{i}.completed")))}\nActual Rigidbody2D movement; no editor teleport/quest/EXP injection. UI keyboard navigation adapter + auto EdgeExit; speed-up timeScale=4; no debug preset.\n");
-            Debug.Log("[VS1-ROUTE] "+(Finished?"PASS":Failure));
-            if(Finished&&Environment.GetCommandLineArgs().Contains("--showcase"))yield return Showcase();
+            Debug.Log("[VS1-ROUTE] "+(Finished?"PASS Q1–Q6 fresh, actual Rigidbody2D and UI commands":Failure));
             yield return new WaitForSecondsRealtime(1);Application.Quit(Finished?0:2);
-        }
-        private void Update() {
-            if(!capture||!cli||host==null)return;
-            if(Time.unscaledTime-lastCapture>=.1f){lastCapture=Time.unscaledTime;ScreenCapture.CaptureScreenshot(Path.Combine(evidence,"frames",$"{frame++:D5}.png"));}
         }
         public IEnumerator Run(SliceHost value) {
             host=value;host.ExternalInput=true;float old=Time.timeScale;Time.timeScale=4;
@@ -54,21 +39,8 @@ namespace HuyenLo.Runtime
             Finished=Failure==null&&stack.Count==0;
             host.ExternalAxis=0;host.CombatRelease("1");Time.timeScale=old;
         }
-        private IEnumerator Shot(string name){
-            yield return new WaitForSecondsRealtime(.25f);ScreenCapture.CaptureScreenshot(Path.Combine(evidence,name+".png"));yield return new WaitForSecondsRealtime(.15f);
-        }
-        // Separate visual/debug probes AFTER the fresh acceptance route; never counted as route proof.
-        private IEnumerator Showcase(){
-            yield return Shot("village");
-            host.Hud.Toggle("bag");yield return Shot("bag-grid");host.Hud.Close();
-            host.Hud.Toggle("equipment");yield return Shot("equipment");host.Hud.Close();
-            yield return Exit("toAcademy");yield return Move(3);host.Hud.OpenNpc("Phong");yield return Shot("class-npcs");host.Hud.Close();yield return Move(18);yield return Shot("academy");
-            yield return Exit("toVillageA");yield return Exit("toMist");yield return Move(18);yield return Shot("mist-entrance");
-            host.ResetPrototype(PrototypeStart.Fresh);yield return new WaitForFixedUpdate();yield return Shot("quest-marker");host.Interact();yield return Shot("npc-dialogue");host.Hud.Close();
-            host.ResetPrototype(PrototypeStart.Crowd);yield return new WaitForFixedUpdate();S.Player.InvulnerableUntil=S.Now+10; // separate render fixture, labeled DEBUG, not route
-            yield return new WaitForSecondsRealtime(3);yield return Shot("crowd-four");
-            host.Hud.Toggle("debug");yield return Shot("debug-crowd");host.Hud.Close();
-        }
+
+
         private IEnumerator Move(double x) {
             host.Hud.Close();double started=S.Now;
             while(Math.Abs(host.Body.position.x-x)>.22){
@@ -98,7 +70,6 @@ namespace HuyenLo.Runtime
         private IEnumerator Talk(string npc,bool accept=false,bool turnIn=false) {
             var a=SliceSession.Anchors.First(x=>x.Id==npc);Check(S.Player.Map==a.Map,"wrong map for "+npc);
             yield return Move(a.Position.X);host.Interact();Check(host.Hud.Panel=="npc","open NPC "+npc);
-            if(capture)yield return new WaitForSecondsRealtime(.2f);
             if(accept)Ui("quest.accept");if(turnIn)Ui("quest.turnin");host.HandleMenuKey("escape");yield return new WaitForFixedUpdate();
         }
         private IEnumerator Exit(string id) {

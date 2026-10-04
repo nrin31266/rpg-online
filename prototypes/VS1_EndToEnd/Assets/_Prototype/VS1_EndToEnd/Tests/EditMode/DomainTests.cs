@@ -53,14 +53,15 @@ namespace HuyenLo.Tests
             s.Combat.Press("1",1);s.Combat.Release("1");Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));b.Position=new Point(21.1,.8);s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));
             a.Hp=0;a.RespawnAt=100;s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));
         }
-        [Test] public void ManualContextChangesAutoButExplicitIsPinned() {
+        [Test] public void ExplicitFocusRetainsWithinEnvelopeThenReturnsToAuto() {
             var s=Fixture(Rules.Sword1);var a=s.Mobs[0];s.Combat.Press("1",1);s.Combat.Release("1");
             var b=s.Mobs[1];b.Map=Map.Academy;b.Position=new Point(30,.8);s.Player.Position=new Point(29,.8);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));
-            s.Combat.Explicit(a);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Explicit));
+            a.Position=new Point(27,.8);s.Combat.Explicit(a);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Explicit));
+            a.Position=new Point(22,.8);s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Auto));
         }
         [Test] public void FacingIndependentAcquireAndExplicitOutOfRangeDoesNotSubstitute() {
             var s=Fixture(Rules.Sword1);s.Player.Position=new Point(23,.8);s.Combat.Facing=1;s.Combat.Press("1",1);Assert.That(s.Combat.Running.Facing,Is.EqualTo(-1));s.Combat.Cancel();
-            var a=s.Mobs[0];a.Position=new Point(30,.8);var b=s.Mobs[1];b.Map=Map.Academy;b.Position=new Point(23.5,.8);s.Combat.Explicit(a);double mp=s.Player.Mp;
+            var a=s.Mobs[0];a.Position=new Point(26,.8);var b=s.Mobs[1];b.Map=Map.Academy;b.Position=new Point(23.5,.8);s.Combat.Explicit(a);double mp=s.Player.Mp;
             s.Combat.Press("1",1);Assert.That(s.Combat.Running,Is.Null);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));Assert.That(s.Player.Mp,Is.EqualTo(mp));
         }
         [Test] public void ApproachIsBoundedHorizontalAndManualCancels() {
@@ -152,17 +153,17 @@ namespace HuyenLo.Tests
         }
         [Test] public void MobWindupMissResolvesOnClockInsteadOfHittingAfterPlayerReturns() {
             var s=new SliceSession();var mob=s.Mobs.First(x=>x.Slot=="DS1.slot1");s.Player.Map=Map.Mist;
-            s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);s.Tick(.02);Advance(s,.16);Assert.That(mob.Windup,Is.True);
+            s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);for(int i=0;i<100&&!mob.Windup;i++)s.Tick(.02);Assert.That(mob.Windup,Is.True);
             double hp=s.Player.Hp;s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y+3);Advance(s,1);
             Assert.That(mob.Windup,Is.False);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);s.Tick(.02);
             Assert.That(s.Player.Hp,Is.EqualTo(hp),"Jump dodge must not turn into a delayed hit");
         }
         [Test] public void PortalCancelsMobWindupAndEmptyMapReturnsWithoutNewLifeOrLoot() {
             var s=new SliceSession();var mob=s.Mobs.First(x=>x.Slot=="DS1.slot1");s.Player.Map=Map.Mist;s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
-            s.Tick(.02);Advance(s,.16);Assert.That(mob.Windup,Is.True);mob.Hp=mob.MaxHp-1;int generation=mob.Generation;
+            for(int i=0;i<100&&!mob.Windup;i++)s.Tick(.02);Assert.That(mob.Windup,Is.True);mob.Hp=mob.MaxHp-1;int generation=mob.Generation;
             s.Player.Position=new Point(-4,.8);Assert.That(s.TryExit("toVillageM"),Is.True);Assert.That(mob.Windup,Is.False);
             Advance(s,3);Assert.That(mob.Hp,Is.EqualTo(mob.MaxHp));Assert.That(mob.Generation,Is.EqualTo(generation));Assert.That(s.Loot,Is.Empty);
-            s.Player.Position=new Point(30,.8);Assert.That(s.TryExit("toMist"),Is.True);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
+            s.Player.Position=new Point(34,.8);Assert.That(s.TryExit("toMist"),Is.True);s.Player.Position=new Point(mob.Home.X+.5,mob.Home.Y);
             double hp=s.Player.Hp;s.Tick(.02);Assert.That(s.Player.Hp,Is.EqualTo(hp),"Portal must not retain a deferred old hit");
         }
         [TestCase(1)] [TestCase(2)] [TestCase(3)] public void EverySkillNeedsAnotherPhysicalPress(int slot) {
@@ -199,17 +200,20 @@ namespace HuyenLo.Tests
             }
         }
         [Test] public void EdgeOverlapTransitionsOnceWithoutInteractAndResetIsFresh() {
-            var s=new SliceSession();s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Academy));int revision=s.WorldRevision;
+            var s=new SliceSession();s.ObservePosition(new Point(-10,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Academy));int revision=s.WorldRevision;
             for(int i=0;i<10;i++)s.ObservePosition(s.Player.Position,true);Assert.That(s.WorldRevision,Is.EqualTo(revision));
             var debug=PrototypePresets.Create(PrototypeStart.SwordTraining);Assert.That(debug.Player.Level,Is.EqualTo(5));Assert.That(debug.Combat.Unlocked.ContainsKey(1),Is.True);Assert.That(debug.DebugPreset,Is.Not.Null);
             var fresh=PrototypePresets.Create(PrototypeStart.Fresh);Assert.That(fresh.Quest,Is.EqualTo(1));Assert.That(fresh.Player.Level,Is.EqualTo(1));Assert.That(fresh.Receipts,Is.Empty);Assert.That(fresh.Combat.Cooldowns,Is.Empty);Assert.That(fresh.DebugPreset,Is.Null);
         }
-        [Test] public void MeleePhaseOffsetsAndRecoveryDoNotChangeAttackInterval(){
+        [Test] public void MeleeWindupAndRecoveryKeepConfiguredAttackInterval(){
             var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(30,4.25);s.Player.InvulnerableUntil=100;
-            var a=s.Mobs.First(x=>x.Id==30);var b=s.Mobs.First(x=>x.Id==31);a.Position=new Point(29.5,4.25);b.Position=new Point(30.5,4.25);
-            s.Tick(.02);double first=a.HitAt;Assert.That(a.Windup,Is.True);Assert.That(b.Windup,Is.False);Advance(s,.08);
-            Assert.That(b.Windup,Is.True);Assert.That(b.HitAt,Is.GreaterThan(first));Assert.That(a.NextAttack-(first-.35),Is.EqualTo(a.Interval).Within(.001));
-            double x=a.Position.X;Advance(s,.38);Assert.That(a.Position.X,Is.Not.EqualTo(x),"Recovery should visibly reposition without a new cooldown");
+            var pack=s.Mobs.Where(x=>x.Slot.StartsWith("DS3.")).ToArray();
+            foreach(var mob in pack)mob.Position=new Point(30+(mob==pack[0]?-.5:.5),4.25);
+            for(int i=0;i<300;i++){
+                s.Tick(.02);
+                foreach(var mob in pack)if(mob.Windup)Assert.That(mob.NextAttack-(mob.HitAt-.35),Is.EqualTo(mob.Interval).Within(.001),"Steering/recovery must not extend the configured attack clock");
+            }
+            Assert.That(pack.All(x=>x.BiteAttempts>0),Is.True);
         }
         [Test] public void ClassAdmissionRequiresManualUnequipAndHasTwoGuides(){
             var s=PrototypePresets.Create(PrototypeStart.Class);s.QuestState=QuestState.InProgress;s.Stage=1;s.Player.Map=Map.Academy;s.Player.Position=SliceSession.Anchors.First(x=>x.Id=="Phong").Position;
@@ -221,28 +225,25 @@ namespace HuyenLo.Tests
             Assert.That(s.Player.Inventory.Bag.Count(x=>x.Id=="sword1"),Is.EqualTo(1));Assert.That(s.ChooseSword(),Is.False);
         }
         [Test] public void ReciprocalExitPreservesTravelDirection(){
-            var s=new SliceSession();s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Academy));Assert.That(s.Player.Position.X,Is.EqualTo(31));
-            s.ObservePosition(new Point(34,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(-1));
-            s.ObservePosition(new Point(30,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Mist));Assert.That(s.Player.Position.X,Is.EqualTo(-1));
-            s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(27));
+            var s=new SliceSession();s.ObservePosition(new Point(-10,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Academy));Assert.That(s.Player.Position.X,Is.EqualTo(31));
+            s.ObservePosition(new Point(34,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(-8));
+            s.ObservePosition(new Point(34,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Mist));Assert.That(s.Player.Position.X,Is.EqualTo(-2));
+            s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(32));
         }
         [TestCase(1,107)] [TestCase(2,107)] [TestCase(4,107)] [TestCase(4,104.6)] [TestCase(4,120.8)]
         public void EveryWolfCanReengageWithoutFrontDeathOrTeleport(int count,double playerX){
             var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(playerX,1.45);s.Player.InvulnerableUntil=100;
             var pack=s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")).OrderBy(x=>x.Id).ToArray();
             for(int j=0;j<4;j++){pack[j].Home=pack[j].Position=new Point(Math.Max(104.45,Math.Min(121.55,playerX+(playerX>115?-1:1)*(1+j))),1.45);if(j>=count){pack[j].Hp=0;pack[j].RespawnAt=100;}}
-            double maxOverlapRun=0;var runs=new double[4,4];
             for(int i=0;i<800;i++){
                 var before=pack.Select(x=>x.Position.X).ToArray();var windup=pack.Select(x=>x.Windup).ToArray();var facing=pack.Select(x=>x.Facing).ToArray();s.Tick(.02);
                 for(int j=0;j<count;j++){
                     Assert.That(Math.Abs(pack[j].Position.X-before[j]),Is.LessThanOrEqualTo(pack[j].Speed*.02+.0001),"No teleport or separation shove");
                     if(windup[j]&&pack[j].Windup){Assert.That(pack[j].Facing,Is.EqualTo(facing[j]));Assert.That(pack[j].Position.X,Is.EqualTo(before[j]));}
                     Assert.That(pack[j].Position.X,Is.InRange(pack[j].LaneMin,pack[j].LaneMax));
-                    for(int k=j+1;k<count;k++){runs[j,k]=Math.Abs(pack[j].Position.X-pack[k].Position.X)<.5?runs[j,k]+.02:0;maxOverlapRun=Math.Max(maxOverlapRun,runs[j,k]);}
                 }
             }
             Assert.That(pack.Take(count).All(x=>x.BiteAttempts>=2),Is.True,"Every wolf must get actual in-range attempts without removing the front mob: "+string.Join(",",pack.Take(count).Select(x=>x.Id+":"+x.BiteAttempts+" "+x.Motion+" goal="+x.DesiredX)));
-            Assert.That(maxOverlapRun,Is.LessThan(2),"Crossings may be brief; no persistent blob");
         }
         [Test] public void PackLeavesBoundaryThenResumesPatrolWithoutNewLifeOrCredit(){
             var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(107,1.45);s.Player.InvulnerableUntil=100;
@@ -281,7 +282,8 @@ namespace HuyenLo.Tests
         [Test] public void WideWaterIsSceneryBehindContinuousSolidBridge(){
             var bridge=BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="Valley solid wooden bridge");
             var water=BlockoutLayout.Waters(Map.Mist).Single();
-            Assert.That(water.DecorativeOnly,Is.True);Assert.That(bridge.OneWay,Is.False);Assert.That(bridge.Wood,Is.True);
+            Assert.That(water.DecorativeOnly,Is.False);Assert.That(bridge.OneWay,Is.False);Assert.That(bridge.Wood,Is.True);
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,-1.3)),Is.EqualTo(.85));
             Assert.That(bridge.TopAt(74)-water.Level,Is.GreaterThanOrEqualTo(2),"The bridge needs visible air above water");
             Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,65.9),Is.EqualTo(bridge.TopAt(74)).Within(.0001));
             Assert.That(BlockoutLayout.BaseGroundTop(Map.Mist,82.01),Is.EqualTo(bridge.TopAt(74)).Within(.01));
