@@ -557,3 +557,72 @@ Phím H/M chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và �
 ````text
 **Đóng giao diện theo thao tác:** nhận/trả quest, nhập phái và nghỉ thành công đóng hội thoại để tiếp tục đi; câu xác nhận vẫn hiện trên NPC/tracker. Lỗi/reject giữ view và reason. Buy/Sell/Store/Take giữ view để làm nhiều lần; Esc lùi một submenu, ở root thì đóng. Equip/Unequip/Learn thành công trở về view chứa item/slot; tab switch đi trực tiếp tới view mới, không giữ submenu cũ. Intro hiện trước khi nhận quest; không bỏ narrative chỉ vì auto-close.
 ````
+
+
+<a id="single-behavior-history-2"></a>
+
+## Historical source fragments — 2_HUYEN_LO_TECHNICAL.md
+
+Các đoạn dưới đây giữ nguyên văn trước đồng bộ luật được chủ dự án duyệt. Chỉ là lịch sử; không áp dụng làm luật hiện hành. Source: `docs/design/2_HUYEN_LO_TECHNICAL.md`.
+
+### Source fragment 2.1
+
+````text
+**UI focus/submenu:** modal giữ breadcrumb + selected action/itemInstanceId, không giữ closure tới item đã bị consume/reset. NPC root chỉ hiện quest/service; service view lấy đúng danh sách; Esc quay một cấp rồi đóng, I/C/Q mở root mới. Bag grid điều hướng theo hàng/cột và ô rỗng, detail dùng cùng domain validators; equipment slots có selected/empty/locked cues. Markers derive quest state, dialogue không tự grant objective/reward. Class admission kiểm slot Vũ khí trống trước staged grant; tháo/cất là commands riêng.
+````
+
+### Source fragment 2.2
+
+````text
+**MapTransition contract:** `EdgeExit` là trigger mép map + targetMap/targetExit/spawn anchor; authority kiểm actor alive, MapId/generation, overlap đúng exit, connected destination và unlock, không nhận arbitrary destination từ client. `SpecialGate` có activation/interaction riêng theo GDD (Huyền Môn/Arena), không chung E cho mọi exit. Hai loại đi qua cùng pipeline MapId/checkpoint/cancel. Một pending transition/actor, dedup request/trigger; vào vùng đích ngoài return trigger, chỉ re-arm sau khi rời exit. Reject hiện reason một lần và không spam retry khi đứng tại biên; cần rời rồi vào lại. Actor khác không bị khóa exit. Backend commit destination checkpoint trước publish theo §6; fail giữ nguồn và không cho destination snapshot giả. Collider/safe-strip/camera và pending ACK phải kiểm riêng, không lấy trigger local prototype chứng minh online.
+````
+
+### Source fragment 2.3
+
+````text
+**ActionTimeline:** authority kiểm requested SkillId, class/learned/level, MP/per-skill CD/common action lock và target/geometry; accepted start tạo actionId/life/startClock, snapshot SkillId/profile/source stats/passive/origin/facing rồi commit MP/CD đúng một lần. Một latest intent buffer thử 150 ms, không FIFO; running action không đọc mutable selectedSlot. Một timeline cho Novice/slot requests; không J hoặc held-repeat executor. Logical ranged resolve tại clock trong GDD, không gameplay projectile object. Spread assignments ABC/ABA/AAA snapshot ở start, cùng +0,12 s stable hitIndex; invalid index mất hit, không reacquire. Line sort intersections; Hàn invalid primary không nổ, primary Evade vẫn nổ/secondary roll riêng/no primary double-hit. Dedup actionId+hitIndex+targetId+generation; revalidate target lifecycle/MapId/shape và DEF/EVA tại resolve. Death/map transition/CC hủy unresolved action, không refund; result đã resolve bất biến. Presentation projectile không giữ callback mutate HP.
+````
+
+### Source fragment 2.4
+
+````text
+Input System actions: Move (A/←, D/→ OR/clamp không cộng speed), Jump (Space/↑), DropThrough (S/↓), Slot1/2/3, Interact và panels theo GDD §9. Không ExecuteSelected/J hoặc RepeatOnHold. Press Slot1 chọn basic khi Novice hoặc S1 sau class; Slot2/3 chỉ khi learned/unlocked. Một physical press → một requested SkillId/intentId; giữ input không emit performed requests liên tục. Slot hợp lệ vẫn selected khi reject, locked slot không đổi selection hoặc tạo queue. Authority không trust selectedSlot/secondary list client.
+````
+
+### Source fragment 2.5
+
+````text
+CombatFocus NONE/AUTO/EXPLICIT giữ target ID+generation+MapId riêng selection. Retain trước acquire; AUTO context hysteresis không nearest sort mỗi frame. NONE acquire tại press trong local eligibility/envelope; không có target thì reject, không tạo pending chờ spawn. EXPLICIT/range reject không thay target để cast. Loot candidate riêng; E act ngay, pickup next candidate không mutate focus.
+````
+
+### Source fragment 2.6
+
+````text
+`PendingCast` nhỏ cho một press: requested SkillId, target/life/map, intentId, expiry, start/progress position; không source-stat/action snapshot hoặc commit cost lúc approach. Validate learned/state/MP/CD trước movement, trừ một latest buffer recovery ngắn nếu skill sẵn tại recovery end. In-range start ngay; hơi ngoài range và cùng reachable lane thì bounded run. Tới tầm revalidate target/profile/MP/CD/state/geometry rồi accepted start mới snapshot/commit. Target invalid/changed, blocked, hết budget/timeout hoặc manual movement/jump/drop/UI/Esc/death/map transition → clear + reason, không reacquire/cast đích mới cùng press. Press unlocked mới replace pending/buffer cũ; running action immutable. Release không cancel one-shot pending, hold không tạo cast thứ hai. Một latest buffer thử 150 ms, không FIFO/queue chờ CD dài hoặc thiếu MP. Reject không giữ intent để bất ngờ cast sau này.
+````
+
+### Source fragment 2.7
+
+````text
+**UI input boundary:** modal giữ một selected action ID ổn định; build cùng danh sách action/điều kiện cho keyboard và mouse. Menu coordinator nhận Navigate/Confirm/Back; renderer chỉ vẽ focus, disabled reason và dispatch command, không mutate progression. NPC mới mở ưu tiên quest action; mở modal consume input vừa dùng, không xác nhận thêm trong cùng frame. Khi action làm list đổi, giữ selected ID còn tồn tại hoặc clamp index; không giữ callback vào item/session cũ. Close/transition/reset clear pending gameplay, UI capture và buffer; giữ phím không tự resume. Enter thuộc Confirm khi modal, Chat khi world; Tab/Shift+Tab đổi RPG tab, arrows giữ grid navigation. Tab ngoài RPG chọn action, không combat cycling. Tab coordinator lưu selected action ID theo view; context bag filter theo GearSlot, không copy inventory. Equipment/Attributes/Derived Stats là ba view riêng đọc cùng evaluator; preview và world đọc cùng module/pose/socket contract; technique cụ thể phải qua art gate. NPC acceptance/completion text chỉ presentation, không mutate reward ngoài domain command.
+````
+
+### Source fragment 2.8
+
+````text
+| Bộ nghiệm thu | Ca bắt buộc | Evidence |
+| --- | --- | --- |
+| Progression | Cumulative 53.100, carry EXP, catch-up remaining, reset Lv 5 một lần, trì hoãn Q6 tới Lv 6+ giữ total points / normal Mộc Kiếm và M reserved potion, 95 điểm, không branch cap / rank | State trước / sau và reload |
+| Combat / status | BaseHP/MP theo cấp; nội tại Kiếm Tâm/Ưng Nhãn nhân final stat một lần, Kiếm Thế/Xạ Tâm +12% direct skill đúng cự ly; basic Tân Lữ CD1,00 s; sau class chỉ S1/S2/S3 tích lũy/CD riêng/common lock, Lv 5 active vẫn single, Lv 10 mới đánh lan, Lv 17 big; A/B/C fallback/no reacquire, per-unique-target status roll cached kể cả fail; S2 độc lập giữ CD; Bỏng 4%/70%, 6 s/1 s/6% ATK, refresh source + expiry nhưng không reset tick; Freeze 1,5 s Normal/Linh + miễn 3 s, test 1/2/4 Cung; Boss Slow 3 s/75% action wait **không reset countdown/action đã start**; PvP Slow 25% move 1,5 s, không attack/CD slow; không nhân status khi nhiều caster | Game Server clock / stat evaluator / status logs, không AnimationEvent |
+| CC / AI | Sticky per-mob threat 1,25 ×, group wake no copied threat; dead / disconnect / map transition / leash retarget, Return clears status / ledger; front / vertical miss, no contact / shoving, projectile snapshot, Ong melee-accessible | N-player target / status tests |
+| World / timers | 2 / 3 / 4 players same-map farm, no whole-map starvation, safe exit strip, no chain aggro cả map, traversal / run-back logs; N-player root occupancy; drop-through một actor không ảnh hưởng actor khác; density theo GDD matrix TEST / TUNABLE, Return reset HP, deadlines map rỗng / re-entry, respawn idempotent | Clock / MapId logs |
+| Boss | New world/Alive boot đúng một con; HP 32.000, ATK 160, DEF 25, ACC 140, EVA 60; chết hồi sau 15 phút / demo 60 s, không spawn khi nhận Q12; một action theo thứ tự GDD, ba vùng đá không double-hit; Cuồng Mạch chỉ đổi nhịp về sau, Làm Chậm chỉ giảm tốc phần chờ còn lại; ngưỡng 10% = 3.200/demo 1.280, corpse đủ điều kiện, không EXP/Vàng trực tiếp, một pile/Thỏi/cửa nhặt 12–30–90 s | Lifecycle/clock/credit/claim logs, 2/4 người |
+| RPG — thưởng/nhặt | Mỗi người nhận phần EXP/Vàng theo đóng góp, làm tròn xuống, không chia lại; lệch cấp ≤3 nhận đủ, ≥4 không có thưởng farm. TopDamage không đủ level thì không roll set thường, không fallback. Shared pickup 8/20/60 s; một item chỉ một claim. Level tăng từ kill không tước quyền nhặt đã chụp; người tới sau dùng level hiện tại. | Race claim, túi đầy, deadline và crash logs |
+| RPG — catalog | 18 dòng / 21 mẫu thường có tên riêng; Kiếm thêm Chí mạng 0,5/1/1,5 điểm %, Cung thêm ACC 10/20/30, Giày thêm tốc chạy 1/2/3%. Quái Lv 2/4 chỉ rơi năm ô không vũ khí ở mọi map. Mặc I không vũ khí Lv 1, vũ khí I Lv 5, II Lv 11, III Lv 17. Ong Lv 10 rơi II nhưng chưa mặc/chuyển vào đích II trước Lv 11. Dây chuyền III bán 225, Thỏi bán 250; cường hóa không tăng giá bán. | 21 templateID/tên duy nhất; sai phái không mặc/chuyển; Chí mạng/ACC/tốc chạy tại +0/+4/+8, preview/load khớp; nguồn rơi, shop và cấp mặc |
+| RPG — cường hóa/chuyển giao | Trần I+4/II+6/III+8; Tinh Hoa I +4, II +8; thất bại giữ cấp nhưng tiêu chi phí. Chuyển cùng bậc 800 Vàng hoặc lên đúng bậc kế 500 Vàng +2 đá; cùng ô/đúng loại vũ khí, đủ cấp, hai instance khác nhau trong túi. Từ chối nếu đích không tăng; nguồn bị tiêu, đích giữ ID/phẩm chất; receipt replay không trừ/cấp lại. | +0→+8, vượt trần, khác phái, no-gain, hai lệnh tranh nguồn, save failure |
+| Linh Biến / economy | Chance 5% only Lv 8+, HP × 5 / EXP-Gold × 3, cap 1 under concurrent respawn, fixed mobIdentity / fixedLevel validate slot cache, respawn25 s; Q8 reservation waits live variant / no demote, same Linh rewards, no force replay; Stone / gear / Gold-hour and crowd contention | Seed / slot / generation logs and measured throughput |
+| Quest | Một bảng Q1–Q12 GDD là authority; Q4 Nấm DS2/loot/equip/sell; Q5 5 Sói DS3–DS6, Q8 4 Sói TA4+TA6 rồi force `TA4.slot1`, Q10 6 Đoạt XN1–XN3/evidence #2/#4/#6, Q11 3/3/4 Thạch theo XN4/5/6, Q12 6 Cổ HT4+HT5; active virtual evidence, no pre-farm/overcount; damage trước accept/sai step không hồi tố, late quest không bị level penalty softlock; Q4–Q7 supply/manual/full bag/replay, Q9 optional, Q11 activation ngoài portal | Solo/late/online/reconnect/full-bag journey |
+| PvP / chat | Wager 1.000–10.000 bước 1.000; accept đúng stake, cả hai đủ Vàng/escrow một transaction trước MatchId; thiếu tiền/đồng thời accept hai lời mời không trừ một phía. Food tick; HP/MP Potion riêng CD 8 s, mỗi loại tối đa 3/người/MatchId, mỗi use tiêu đúng một bình, reject không tiêu; cấm Hồi Sinh Phù. Active sau countdown/ACK; HP=0 hoặc disconnect sau Active thắng/FORFEIT; disconnect trước Active hủy; 120 s cả hai sống hòa **không so HP**; hệ số PvP 0,20 và Slow đúng luật. Chat theo MapId, 80 ký tự/rate. | Test cả 10 stake; W=1.000: WIN trả 1.800/fee200, DRAW trả 900 mỗi người, cancel/SYSTEM_ABORT trả 1.000 mỗi người; WIN/FORFEIT +200 Journey một lần, Q9 không credit FORFEIT/abort; match logs hai Clients |
+| Recovery / backend / network | N-player registry/recipient sets; ticket/lease, resume token một lần trong 15 s giữ exact runtime, actor vẫn chịu hit; mất phiên load checkpoint MapId/HP/MP ở một SafeAnchor farm/combat, safe-zone coordinate hợp lệ/fallback, Arena không restore, HP=0 vẫn chết. Periodic 30 s, map-transition/logout/death/revive/PvP critical; PvE potion consume+HP checkpoint cùng transaction, PvP potion consume chỉ ghi item/receipt và giữ pre-Arena checkpoint; stale seq không overwrite. Escrow HELD/BIND/ACTIVE/settled crash hoặc mất ACK: refund 100% nếu SYSTEM_ABORT/pre-Active, không refund sau settled; death/claim/enhance receipts vẫn sống qua crash; schema migration fail chặn startup. | PostgreSQL transaction tests, checkpoint race/failure, orphan reconciler, 2/3/4 Client network/crash logs |
+| Art / UI | 64 × 64 / PPU 32 / 26 frames, pivot/frame alignment, gear flip, map anchors; phân biệt Bỏng/tia lửa, quái Đóng Băng/băng vỡ, Boss/PvP Làm Chậm/phủ lam mờ; input context | Import audit / video |
+````
