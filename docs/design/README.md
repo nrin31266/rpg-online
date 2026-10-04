@@ -1,5 +1,14 @@
 # Huyền Lộ Design Documentation
 
+## Tóm tắt
+
+Điểm vào năm tài liệu: GDD WHAT, Technical HOW, Analysis WHY, Art VISUAL/PRODUCTION, Roadmap WHEN. GDD thắng khi có mâu thuẫn. Quick Routing dẫn đúng owner; thuật ngữ thống nhất, không tạo luật thứ sáu.
+
+## Tìm gì ở đâu
+
+- [Thứ tự đọc](#đọc-trước), [authority](#authority), [Quick Routing](#quick-routing).
+- [Quy ước cập nhật](#quy-ước-cập-nhật), [thuật ngữ](#thuật-ngữ-dùng-chung).
+
 ## Đọc trước
 
 1. [GDD](1_HUYEN_LO_GDD.md): game, luật, scope và DoD hiện hành.
@@ -16,7 +25,7 @@ TARGET P0 giữ Kiếm + Cung và Dedicated + Spring/PostgreSQL online. CURRENT 
 
 Nếu Analysis / Technical mâu thuẫn GDD, GDD thắng. Deterministic defect đã xác minh phải sửa đồng bộ; proposal không tự đổi luật.
 
-Feedback V6.2.4 đã sync: ba skill tích lũy/class, keyboard-complete menus, 1–3 one-press bounded approach/cast, logical ranged và focus/interaction riêng; luật chi tiết ở owner. Prototype cũ không production codebase hoặc evidence pass cho revision mới; harvest/probe → production base → G-L mới → G-N sớm theo Roadmap. Chi tiết luật ở GDD, contract ở Technical, rationale/gates ở Analysis; review artifact tạm được dọn sau audit. User lock và review đã thống nhất được ghi vào GDD hiện hành. Nguồn tham khảo không tự đổi design.
+Luật controls/focus/pending/dùng đồ nhanh đọc GDD; implementation contract đọc Technical. Prototype dùng một hành vi đã duyệt, đồ họa tối giản, không phải production base. Nguồn tham khảo không tự đổi design.
 
 ## Quick Routing
 
@@ -24,6 +33,10 @@ Feedback V6.2.4 đã sync: ba skill tích lũy/class, keyboard-complete menus, 1
 | --- | --- |
 | Character / attributes / EXP | [GDD §2](1_HUYEN_LO_GDD.md#character-power) + [Analysis §2](3_HUYEN_LO_DESIGN_ANALYSIS.md#character-evidence) |
 | Skills / nội tại / bí kíp / status / cast | [GDD §3](1_HUYEN_LO_GDD.md#class-combat) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
+| Đổi mục tiêu / AUTO / click / world Tab | [GDD focus](1_HUYEN_LO_GDD.md#focus-input) + [Technical CycleTarget](2_HUYEN_LO_TECHNICAL.md#input-contract) |
+| Pending / giữ phím / buffer / arrival / Esc | [GDD pending](1_HUYEN_LO_GDD.md#pending-cast), [Esc](1_HUYEN_LO_GDD.md#escape-priority) + [Technical contract](2_HUYEN_LO_TECHNICAL.md#input-contract) |
+| Dùng đồ nhanh 4/5, H/M, F | [GDD Quick Potion / Food](1_HUYEN_LO_GDD.md#quick-items) + [bảng phím](1_HUYEN_LO_GDD.md#ux-art) |
+| Quái chọn cánh / hysteresis / SpawnSlot | [GDD crowd](1_HUYEN_LO_GDD.md#melee-crowd) + [Analysis balance finding](3_HUYEN_LO_DESIGN_ANALYSIS.md#novice-onboarding-evidence) |
 | World / mob / Linh / Boss | [GDD §4](1_HUYEN_LO_GDD.md#world-farm) + [Technical §7](2_HUYEN_LO_TECHNICAL.md#timers) |
 | Farm Lv 1 → 20 / density | [Analysis §3 matrix / model](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression) từ GDD §4 |
 | Story / Q1–Q12 | [GDD §5](1_HUYEN_LO_GDD.md#quests-story) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
@@ -37,9 +50,9 @@ Feedback V6.2.4 đã sync: ba skill tích lũy/class, keyboard-complete menus, 1
 
 ## Quy ước cập nhật
 
-Giữ năm file thiết kế active (1–5) và README làm điểm vào; tiền tố biểu thị thứ tự đọc. GDD là nguồn xác định version hiện hành; không tạo GDD versioned, audit, archive hay Open Questions riêng.
+Giữ năm file thiết kế active (1–5) và README làm điểm vào; tiền tố biểu thị thứ tự đọc. GDD là nguồn xác định luật hiện hành; không tạo GDD versioned, audit, archive hay Open Questions riêng.
 
-Trạng thái / version và DoD hiện hành xem GDD; bằng chứng nghiệm thu xem Technical.
+Trạng thái và DoD hiện hành xem GDD; bằng chứng nghiệm thu xem Technical.
 
 BASELINE là số đang dùng để triển khai; TUNABLE chỉ chỉnh sau khi đo; P1 / P2 không thành yêu cầu P0. Trạng thái quyết định chỉ giữ ở Analysis §5: bảng gate sẵn có và alias A01–A17 gắn vào gate đó; Art giữ reasoning/ma trận thử, Roadmap giữ thứ tự, không mở sổ quyết định cạnh tranh.
 
@@ -68,6 +81,11 @@ GDD ưu tiên tiếng Việt; Technical giữ identifier tiếng Anh khi cần c
 | Đối tượng dữ liệu lưu/truyền | DTO | Bản dữ liệu không chứa tham chiếu Unity runtime. |
 | Ưu tiên triển khai | P0 / P1 / P2 | P0 bắt buộc TARGET hiện tại; VS-1 là một phần thử trước. P1 sau core; P2 hoàn thiện thêm. |
 | Mốc dùng để triển khai / số cần đo lại | BASELINE / TUNABLE | BASELINE là số hiện hành; TUNABLE chỉ đổi sau kiểm chứng. |
+| Mục tiêu chiến đấu | CombatFocus | NONE/AUTO/EXPLICIT; giữ đúng identity/life, độc lập selected skill và interaction candidate. |
+| Đổi mục tiêu | CycleTarget | World Tab/Shift+Tab; context modal vẫn UI navigation. |
+| Lệnh chờ tiếp cận | PendingCast / Approach | Một intent chưa commit tài nguyên, đi ngang có giới hạn theo profile; không tạo map transition. |
+| Đệm lệnh mới nhất | Latest buffer | Một intent có expiry/readiness theo GDD; không hàng đợi cast dài. |
+| Dùng đồ nhanh | QuickHP / QuickMP / Food | 4/H, 5/M, F gọi cùng consumable validator; không chọn skill. |
 | Cụm quái | SpawnGroup | Bố trí một bãi quái do designer author; **không phải Party**. |
 | Điểm sinh quái | SpawnSlot | Vị trí có ID cố định, tham chiếu mob identity; hồi sinh đúng loài / level đó. |
 | Loại quái cố định | Mob identity | Tên, palette và level nhận diện nội dung; có thể dùng chung rig / AI. |
