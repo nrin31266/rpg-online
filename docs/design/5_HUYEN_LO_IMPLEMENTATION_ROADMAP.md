@@ -1,5 +1,15 @@
 # Huyền Lộ — Roadmap triển khai và trạng thái hiện tại
 
+## Tóm tắt
+
+Owner của thứ tự/gates và CURRENT/DEFERRED. Thân §1–6 hướng dẫn việc cần làm; §7–10 là phụ lục lịch sử nguyên văn. VS-1 disposable đồ họa tối giản; production sẽ thiết kế lại. Giữ TARGET Kiếm/Cung/online và khung quản lý hai tháng/bốn người.
+
+## Tìm gì ở đâu
+
+- [CURRENT / TARGET](#target-current-deferred), [VS-1](#vs-1), [phase gates](#phase-gates).
+- [Khung quản lý](#management-window), [art workflow](#art-workflow), [điều kiện production](#production-release).
+- [Phụ lục lịch sử §7–10](#roadmap-history-appendix), [SOURCE → DESTINATION](#source-destination).
+
 **Ngày đồng bộ:** 2026-10-04 · **Trạng thái:** DESIGN + PROTOTYPE VALIDATION; VS-1 disposable/reference cũ, production codebase chưa bắt đầu, chưa mở G-N.
 
 File này sở hữu **thứ tự làm, CURRENT/DEFERRED, điều kiện mở production và routing hồ sơ bản mẫu** (§10, chi tiết ở CHANGELOG prototype). [GDD](1_HUYEN_LO_GDD.md) giữ game đích; [Technical](2_HUYEN_LO_TECHNICAL.md) giữ cách chạy/tích hợp; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) giữ evidence/quyết định; [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md) giữ chi tiết hình ảnh và production. Không dùng roadmap để sửa luật, duyệt proposal Art hoặc thu nhỏ nghiệm thu cuối.
@@ -12,9 +22,7 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED, điều kiện mở pr
 
 **CURRENT** là harvest VS-1 mock đã chạy → sửa docs → movement/UI/art/rig probe → thiết kế production base → implement core base/local slice revision mới → G-N Dedicated với hai client sớm. Không nối network thẳng vào throwaway classes hoặc xem cấu trúc prototype là base đã duyệt. `Offline/local-first` là cách triển khai để kiểm sớm, không đổi game đích thành single-player. `CURRENT` không có nghĩa đã code hoặc đã pass.
 
-**Evidence lịch sử 2026-10-03:** [VS-1 disposable/reference](../../prototypes/VS1_EndToEnd/README.md) tại checkpoint `archive/checkpoint-46006c4` (local-only archive, không có trên origin) có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
-
-**Prototype update 2026-10-04:** V6.2.4 có route/tests nhưng bị user từ chối về hình địa hình: Sói trong lòng nước, dòng nước đứt, background chưa đúng lớp đất. V6.2.5 bị user từ chối vì hiểu sai núi thành backdrop giả. V6.2.6 cũng bị user từ chối: slab đất lơ lửng, cầu sát nước và bờ chắn. V6.2.7 sửa rear soil/pass-through và cầu; kết quả kiểm ở [hồ sơ prototype](#prototype-visual-review), không tự pass G-L hoặc art production.
+Lịch sử prototype ở [Phụ lục](#roadmap-history-appendix); G-L vẫn PARTIAL, chưa có normal-speed feel/usability review hoặc art production được nghiệm thu.
 
 **DEFERRED** là phần đã thiết kế và vẫn phải làm trong TARGET, nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung thuộc TARGET P0, **không phải feature P1**. Mọi bảng Cung, projectile, gear, pose/VFX và balance được giữ. Q6/lore vẫn giới thiệu hai phái; trong bản thử sớm, Kiếm chơi được, Cung ghi “Chưa mở trong bản thử nghiệm”. Không dùng nhãn này trong sản phẩm cuối.
 
@@ -31,7 +39,7 @@ File này sở hữu **thứ tự làm, CURRENT/DEFERRED, điều kiện mở pr
 | PvP/Q9/escrow/settlement | DEFERRED khỏi VS-1, TARGET P0 | G-D trước G-P; Q9 optional cho người chơi không có nghĩa được bỏ hệ PvP |
 | Buff R, shield/groggy, QoL/P1/P2 | Chưa duyệt triển khai | Chỉ xét sau core; proposal vẫn ở Analysis, không chen vào VS-1 |
 
-**Probe map/UI hiện tại:** thông số, sơ đồ và capture riêng của mock nằm ở [§10](#prototype-visual-review). Budget release, quest và các gate production không đổi. G-L vẫn PARTIAL; không dùng tests để kết luận layout/feel đã được người chơi duyệt.
+**Bản chạy thử hiện tại:** một hành vi đã duyệt, không ProbeConfig/flag/F8/metric harness; dừng A/B, evidence work, hook/Git cleanup và Phase H. Các thông số/hồ sơ cũ chỉ ở [Phụ lục §10](#prototype-visual-review). Budget release, quest và các gate production không đổi. G-L vẫn PARTIAL; không dùng tests để kết luận layout/feel đã được người chơi duyệt.
 
 <a id="vs-1"></a>
 
@@ -43,7 +51,9 @@ Hướng triển khai đã xác nhận là **Kiếm trước → local/offline t
 
 Khi review thay phạm vi slice, cập nhật mục này và phần G-L/validation liên quan; không âm thầm đổi quest/map trong GDD, dependency gate mạng hoặc final acceptance.
 
-Một đường đi revision mới: NPC → nhảy/drop-through/EdgeExit auto-transition → nhận/mặc Mộc Kiếm, hạ ba Dummy đồng thời → Nấm/nhặt supply/mặc Áo/bán sample → chuẩn bị Food/Bình Máu, đánh Sói → catch-up Lv5 → chọn Kiếm/cộng điểm/học bí kíp/S1 + dùng Bình MP → trả Q6. Quest objectives là hành động, tutorial glyph từ bindings. Cung giới thiệu nhưng chưa playable; Quần/Áo/Mộc/Kiếm phải đổi hình đọc được. Đồ II/III chỉ fixture hẹp, không route mới.
+**VS-1 là bản chạy thử đồ họa tối giản, thiết kế lại ở production.** Giữ layout/collision/spawn/EdgeExit/tuyến Q1–Q6; chỉ hộp/capsule màu, text/markers/bars. Đây là phạm vi prototype, không thay quy định art TARGET.
+
+Một đường đi revision mới: NPC → nhảy/drop-through/EdgeExit auto-transition → nhận/mặc Mộc Kiếm, hạ ba Dummy đồng thời → Nấm/nhặt supply/mặc Áo/bán sample → chuẩn bị Food/Bình Máu, đánh Sói → catch-up Lv5 → chọn Kiếm/cộng điểm/học bí kíp/S1 + dùng Bình MP → trả Q6. Quest objectives là hành động, tutorial glyph từ bindings. Cung giới thiệu nhưng chưa playable; Đồ và class vẫn hiện tên/slot/stat rõ; không yêu cầu art outfit trong bản chạy thử tối giản. Đồ II/III chỉ fixture hẹp, không route mới.
 
 | Cần có trong slice | Evidence G-L cần giữ |
 | --- | --- |
@@ -129,6 +139,12 @@ Trước G-N chỉ sản xuất mẫu art nhỏ đủ kiểm VS-1: một room m�
 Giữ cut ladder: cắt P1/P2 và polish trước; giảm cosmetic variations/shake/sound/summary cầu kỳ, giữ thông tin gameplay/pending/status/telegraph, Storage core và Journey scores. Cung/Boss/backend/PvP DEFER khỏi VS-1 theo thứ tự hiện hành, không xóa khỏi TARGET. Review cuối tuần 2/4 và sau mỗi gate bằng công còn lại; nếu TARGET vượt hai tháng, trình phạm vi bản thử cụ thể và lịch tiếp theo, không âm thầm hạ final DoD. Các rationale và workload từ lịch cũ được giữ đầy đủ ở phần trace dưới đây.
 
 <a id="legacy-roadmap"></a>
+
+<a id="roadmap-history-appendix"></a>
+
+# Phụ lục — lịch sử roadmap và hồ sơ prototype
+
+§7–10 dưới đây được chuyển nguyên văn. Những chữ CURRENT, mặc định OFF, flags/A/B và các version trong phần này mô tả thời điểm cũ; không áp dụng cho bản chạy thử hiện hành. Luật đọc GDD, phạm vi hiện hành đọc §1–6.
 
 # 7. Trace roadmap cũ — dữ liệu giữ để đối chiếu
 

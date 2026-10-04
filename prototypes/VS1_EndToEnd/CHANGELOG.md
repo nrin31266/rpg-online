@@ -856,3 +856,34 @@ Các đoạn dưới đây giữ nguyên văn trước đồng bộ luật đư�
 ````text
 Ba skill entries/class dùng selected/locked/CD/MP cues, ghi rõ chỉ là default prototype UX; Tân Lữ entry 1 Mộc Kiếm, 2/3 khóa; 1/2/3 one-press bounded approach/cast, không J/RepeatOnHold; pending tiếp cận có cue “Đang tiếp cận”, reject nêu blocked/quá xa/chưa sẵn, manual/Esc hủy. Release không cancel pending; không hiện accepted cast animation trước validation/commit. Accepted action presentation bind snapshotted SkillId, không selection mới.
 ````
+
+
+<a id="single-behavior-history-5"></a>
+
+## Historical source fragments — 5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md
+
+Các đoạn dưới đây giữ nguyên văn trước đồng bộ luật được chủ dự án duyệt. Chỉ là lịch sử; không áp dụng làm luật hiện hành. Source: `docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md`.
+
+### Source fragment 5.1
+
+````text
+**Evidence lịch sử 2026-10-03:** [VS-1 disposable/reference](../../prototypes/VS1_EndToEnd/README.md) tại checkpoint `archive/checkpoint-46006c4` (local-only archive, không có trên origin) có route/tests/build Linux revision V6.2.0. Feedback V6.2.1 đổi control/Q4–Q5/transition; evidence cũ giữ để trace, **không pass G-L revision mới hoặc production base**. G-L PARTIAL: chưa có normal-speed feel/usability review, rig/pose/pivot/socket, giờ art/QA/rework/% asset dùng được. Prototype code/evidence tách dưới `_Prototype`/`PrototypeEvidence`; production chưa bắt đầu.
+````
+
+### Source fragment 5.2
+
+````text
+**Prototype update 2026-10-04:** V6.2.4 có route/tests nhưng bị user từ chối về hình địa hình: Sói trong lòng nước, dòng nước đứt, background chưa đúng lớp đất. V6.2.5 bị user từ chối vì hiểu sai núi thành backdrop giả. V6.2.6 cũng bị user từ chối: slab đất lơ lửng, cầu sát nước và bờ chắn. V6.2.7 sửa rear soil/pass-through và cầu; kết quả kiểm ở [hồ sơ prototype](#prototype-visual-review), không tự pass G-L hoặc art production.
+````
+
+### Source fragment 5.3
+
+````text
+**Probe map/UI hiện tại:** thông số, sơ đồ và capture riêng của mock nằm ở [§10](#prototype-visual-review). Budget release, quest và các gate production không đổi. G-L vẫn PARTIAL; không dùng tests để kết luận layout/feel đã được người chơi duyệt.
+````
+
+### Source fragment 5.4
+
+````text
+Một đường đi revision mới: NPC → nhảy/drop-through/EdgeExit auto-transition → nhận/mặc Mộc Kiếm, hạ ba Dummy đồng thời → Nấm/nhặt supply/mặc Áo/bán sample → chuẩn bị Food/Bình Máu, đánh Sói → catch-up Lv5 → chọn Kiếm/cộng điểm/học bí kíp/S1 + dùng Bình MP → trả Q6. Quest objectives là hành động, tutorial glyph từ bindings. Cung giới thiệu nhưng chưa playable; Quần/Áo/Mộc/Kiếm phải đổi hình đọc được. Đồ II/III chỉ fixture hẹp, không route mới.
+````
