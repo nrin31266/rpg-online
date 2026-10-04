@@ -85,7 +85,7 @@ namespace HuyenLo.Runtime
             go.transform.localScale=size;var sr=go.AddComponent<SpriteRenderer>();sr.sprite=square;sr.color=color;sr.sortingOrder=order;return sr;
         }
         private void Ground(string name,float x,float y,float width,float height,bool oneWay=false,bool wood=false,bool rearEarth=false,float rise=0) {
-            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),rearEarth?new Color(.28f,.33f,.29f):wood||oneWay?new Color(.55f,.39f,.23f):new Color(.44f,.38f,.27f));
+            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),wood||(oneWay&&!rearEarth)?new Color(.55f,.39f,.23f):new Color(.44f,.38f,.27f));
             if(rearEarth)sr.sortingOrder=-14;else if(oneWay||wood)sr.sortingOrder=6;
             sr.gameObject.layer=6;var box=sr.gameObject.AddComponent<BoxCollider2D>();
             // Full rear soil is visual; only a thin top participates in collision.
@@ -117,16 +117,19 @@ namespace HuyenLo.Runtime
                     var edge=RectVisual("Solid sloped bank cap",world.transform,new Vector2((float)surface.X,(ly+ry)/2),new Vector2(Mathf.Sqrt((float)(surface.Width*surface.Width+surface.Rise*surface.Rise)),.1f),new Color(.43f,.6f,.36f),1);edge.transform.localEulerAngles=new Vector3(0,0,Mathf.Atan2(ry-ly,right-left)*Mathf.Rad2Deg);continue;
                 }
                 var cap=surface.Wood?new Color(.72f,.53f,.31f):riverbed?new Color(.55f,.48f,.33f):new Color(.43f,.6f,.36f);
+                float top=(float)(surface.Y+surface.Height/2);
                 if(surface.RearEarth){
-                    float top=(float)(surface.Y+surface.Height/2),left=(float)(surface.X-surface.Width/2),right=(float)(surface.X+surface.Width/2);
-                    RectVisual("Rear earth soft band",world.transform,new Vector2((float)surface.X,top-.2f),new Vector2((float)surface.Width,.35f),new Color(.33f,.39f,.31f),-13);
-                    for(float lip=left;lip<right;lip+=.75f){float length=Mathf.Min(.6f,right-lip);RectVisual("Rear earth segmented landing lip",world.transform,new Vector2(lip+length/2,top),new Vector2(length,.1f),new Color(.47f,.58f,.39f),-12);}
-                    for(float px=left+.6f;px<right;px+=2)for(float py=-7.5f;py<top-.5f;py+=1.5f)RectVisual("Rear soil grain",world.transform,new Vector2(px,py),new Vector2(.08f,.05f),new Color(.24f,.29f,.26f),-13);
+                    float left=(float)(surface.X-surface.Width/2),right=(float)(surface.X+surface.Width/2);
+                    RectVisual("Walkable grass cap",world.transform,new Vector2((float)surface.X,top),new Vector2((float)surface.Width,.09f),cap,-12);
+                    RectVisual("Grass highlight",world.transform,new Vector2((float)surface.X,top+.035f),new Vector2((float)surface.Width,.025f),new Color(.52f,.72f,.42f),-12);
+                    RectVisual("Soil upper band",world.transform,new Vector2((float)surface.X,top-.25f),new Vector2((float)surface.Width,.45f),new Color(.51f,.44f,.31f),-13);
+                    for(float px=left+.6f;px<right;px+=1.8f)for(float py=-7.5f;py<top-.5f;py+=1.4f)
+                        RectVisual("Soil grain",world.transform,new Vector2(px,py),new Vector2(.09f,.06f),new Color(.36f,.31f,.23f),-13);
                     continue;
                 }
-                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,(float)(surface.Y+surface.Height/2)),new Vector2((float)surface.Width,.08f),cap,surface.Wood?7:1);
+                RectVisual("Walkable cap",world.transform,new Vector2((float)surface.X,top),new Vector2((float)surface.Width,.09f),cap,surface.Wood?7:1);
                 if(!surface.Wood){
-                    float top=(float)(surface.Y+surface.Height/2);
+                    RectVisual("Grass highlight",world.transform,new Vector2((float)surface.X,top+.035f),new Vector2((float)surface.Width,.025f),new Color(.52f,.72f,.42f),1);
                     RectVisual("Soil upper band",world.transform,new Vector2((float)surface.X,top-.25f),new Vector2((float)surface.Width,.45f),new Color(.51f,.44f,.31f),0);
                     for(float px=(float)(surface.X-surface.Width/2)+.6f;px<surface.X+surface.Width/2;px+=1.8f)
                         for(float py=(float)(surface.Y-surface.Height/2)+.4f;py<top-.5f;py+=1.4f)RectVisual("Soil grain",world.transform,new Vector2(px,py),new Vector2(.09f,.06f),new Color(.36f,.31f,.23f),1);
@@ -231,10 +234,11 @@ namespace HuyenLo.Runtime
             Label(name,new Vector3(x-width*.2f,baseY+height+.75f,0),world.transform,.055f);
         }
         private void BridgeDetails(){
-            // Supports are behind the crossing, never colliders or barriers at its ends.
-            foreach(float x in new[]{67f,73.5f,81f}){
-                RectVisual("Bridge pier",world.transform,new Vector2(x,-.2f),new Vector2(.22f,2.2f),new Color(.35f,.25f,.17f),4);
-                var brace=RectVisual("Bridge diagonal brace",world.transform,new Vector2(x+.55f,.35f),new Vector2(1.5f,.12f),new Color(.43f,.3f,.19f),4);brace.transform.localEulerAngles=new Vector3(0,0,35);
+            // Supports are behind the crossing, never colliders or barriers at its ends. Purely square and rectangular blocks.
+            foreach(float x in new[]{68f,74f,80f}){
+                RectVisual("Bridge pier",world.transform,new Vector2(x,-.1f),new Vector2(.35f,2.1f),new Color(.35f,.25f,.17f),4);
+                RectVisual("Bridge pier cap",world.transform,new Vector2(x,.85f),new Vector2(.75f,.16f),new Color(.42f,.30f,.20f),4);
+                RectVisual("Bridge cross beam",world.transform,new Vector2(x,.1f),new Vector2(1.2f,.14f),new Color(.38f,.27f,.18f),4);
             }
             for(float x=66.2f;x<82;x+=2)RectVisual("Rear bridge rail post",world.transform,new Vector2(x,1.65f),new Vector2(.09f,.9f),new Color(.38f,.27f,.18f),3);
             RectVisual("Rear bridge handrail",world.transform,new Vector2(74,2.05f),new Vector2(16,.1f),new Color(.54f,.38f,.22f),3);

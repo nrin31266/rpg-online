@@ -81,9 +81,8 @@ namespace HuyenLo.Domain
                 yield return RearEarth("Stream rear cliff",64,66,3.4);
                 // Wide water is inaccessible scenery: a solid wooden bridge is the only route.
                 yield return new Surface("Valley solid wooden bridge",74,1.05,16,.3,false,false,true);
-                yield return new Surface("DS6 sloped bridge approach",84,-3.4,4,9.2,false,false,false,false,-1.2);
-                yield return Earth("DS6 clearing",86,100,0);
-                yield return Earth("Eastern ridge step",100,104,.4);
+                yield return Earth("DS6 clearing",82,100,1.2);
+                yield return Earth("Eastern ridge step",100,104,1);
                 yield return Earth("PROBE7 ridge",104,122,.8);
                 yield return new Surface("PROBE8 timber climbing step",107,2.4,2,.2,true);
                 yield return RearEarth("PROBE8 earth lookout",109,119,4.6);

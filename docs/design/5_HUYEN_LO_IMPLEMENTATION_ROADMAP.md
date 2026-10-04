@@ -340,17 +340,16 @@ Reader Testing độc lập theo skill doc-coauthoring kiểm scope/gates, autho
 
 Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture và thông số thử. Docs 1–4 giữ luật, contract, reasoning balance và production visual requirements; không lấy một lần sửa mock để khóa design mới. V6.2.4, V6.2.5 và V6.2.6 bị user từ chối về địa hình dù tests/route pass; các hình và mô tả cũ dưới đây chỉ là lịch sử, **không mô tả bản hiện tại và không phải visual acceptance**.
 
-## V6.2.7 — CURRENT: đất phía sau được fill đầy, cầu có khoảng hở và lối vào liên tục
+## V6.2.7 — CURRENT: đất cùng màu tầng, mặt cỏ mượt, cầu mặt vuông nối liền hai bờ
 
-Feedback mới phân biệt **đất ở lớp sau của đường chơi** với ngoại cảnh xa. Thân đất lớp sau phải đầy xuống nền, nhìn tự nhiên; nhân vật đi xuyên thân, nhảy xuyên lên và đứng trên mặt cao. V6.2.6 đã nhầm thành slab solid có khoảng rỗng phía dưới và gọi test pass là đủ để chứng minh cấu trúc. Các hình V6.2.6 giữ nguyên làm lịch sử bị từ chối.
+Feedback hoàn thiện: các phần đất dùng chung màu cho toàn bộ các tầng; mặt cỏ để đứng ở trên được làm mượt và liền mạch; cầu không dùng khối chéo (bỏ dốc nghiêng và thanh chống chéo xoay độ), sử dụng toàn bộ mặt vuông/chữ nhật phẳng và nối liền mạch hai bờ cùng cao độ để đi qua không bị chắn phải nhảy.
 
-- **Foreground solid:** đất sáng/contrast cao, mép cỏ liền, thân collider đầy; không S xuyên. Các cliff/bậc bắt buộc và đồi Tạ Minh vẫn kiểu này.
-- **Rear earth terrace:** thân đất trầm hơn được fill tới y−8 và render sau actor; không collider ở thân/sườn. Chỉ mặt trên có support one-way mỏng, cue mép cỏ đứt đoạn rõ. Nhảy từ dưới xuyên mặt, rơi từ trên thì đứng lại; S/↓ chủ động ignore đúng support đang đứng, rồi tiếp đất ở tuyến dưới. Không đổi toàn map thành pass-through hoặc auto-fall khi đi trên.
-- Cung đường x−18…−10/top6,4, DS5 x54…64/top4,6, vách thác sau x64…66/top3,4, PROBE8 x109…119/top4,6 và bậc sau x119…122/top3,2 dùng rear earth. Mob vẫn ở support riêng của đàn; không nhấc quái tầng dưới lên cao theo hình fill.
-- **Cầu:** x66…82, sàn solid top1,2; nước trang trí level−1,2, cách mặt đi2,4 u. Trụ/chống chéo và lan can nằm lớp sau, không collider chắn người. Đường thấp DS5 nối cùng cao độ vào đầu tây; đầu đông nối dốc solid x82…86 từ1,2 xuống0. Không vách ở miệng cầu, đi qua hai chiều không cần jump; S không xuyên sàn xuống nước.
-- Nguồn nước/thác ở rear cliff top3,4 nối nước−1,2; thác nằm sau sàn cầu. Vũng nhỏ Vân Khê giữ đáy đi được/speed×0,85. Không swimming/drowning/physics nước.
+- **Màu đất đồng nhất:** Tất cả các khối đất (tiền cảnh solid và đất tầng sau) dùng chung palette màu đất (`#706145`); thân đất tầng sau vẽ đầy xuống nền và nằm sau actor (sortingOrder −14); không collider ở thân/sườn, chỉ mặt trên đỡ nhân vật.
+- **Mặt cỏ mượt:** Bỏ mép đứt đoạn; toàn bộ các mặt đỡ nhân vật đều có thanh cỏ xanh mượt (`#6E9C5C`) kèm dải highlight (`#85B86B`) chạy liền suốt bề rộng, tạo cảm giác phẳng mịn và nhất quán giữa các tầng.
+- **Cầu mặt vuông nối liền hai bờ:** x66…82, sàn solid top1,2. Hai đầu cầu nối trực tiếp với đường hai bờ ở cùng cao độ (bờ tây `DS5 lower passage` top1,2 và bờ đông `DS6 clearing` top1,2), đi qua hai chiều hoàn toàn phẳng, không bị chắn, không cần nhảy. Trụ cầu, mũ trụ và xà ngang đều là các khối hình chữ nhật vuông vức, không góc chéo, không thanh chống xoay độ. Nước suối trang trí nằm sâu bên dưới (level−1,2), cách sàn cầu 2,4 u.
+- Cung đường x−18…−10/top6,4, DS5 x54…64/top4,6, vách thác sau x64…66/top3,4, PROBE8 x109…119/top4,6 và bậc sau x119…122/top3,2 dùng rear earth cùng màu và mặt cỏ mượt. Nhảy xuyên từ dưới lên mặt trên, S/↓ chủ động rơi xuống lại đường thấp.
 
-Các màu/tọa độ/dốc/collider mỏng là CURRENT PROBE, không khóa production. Docs1–4 không đổi; luật visual solid/one-way/back/front đã có trong Art, revision này sửa mock để thể hiện được nó. G-L vẫn PARTIAL; cần người chơi đọc được cue trước khi xem là visual acceptance.
+Các màu/tọa độ/mặt vuông là CURRENT PROBE, không khóa production. Docs 1–4 giữ nguyên 100%. G-L vẫn PARTIAL; cần người chơi xem hình thực tế để đánh giá.
 
 **Kiểm V6.2.7:** EditMode **58/58**, PlayMode **10/10**; Linux development build đã build lại. [Fresh Q1–Q6](../../prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/route-result.txt) PASS bằng Rigidbody2D và keyboard menu adapter, timeScale4; không preset hoặc inject position/quest/EXP/HP để bỏ bước. PlayMode kiểm riêng đi qua cầu hai chiều không jump, S không xuyên cầu, jump xuyên rear earth/landing/drop và leo tới NPC tầng cao. Hai lỗi xuất hiện khi thêm dốc (tọa độ mesh sprite và giả định collider chỉ là Box) đã sửa trước lượt kiểm cuối; không bỏ qua exception để lấy PASS.
 

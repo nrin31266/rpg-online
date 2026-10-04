@@ -29,7 +29,7 @@ namespace HuyenLo.Domain
                 s.Combat.Unlocked[1]=Rules.Sword1;s.Player.Inventory.Add(new[]{s.NewItem("mp1",3)});
                 s.Player.Position=new Point(20,.8);
             }
-            if(start==PrototypeStart.Crowd){s.Player.Map=Map.Mist;s.Player.Position=new Point(105,1.52);s.Player.Inventory.Add(new[]{s.NewItem("hp1",20),s.NewItem("food1",4)});}
+            if(start==PrototypeStart.Crowd){s.Player.Map=Map.Mist;s.Player.Position=new Point(85,1.92);s.Player.Inventory.Add(new[]{s.NewItem("hp1",20),s.NewItem("food1",4)});}
             s.Player.Hp=s.Player.Stats.Hp;s.Player.Mp=s.Player.Stats.Mp;
             s.Emit("DEBUG preset "+start+" — không là evidence hành trình.");return s;
         }
