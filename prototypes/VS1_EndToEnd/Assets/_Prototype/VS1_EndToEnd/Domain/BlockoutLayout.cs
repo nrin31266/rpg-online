@@ -36,7 +36,8 @@ namespace HuyenLo.Domain
                 yield return Earth("Inn step",17,18,.3);
                 yield return Earth("Ritual courtyard",18,32,0);
                 yield return Earth("East lookout",32,40,1);
-                yield return new Surface("Wooden market gallery",11,3,6,.25,true);
+                yield return new Surface("Wooden forge gallery",13,3,5,.25,true);
+                yield return new Surface("Elder house upper floor",0,2.875,5,.25,true);
             }else if(map==Map.Academy){
                 yield return Earth("West dojo terrace",-30,-24,4);
                 yield return Earth("Dojo upper stair",-24,-22,3);
@@ -49,6 +50,7 @@ namespace HuyenLo.Domain
                 yield return Earth("Dummy yard and gate",19,40,0);
                 yield return new Surface("HV_JumpLedge wooden deck",8,2.8,4,.4,true);
                 yield return new Surface("West dojo gallery",-27,6.1,5,.25,true);
+                yield return new Surface("Bow hall upper floor",-12,2.675,6,.25,true);
             }else {
                 yield return Earth("Mist entrance and mushrooms",-10,18,0);
                 yield return Earth("DS3 low stair",18,20,.6);
@@ -56,10 +58,10 @@ namespace HuyenLo.Domain
                 yield return Earth("DS3 solid terrace",22,38,1.8);
                 yield return Earth("DS4 upper descent",38,41,1.2);
                 yield return Earth("DS4 low descent",41,44,.6);
-                yield return Earth("DS4 valley",44,60,0);
-                yield return Earth("Stream upper bank",60,62,-.5);
-                yield return Earth("Stream low bank",62,64,-1.25);
-                yield return Earth("DS5 walkable basin",64,80,-2);
+                yield return Earth("DS4 valley",44,56,0);
+                yield return Earth("DS5 dry shore",56,64,.8);
+                yield return Earth("Stream bank",64,66,-.5);
+                yield return Earth("Walkable stream basin",66,80,-2);
                 yield return Earth("DS6 lower stair",80,82,-1.25);
                 yield return Earth("DS6 upper stair",82,86,-.5);
                 yield return Earth("DS6 clearing",86,100,0);
@@ -67,15 +69,14 @@ namespace HuyenLo.Domain
                 yield return Earth("PROBE7 ridge",104,122,.8);
                 yield return Earth("Eastern road",122,132,0);
                 yield return new Surface("PROBE8 wooden upper bridge",54,3.2,10,.4,true);
-                yield return new Surface("Valley wooden footbridge",73,-.025,22,.25,true);
+                yield return new Surface("Valley wooden footbridge",73,-.025,18,.25,true);
             }
         }
         // Feet contact, not XY overlap: bridge/air actors must remain dry. No water physics.
         public static IEnumerable<WaterRegion> Waters(Map map){
             if(map==Map.Village)yield return new WaterRegion(2.4,4,-.35,0);
             if(map==Map.Mist){
-                yield return new WaterRegion(64,69,-2,-1.55);
-                yield return new WaterRegion(71,80,-2,-1.45);
+                yield return new WaterRegion(66,80,-2,-1.45);
             }
         }
         public static double WaterSpeed(Map map,Point feet){

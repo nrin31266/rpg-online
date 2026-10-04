@@ -1,0 +1,88 @@
+{
+  "revision": "V6.2.5",
+  "created_utc": "2026-10-04T05:44:08.251942+00:00",
+  "base_checkpoint": "c6786c4e6897987a6a7ea23415484e5a39ecf4f8",
+  "status": "Prototype repaired; G-L PARTIAL, no user visual/feel acceptance and no production/network/backend acceptance",
+  "tests": {
+    "EditMode": {
+      "result": "Passed",
+      "passed": "57",
+      "failed": "0",
+      "total": "57",
+      "duration": "0.2642143",
+      "start-time": "2026-10-04 05:39:34Z",
+      "end-time": "2026-10-04 05:39:34Z"
+    },
+    "PlayMode": {
+      "result": "Passed",
+      "passed": "7",
+      "failed": "0",
+      "total": "7",
+      "duration": "54.6275848",
+      "start-time": "2026-10-04 05:37:51Z",
+      "end-time": "2026-10-04 05:38:45Z"
+    }
+  },
+  "standalone_route": {
+    "result": "PASS",
+    "timeScale": 4,
+    "fresh_Q1_Q6": true,
+    "preset": false,
+    "physics": "actual Rigidbody2D; keyboard menu adapter and automatic EdgeExit"
+  },
+  "native_review": {
+    "timeScale": 1,
+    "fixtures": "SwordTraining/Crowd explicitly DEBUG; native screenshots reviewed separately from route",
+    "upstairs_interaction_logged": true,
+    "runtime_exceptions_found": false,
+    "captures": {
+      "village.png": {
+        "description": "Native fresh start at 1x, two real house levels and layered earth; not fresh journey acceptance",
+        "sha256": "e1eaa0d076fcb0c6a592f3cc5b2e6528dbd79c7fa028223853047077fa9de1bf"
+      },
+      "academy-floor.png": {
+        "description": "SwordTraining DEBUG fixture, actual keyboard jump/E/Esc, NPC on real upstairs floor, player moved aside",
+        "sha256": "1187d6f9f22b5bf96af813a6c4d159e96d2cdd90134e174e674537f984ba5f12"
+      },
+      "mist-stream.png": {
+        "description": "Crowd DEBUG fixture, native keyboard 1x, dry bridge and continuous source/fall/basin",
+        "sha256": "b3255faf4826ead41a063503911a40bbd2bf816980adb308d59e0c890a2279ad"
+      },
+      "mist-wading.png": {
+        "description": "Same fixture, native S drop through bridge then walking at basin bottom",
+        "sha256": "63769d2e524cfc374131722705b41f335bd095d29dc9dc3b63d35f0cdece73cf"
+      },
+      "dry-pack.png": {
+        "description": "Same fixture, native walking/jumping onto dry DS5 shore; upper PROBE8 on real deck",
+        "sha256": "cac531e206a407dbcdbf97526b6ea1497fb13faebc0278523cb9bf89c8bb49d9"
+      }
+    },
+    "actual_keyboard": true
+  },
+  "build": {
+    "result": "Succeeded",
+    "unity": "6000.5.9f1",
+    "bytes": 165630598,
+    "path": "prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64",
+    "sha256": {
+      "HuyenLo.x86_64": "a7ad5b156bd9a1232544ff6fc12e5f863d8f1f2348c5b141f5c3d4230e5be292",
+      "HuyenLo_Data/Managed/HuyenLo.Domain.dll": "9a682f79c5201335e6b1ad1c7ff25ce038b283ba440bf1816a09a297533367e7",
+      "HuyenLo_Data/Managed/HuyenLo.Runtime.dll": "f349f624511c068c41c8976973206780976b3449a44a3c6e87742c3fdb9a4786"
+    }
+  },
+  "source_sha256": {
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/BlockoutLayout.cs": "97c8c0384ff58185dd7667bdbf113c487cf89fc9893b13e7b3000425d6f6a0ba",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/CombatController.cs": "2e086a6fc8078d1fc4940ac9c565cd14e48793bc94a5b389cb2e5e776b3cf5aa",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/PrototypePresets.cs": "4e7090533219f3fb96a310354aebf12ae75c6e22bb9de9d5158af1c3db7d0181",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs": "3269d67ca286801ce8f8624557109fc806cf679d8e0e2ed646bc78abbb8df316",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs": "7ae41d4e8ae577470a8183308ce6d04af92af68d56d1283b4803efbd66e45e34",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Editor/SliceBuild.cs": "70c995b06f23aaf10aaa6d7a0f13c70f628f859f138147aaddf2b92926e85893",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/GeometricRig.cs": "24d061d017d2cfacd7e4b2148f02a0a4d8e1e5e61ebd98c3d3d558ba22e98508",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHost.cs": "32d5923afebede51865484e1dc7175b3f47db8926dd6f7976cdc0e9ae1438e61",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs": "0ebd740a98e80be9a78d8561fa2410248348a56d98c750057ad5ff4eeba88930",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceRouteProbe.cs": "7736aae04a4118850c6e6c22a12a34208f4b2c9cdbb6d6d2d196293b23e11c08",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/DomainTests.cs": "2de96d5d7203dbb1fc47515def63a5949a10088342e48c4f75c58df455e7b090",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/ContinuousRouteTests.cs": "3ef516a8971fe1b96ae4e383d847d9981589618ccc8be3a3441d2025a4e02e11",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/InputPhysicsTests.cs": "416ee83eddc35069ad431b5f2454c663f3f641e2cdd207cc24d60ab336778388"
+  }
+}

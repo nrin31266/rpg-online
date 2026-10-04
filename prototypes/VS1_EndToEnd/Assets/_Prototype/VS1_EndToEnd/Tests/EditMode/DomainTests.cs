@@ -263,6 +263,27 @@ namespace HuyenLo.Tests
             Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(73,.1)),Is.EqualTo(1));
             Assert.That(BlockoutLayout.WaterSpeed(Map.Academy,new Point(3,0)),Is.EqualTo(1));
         }
+        [Test] public void DryPacksStayOnShoreWhilePlayerCrossesWater(){
+            var s=PrototypePresets.Create(PrototypeStart.Crowd);
+            foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist)){
+                foreach(double x in new[]{m.Home.X,m.ActivityMin,m.ActivityMax})
+                    Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(x,m.Home.Y-.65)),Is.EqualTo(1),m.Slot+" must have a dry home and patrol/chase bounds");
+            }
+            s.Player.InvulnerableUntil=200;s.Player.Position=new Point(58,1.52);Advance(s,8);
+            s.Player.Position=new Point(73,-1.28);
+            for(int tick=0;tick<600;tick++){
+                s.Tick(.02);
+                foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist))
+                    Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(m.Position.X,m.Position.Y-.65)),Is.EqualTo(1),m.Slot+" entered water during chase/return/patrol");
+            }
+            Assert.That(s.Mobs.Where(x=>x.Slot.StartsWith("DS5")).All(x=>!x.Engaged&&!x.Returning),Is.True);
+        }
+        [Test] public void MistBasinHasNoDryGapAndBridgeSpansBothBanks(){
+            for(double x=66.1;x<80;x+=.2)Assert.That(BlockoutLayout.WaterSpeed(Map.Mist,new Point(x,BlockoutLayout.GroundTop(Map.Mist,x))),Is.LessThan(1),"Dry gap at "+x);
+            var bridge=BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="Valley wooden footbridge");
+            var volume=BlockoutLayout.Waters(Map.Mist).Single();
+            Assert.That(bridge.X-bridge.Width/2,Is.LessThan(volume.Left));Assert.That(bridge.X+bridge.Width/2,Is.GreaterThan(volume.Right));
+        }
         [Test] public void TrackerDirectionsFollowCurrentQuestStepAndMap(){
             var s=new SliceSession();s.QuestState=QuestState.InProgress;
             Assert.That(s.Objective,Does.Contain("Vân Khê · ở map hiện tại"));Assert.That(s.Objective,Does.Not.Contain("Đồng Sương"));
@@ -272,8 +293,11 @@ namespace HuyenLo.Tests
             s.Stage=5;Assert.That(s.Objective,Does.Contain("Cổng đông Học Viện → Vân Khê"));
         }
         [Test] public void TerrainHasSolidElevationAndFewIntentionalOneWayDecks(){
-            foreach(Map map in Enum.GetValues(typeof(Map))){var surfaces=BlockoutLayout.Surfaces(map).ToArray();Assert.That(surfaces.Where(x=>!x.OneWay).Select(x=>x.Y+x.Height/2).Distinct().Count(),Is.GreaterThan(1));Assert.That(surfaces.Count(x=>x.OneWay),Is.InRange(1,2));}
-            var s=new SliceSession();foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist&&!x.Slot.StartsWith("PROBE8")))Assert.That(m.Home.Y,Is.EqualTo(BlockoutLayout.GroundTop(m.Map,m.Home.X)+.65));
+            foreach(Map map in Enum.GetValues(typeof(Map))){var surfaces=BlockoutLayout.Surfaces(map).ToArray();Assert.That(surfaces.Where(x=>!x.OneWay).Select(x=>x.Y+x.Height/2).Distinct().Count(),Is.GreaterThan(1));Assert.That(surfaces.Count(x=>x.OneWay),Is.InRange(1,3));}
+            var s=new SliceSession();foreach(var m in s.Mobs.Where(x=>x.Map==Map.Mist)){
+                double support=m.Slot.StartsWith("PROBE8")?BlockoutLayout.Surfaces(Map.Mist).Single(x=>x.Name=="PROBE8 wooden upper bridge").Y+.2:BlockoutLayout.GroundTop(m.Map,m.Home.X);
+                Assert.That(m.Home.Y,Is.EqualTo(support+.65).Within(.0001),m.Slot+" must stand above its real support");
+            }
         }
         [Test] public void ProbePocketsDoNotGrantQ5KillCredit(){
             var s=PrototypePresets.Create(PrototypeStart.Crowd);s.Quest=5;s.Stage=3;s.QuestState=QuestState.InProgress;

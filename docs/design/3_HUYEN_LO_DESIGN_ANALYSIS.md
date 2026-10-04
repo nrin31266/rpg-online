@@ -8,7 +8,7 @@ GDD là design authority; Technical là implementation contract. **DERIVED** là
 
 # 1. Phương pháp, đối chiếu và giới hạn
 
-Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](../../prototypes/VS1_EndToEnd/README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
+Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. Các mô hình dưới đây không nghiệm thu runtime; kết quả bản mẫu thuộc [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
 
 **Nguồn đầu vào:** [nhân vật](1_HUYEN_LO_GDD.md#character-power), [kỹ năng/trạng thái](1_HUYEN_LO_GDD.md#class-combat), [quái và bãi](1_HUYEN_LO_GDD.md#world-farm), [trang bị/thưởng](1_HUYEN_LO_GDD.md#gear-economy), [Food/Bình](1_HUYEN_LO_GDD.md#consumables-death). Analysis không giữ catalog thứ hai.
 
@@ -385,10 +385,10 @@ Chuyển giao bảo toàn cấp giảm trung bình khoảng mười lần thử 
 
 Hai người chính tuyến ở khoảng **50–65% thời gian ra đòn hữu hiệu** đạt 91–119 s, đúng mục tiêu 90–150 s. 75% cho 79 s là biên thuận lợi, cần cảnh né/telegraph thật để xem có quá nhanh. Bốn người endgame ~40 s ở 65% là hệ quả tự nhiên của cộng DPS, không lý do thêm auto-scale Boss; capacity/độ khó nhiều người phải đo. +8 làm nhanh hơn nhưng không vài giây và không cần cho Q12. Boss ATK 160, ba vùng Nham Thạch Rơi, lịch một action/các cooldown phải kiểm scene; mô hình không chứng minh đòn luôn né được. Demo HP 12.800/respawn 60 s chỉ là override nghiệm thu, không dùng làm cân bằng release.
 
-**Feedback V6.2.4 — CURRENT PROBE:** mock trước gộp người hướng dẫn phái và đảo mép Học Viện, hai sai lệch đã được đưa về đúng contract. User yêu cầu manual unequip trước chọn class; reject không grant/đổi class. V6.2.3 có lỗi rank/peer clipping làm Sói sau kẹt; V6.2.4 thay bằng recovery/cross goals + bounded neighbor correction, trace eligibility và kiểm cả bốn có windup mà không phải giết con trước; không tăng stat/giảm interval. Đồng Sương mock giữ DS1–DS6/10 slots, thêm PROBE7/4 và PROBE8/3 ở hai lane riêng để kiểm crowd/vertical; 17 slots là workload mock, không thay budget release hoặc capacity promise. PROBE không credit Q5, vẫn level-gap loot thường. Terrain dùng khối solid bậc lớn, ít sàn gỗ one-way, nước nông giảm tốc nhẹ theo direction mới của user, thác/ripple cosmetic. RPG shell năm tab và geometric rig là UX/visual probe, không nghiệm thu art production. Bảng TTK/farm/hành trình trước chưa tính topology/crowd mới; vẫn là lịch sử đối chiếu, cần rerun khi gate tương ứng.
 
-**Feedback nối tiếp:** hai ảnh tham khảo cung cấp terrain grammar (khối đất liền, terraces, basin, cầu/thác), không scale pixel hoặc yêu cầu sao chép asset. Mock tăng depth basin và thử ×0,85 water contact; chưa đo ảnh hưởng travel/journey/endgame và không retune EXP/TTK từ đó. Shared activity bounds + return→patrol giải quyết đứng mãi ở mép; giữ combat hiện tại. Lỗi mouse equipment do action list đổi giữa render, khác với keyboard logic PASS; cần kiểm click thật trên build bên cạnh tests. Menu close policy tách terminal single action khỏi batch services. Review 1× phát hiện tracker Q1 chỉ sai sang cổng Đồng Sương; route hint nay theo step destination/current map, kiểm cả bước quay về NPC.
 
+
+Hồ sơ feedback và lỗi của mock được giữ tại [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-feedback-history); các mô phỏng balance dưới đây không nghiệm thu layout của bản mẫu.
 
 <a id="review-decisions"></a>
 <a id="open-decisions"></a>
@@ -420,7 +420,7 @@ TECH-01/SAVE-01 và A15 còn cần chốt thứ tự Potion–hit–checkpoint, 
 
 **Rủi ro kiến trúc V6.1:** auth/ticket/lease, checkpoint ordering/validation, reconnect grace, escrow orphan recovery, transaction N recipients, backend downtime và dedicated build/headless physics cần integration tests. Mốc giờ player-host/JSON cũ không còn dùng để cam kết lịch; spike đầu đo integration/latency, sau đó Technical mới đặt lại ngân sách. Quest, gear, combat PvE và world balance giữ số hiện tại; các luật PvP/recovery trên là user lock, không Open Decision.
 
-[Review Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT thu hoạch mock, probe feel/art/UI rồi review/dựng production base; G-L revision mới trước gate Dedicated hai Client và production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
+[Review Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) tách nguyên tắc đủ dùng và con số chưa duyệt; thứ tự probe/mở production được quản lý tại [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates).
 
 Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST/SPIKE ghi rõ phải đo gì. Không tăng NeedEXP, HP quái hoặc tạo hệ thống mới từ mô hình thiếu cảnh thật.
 
@@ -507,7 +507,7 @@ Research claims về CPU/GPRS/T9 motive là HISTORICAL INFERENCE; “1000 mobs <
 
 ## Keyboard UX và editorial review — 2026-10-04
 
-Bản mẫu mới kiểm one-press approach/cast, Nấm→Sói, EdgeExit và menu bằng bàn phím. Debug preset giúp tái hiện một đoạn mà không replay cả hành trình; đây là fixture có nhãn, không save authority hoặc evidence route thật. G-L vẫn PARTIAL tới khi có rig/import và manual usability/feel review ở tốc độ thường. Production base và Dedicated/backend chưa bắt đầu.
+Trạng thái build, debug fixtures và kết quả kiểm VS-1 thuộc [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history); chúng không thay thế validation balance hoặc G-L production.
 
 Editorial bổ sung First Art Probe, file lifecycle, pose/socket minimum schema, asset DoD, visual style sample và provenance ngay tại Art §22–24. Không chốt nghĩa 26 frame, technique/socket/camera hoặc sản xuất full catalog. Các bảng mô phỏng/accounting giữ để đối chiếu, không chuyển thành acceptance mới.
 
@@ -515,7 +515,7 @@ Editorial bổ sung First Art Probe, file lifecycle, pose/socket minimum schema,
 
 ## Feedback prototype 2026-10-03 — V6.2.1, quyết định tạm và giới hạn evidence
 
-User yêu cầu sửa theo feedback và tự xử lý inconsistency; đây là nguồn của lượt sửa, không NSO recommendation tự thành luật. V6.2.0 prototype tại checkpoint `46006c4` được giữ làm reference; build/tests/video cũ vẫn đúng cho revision đó, **không chứng minh V6.2.1 đạt G-L**. Production codebase chưa bắt đầu, không lấy các class prototype làm architecture authority.
+User yêu cầu sửa theo feedback và tự xử lý inconsistency là nguồn của lượt sửa design; NSO recommendation không tự thành luật. Lịch sử code/checkpoint được giữ tại [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
 
 | ID / xử lý | Kết luận và lý do | Gate / chưa chốt |
 | --- | --- | --- |

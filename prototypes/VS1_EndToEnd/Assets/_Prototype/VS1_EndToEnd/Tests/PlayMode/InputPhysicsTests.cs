@@ -41,6 +41,24 @@ namespace HuyenLo.Tests
             }finally {Object.Destroy(go);}
             yield return null;
         }
+        [UnityTest] public IEnumerator UpperFloorSupportsNpcAndKeyboardInteraction(){
+            var go=new GameObject("Upstairs NPC fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;host.ResetPrototype(PrototypeStart.SwordTraining);
+            var oldBackground=InputSystem.settings.backgroundBehavior;var oldEditor=InputSystem.settings.editorInputBehaviorInPlayMode;
+            InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            var keyboard=InputSystem.AddDevice<Keyboard>();keyboard.MakeCurrent();
+            try{
+                host.Body.position=new Vector2(-12,.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();
+                Assert.That(host.Session.NearAnchor(),Is.Null,"Upstairs service cannot be used from the ground floor");
+                host.ExternalJump=true;host.ExternalJumpHeld=true;
+                for(int i=0;i<65;i++)yield return new WaitForFixedUpdate();
+                Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.EqualTo(3.52f).Within(.08));
+                Assert.That(host.Session.NearAnchor().Id,Is.EqualTo("Diep"));
+                host.ExternalInput=false;yield return Tap(keyboard,Key.E);Assert.That(host.Hud.Panel,Is.EqualTo("npc"));
+                yield return Tap(keyboard,Key.Escape);Assert.That(host.Hud.Panel,Is.Null.Or.Empty);
+            }finally{InputSystem.settings.backgroundBehavior=oldBackground;InputSystem.settings.editorInputBehaviorInPlayMode=oldEditor;InputSystem.RemoveDevice(keyboard);Object.Destroy(go);}yield return null;
+        }
         [UnityTest] public IEnumerator WalkableBasinAndBridgeHaveDistinctMovementSpeeds(){
             var go=new GameObject("Water feet fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;
             try {

@@ -1,0 +1,66 @@
+[
+  {
+    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "source_marker": "User yêu cầu sửa theo feedback và tự xử lý inconsistency;",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
+    "sha256": "3d2ff2e5c7a5c126da62963ced2df1bf760efc6fd84dbcc18d1a45dec590fc65",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**UI event boundary:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "7aef44b2678712b07abdadf0655e15a46d40616598b3db680f5b795d9d6ab143",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+    "source_marker": "### 19.1.",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-ui-history",
+    "sha256": "884989147846f0d6d27a9b1ab93efcc8bf2b6136b559593432c6a3dd9e0a3ec6",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "source_marker": "Bộ power/MP/CD/gear làm control",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
+    "sha256": "f39b09609c130bfd5853f8ea12ac2100ee86ab25af6e58256c90e12a54255566",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Blockout V6.2.4:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "fa44f47e3e924f3293f2f959e4657296a8ee9bfba9e04a392436af53330820aa",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "source_marker": "[Review Art]",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
+    "sha256": "703ab4979b67ad609244a92ce3863f7e7b81fc76d2127bba5800727075a975d4",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
+    "source_marker": "**Feedback V6.2.4 — CURRENT PROBE:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-feedback-history",
+    "sha256": "06c538e59fb2ae6a89d8e78351fd2c38090836f3de661954743663d3eab2401a",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Mock/dev boundary:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "8a80ddcf7d750e98ec4b6dc143ec10d54ed52813e20084661f7da5563148636a",
+    "checked": true,
+    "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
+  }
+]

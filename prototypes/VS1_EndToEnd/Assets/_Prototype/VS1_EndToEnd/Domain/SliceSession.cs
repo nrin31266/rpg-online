@@ -43,7 +43,7 @@ namespace HuyenLo.Domain
             new Anchor("Ta","Tạ Minh",Map.Village,26),
             new Anchor("toAcademy","← Học Viện",Map.Village,-4,exit:true),new Anchor("toMist","Đồng Sương →",Map.Village,30,exit:true),
             new Anchor("toVillageA","Vân Khê →",Map.Academy,34,exit:true),new Anchor("Phong","Phong Du",Map.Academy,0),
-            new Anchor("Diep","Diệp Lam",Map.Academy,-12),
+            new Anchor("Diep","Diệp Lam",Map.Academy,-12,3.6),
             new Anchor("toVillageM","← Vân Khê",Map.Mist,-4,exit:true),
             new Anchor("outOfSlice","Trúc Ảnh →",Map.Mist,126,exit:true)
         };
@@ -55,10 +55,10 @@ namespace HuyenLo.Domain
             Mobs.Add(new Mob(21,"DS2.slot1","Nấm Linh",Map.Mist,new Point(15,.65),2,48,9,4,68,24,1.2,.8,1.8));
             int id=30;
             for(int pocket=3;pocket<=6;pocket++)for(int slot=1;slot<=2;slot++)
-                Mobs.Add(new Mob(id++,$"DS{pocket}.slot{slot}","Sói Sương",Map.Mist,new Point(30+(pocket-3)*20+(slot-1)*2,.65),4,107,13,5,76,28,2.4,1,1.3));
+                Mobs.Add(new Mob(id++,$"DS{pocket}.slot{slot}","Sói Sương",Map.Mist,new Point((pocket==5?58:30+(pocket-3)*20)+(slot-1)*2,.65),4,107,13,5,76,28,2.4,1,1.3));
             // Two extra mock pockets are explicitly probes, outside the release DS1–DS6 budget/quest credit.
             for(int i=0;i<4;i++)Mobs.Add(new Mob(60+i,"PROBE7.slot"+(i+1),"Sói Sương",Map.Mist,new Point(106+i*1.5,.65),4,107,13,5,76,28,2.4,1,1.3){Lane=7,LaneMin=101,LaneMax=121});
-            for(int i=0;i<3;i++)Mobs.Add(new Mob(70+i,"PROBE8.slot"+(i+1),"Sói Sương",Map.Mist,new Point(51+i*1.5,3.85),4,107,13,5,76,28,2.4,1,1.3){Lane=8,LaneMin=49.5,LaneMax=58.5});
+            for(int i=0;i<3;i++)Mobs.Add(new Mob(70+i,"PROBE8.slot"+(i+1),"Sói Sương",Map.Mist,new Point(51+i*1.5,4.05),4,107,13,5,76,28,2.4,1,1.3){Lane=8,LaneMin=49.5,LaneMax=58.5});
             foreach(var mob in Mobs.Where(x=>x.Map==Map.Mist&&!x.Slot.StartsWith("PROBE8"))){
                 double y=BlockoutLayout.GroundTop(mob.Map,mob.Home.X)+.65;
                 mob.Home=mob.Position=mob.PreviousPosition=new Point(mob.Home.X,y);
