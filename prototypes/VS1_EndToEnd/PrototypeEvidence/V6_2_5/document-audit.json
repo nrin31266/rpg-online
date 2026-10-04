@@ -161,8 +161,8 @@
         "sha256": "a3a14333d4a3024cd37b2b9ed79916f513429def454347d03cfdf4e72ee6ab96"
       },
       "after": {
-        "lines": 485,
-        "pipe_rows": 165,
+        "lines": 491,
+        "pipe_rows": 166,
         "headings": 29,
         "critical": {
           "53.100": 2,
@@ -171,9 +171,9 @@
           "26 frame/khung": 9,
           "1.800/200": 0
         },
-        "sha256": "b9cde6e409f1e79fd5b0538e70ec034844373c139c4e381ad928fc414abcc537"
+        "sha256": "4138f7f95239f8524520d3cb740a6cb4b3fb06c4e524b35bc4092b171cc4e5a2"
       },
-      "delta_lines": 151
+      "delta_lines": 157
     }
   },
   "critical_total_before": {

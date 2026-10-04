@@ -371,6 +371,10 @@ Mục này sở hữu layout/tọa độ mock, lỗi runtime, fixtures, capture 
 
 **Mock/dev boundary:** Unity project tham khảo nằm tại `prototypes/VS1_EndToEnd/`; production `game/` dự kiến dùng chung rules/content cho Client và Dedicated build, `backend/` dành Spring/PostgreSQL. Chưa scaffold hai phần production. Debug menu chỉ Editor/Development build, tạo session fixture mới từ mốc Q1–Q6/sân tập và reset đủ inventory/receipts/clock/food/cooldown/loot/focus. Preset có nhãn DEBUG, không dùng trong route acceptance. Chọn menu mốc thay save JSON; JSON hiện chỉ config/fixture/evidence, production persistence vẫn PostgreSQL.
 
+**Offset fixture cũ — lịch sử, chưa là production lock:** proposal 3–4 offsets được giữ để đối chiếu; response hiện tại đọc phần V6.2.5.
+
+**Melee separation/reposition prototype:** production phải đạt nguyên tắc cluster đọc được mà không pile; exact spacing/response vẫn PHY-01 TUNABLE. Disable body collisions Player–Monster và Monster–Monster; hurtbox/query riêng. Ground AI chọn desired X offsets trái/phải quanh reachable target trên cùng lane; thử một danh sách 3–4 offsets chỉ là fixture, không lock slot count hoặc formation system. Điểm bị tường/mép/actor gần chiếm thì chọn điểm hợp lệ khác hoặc hold có hạn; không teleport sang phía kia player, không group attack mutex. Threat target không đổi vì offset bị chiếm. N-player probe theo từng mob/target, không assume hai người.
+
 <a id="prototype-feedback-history"></a>
 
 ## Analysis — lịch sử feedback V6.2.4
@@ -469,6 +473,8 @@ DoD của view: hoàn tất Q1–Q6 không click, submenu không lọt movement/
 | 3_HUYEN_LO_DESIGN_ANALYSIS.md: `User yêu cầu sửa theo feedback và tự xử lý inconsistency;` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
 | 3_HUYEN_LO_DESIGN_ANALYSIS.md: `[Review Art]` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
 | 3_HUYEN_LO_DESIGN_ANALYSIS.md: `Bộ power/MP/CD/gear làm control` | [Roadmap](#prototype-runtime-history) | Lịch sử runtime; phương pháp/decision design vẫn ở Analysis |
+| 2_HUYEN_LO_TECHNICAL.md: `**Melee separation/reposition prototype:**` | [Roadmap](#prototype-technical-history) | Giữ offset fixture cũ, production chỉ giữ nguyên tắc |
+
 
 <a id="prototype-runtime-history"></a>
 

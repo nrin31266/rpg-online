@@ -94,5 +94,11 @@
     "source_marker": "Bộ power/MP/CD/gear làm control",
     "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
     "sha256": "f39b09609c130bfd5853f8ea12ac2100ee86ab25af6e58256c90e12a54255566"
+  },
+  {
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**Melee separation/reposition prototype:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "3aa6e84c62f3cf3a91be26c5e94026cf3fd0dcb529038db632a52e24591ee4a5"
   }
 ]

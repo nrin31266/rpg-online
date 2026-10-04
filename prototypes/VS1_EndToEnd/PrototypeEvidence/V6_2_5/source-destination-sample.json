@@ -8,10 +8,10 @@
     "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
   },
   {
-    "source": "2_HUYEN_LO_TECHNICAL.md",
-    "source_marker": "**UI event boundary:**",
-    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
-    "sha256": "7aef44b2678712b07abdadf0655e15a46d40616598b3db680f5b795d9d6ab143",
+    "source": "4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md",
+    "source_marker": "### 13.1.",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-map-history",
+    "sha256": "883dc600d3e33f915a59ac82bf17c5972b3b05ddf491bc3680de26e18ab7e513",
     "checked": true,
     "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
   },
@@ -25,9 +25,9 @@
   },
   {
     "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
-    "source_marker": "Bộ power/MP/CD/gear làm control",
+    "source_marker": "[Review Art]",
     "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
-    "sha256": "f39b09609c130bfd5853f8ea12ac2100ee86ab25af6e58256c90e12a54255566",
+    "sha256": "703ab4979b67ad609244a92ce3863f7e7b81fc76d2127bba5800727075a975d4",
     "checked": true,
     "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
   },
@@ -40,10 +40,10 @@
     "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
   },
   {
-    "source": "3_HUYEN_LO_DESIGN_ANALYSIS.md",
-    "source_marker": "[Review Art]",
-    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history",
-    "sha256": "703ab4979b67ad609244a92ce3863f7e7b81fc76d2127bba5800727075a975d4",
+    "source": "2_HUYEN_LO_TECHNICAL.md",
+    "source_marker": "**UI event boundary:**",
+    "destination": "5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-technical-history",
+    "sha256": "7aef44b2678712b07abdadf0655e15a46d40616598b3db680f5b795d9d6ab143",
     "checked": true,
     "method": "Reconstructed full source from checkpoint; exact text and destination anchor verified"
   },
