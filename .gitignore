@@ -36,3 +36,6 @@ research/notes/*
 /prototypes/**/PrototypeEvidence/**/*.png
 /game/Validation/
 /game/PrototypeEvidence/
+
+# Original thesis draft remains local; do not ignore all DOCX assets.
+/Chuong_1_Xay_dung_kich_ban_game_Huyen_Lo.docx

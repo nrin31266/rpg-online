@@ -1,0 +1,4 @@
+# Relative to the Assets directory of any Unity project.
+Assets/**/Art/**
+Assets/**/Fonts/**
+# Explicit exemptions apply only to size, never forbidden extensions.
