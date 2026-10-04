@@ -33,14 +33,12 @@ namespace HuyenLo.Domain
             if(map==Map.Village){
                 yield return Earth("West gate approach",-12,-8,0);
                 yield return Earth("Village square west",-8,2,0);
-                yield return new Surface("Lotus pond west bank",2.325,-4,.65,8,rise:-.65,stone:true);
-                yield return Stone("Lotus pond bed",2.65,4.35,-.65);
-                yield return new Surface("Lotus pond east bank",4.675,-4,.65,8,rise:.65,stone:true);
-                yield return Earth("Village square east",5,8,0);
-                yield return Stone("Market step",8,9,.3);
-                yield return Stone("Forge terrace",9,17,.6);
-                yield return Stone("Inn step",17,18,.3);
-                yield return Earth("Inn courtyard",18,21,0);
+                yield return Earth("Lotus pond bed",2,8,-.8);
+                // Rear soil has a one-way top: dry upper path or S to wade in the rectangular basin.
+                yield return RearEarth("Lotus pond dry earth route",2,8,1.2);
+                yield return Earth("Village square east",8,10,0);
+                yield return Stone("Forge terrace",10,17,.6);
+                yield return Earth("Inn courtyard",17,21,0);
                 yield return Stone("Ritual foothill",21,22,1.2);
                 yield return Stone("Ritual upper step",22,23,2.4);
                 yield return Stone("Ritual hill",23,29,3.6);
@@ -58,48 +56,46 @@ namespace HuyenLo.Domain
                 yield return Stone("Class entrance middle step",-7,-6,2.8);
                 yield return Stone("Class entrance low step",-6,-5,1.4);
                 yield return Stone("Class main hall route",-5,12,0);
-                yield return Stone("Practice approach step",12,14,.4);
-                yield return Stone("Practice terrace",14,17,.8);
-                yield return Stone("Practice descent",17,19,.4);
-                yield return Earth("Dummy yard and gate",19,36,0);
+                yield return Stone("Practice terrace",12,18,.8);
+                yield return Earth("Dummy yard and gate",18,36,0);
                 yield return new Surface("HV_JumpLedge wooden deck",8,2.8,4,.4,true);
                 yield return new Surface("West dojo gallery",-25,6.1,5,.25,true);
                 yield return new Surface("Bow hall upper floor",-12,9.075,6,.25,true);
             }else {
                 yield return Earth("Mist entrance and mushrooms",-6,20,0);
-                yield return Stone("DS3 low stair",20,22,1.2);
-                yield return Stone("DS3 upper stair",22,24,2.4);
+                yield return Earth("DS3 low stair",20,22,1.2);
+                yield return Earth("DS3 upper stair",22,24,2.4);
                 yield return Earth("DS3 solid hill",24,38,3.6);
-                yield return Stone("DS4 upper descent",38,41,2.4);
-                yield return Stone("DS4 low descent",41,44,1.2);
+                yield return Earth("DS4 upper descent",38,41,2.4);
+                yield return Earth("DS4 low descent",41,44,1.2);
                 yield return Earth("DS4 valley entry",44,46,0);
-                yield return Stone("DS4 jumping approach",46,48,1.2);
-                yield return Stone("DS4 takeoff plateau",48,55,2.4);
-                yield return Stone("DS5 lane descent",55,57,1.8);
-                yield return Stone("DS5 lower passage",57,66,1.2);
+                yield return Earth("DS4 jumping approach",46,48,1.2);
+                yield return Earth("DS4 takeoff plateau",48,55,2.4);
+                yield return Earth("DS5 lane descent",55,57,1.8);
+                yield return Earth("DS5 lower passage",57,66,1.2);
                 // Layered rear-earth hill overlooking the river gorge and bridge:
                 yield return RearEarth("DS5 walkable earth overhang",54,64,4.6);
                 yield return RearEarth("Stream rear cliff",61,66,3.4);
                 // Continuous solid wooden bridge at y=1.2 from 66 to 82:
                 yield return new Surface("Valley solid wooden bridge",74,1.05,16,.3,false,false,true);
                 // Clean riverbed canyon floor below the bridge:
-                yield return Stone("Riverbed canyon floor",64,84,-1.5);
+                yield return Earth("Riverbed canyon floor",66,82,-1.5);
                 yield return Earth("DS6 clearing",82,100,1.2);
                 // Multi-tiered eastern terraces framing the waterfall gorge:
                 yield return RearEarth("DS6 waterfall eastern shoulder",82,88,3.4);
                 yield return RearEarth("DS6 ancient stone crest",86,94,4.4);
-                yield return Stone("Eastern ridge step",100,104,1);
+                yield return Earth("Eastern ridge step",100,104,1);
                 yield return Earth("PROBE7 ridge",104,122,.8);
                 yield return new Surface("PROBE8 timber climbing step",107,2.4,2,.2,true);
                 yield return RearEarth("PROBE8 earth lookout",109,119,4.6);
                 yield return RearEarth("PROBE8 climbing ledge",119,122,3.2);
-                yield return Stone("Eastern climbing shoulder",122,124,2);
+                yield return Earth("Eastern climbing shoulder",122,124,2);
                 yield return Earth("Eastern road",124,130,0);
             }
         }
         // Feet contact, not XY overlap: bridge/air actors must remain dry.
         public static IEnumerable<WaterRegion> Waters(Map map){
-            if(map==Map.Village)yield return new WaterRegion(2.2,4.8,-.7,-.2);
+            if(map==Map.Village)yield return new WaterRegion(2,8,-.8,-.2);
             if(map==Map.Mist){
                 yield return new WaterRegion(66,82,-1.6,-.9,.85,false);
             }

@@ -215,7 +215,11 @@ namespace HuyenLo.Runtime
         private void DrawEquipment(Rect area){
             GUI.Label(new Rect(area.x+20,area.y+15,700,25),"Trang bị · Enter/E chọn slot để tháo · I: hành trang · Esc: quay lại");
             float cx=area.x+area.width/2,cy=area.y+220;
-            Fill(new Rect(cx-30,cy-80,60,140),P.School==School.Novice?new Color(.3f,.8f,.55f):new Color(.3f,.6f,1));
+            foreach(var part in GeometricRig.Pose(P,1,0,0,false)){
+                var center=new Vector2(cx+part.Center.x*100,cy-part.Center.y*100);
+                var saved=GUI.matrix;GUIUtility.RotateAroundPivot(-part.Angle,center);
+                Fill(new Rect(center.x-part.Size.x*50,center.y-part.Size.y*50,part.Size.x*100,part.Size.y*100),part.Color);GUI.matrix=saved;
+            }
             for(int i=0;i<6;i++){
                 Rect r=new Rect(cx+(i%2==0?-340:155),area.y+90+(i/2)*95,185,85);var a=actions[i];DrawButton(a,r);
             }
@@ -233,7 +237,7 @@ namespace HuyenLo.Runtime
             levelText=$"Lv{P.Level} · {(P.School==School.Novice?"Tân Lữ":"Kiếm")} · Vàng {P.Gold}";
             vitalsText=$"HP {P.Hp:F0}/{st.Hp:F0} · MP {P.Mp:F0}/{st.Mp:F0}";
             experienceText=$"EXP {P.TotalExp} · điểm {P.Unspent}";
-            foodText=$"Food {(S.FoodUntil>S.Now?$"{S.FoodUntil-S.Now:F0}s":"chưa dùng")} · 4/H:HP {Math.Max(0,S.HpPotionUntil-S.Now):F1}s · 5/M:MP {Math.Max(0,S.MpPotionUntil-S.Now):F1}s";
+            foodText=$"Food {(S.FoodUntil>S.Now?$"{S.FoodUntil-S.Now:F0}s":"chưa dùng")} · HP {Math.Max(0,S.HpPotionUntil-S.Now):F1}s · MP {Math.Max(0,S.MpPotionUntil-S.Now):F1}s";
             objectiveText=S.Objective;
             skillsText=P.School==School.Novice?"Mộc Kiếm":string.Join(" · ",S.Combat.Unlocked.Values.Select(x=>x.Name));
         }
@@ -244,7 +248,7 @@ namespace HuyenLo.Runtime
             GUILayout.Label(levelText);GUILayout.Label(vitalsText);GUILayout.Label(experienceText);GUILayout.Label(foodText);GUILayout.EndArea();
             Fill(new Rect(18,187,300,8),Color.gray);Fill(new Rect(18,187,300*(float)Math.Max(0,Math.Min(1,P.Hp/st.Hp)),8),new Color(.7f,.25f,.25f));
             Fill(new Rect(18,201,300,8),Color.gray);Fill(new Rect(18,201,300*(float)Math.Max(0,Math.Min(1,P.Mp/st.Mp)),8),new Color(.25f,.5f,.8f));
-            GUI.Box(new Rect(Screen.width-340,8,332,165),"");GUI.Label(new Rect(Screen.width-330,16,310,105),objectiveText);GUI.Label(new Rect(Screen.width-330,125,310,43),"E: tương tác · I: túi · C: nhân vật · Q: quest");
+            GUI.Box(new Rect(Screen.width-340,8,332,165),"");GUI.Label(new Rect(Screen.width-330,16,310,105),objectiveText);
             var focus=S.Combat.Focus;if(focus!=null){GUI.Box(new Rect(345,8,250,90),"");GUI.Label(new Rect(355,14,230,27),$"{focus.Name} Lv{focus.Level}");GUI.Label(new Rect(355,42,230,24),$"{focus.Hp:F0} / {focus.MaxHp:F0}");Fill(new Rect(355,70,230*(float)(focus.Hp/focus.MaxHp),10),Color.green);var pt=Host.ScreenPoint(new Point(focus.Position.X,focus.Position.Y+1));Fill(new Rect(pt.x-25,Screen.height-pt.y,50*(float)(focus.Hp/focus.MaxHp),5),Color.red);}
             GUI.Label(new Rect(112,Screen.height-31,Screen.width-230,25),S.Feedback);
             string skills=skillsText;
@@ -257,7 +261,7 @@ namespace HuyenLo.Runtime
                 GUI.Label(new Rect(r.x+5,r.y+26,72,23),unlocked?skill.Name.Replace(" nhập môn","").Replace(" tiến cảnh",""):"Chưa học",slotText);
                 if(unlocked)GUI.Label(new Rect(r.x+5,r.y+49,72,22),S.Combat.Remaining(skill)>0?"CD "+S.Combat.Remaining(skill).ToString("0.0"):"MP "+skill.Mp);
             }
-            GUI.Label(new Rect(barX+282,Screen.height-91,225,48),InputBindings.HpGlyph()+": HP · "+InputBindings.MpGlyph()+": MP · F: Food\n"+(S.DebugPreset==null?"":"DEV preset: "+S.DebugPreset));
+            GUI.Label(new Rect(barX+282,Screen.height-91,225,48),S.DebugPreset==null?"":"DEV preset: "+S.DebugPreset);
 
             if(panel=="chat"){GUI.Box(new Rect(20,Screen.height-170,480,58),"Chat · prototype local");GUI.SetNextControlName("chat-input");chatText=GUI.TextField(new Rect(30,Screen.height-143,460,24),chatText,80);GUI.FocusControl("chat-input");return;}
             if(!Modal){

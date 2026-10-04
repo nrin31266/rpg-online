@@ -1,8 +1,0 @@
-Linux Development build: Succeeded
-Unity 6000.5.9f1
-165626161 bytes (Unity build report)
-Executable: /home/nguyenvanrin/PersonalProjects/rpg-online/prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64
-Build/cache/raw logs intentionally not tracked.
-Fresh route: Q1–Q6 PASS, real physics + keyboard adapter, timeScale4, no debug preset/showcase.
-Native keyboard/mouse targeted review: timeScale1; fixtures explicitly labeled DEBUG.
-Production base / G-N / G-D not started; G-L remains PARTIAL.

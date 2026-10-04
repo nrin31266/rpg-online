@@ -17,7 +17,7 @@ Một phiên RAM mới bắt đầu Q1; không save JSON, không resume, F8 mở
 | A/←, D/→ | Di chuyển; aliases không cộng tốc |
 | Space/↑, S/↓ | Jump / drop trên one-way |
 | 1/2/3 | Một press: chọn skill → bounded approach nếu cần → cast một lần; Novice chỉ 1 |
-| Tab / Shift+Tab ở world | Chọn mục tiêu kế/trước trong envelope |
+| Tab / Shift+Tab ở world | Chọn mục tiêu kế/trước trong search envelope rộng hơn tầm đánh |
 | E | Nhặt hoặc NPC; chỉ manual movement kích hoạt EdgeExit |
 | I / C / Q | Hành trang / Nhân vật / Quest |
 | Mũi tên/WASD, Tab/Shift+Tab ở menu, Enter/E | Chọn ô/action/tab và xác nhận bằng bàn phím |
@@ -31,7 +31,7 @@ Luật giữ phím/arrival/buffer/focus ở [GDD §3](../../docs/design/1_HUYEN_
 
 ## Phạm vi
 
-Q1–Q6: Vân Khê ↔ Học Viện, Vân Khê ↔ Đồng Sương; giữ layout/collision/spawn/exits hiện có. Player/quái/NPC là hộp màu, terrain/cầu/sàn là mảng phẳng. Có viền cỏ, mặt đá, ván cầu, đầu/chân đơn giản cho actor; không cây/thác/sương/parallax hoặc rig trang trí. Nước là overlay không collider theo WaterRegion, nằm thấp dưới cầu. Hố Vân Khê có hai bờ dốc và đáy trũng; chạm nước nông vẫn giảm tốc như trước. Không mở rộng roster.
+Q1–Q6: Vân Khê ↔ Học Viện, Vân Khê ↔ Đồng Sương; giữ layout/collision/spawn/exits hiện có. Player dùng lại rig hình học từ commit `50f05ed`, cache các bộ phận; NPC có đầu/tóc/áo, Sói có thân/mõm/tai/chân, Dummy có cọc và tay. Chân đặt theo mặt đỡ. Đất liền bên dưới, cỏ xanh và đá lát nông phân biệt bề mặt; không cột đá/đất xen kẽ toàn chiều cao. Vũng Vân Khê là hình chữ nhật dài 6 u, đáy -0,8 và đường đất one-way phía trên 1,2; S để xuống lội, nhảy lên đi khô. Nước dưới cầu được nâng mặt hình ảnh lên 0,75, không đổi collider hoặc slow của đường cầu. Không vẽ viền đứng dưới nước. Không mở rộng roster.
 
 Giữ marker NPC, đối thoại, HP/MP, target HUD/mini HP, skill text/CD, quest tracker, bag grid/equipment slots. S1/S2/S3 Kiếm giữ số; basic Tân Lữ dùng nhịp được duyệt. Code pending/selection/geometry lấy range từ profile; ranged chỉ fixture, không gameplay Cung. Dedicated/backend/PvP/Boss chưa làm; chat chỉ ô nhập local có nhãn.
 
@@ -40,3 +40,5 @@ Giữ marker NPC, đối thoại, HP/MP, target HUD/mini HP, skill text/CD, ques
 EditMode kiểm domain/cost/arrival/life/clock; PlayMode kiểm Input System, physics/UI và fresh route. Build có `--verify-route` để đi Q1–Q6 bằng Rigidbody2D và menu commands, không preset/inject quest/EXP/HP/position. Driver chỉ log PASS/FAIL, không capture/showcase/evidence directory hoặc đo metric. Automation không thay review feel/usability của người thật.
 
 Lịch sử và giới hạn kết quả trước ở [CHANGELOG](CHANGELOG.md). Font [DejaVu Sans](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/DejaVuSans.ttf) giữ [license](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/LICENSE.txt). Production base chưa bắt đầu; G-L production/G-N/G-D chưa nghiệm thu.
+
+Focus prototype: click/Tab tìm trong ±12 u ngang / ±6 u dọc; giữ focus đến ±20 u ngang / ±10 u dọc hoặc lifecycle invalid. Nhảy/hủy pending không clear focus. Attack/assist vẫn theo skill profile, không cast xa theo HUD. Các số này là tuning disposable. Hướng dẫn phím ở một panel bên trái; context menu vẫn có chỉ dẫn thao tác riêng.

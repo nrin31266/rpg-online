@@ -394,3 +394,5 @@ Các anchor dưới đây giữ routing lịch sử cho tài liệu read-only; n
 <a id="prototype-runtime-history"></a>
 
 [Analysis — runtime và sequencing](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-runtime-history).
+
+**Feedback prototype 2026-10-05 — địa hình/focus/actor:** vũng Vân Khê chữ nhật dài hơn, có đường đất one-way phía trên để chọn đi khô/lội nước; cầu giữ đường đi solid và nâng mặt nước hình ảnh, không thêm collision dưới nước. Thân đất liền, mặt cỏ/đá lát nông khác nhau; bỏ bờ tam giác và bậc vụn ở quảng trường. Dùng lại rig hình học từ `50f05ed`, cache renderer thay vì dựng mỗi frame; NPC/Sói/Dummy đặt chân đúng support. Hướng dẫn phím world chỉ một panel. Tab/click search thử ±12 u ngang/±6 u dọc; retention ±20/±10, độc lập range/vertical cast nên nhảy không mất focus. Quái có thể crossing ngắn khi recovery, nhưng không bắt đầu windup khi peer quá sát; không slot/token/formation. Đây là sửa disposable probe, chưa nghiệm thu feel hoặc G-L production; chi tiết/tọa độ không chuyển sang docs 1–4.

@@ -1,6 +1,0 @@
-V6.2.5 Linux Development build — Succeeded
-Unity 6000.5.9f1
-Size 165630598 bytes
-prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64
-57 EditMode, 7 PlayMode; fresh Q1–Q6 standalone route PASS at timeScale4.
-Native 1x DEBUG visual probes are separate; G-L remains PARTIAL.

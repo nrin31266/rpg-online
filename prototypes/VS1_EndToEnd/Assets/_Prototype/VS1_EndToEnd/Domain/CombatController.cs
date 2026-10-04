@@ -58,10 +58,14 @@ namespace HuyenLo.Domain
         public double Remaining(Skill skill) => skill!=null&&Cooldowns.TryGetValue(skill.Id,out var end)?Math.Max(0,end-session.Now):0;
         public void Explicit(Mob target) {
             CancelIntent();
-            if(!P.Alive||!InEnvelope(target,Selected??Rules.Novice))return;
+            if(!P.Alive||!InSearch(target))return;
             FocusId=target.Id;FocusGeneration=target.Generation;FocusKind=FocusKind.Explicit;session.Emit("Focus EXPLICIT "+target.Slot);
         }
         public void ClearFocus(){CancelIntent();FocusId=FocusGeneration=0;FocusKind=FocusKind.None;}
+        // Selection/retention are local usability bounds, independent of execution geometry.
+        private bool Relevant(Mob m) => m!=null&&m.Alive&&!m.Returning&&m.Map==P.Map;
+        private bool InSearch(Mob m) => Relevant(m)&&Math.Abs(m.Position.X-P.Position.X)<=12&&Math.Abs(m.Position.Y-P.Position.Y)<=6;
+        private bool InRetention(Mob m) => Relevant(m)&&Math.Abs(m.Position.X-P.Position.X)<=20&&Math.Abs(m.Position.Y-P.Position.Y)<=10;
         private bool InEnvelope(Mob m,Skill skill) => m!=null && m.Alive && !m.Returning && m.Map==P.Map && m.Position.Distance(P.Position)<=skill.Range+ApproachBudget(skill) && Math.Abs(m.Position.Y-P.Position.Y)<=skill.Vertical;
         private void Acquire(Skill skill) {
             skill=skill??Rules.Novice;
@@ -86,9 +90,7 @@ namespace HuyenLo.Domain
         }
         public bool CycleTarget(int direction) {
             if(!P.Alive)return false;
-            var skill=Selected??Rules.Novice;
-            double search=skill.Range+ApproachBudget(skill);
-            var candidates=session.Mobs.Where(x=>x.Alive&&!x.Returning&&x.Map==P.Map&&x.Position.Distance(P.Position)<=search&&Math.Abs(x.Position.Y-P.Position.Y)<=skill.Vertical)
+            var candidates=session.Mobs.Where(x=>InSearch(x))
                 .OrderBy(x=>Math.Abs(x.Position.X-P.Position.X)).ThenBy(x=>x.Slot,StringComparer.Ordinal).ToArray();
             if(candidates.Length==0)return false;
             int current=Array.FindIndex(candidates,x=>x.Id==FocusId&&x.Generation==FocusGeneration);
@@ -195,7 +197,7 @@ namespace HuyenLo.Domain
                 if(!InEnvelope(session.Find(pendingTarget.Id,pendingTarget.Generation),pendingSkill)){ValidationReject(ActionRejectReason.OutOfRange);return;}
             }
             var previous=FocusKind;
-            if(previous!=FocusKind.None&&!InEnvelope(Focus,Selected??Rules.Novice)){
+            if(previous!=FocusKind.None&&!InRetention(Focus)){
                 bool hadIntent=HasPendingCast||HasBufferedCast;ClearFocus();
                 if(hadIntent)session.Feedback="Mục tiêu đã mất hoặc ra khỏi tầm tìm — cần bấm mới.";
                 Acquire(Selected);

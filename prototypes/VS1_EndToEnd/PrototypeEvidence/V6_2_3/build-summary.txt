@@ -1,2 +1,0 @@
-Build Finished, Result: Success.
-[VS1] Build Succeeded; 165595486 bytes

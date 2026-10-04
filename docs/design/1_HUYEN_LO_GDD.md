@@ -184,14 +184,14 @@ Tầm đánh trong skill profiles là tầm thực, không cộng thêm nội t�
 
 ## CombatFocus, một lần bấm skill và interaction
 
-CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. Selection chọn nearest eligible trong local envelope, tie stable entity ID, rồi mới auto-face khi start action. Search/retention khác execution range; reward level-gap không cấm combat/quest. Search/retention/vertical bounds và hysteresis là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa.
+CombatFocus = NONE / AUTO / EXPLICIT, độc lập selectedSlot. Selection chọn nearest eligible trong local envelope, tie stable entity ID, rồi mới auto-face khi start action. Search/retention khác execution range; nhảy hoặc rời hình đánh không tự clear focus còn trong retention bounds; reward level-gap không cấm combat/quest. Search/retention/vertical bounds và hysteresis là TUNABLE; không sort nearest mỗi frame hoặc chain bãi xa.
 
 | Trạng thái / input | Luật giữ và đổi mục tiêu |
 | --- | --- |
 | NONE / AUTO | Acquire gần nhất hợp lệ; AUTO không cướp focus còn relevant vì con khác gần hơn. |
-| Click / world Tab / Shift+Tab | Chọn EXPLICIT; cycle tiến/lùi, wrap, chỉ eligible trong envelope. Thứ tự khoảng cách ngang rồi authored SpawnSlot ID ổn định. |
+| Click / world Tab / Shift+Tab | Chọn EXPLICIT; cycle tiến/lùi, wrap, chỉ eligible trong search envelope. Thứ tự khoảng cách ngang rồi authored SpawnSlot ID ổn định. |
 | RETAIN AUTO / EXPLICIT | Giữ đúng ID/generation/life và MapId; focus ngoài execution range không tự đổi đích để cast. |
-| Esc clear / death / despawn / generation invalid / ra khỏi envelope / chuyển map | Clear focus, trở về chế độ auto-acquire; không tự tạo cast. AUTO mất relevance do đổi combat context cũng clear. |
+| Esc clear / death / despawn / generation invalid / ra khỏi retention envelope / chuyển map | Clear focus, trở về chế độ auto-acquire; không tự tạo cast. AUTO mất relevance do đổi combat context cũng clear. |
 | Đổi / clear focus khi pending | Hủy pending/buffer cũ; lần bấm mới mới được cast vào đích mới. |
 
 1/2/3 chọn unlocked S1/S2/S3 và yêu cầu thực thi **đúng một lần cho mỗi physical press**; Tân Lữ dùng **1 = basic Mộc Kiếm** cùng pipeline, 2/3 khóa. Bỏ binding combat J và RepeatOnHold cho mọi profile. Giữ phím không lặp cast, không lặp approach, không sinh intent mới. Slot hợp lệ được chọn cả khi attempt reject; locked slot không đổi selection hoặc hủy action đã accepted. SelectedSlot là cue UX, không cần một phím execute khác. Running action giữ SkillId/profile snapshot.

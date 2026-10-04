@@ -54,7 +54,8 @@ namespace HuyenLo.Runtime
         public string LastDialogue {get;private set;}
 
         private readonly List<BoxCollider2D> tempColliderKeys=new List<BoxCollider2D>();
-        private SpriteRenderer marker,playerBox;
+        private SpriteRenderer marker;
+        private readonly Dictionary<string,SpriteRenderer> playerParts=new Dictionary<string,SpriteRenderer>();
         private int feedbackResultCount;
         private readonly Dictionary<int,double> flashUntil=new Dictionary<int,double>();
         private readonly Stack<TextMesh> damagePool=new Stack<TextMesh>();
@@ -82,9 +83,6 @@ namespace HuyenLo.Runtime
             cameraView=new GameObject("Camera").AddComponent<Camera>();cameraView.tag="MainCamera";cameraView.orthographic=true;cameraView.clearFlags=CameraClearFlags.SolidColor;cameraView.orthographicSize=6.5f;cameraView.backgroundColor=new Color(.055f,.09f,.13f);
             cameraView.transform.position=new Vector3(9,3,-10);
             playerVisual=new GameObject("PlayerPhysics");Body=playerVisual.AddComponent<Rigidbody2D>();Body.gravityScale=2;Body.freezeRotation=true;Body.interpolation=RigidbodyInterpolation2D.Interpolate;Body.collisionDetectionMode=CollisionDetectionMode2D.Continuous;
-            playerBox=RectVisual("Player",playerVisual.transform,Vector2.zero,new Vector2(.55f,1.4f),new Color(.3f,.8f,.55f),10);
-            RectVisual("Head",playerVisual.transform,new Vector2(0,.38f),new Vector2(.4f,.4f),new Color(.87f,.7f,.5f),11);
-            RectVisual("Leg divider",playerVisual.transform,new Vector2(0,-.5f),new Vector2(.07f,.35f),cameraView.backgroundColor,11);
             playerVisual.layer=7;playerCollider=playerVisual.AddComponent<BoxCollider2D>();playerCollider.size=new Vector2(.55f,1.4f);
             var mat=new PhysicsMaterial2D("NoFriction"){friction=0,bounciness=0};playerCollider.sharedMaterial=mat;
             marker=RectVisual("CombatFocus",null,Vector2.zero,new Vector2(.9f,.08f),Color.yellow,12);
@@ -98,29 +96,139 @@ namespace HuyenLo.Runtime
             go.transform.localScale=size;var sr=go.AddComponent<SpriteRenderer>();sr.sprite=square;sr.color=color;sr.sortingOrder=order;return sr;
         }
         private void Ground(string name,float x,float y,float width,float height,bool oneWay=false,bool wood=false,bool rearEarth=false,float rise=0,bool stone=false) {
-            Color col=wood||(oneWay&&!rearEarth)?new Color(.55f,.39f,.23f):stone?new Color(.35f,.40f,.44f):new Color(.44f,.38f,.27f);
-            var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),col);
-            if(rearEarth)sr.sortingOrder=-12;else if(oneWay||wood)sr.sortingOrder=6;else if(stone)sr.sortingOrder=0;
-            if(rearEarth)sr.color=new Color(.39f,.43f,.32f);
-            sr.gameObject.layer=6;var box=sr.gameObject.AddComponent<BoxCollider2D>();
-            // Full rear soil is visual; only a thin top participates in collision.
-            if(rearEarth){box.size=new Vector2(1,.16f/height);box.offset=new Vector2(0,.5f-.08f/height);}
-            if(rise!=0){
-                box.enabled=false;
-                var vertices=new[]{new Vector2(-.5f,-.5f),new Vector2(.5f,-.5f),new Vector2(.5f,.5f+Mathf.Min(0,rise)/height),new Vector2(-.5f,.5f-Mathf.Max(0,rise)/height)};
-                var polygon=sr.gameObject.AddComponent<PolygonCollider2D>();polygon.points=vertices;
-                var shape=Sprite.Create(square.texture,square.rect,new Vector2(.5f,.5f),square.pixelsPerUnit);shape.OverrideGeometry(vertices.Select(v=>new Vector2((v.x+.5f)*square.rect.width,(v.y+.5f)*square.rect.height)).ToArray(),new ushort[]{0,1,2,0,2,3});sr.sprite=shape;terrainSprites.Add(shape);
-            }
             float top=height/2;
-            if(rise==0){
-                var cap=RectVisual(wood?"Timber deck":stone?"Stone surface":"Grass surface",world.transform,new Vector2(x,y+top-.035f),new Vector2(width,.07f),wood?new Color(.8f,.59f,.3f):stone?new Color(.7f,.73f,.7f):new Color(.35f,.65f,.29f),sr.sortingOrder+1);
-                if(wood)for(float offset=-width/2+.5f;offset<width/2;offset+=1)RectVisual("Plank seam",world.transform,new Vector2(x+offset,y),new Vector2(.025f,height),new Color(.3f,.2f,.12f),sr.sortingOrder+1);
+            float worldTop=y+top;
+            float worldBottom=y-top;
+            bool submerged=false;
+            foreach(var w in BlockoutLayout.Waters(renderedMap)){
+                if(worldTop<=(float)w.Level&&x>=(float)w.Left&&x<=(float)w.Right){submerged=true;break;}
             }
-            if(rise!=0){
-                var lip=RectVisual("Sloped stone surface",world.transform,new Vector2(x,y+top-Mathf.Abs(rise)/2),new Vector2(Mathf.Sqrt(width*width+rise*rise),.065f),new Color(.7f,.73f,.7f),sr.sortingOrder+1);
-                lip.transform.rotation=Quaternion.Euler(0,0,Mathf.Atan2(rise,width)*Mathf.Rad2Deg);
+
+            if(rearEarth){
+                // Background layered hills: one-way traversable mountain ridges in cross-section
+                var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),new Color(.30f,.25f,.18f),-12);
+                sr.gameObject.layer=6;
+                var box=sr.gameObject.AddComponent<BoxCollider2D>();
+                box.size=new Vector2(1,.16f/height);
+                box.offset=new Vector2(0,.5f-.08f/height);
+                var eff=sr.gameObject.AddComponent<PlatformEffector2D>();
+                eff.useOneWay=true;eff.useOneWayGrouping=true;eff.surfaceArc=160;
+                box.usedByEffector=true;platforms.Add(box);
+
+                // Top surface: lush green grass for mountain ridges, seamless without vertical borders
+                if(!submerged){
+                    RectVisual(name+" Turf root",world.transform,new Vector2(x,worldTop-.065f),new Vector2(width,.06f),new Color(.24f,.42f,.16f),-11);
+                    RectVisual(name+" Grass blades",world.transform,new Vector2(x,worldTop-.02f),new Vector2(width,.04f),new Color(.38f,.62f,.23f),-10);
+                }
+                return;
             }
-            if(oneWay){var eff=sr.gameObject.AddComponent<PlatformEffector2D>();eff.useOneWay=true;eff.useOneWayGrouping=true;eff.surfaceArc=160;box.usedByEffector=true;platforms.Add(box);}
+
+            if(wood||(oneWay&&!rearEarth)){
+                // Wooden decks, bridges, upper floors
+                var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),new Color(.55f,.39f,.23f),6);
+                sr.gameObject.layer=6;
+                var box=sr.gameObject.AddComponent<BoxCollider2D>();
+                if(oneWay){
+                    var eff=sr.gameObject.AddComponent<PlatformEffector2D>();
+                    eff.useOneWay=true;eff.useOneWayGrouping=true;eff.surfaceArc=160;
+                    box.usedByEffector=true;platforms.Add(box);
+                }
+                RectVisual(name+" Timber deck",world.transform,new Vector2(x,worldTop-.035f),new Vector2(width,.07f),new Color(.8f,.59f,.3f),7);
+                for(float offset=-width/2+.5f;offset<width/2;offset+=1){
+                    RectVisual(name+" Plank seam",world.transform,new Vector2(x+offset,y),new Vector2(.025f,height),new Color(.3f,.2f,.12f),7);
+                }
+                return;
+            }
+
+            // Foreground solid ground: Geological stratification (bedrock below, earth above) + Architectural masonry
+            // 1. Bedrock stratum underneath across the lower terrain (dãy ngang dưới là đá):
+            float bedrockTop=Mathf.Min(worldTop-0.7f,worldTop<0?worldTop-0.7f:-0.4f);
+            var srBase=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),new Color(.36f,.38f,.38f),0);
+            srBase.gameObject.layer=6;
+            var baseBox=srBase.gameObject.AddComponent<BoxCollider2D>();
+
+            // 2. Earth / soil layer rising above bedrock (rồi đất lên):
+            if(worldTop>bedrockTop){
+                float earthH=worldTop-bedrockTop;
+                float earthY=bedrockTop+earthH/2;
+                Color earthCol=submerged?new Color(.30f,.25f,.18f):new Color(.44f,.36f,.25f);
+                RectVisual(name+" Earth layer",world.transform,new Vector2(x,earthY),new Vector2(width,earthH),earthCol,0);
+            }
+
+            // 3. Surface cap:
+            if(submerged){
+                // Submerged under water: clean riverbed/pond bed, NO lines, NO sediment strips!
+            }else if(stone){
+                // Architectural stone masonry on top (xây bằng đá ở trên như công trình: bậc thềm, sân tập võ, lối đi, tế đàn)
+                RectVisual(name+" Stone paving",world.transform,new Vector2(x,worldTop-.14f),new Vector2(width,.28f),new Color(.60f,.62f,.60f),1);
+                RectVisual(name+" Stone edge",world.transform,new Vector2(x,worldTop-.025f),new Vector2(width,.05f),new Color(.72f,.74f,.72f),2);
+                for(float offset=-width/2+1.5f;offset<width/2;offset+=1.5f){
+                    RectVisual(name+" Stone joint",world.transform,new Vector2(x+offset,worldTop-.14f),new Vector2(.03f,.28f),new Color(.45f,.47f,.45f),2);
+                }
+            }else{
+                // Natural outdoor earth: lush green grass on top (mặt trên có cỏ xanh)
+                RectVisual(name+" Turf root bed",world.transform,new Vector2(x,worldTop-.065f),new Vector2(width,.06f),new Color(.25f,.46f,.17f),1);
+                RectVisual(name+" Grass blades",world.transform,new Vector2(x,worldTop-.02f),new Vector2(width,.04f),new Color(.40f,.68f,.25f),2);
+            }
+        }
+        private void DecorativeStructures() {
+            if(renderedMap==Map.Academy){
+                // Bow hall pavilion behind Diệp Lam (x = -12, upper deck at y = 9.075):
+                float bowBase=6.4f,bowRoof=11.2f,bowH=bowRoof-bowBase;
+                RectVisual("Bow hall wall",world.transform,new Vector2(-12,bowBase+bowH/2),new Vector2(6.8f,bowH),new Color(.34f,.30f,.24f),-8);
+                RectVisual("Bow hall left pillar",world.transform,new Vector2(-14.7f,bowBase+bowH/2),new Vector2(.24f,bowH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("Bow hall right pillar",world.transform,new Vector2(-9.3f,bowBase+bowH/2),new Vector2(.24f,bowH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("Bow hall upper beam",world.transform,new Vector2(-12,8.92f),new Vector2(6.6f,.22f),new Color(.38f,.26f,.16f),-3);
+                RectVisual("Bow hall roof eave",world.transform,new Vector2(-12,bowRoof+.2f),new Vector2(7.8f,.42f),new Color(.24f,.35f,.38f),-3);
+                RectVisual("Bow hall roof ridge",world.transform,new Vector2(-12,bowRoof+.48f),new Vector2(5.8f,.16f),new Color(.36f,.46f,.48f),-2);
+                Label("Cung đường",new Vector3(-12,bowRoof+.82f,0),world.transform,.06f);
+
+                // West dojo pavilion (x = -25, upper deck at y = 6.1):
+                float dojoBase=4.0f,dojoRoof=8.2f,dojoH=dojoRoof-dojoBase;
+                RectVisual("West dojo wall",world.transform,new Vector2(-25,dojoBase+dojoH/2),new Vector2(5.8f,dojoH),new Color(.34f,.30f,.24f),-8);
+                RectVisual("West dojo left pillar",world.transform,new Vector2(-27.2f,dojoBase+dojoH/2),new Vector2(.22f,dojoH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("West dojo right pillar",world.transform,new Vector2(-22.8f,dojoBase+dojoH/2),new Vector2(.22f,dojoH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("West dojo upper beam",world.transform,new Vector2(-25,5.95f),new Vector2(5.6f,.2f),new Color(.38f,.26f,.16f),-3);
+                RectVisual("West dojo roof eave",world.transform,new Vector2(-25,dojoRoof+.2f),new Vector2(6.8f,.42f),new Color(.24f,.35f,.38f),-3);
+                RectVisual("West dojo roof ridge",world.transform,new Vector2(-25,dojoRoof+.48f),new Vector2(4.8f,.14f),new Color(.36f,.46f,.48f),-2);
+                Label("Võ đường phía tây",new Vector3(-25,dojoRoof+.82f,0),world.transform,.06f);
+
+                // Jump training platform (x = 8, deck at y = 2.8, ground at y = 0): sturdy timber scaffold structure
+                RectVisual("Jump ledge timber stilt left",world.transform,new Vector2(6.6f,1.35f),new Vector2(.20f,2.7f),new Color(.42f,.29f,.18f),5);
+                RectVisual("Jump ledge timber stilt right",world.transform,new Vector2(9.4f,1.35f),new Vector2(.20f,2.7f),new Color(.42f,.29f,.18f),5);
+                RectVisual("Jump ledge upper beam",world.transform,new Vector2(8f,2.65f),new Vector2(3.6f,.16f),new Color(.35f,.23f,.14f),5);
+                RectVisual("Jump ledge mid brace",world.transform,new Vector2(8f,1.35f),new Vector2(2.8f,.12f),new Color(.42f,.29f,.18f),5);
+            }else if(renderedMap==Map.Village){
+                // Elder house pavilion (x = -2, upper deck at y = 2.875):
+                float elderBase=0,elderRoof=5.2f,elderH=elderRoof-elderBase;
+                RectVisual("Elder house wall",world.transform,new Vector2(-2,elderBase+elderH/2),new Vector2(5.8f,elderH),new Color(.36f,.32f,.25f),-8);
+                RectVisual("Elder house left pillar",world.transform,new Vector2(-4.2f,elderBase+elderH/2),new Vector2(.22f,elderH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("Elder house right pillar",world.transform,new Vector2(0.2f,elderBase+elderH/2),new Vector2(.22f,elderH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("Elder house upper beam",world.transform,new Vector2(-2,2.72f),new Vector2(5.6f,.2f),new Color(.38f,.26f,.16f),-3);
+                RectVisual("Elder house roof eave",world.transform,new Vector2(-2,elderRoof+.2f),new Vector2(6.8f,.42f),new Color(.24f,.35f,.38f),-3);
+                RectVisual("Elder house roof ridge",world.transform,new Vector2(-2,elderRoof+.48f),new Vector2(4.8f,.14f),new Color(.36f,.46f,.48f),-2);
+                Label("Nhà trưởng lão",new Vector3(-2,elderRoof+.82f,0),world.transform,.06f);
+
+                // Wooden forge workshop (x = 13, upper deck at y = 3):
+                float forgeBase=0.6f,forgeRoof=5.6f,forgeH=forgeRoof-forgeBase;
+                RectVisual("Forge wall",world.transform,new Vector2(13,forgeBase+forgeH/2),new Vector2(5.8f,forgeH),new Color(.36f,.32f,.25f),-8);
+                RectVisual("Forge left pillar",world.transform,new Vector2(10.8f,forgeBase+forgeH/2),new Vector2(.22f,forgeH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("Forge right pillar",world.transform,new Vector2(15.2f,forgeBase+forgeH/2),new Vector2(.22f,forgeH),new Color(.44f,.30f,.18f),-4);
+                RectVisual("Forge upper beam",world.transform,new Vector2(13,2.85f),new Vector2(5.6f,.2f),new Color(.38f,.26f,.16f),-3);
+                RectVisual("Forge roof eave",world.transform,new Vector2(13,forgeRoof+.2f),new Vector2(6.8f,.42f),new Color(.24f,.35f,.38f),-3);
+                RectVisual("Forge roof ridge",world.transform,new Vector2(13,forgeRoof+.48f),new Vector2(4.8f,.14f),new Color(.36f,.46f,.48f),-2);
+                Label("Lò rèn",new Vector3(13,forgeRoof+.82f,0),world.transform,.06f);
+            }else if(renderedMap==Map.Mist){
+                // PROBE8 climbing timber step (x = 107, deck at y = 2.4, ground at y = 0.8): sturdy mountain lookout stilt
+                RectVisual("Climbing step stilt left",world.transform,new Vector2(106.3f,1.55f),new Vector2(.16f,1.5f),new Color(.42f,.29f,.18f),5);
+                RectVisual("Climbing step stilt right",world.transform,new Vector2(107.7f,1.55f),new Vector2(.16f,1.5f),new Color(.42f,.29f,.18f),5);
+                RectVisual("Climbing step upper beam",world.transform,new Vector2(107f,2.28f),new Vector2(1.8f,.14f),new Color(.35f,.23f,.14f),5);
+
+                // Valley wooden bridge piers:
+                foreach(float px in new[]{69f,74f,79f}){
+                    RectVisual("Bridge pier",world.transform,new Vector2(px,-.2f),new Vector2(.35f,2.2f),new Color(.35f,.25f,.17f),2);
+                }
+            }
         }
         private TextMesh Label(string text,Vector3 position,Transform parent=null,float scale=.12f) {
             var go=new GameObject("Label "+text);if(parent!=null)go.transform.SetParent(parent);go.transform.position=position;
@@ -135,11 +243,13 @@ namespace HuyenLo.Runtime
             foreach(var surface in BlockoutLayout.Surfaces(renderedMap))
                 Ground(surface.Name,(float)surface.X,(float)surface.Y,(float)surface.Width,(float)surface.Height,surface.OneWay,surface.Wood,surface.RearEarth,(float)surface.Rise,surface.Stone);
             Ground("LeftBoundary",min,5,1,14);Ground("RightBoundary",max,5,1,14);
+            DecorativeStructures();
             foreach(var water in BlockoutLayout.Waters(renderedMap)){
-                // A small collider-free overlay follows the authored basin, never a tall column under the bridge.
+                // Village is a real shallow basin; inaccessible bridge water uses a higher scenic surface.
                 float left=(float)water.Left,right=(float)water.Right,level=(float)water.Level;
-                float bottom=(float)water.Bottom;
-                RectVisual("Shallow water · no collider",world.transform,new Vector2((left+right)/2,(level+bottom)/2),new Vector2(right-left,level-bottom),new Color(.18f,.43f,.58f,.6f),renderedMap==Map.Village?12:3);
+                float bottom=renderedMap==Map.Mist?-8:(float)water.Bottom;
+                if(renderedMap==Map.Mist)level=.75f;
+                RectVisual("Shallow water · no collider",world.transform,new Vector2((left+right)/2,(level+bottom)/2),new Vector2(right-left,level-bottom),new Color(.18f,.43f,.58f,.85f),renderedMap==Map.Village?12:3);
                 RectVisual("Water surface",world.transform,new Vector2((left+right)/2,level),new Vector2(right-left,.045f),new Color(.46f,.77f,.85f),renderedMap==Map.Village?13:4);
             }
             foreach(var a in SliceSession.Anchors.Where(x=>x.Map==renderedMap))RenderNpc(a);
@@ -170,22 +280,53 @@ namespace HuyenLo.Runtime
             return new Vector3(Mathf.Clamp(visual.x,Mathf.Min(min,max),Mathf.Max(min,max)),Mathf.Max(2.4f,visual.y+1.6f),-10);
         }
         private void RenderNpc(Anchor a){
-            var root=new GameObject(a.Name);root.transform.SetParent(world.transform,false);root.transform.localPosition=new Vector3((float)a.Position.X,(float)a.Position.Y,0);
-            RectVisual(a.EdgeExit?"Map edge":"NPC",root.transform,Vector2.zero,a.EdgeExit?new Vector2(.2f,1.5f):new Vector2(.55f,1.4f),a.EdgeExit?new Color(.85f,.6f,.18f):new Color(.9f,.7f,.3f),9);
-            if(!a.EdgeExit)RectVisual("NPC head",root.transform,new Vector2(0,.45f),new Vector2(.4f,.32f),new Color(.9f,.74f,.53f),10);
+            var root=new GameObject(a.Name);root.transform.SetParent(world.transform,false);
+            float ground=(float)BlockoutLayout.GroundTop(renderedMap,a.Position.X);
+            root.transform.localPosition=new Vector3((float)a.Position.X,ground+.7f,0);
+            if(a.EdgeExit)RectVisual("Map edge",root.transform,Vector2.zero,new Vector2(.2f,1.4f),new Color(.85f,.6f,.18f),9);
+            else {
+                RectVisual("NPC robe",root.transform,new Vector2(0,-.15f),new Vector2(.5f,1.1f),new Color(.7f,.49f,.25f),9);
+                RectVisual("NPC head",root.transform,new Vector2(0,.55f),new Vector2(.36f,.36f),new Color(.9f,.74f,.53f),10);
+                RectVisual("NPC hair",root.transform,new Vector2(0,.75f),new Vector2(.4f,.12f),new Color(.2f,.22f,.23f),11);
+                RectVisual("NPC belt",root.transform,new Vector2(0,-.1f),new Vector2(.54f,.08f),new Color(.3f,.24f,.2f),10);
+            }
             Label(a.EdgeExit?(a.Id.StartsWith("toVillage")?"← ":"→ ")+a.Name:a.Name,root.transform.position+Vector3.up*1.3f,root.transform,.05f);
             if(!a.EdgeExit)npcMarkers[a.Id]=Label("",root.transform.position+Vector3.up*1.8f,root.transform,.09f);
         }
         private void SpawnMob(Mob m){
             var root=new GameObject(m.Slot);root.transform.SetParent(world.transform,false);root.transform.localPosition=new Vector3((float)m.Position.X,(float)m.Position.Y,0);
-            var color=m.Dummy?new Color(.75f,.6f,.4f):m.Name=="Nấm Linh"?new Color(.7f,.3f,.7f):new Color(.55f,.65f,.8f);
             var visual=new GameObject("Silhouette");visual.transform.SetParent(root.transform,false);
-            var view=new MobPresenter{Root=root,VisualRoot=visual.transform};view.Parts.Add((RectVisual(m.Name,visual.transform,Vector2.zero,new Vector2(.7f,m.Dummy?1.2f:.8f),color,10),color));
-            if(!m.Dummy){
-                RectVisual("Head",visual.transform,new Vector2(.27f,.16f),new Vector2(.3f,.3f),color*.8f,11);
-                RectVisual("Feet",visual.transform,new Vector2(0,-.35f),new Vector2(.5f,.12f),color*.65f,11);
+            var view=new MobPresenter{Root=root,VisualRoot=visual.transform,IsDummy=m.Dummy,IsWolf=!m.Dummy&&m.Name!="Nấm Linh"};
+            void Part(string name,Vector2 at,Vector2 size,Color color,int layer=10){view.Parts.Add((RectVisual(name,visual.transform,at,size,color,layer),color));}
+            if(m.Dummy){
+                Part("Dummy post",new Vector2(0,-.25f),new Vector2(.18f,1.1f),new Color(.5f,.34f,.2f));
+                Part("Dummy arms",new Vector2(0,.22f),new Vector2(.95f,.16f),new Color(.6f,.42f,.25f));
+                Part("Dummy straw head",new Vector2(0,.48f),new Vector2(.42f,.4f),new Color(.8f,.68f,.38f),11);
+            }else if(!view.IsWolf){
+                Part("Mushroom stem",new Vector2(0,-.4f),new Vector2(.25f,.5f),new Color(.8f,.71f,.5f));
+                Part("Mushroom cap",new Vector2(0,-.04f),new Vector2(.75f,.35f),new Color(.7f,.3f,.7f),11);
+            }else {
+                var fur=new Color(.55f,.65f,.8f);
+                Part("Wolf torso",new Vector2(0,-.03f),new Vector2(.8f,.45f),fur);
+                Part("Wolf chest",new Vector2(.27f,-.13f),new Vector2(.28f,.45f),fur*.85f,11);
+                Part("Wolf muzzle",new Vector2(.48f,.12f),new Vector2(.4f,.25f),fur,12);
+                Part("Wolf ear",new Vector2(.31f,.34f),new Vector2(.13f,.22f),fur*.7f,12);
+                Part("Wolf tail",new Vector2(-.49f,.04f),new Vector2(.28f,.14f),fur*.75f);
+                Part("Wolf eye",new Vector2(.4f,.18f),new Vector2(.055f,.045f),new Color(.08f,.1f,.15f),13);
+                Part("Wolf rear leg",new Vector2(-.27f,-.45f),new Vector2(.14f,.4f),fur*.65f,11);
+                Part("Wolf front leg",new Vector2(.27f,-.45f),new Vector2(.14f,.4f),fur*.75f,11);
             }
             Label(m.Name+" Lv"+m.Level,root.transform.position+Vector3.up*.9f,root.transform,.045f);mobViews[m.Id]=view;
+        }
+        private void RenderPlayer(){
+            var action=Session.Combat.Running;
+            float phase=action==null?0:(float)((Session.Now-action.Started)/(action.EndAt-action.Started));
+            foreach(var sr in playerParts.Values)sr.enabled=false;
+            foreach(var part in GeometricRig.Pose(Session.Player,Session.Combat.Facing,Session.Now,phase,action!=null,Body.linearVelocity.x)){
+                if(!playerParts.TryGetValue(part.Name,out var sr)){sr=RectVisual(part.Name,playerVisual.transform,part.Center,part.Size,part.Color,part.Layer);playerParts.Add(part.Name,sr);}
+                sr.enabled=true;sr.transform.localPosition=part.Center;sr.transform.localScale=part.Size;sr.transform.localRotation=Quaternion.Euler(0,0,part.Angle);sr.sortingOrder=part.Layer;
+                sr.color=!Session.Player.Alive?Color.gray:Session.Now-Session.LastHurtAt<.12?Color.white:part.Color;
+            }
         }
         public void Speak(string id)=>SpeakText(id,Hud.Dialogue(id));
         public void SpeakText(string id,string text){
@@ -296,7 +437,7 @@ namespace HuyenLo.Runtime
             if(Session.WorldRevision!=renderedRevision)BuildMap();
             if(!Session.Player.Alive&&Session.Player.Map==Map.Village&&Body.position.y<-8)Body.position=new Vector2((float)Session.Player.Position.X,.8f);
             cameraView.transform.position=Vector3.SmoothDamp(cameraView.transform.position,CameraTarget(),ref cameraVelocity,.045f,100,Time.deltaTime);
-            playerBox.color=!Session.Player.Alive?Color.gray:Session.Now-Session.LastHurtAt<.12?Color.white:Session.Player.School==School.Novice?new Color(.3f,.8f,.55f):new Color(.3f,.6f,1);
+            RenderPlayer();
             foreach(var pair in npcMarkers){var text=Hud.Marker(pair.Key);if(pair.Value.text!=text)pair.Value.text=text;pair.Value.color=text=="?"?Color.yellow:Color.white;}
             if(speech!=null&&Session.Now>speechUntil){Destroy(speech.gameObject);speech=null;}
             foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap)){

@@ -53,11 +53,27 @@ namespace HuyenLo.Tests
             s.Combat.Press("1",1);s.Combat.Release("1");Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));b.Position=new Point(21.1,.8);s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));
             a.Hp=0;a.RespawnAt=100;s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));
         }
-        [Test] public void ExplicitFocusRetainsWithinEnvelopeThenReturnsToAuto() {
+        [Test] public void ExplicitFocusRetainsOutsideExecutionUntilRetentionIsExceeded() {
             var s=Fixture(Rules.Sword1);var a=s.Mobs[0];s.Combat.Press("1",1);s.Combat.Release("1");
-            var b=s.Mobs[1];b.Map=Map.Academy;b.Position=new Point(30,.8);s.Player.Position=new Point(29,.8);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));
+            var b=s.Mobs[1];b.Map=Map.Academy;b.Position=new Point(30,.8);a.Position=new Point(-1,.8);s.Player.Position=new Point(29,.8);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));
             a.Position=new Point(27,.8);s.Combat.Explicit(a);s.Tick(.02,true);Assert.That(s.Combat.FocusId,Is.EqualTo(a.Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Explicit));
-            a.Position=new Point(22,.8);s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Auto));
+            a.Position=new Point(8,.8);s.Tick(.02);Assert.That(s.Combat.FocusId,Is.EqualTo(b.Id));Assert.That(s.Combat.FocusKind,Is.EqualTo(FocusKind.Auto));
+        }
+        [Test] public void JumpAndWideTabDoNotExtendDamageRangeOrClearFocus(){
+            var s=Fixture(Rules.Sword1);var target=s.Mobs[0];target.Position=new Point(31,.8);
+            Assert.That(s.Combat.CycleTarget(1),Is.True);Assert.That(s.Combat.FocusId,Is.EqualTo(target.Id));
+            s.Player.Position=new Point(21,5.1);s.Combat.Tick(true);
+            Assert.That(s.Combat.FocusId,Is.EqualTo(target.Id),"Jump height is not a focus invalidation");
+            double mp=s.Player.Mp;s.Combat.Press("1");Assert.That(s.Combat.Running,Is.Null);
+            Assert.That(s.Player.Mp,Is.EqualTo(mp));Assert.That(s.Combat.FocusId,Is.EqualTo(target.Id));
+        }
+        [Test] public void RectangularVillageBasinHasSeparateDryTop(){
+            var water=BlockoutLayout.Waters(Map.Village).Single();
+            Assert.That(water.Right-water.Left,Is.EqualTo(6));
+            Assert.That(BlockoutLayout.Surfaces(Map.Village).All(x=>x.Rise==0),Is.True);
+            Assert.That(BlockoutLayout.BaseGroundTop(Map.Village,4),Is.EqualTo(-.8).Within(.001));
+            Assert.That(BlockoutLayout.GroundTop(Map.Village,4),Is.EqualTo(1.2).Within(.001));
+            Assert.That(BlockoutLayout.WaterSpeed(Map.Village,new Point(4,1.2)),Is.EqualTo(1));
         }
         [Test] public void FacingIndependentAcquireAndExplicitOutOfRangeDoesNotSubstitute() {
             var s=Fixture(Rules.Sword1);s.Player.Position=new Point(23,.8);s.Combat.Facing=1;s.Combat.Press("1",1);Assert.That(s.Combat.Running.Facing,Is.EqualTo(-1));s.Combat.Cancel();

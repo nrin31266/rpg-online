@@ -409,9 +409,20 @@ namespace HuyenLo.Domain
         public int FreeSide(Mob m) {
             var peers=Neighbors(m);double left=Player.Position.X-m.Range*.9,right=Player.Position.X+m.Range*.9;
             double l=double.PositiveInfinity,r=double.PositiveInfinity;
-            foreach(var p in peers){l=Math.Min(l,Math.Abs(p.Position.X-left));r=Math.Min(r,Math.Abs(p.Position.X-right));}
+            int leftEngaged=0,rightEngaged=0;
+            foreach(var p in peers){
+                l=Math.Min(l,Math.Abs(p.Position.X-left));
+                r=Math.Min(r,Math.Abs(p.Position.X-right));
+                if(p.Engaged){
+                    if(p.ApproachSide<0)leftEngaged++;
+                    else if(p.ApproachSide>0)rightEngaged++;
+                }
+            }
             if(Math.Abs(Bound(m,left)-left)>.001)l=double.NegativeInfinity;
             if(Math.Abs(Bound(m,right)-right)>.001)r=double.NegativeInfinity;
+            if(l==double.NegativeInfinity)return 1;
+            if(r==double.NegativeInfinity)return -1;
+            if(leftEngaged!=rightEngaged)return leftEngaged<rightEngaged?-1:1;
             if(l==r)return (StableLifeHash(m.Slot,1)&1)==0?-1:1;
             return l>r?-1:1;
         }
@@ -422,10 +433,14 @@ namespace HuyenLo.Domain
                 if(Math.Sign(p.Position.X-playerX)!=m.ApproachSide||p.RepositionAfterHit&&Now<p.RepositionUntil&&!p.Windup)continue;
                 double front=(p.Position.X-playerX)*m.ApproachSide;
                 double own=(m.Position.X-playerX)*m.ApproachSide;
-                if(front<own-.1&&Math.Abs(goal-p.Position.X)<.75)
-                    goal=p.Position.X+m.ApproachSide*.75;
+                if(front<own-.1&&((goal-p.Position.X)*m.ApproachSide<.8))
+                    goal=p.Position.X+m.ApproachSide*.8;
             }
             return Bound(m,goal);
+        }
+        private bool HasBiteSpace(Mob m) {
+            foreach(var p in Neighbors(m))if(Math.Abs(m.Position.X-p.Position.X)<.6)return false;
+            return true;
         }
         private void UpdateFacing(Mob m,double dx) {
             if(Math.Abs(dx)<=.15)return;
@@ -447,6 +462,12 @@ namespace HuyenLo.Domain
                 int side=blocked?FreeSide(m):Math.Sign(m.Position.X-playerX);
                 if(side!=0&&side!=m.ApproachSide){m.ApproachSide=side;m.SideLockedUntil=Now+1.5;}
                 m.SideSwitchPending=false;attackGoal=playerX+m.ApproachSide*m.Range*.9;
+            }else if(Now>=m.SideLockedUntil){
+                int free=FreeSide(m);
+                if(free!=m.ApproachSide){
+                    double altGoal=playerX+free*m.Range*.9;
+                    if(Math.Abs(Bound(m,altGoal)-altGoal)<=.001){m.ApproachSide=free;m.SideLockedUntil=Now+1.5;}
+                }
             }
             // Return travel consumes existing recovery, never extends the attack deadline.
             attackGoal=FreeApproachGoal(m,playerX);
@@ -456,7 +477,7 @@ namespace HuyenLo.Domain
             m.Motion=reposition?"reposition":"approach";m.Occupancy="free-space; stable side";
             MoveMob(m,goal,dt,Neighbors(m));
             dx=playerX-m.Position.X;
-            if(Math.Abs(dx)<=m.Range&&Now>=m.NextAttack){
+            if(Math.Abs(dx)<=m.Range&&Now>=m.NextAttack&&HasBiteSpace(m)){
                 // Windup starts from the actual position/facing; subsequent ticks freeze it.
                 m.Facing=dx<0?-1:1;m.Windup=true;m.HitAt=Now+.35;m.NextAttack=Now+m.Interval;m.BiteAttempts++;m.Motion="windup";m.VelocityX=0;
             }else UpdateFacing(m,dx);
