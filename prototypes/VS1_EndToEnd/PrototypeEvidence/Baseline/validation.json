@@ -1,0 +1,43 @@
+{
+  "tests": {
+    "edit": {
+      "total": "59",
+      "passed": "59",
+      "failed": "0",
+      "started_utc": "2026-10-04 15:02:28Z",
+      "finished_utc": "2026-10-04 15:02:29Z",
+      "xml_sha256": "43bbc6cba724b78af411206a7352654fdf21dd12b285e7ed00177ba0c9f9d0ad"
+    },
+    "play": {
+      "total": "10",
+      "passed": "10",
+      "failed": "0",
+      "started_utc": "2026-10-04 15:03:00Z",
+      "finished_utc": "2026-10-04 15:04:21Z",
+      "xml_sha256": "4bd177ba76a185bc1d20cf6577e579a6098ed83a22dee7e243bd04e79e288863"
+    }
+  },
+  "source_sha256": {
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/BlockoutLayout.cs": "53a74e7dadd2a92e23f5bdb15dafa1f049c5234a64aa6a81d6a985b5e91d7b16",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/CombatController.cs": "2e086a6fc8078d1fc4940ac9c565cd14e48793bc94a5b389cb2e5e776b3cf5aa",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/PrototypePresets.cs": "4e7090533219f3fb96a310354aebf12ae75c6e22bb9de9d5158af1c3db7d0181",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs": "3269d67ca286801ce8f8624557109fc806cf679d8e0e2ed646bc78abbb8df316",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceSession.cs": "d1c741af80aa1e32e89d78051452f766f7c8eac7ba1b9a79d4763737bb151cbc",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Editor/SliceBuild.cs": "621ab115c1c927d52785155d027a5395f9e561dab7d026a3cca18aeee962265e",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/GeometricRig.cs": "f7b045fc709af74237d988641999c61d3c590ed6b1b76b94aa2056c9d5fe134e",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHost.cs": "6a5bc88a64b0479842f87ea7fb3dd9202b987798400a3201829d33d8c367364f",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceHud.cs": "b9afe5b201de3c3a3558bc2322cc3de0d41c7b1fba7c99412f397cdf314bbecb",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Runtime/SliceRouteProbe.cs": "28e48758ba299046b440606c16f517cc5808cdb3069447695a05e1465fc3270a",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/DomainTests.cs": "fc7b8440adc592ccdd21b36c8b61b3f809e4a2266136d922c614f0a5be6031a3",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/EditMode/ProbeMetricsTests.cs": "f12a9f4ea803d936764d9bdd11221e2bb6a83e0470773f08821eb4f3bb003db7",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/ContinuousRouteTests.cs": "3ef516a8971fe1b96ae4e383d847d9981589618ccc8be3a3441d2025a4e02e11",
+    "prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Tests/PlayMode/InputPhysicsTests.cs": "b78b17deb8cac516edcb5d397a75807da48ffe5229c6160a60de50ef20cdb75a"
+  },
+  "metrics_sha256": "f244fbc7ad5c1de58dcce458294eea46ce53fb33fd2c6f193d91ad731c232abf",
+  "code_before_probes_is_preserved_in": "/home/nguyenvanrin/PersonalProjects/huyenlo_backup/2026-10-04-input-probes/working-files.tar.gz",
+  "limitations": [
+    "Domain recorder is deterministic scenario evidence, not hardware rollover or normal-speed feel",
+    "Cadence Dummy HP60 instant laboratory renewal isolates input cadence; world respawn25s is not changed",
+    "Finite wolf deaths affect direction/damage metrics; damage intake alone cannot prove absence of safe windows"
+  ]
+}

@@ -66,3 +66,22 @@ Media hiện tại đã không được track ở HEAD; các link cũ vẫn dùn
 | <a id="evidence-vs1-endtoend-ee0eba494e11"></a>VS1_EndToEnd | playmode.xml | `ee0eba494e1113a5b1748a1d27fa4920525a0b605725c562e7ec8892a3564901` | 11820 | CHỜ CHỦ DỰ ÁN ĐIỀN |
 | <a id="evidence-vs1-endtoend-d525b9622d22"></a>VS1_EndToEnd | standalone.log | `d525b9622d22db79c0fd1a59dfb5e198cbf9372b9ce7129dd466c205963ca2fd` | 18385 | CHỜ CHỦ DỰ ÁN ĐIỀN |
 | <a id="evidence-vs1-endtoend-83ff9361d6e4"></a>VS1_EndToEnd | sword-q6.png | `83ff9361d6e44529a112326e1935e6a79785d2da776168ddd884d051cdb42d36` | 79796 | CHỜ CHỦ DỰ ÁN ĐIỀN |
+
+## Phase B — baseline trước sửa hành vi
+
+[Metrics](PrototypeEvidence/Baseline/metrics.json) và [source/test hashes](PrototypeEvidence/Baseline/validation.json): seed731, dt0,02. EditMode59/59 gồm recorder mới (58 test cũ), PlayMode10/10. Mã baseline có thay đổi chưa commit từ phiên trước; exact source được giữ trong backup ngoài repo và hash manifest, không gọi HEAD là toàn bộ source baseline.
+
+| Chỉ số | Baseline đo |
+| --- | ---: |
+| Đổi Facing hoặc dấu vận tốc, mỗi quái / 5 s | 3,3333 |
+| Press bị reject / 60 s | 119/171 = 69,5906% |
+| Dead time basic Tân Lữ | 74% |
+| HP mất / 10 s, 3 Sói, player đứng đánh | 131 |
+| TTK Tân Lữ Lv4 / 1 Sói | 4,96 s |
+| TTK Tân Lữ Lv3 / 3 Dummy HP60 | 9,78 s |
+| Approach bị hủy bởi stale held axis | 20/20 |
+| Auto-approach lọt EdgeExit | 1/1 |
+
+Reject recorder dùng Dummy HP60, tạo life lab kế ngay sau chết để luôn có mục tiêu; không đổi HP catalog hoặc respawn world. Crowd dùng ba PROBE7 Sói với HP107, Lv5 cân bằng/Common I; player sống hết10s, có kill thực. TTK dùng cùng lịch press seed và đi giữa mục tiêu, không unlimited approach. Held/exit là replay thứ tự của Host trên domain, chưa là bằng chứng keyboard hardware.
+
+**CHƯA ĐO bởi người thật:** rollover D+Space+1(+2) trên desktop/laptop; WASD/mũi tên với4/5; feel0,70s normal speed. Rủi ro: cadence press0,35±0,1s nhanh hơn CD, reject≤10% có thể không khả thi; damage intake còn phụ thuộc thời điểm chết của quái, không riêng AI safe window. Không có luật/số GDD được thay.
