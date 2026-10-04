@@ -29,6 +29,16 @@ namespace HuyenLo.Tests
             host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
             for(int i=0;i<4;i++)yield return new WaitForFixedUpdate();
         }
+        [UnityTest] public IEnumerator DebugMenuCanResetFreshWithKeyboard(){
+            InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.F8));yield return null;yield return null;
+            Assert.That(host.Hud.Panel,Is.EqualTo("debug"));
+            yield return new WaitForFixedUpdate();double paused=host.Session.Now;
+            yield return new WaitForFixedUpdate();Assert.That(host.Session.Now,Is.EqualTo(paused));
+            Assert.That(host.Hud.SelectAction("debug.Fresh"),Is.True);
+            Assert.That(host.Hud.ActivateSelected(),Is.True);
+            Assert.That(host.Session.Quest,Is.EqualTo(1));Assert.That(host.Session.DebugPreset,Is.Null);
+            Assert.That(host.Modal,Is.False);yield return null;
+        }
         [UnityTearDown] public IEnumerator Cleanup(){
             InputSystem.RemoveDevice(keyboard);InputSystem.settings.backgroundBehavior=background;
             InputSystem.settings.editorInputBehaviorInPlayMode=editor;Object.Destroy(root);yield return null;

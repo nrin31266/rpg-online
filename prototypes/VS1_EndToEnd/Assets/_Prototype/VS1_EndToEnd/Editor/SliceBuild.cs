@@ -26,7 +26,7 @@ namespace HuyenLo.Editor
         [MenuItem("Huyền Lộ Prototype/Build Linux VS-1")]
         public static void Linux() {
             CreateScene();Directory.CreateDirectory("Builds/Prototype/VS1_EndToEnd");
-            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{"Assets/_Prototype/VS1_EndToEnd/Scenes/VS1.unity"},locationPathName="Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64",target=BuildTarget.StandaloneLinux64,options=BuildOptions.Development});
+            var report=BuildPipeline.BuildPlayer(new BuildPlayerOptions{scenes=new[]{"Assets/_Prototype/VS1_EndToEnd/Scenes/VS1.unity"},locationPathName="Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64",target=BuildTarget.StandaloneLinux64,options=BuildOptions.None});
             Debug.Log($"[VS1] Build {report.summary.result}; {report.summary.totalSize} bytes");
             if (Application.isBatchMode) EditorApplication.Exit(report.summary.result == BuildResult.Succeeded ? 0 : 1);
             if(report.summary.result!=BuildResult.Succeeded)throw new Exception("VS-1 build failed");

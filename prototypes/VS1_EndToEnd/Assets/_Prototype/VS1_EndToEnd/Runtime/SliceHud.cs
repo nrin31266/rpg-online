@@ -21,7 +21,10 @@ namespace HuyenLo.Runtime
         private readonly Dictionary<string,string> tabFocus=new Dictionary<string,string>();
         private readonly string[] tabs={"bag","equipment","attributes","stats","skills"};
         private readonly string[] tabNames={"Hành trang","Trang bị","Thuộc tính","Thông số","Kỹ năng"};
-        private Item[] BagItems=>P.Inventory.Bag.Where(x=>!bagFilter.HasValue||Catalog.Get(x.Id).Kind==ItemKind.Gear&&Catalog.Get(x.Id).Slot==bagFilter.Value).ToArray();
+        private Item[] bagItems=Array.Empty<Item>();
+        private Item[] BagItems=>bagItems;
+        private double refreshAt;
+        private SliceSession refreshSession;
         private bool Rpg=>panel!=null&&(tabs.Contains(panel)||panel=="item"||panel=="equipped");
         public void ChangeTab(int direction){if(!Rpg){Navigate(direction);return;}int i=Array.IndexOf(tabs,panel);SwitchTab(tabs[(Math.Max(0,i)+direction+tabs.Length)%tabs.Length]);}
         public void SwitchTab(string name){if(panel!=null)tabFocus[panel]=SelectedActionId;trail.Clear();npc=null;if(name=="bag")bagFilter=null;Open(name);if(tabFocus.TryGetValue(name,out var focus))SelectAction(focus);}
@@ -32,7 +35,7 @@ namespace HuyenLo.Runtime
         private int selected;
         private Vector2 scroll;
         private Font font;
-        private GUIStyle slotText;
+        private GUIStyle slotText,helpText;
         private string chatText="";
         public void OpenChat(){Toggle("chat");}
         public void SubmitChat(){S.Feedback="Chat online chưa mở trong bản chạy thử.";chatText="";Close();}
@@ -46,7 +49,7 @@ namespace HuyenLo.Runtime
         public void OpenNpc(string id){Close();npc=id;Open("npc");}
         public void Close(){panel=npc=null;selected=0;actions.Clear();trail.Clear();S.Combat.CancelIntent();}
         public void Back(){if(trail.Count==0){Close();return;}var previous=trail.Pop();Open(previous.panel);SelectAction(previous.action);}
-        public bool IsOverUi(Vector2 screen){float y=Screen.height-screen.y;return Modal||y>Screen.height-78||(y<225&&screen.x<333)||(y<174&&screen.x>Screen.width-345)||(S.Combat.Focus!=null&&y<100&&screen.x>=345&&screen.x<=595);}
+        public bool IsOverUi(Vector2 screen){float y=Screen.height-screen.y;return Modal||y>Screen.height-78||(y<410&&screen.x<333)||(y<174&&screen.x>Screen.width-345)||(S.Combat.Focus!=null&&y<100&&screen.x>=345&&screen.x<=595);}
         public void Navigate(int delta){Refresh();if(actions.Count==0)return;selected=(selected+delta+actions.Count)%actions.Count;scroll.y=Mathf.Max(0,(selected-6)*36);}
         public void NavigateGrid(int x,int y){Navigate((panel=="bag"?6:panel=="equipment"?2:1)*y+x);}
         public bool SelectAction(string id){Refresh();int index=actions.FindIndex(x=>x.Id==id);if(index<0)return false;selected=index;return true;}
@@ -83,7 +86,9 @@ namespace HuyenLo.Runtime
             return S.Quest==6?"Đặt Mộc Kiếm vào túi trước khi nhập phái. Rồi học giữ thế." : "Đừng vội. Giữ thế cho chắc, rồi ra đòn.";
         }
         private void Refresh(){
-            if(Host==null||S==null)return;string previous=SelectedActionId;actions.Clear();
+            if(Host==null||S==null)return;refreshSession=S;refreshAt=S.Now+.15;
+            bagItems=P.Inventory.Bag.Where(x=>!bagFilter.HasValue||Catalog.Get(x.Id).Kind==ItemKind.Gear&&Catalog.Get(x.Id).Slot==bagFilter.Value).ToArray();
+            string previous=SelectedActionId;actions.Clear();
             if(!P.Alive){
                 Add("revive.village","Về Vân Khê — miễn phí",()=>{Close();return S.Revive(true);});
                 Add("revive.scroll","Dùng phù — 50% HP/MP",()=>{bool ok=S.Revive(false);if(ok)Close();return ok;},P.Inventory.Count("scroll")>0,"Không có Hồi Sinh Phù.");
@@ -103,11 +108,14 @@ namespace HuyenLo.Runtime
             }else if(panel=="attributes"){
                 foreach(string stat in new[]{"STR","VIT","INT","AGI"}){string value=stat;Add("allocate."+value,"+1 "+new Dictionary<string,string>{{"STR","Công Lực"},{"VIT","Sinh Lực"},{"INT","Linh Lực"},{"AGI","Thân Pháp"}}[value],()=>S.Allocate(value),P.Unspent>0,"Không còn điểm chưa dùng.");}
 
+            }else if(panel=="debug"){
+                foreach(PrototypeStart start in Enum.GetValues(typeof(PrototypeStart))){var preset=start;Add("debug."+preset,DebugLabel(preset)+" — reset phiên",()=>{Host.ResetPrototype(preset);return true;});}
             }else if(panel=="npc")Npc();
             else if(panel=="buy")ShopBuy();else if(panel=="sell")ShopSell();else if(panel=="store")Storage(true);else if(panel=="retrieve")Storage(false);
             if(panel!=null)Add("close",trail.Count>0?"← Quay lại (Esc)":"Đóng (Esc)",()=>{Back();return true;});
             int same=actions.FindIndex(x=>x.Id==previous);selected=same>=0?same:Mathf.Clamp(selected,0,Math.Max(0,actions.Count-1));
         }
+        private static string DebugLabel(PrototypeStart start)=>start==PrototypeStart.Fresh?"Q1 · phiên mới":start==PrototypeStart.Movement?"Q2 · nhảy / rơi sàn":start==PrototypeStart.Dummy?"Q3 · Mộc Kiếm / Bù Nhìn":start==PrototypeStart.FirstLoot?"Q4 · Nấm / trang bị":start==PrototypeStart.Wolves?"Q5 · Food / đàn Sói":start==PrototypeStart.Class?"Q6 · nhập phái":start==PrototypeStart.SwordTraining?"Kiếm · sân tập":"Kiếm · đàn 4 Sói";
         private bool CanUse(Item i,out string reason){
             reason="";if(i==null){reason="Ô trống";return false;}var d=Catalog.Get(i.Id);
             if(d.Kind==ItemKind.Gear&&(P.Level<d.MinLevel||i.Id=="wood"&&P.School!=School.Novice||i.Id=="sword1"&&P.School!=School.Sword)){reason="Cần đúng cấp / phái";return false;}
@@ -215,17 +223,31 @@ namespace HuyenLo.Runtime
             GUI.Label(new Rect(cx-55,area.y+397,120,26),P.School==School.Novice?"Tân Lữ":"Kiếm · Lv"+P.Level);DrawButton(actions.Last(),new Rect(area.x+20,area.yMax-50,200,32));
         }
         private string ViewTitle=>panel=="equipped"?"Trang bị · "+SlotName(chosenSlot):panel=="item"?"Vật phẩm":panel=="quest"?"Nhiệm vụ":"Thao tác";
+        private SliceSession textSession;
+        private double nextTextRefresh;
+        private string headerText,levelText,vitalsText,experienceText,foodText,objectiveText,skillsText;
+        private void RefreshHudText(){
+            if(textSession==S&&S.Now<nextTextRefresh)return;
+            textSession=S;nextTextRefresh=S.Now+.1;var st=P.Stats;
+            headerText="Huyền Lộ · bản chạy thử · "+SliceHost.MapName(P.Map);
+            levelText=$"Lv{P.Level} · {(P.School==School.Novice?"Tân Lữ":"Kiếm")} · Vàng {P.Gold}";
+            vitalsText=$"HP {P.Hp:F0}/{st.Hp:F0} · MP {P.Mp:F0}/{st.Mp:F0}";
+            experienceText=$"EXP {P.TotalExp} · điểm {P.Unspent}";
+            foodText=$"Food {(S.FoodUntil>S.Now?$"{S.FoodUntil-S.Now:F0}s":"chưa dùng")} · 4/H:HP {Math.Max(0,S.HpPotionUntil-S.Now):F1}s · 5/M:MP {Math.Max(0,S.MpPotionUntil-S.Now):F1}s";
+            objectiveText=S.Objective;
+            skillsText=P.School==School.Novice?"Mộc Kiếm":string.Join(" · ",S.Combat.Unlocked.Values.Select(x=>x.Name));
+        }
         private void OnGUI(){
-            if(Host==null||S==null)return;Refresh();GUI.skin.font=font;GUI.skin.label.fontSize=15;GUI.skin.label.wordWrap=true;GUI.skin.button.fontSize=14;GUI.skin.button.wordWrap=true;
-            var st=P.Stats;
-            GUI.Box(new Rect(8,8,325,214),"");GUILayout.BeginArea(new Rect(18,15,305,170));GUILayout.Label("Huyền Lộ · bản chạy thử · "+SliceHost.MapName(P.Map));
-            GUILayout.Label($"Lv{P.Level} · {(P.School==School.Novice?"Tân Lữ":"Kiếm")} · Vàng {P.Gold}");GUILayout.Label($"HP {P.Hp:F0}/{st.Hp:F0} · MP {P.Mp:F0}/{st.Mp:F0}");GUILayout.Label($"EXP {P.TotalExp} · điểm {P.Unspent}");GUILayout.Label($"Food {(S.FoodUntil>S.Now?$"{S.FoodUntil-S.Now:F0}s":"chưa dùng")} · {InputBindings.HpGlyph()}:HP {Math.Max(0,S.HpPotionUntil-S.Now):F1}s · {InputBindings.MpGlyph()}:MP {Math.Max(0,S.MpPotionUntil-S.Now):F1}s");GUILayout.EndArea();
+            if(Host==null||S==null)return;if(Modal&&(refreshSession!=S||S.Now>=refreshAt))Refresh();GUI.skin.font=font;GUI.skin.label.fontSize=15;GUI.skin.label.wordWrap=true;GUI.skin.button.fontSize=14;GUI.skin.button.wordWrap=true;
+            RefreshHudText();var st=P.Stats;
+            GUI.Box(new Rect(8,8,325,214),"");GUILayout.BeginArea(new Rect(18,15,305,170));GUILayout.Label(headerText);
+            GUILayout.Label(levelText);GUILayout.Label(vitalsText);GUILayout.Label(experienceText);GUILayout.Label(foodText);GUILayout.EndArea();
             Fill(new Rect(18,187,300,8),Color.gray);Fill(new Rect(18,187,300*(float)Math.Max(0,Math.Min(1,P.Hp/st.Hp)),8),new Color(.7f,.25f,.25f));
             Fill(new Rect(18,201,300,8),Color.gray);Fill(new Rect(18,201,300*(float)Math.Max(0,Math.Min(1,P.Mp/st.Mp)),8),new Color(.25f,.5f,.8f));
-            GUI.Box(new Rect(Screen.width-340,8,332,165),"");GUI.Label(new Rect(Screen.width-330,16,310,105),S.Objective);GUI.Label(new Rect(Screen.width-330,125,310,43),"E: tương tác · I: túi · C: nhân vật · Q: quest");
+            GUI.Box(new Rect(Screen.width-340,8,332,165),"");GUI.Label(new Rect(Screen.width-330,16,310,105),objectiveText);GUI.Label(new Rect(Screen.width-330,125,310,43),"E: tương tác · I: túi · C: nhân vật · Q: quest");
             var focus=S.Combat.Focus;if(focus!=null){GUI.Box(new Rect(345,8,250,90),"");GUI.Label(new Rect(355,14,230,27),$"{focus.Name} Lv{focus.Level}");GUI.Label(new Rect(355,42,230,24),$"{focus.Hp:F0} / {focus.MaxHp:F0}");Fill(new Rect(355,70,230*(float)(focus.Hp/focus.MaxHp),10),Color.green);var pt=Host.ScreenPoint(new Point(focus.Position.X,focus.Position.Y+1));Fill(new Rect(pt.x-25,Screen.height-pt.y,50*(float)(focus.Hp/focus.MaxHp),5),Color.red);}
             GUI.Label(new Rect(112,Screen.height-31,Screen.width-230,25),S.Feedback);
-            string skills=P.School==School.Novice?"Mộc Kiếm":string.Join(" · ",S.Combat.Unlocked.Values.Select(x=>x.Name));
+            string skills=skillsText;
             float barX=Screen.width/2-132;
             if(slotText==null)slotText=new GUIStyle(GUI.skin.label){fontSize=12};
             for(int i=1;i<=3;i++){
@@ -238,15 +260,22 @@ namespace HuyenLo.Runtime
             GUI.Label(new Rect(barX+282,Screen.height-91,225,48),InputBindings.HpGlyph()+": HP · "+InputBindings.MpGlyph()+": MP · F: Food\n"+(S.DebugPreset==null?"":"DEV preset: "+S.DebugPreset));
 
             if(panel=="chat"){GUI.Box(new Rect(20,Screen.height-170,480,58),"Chat · prototype local");GUI.SetNextControlName("chat-input");chatText=GUI.TextField(new Rect(30,Screen.height-143,460,24),chatText,80);GUI.FocusControl("chat-input");return;}
-            if(!Modal)return;float width=Mathf.Min(820,Screen.width-40),height=Mathf.Min(550,Screen.height-150);Rect area=new Rect((Screen.width-width)/2,115,width,height);Fill(area,new Color(.08f,.14f,.18f,1));GUI.Box(area,"");
+            if(!Modal){
+                GUI.Box(new Rect(8,232,325,138),"Phím thao tác");
+                if(helpText==null)helpText=new GUIStyle(GUI.skin.label){fontSize=13,wordWrap=false};
+                GUI.Label(new Rect(18,255,305,112),"A/D, ←/→: chạy · Space/↑: nhảy\nS/↓: xuống sàn · 1/2/3: chọn + đánh\nTab / Shift+Tab: mục tiêu kế / trước\n4/H: máu · 5/M: Linh lực · F: Food\nE: NPC/nhặt · I: hành trang\nC: nhân vật · Q: nhiệm vụ\nEnter: chat local · Esc: hủy / lùi",helpText);
+                if(GUI.Button(new Rect(18,378,145,26),"F8 · Debug / Reset")){Toggle("debug");GUIUtility.ExitGUI();}
+                return;
+            }float width=Mathf.Min(820,Screen.width-40),height=Mathf.Min(550,Screen.height-150);Rect area=new Rect((Screen.width-width)/2,115,width,height);Fill(area,new Color(.08f,.14f,.18f,1));GUI.Box(area,"");
             if(Rpg){
                 for(int i=0;i<tabs.Length;i++){var r=new Rect(area.x+i*area.width/5,area.y,area.width/5,32);var old=GUI.backgroundColor;GUI.backgroundColor=panel==tabs[i]?new Color(.5f,.7f,.45f):Color.gray;if(GUI.Button(r,tabNames[i])){GUI.backgroundColor=old;SwitchTab(tabs[i]);GUIUtility.ExitGUI();}GUI.backgroundColor=old;}
                 area.y+=38;area.height-=38;
             }
             if(panel=="bag"){DrawInventory(area);return;}if(panel=="equipment"){DrawEquipment(area);return;}
             GUILayout.BeginArea(new Rect(area.x+20,area.y+12,area.width-40,area.height-24));
-            GUILayout.Label(!P.Alive?"Đã chết":npc!=null?SliceSession.Anchors.First(x=>x.Id==npc).Name+" · "+(panel=="npc"?"Nói chuyện":panel=="buy"?"Mua hàng":panel=="sell"?"Bán đồ":panel=="store"?"Gửi rương":panel=="retrieve"?"Lấy rương":"Nhiệm vụ"):tabs.Contains(panel)?tabNames[Array.IndexOf(tabs,panel)]:ViewTitle);
+            GUILayout.Label(!P.Alive?"Đã chết":npc!=null?SliceSession.Anchors.First(x=>x.Id==npc).Name+" · "+(panel=="npc"?"Nói chuyện":panel=="buy"?"Mua hàng":panel=="sell"?"Bán đồ":panel=="store"?"Gửi rương":panel=="retrieve"?"Lấy rương":"Nhiệm vụ"):panel=="debug"?"Debug · chọn giai đoạn (reset toàn phiên)":tabs.Contains(panel)?tabNames[Array.IndexOf(tabs,panel)]:ViewTitle);
             GUILayout.Label(Rpg?"Tab / Shift+Tab đổi tab · mũi tên chọn · Enter/E dùng · Esc quay lại":"↑/↓ chọn · Enter/E thực hiện · Esc quay lại");
+            if(panel=="debug")GUILayout.Label("Chỉ bản mẫu local. Fresh = chơi lại Q1; các preset còn lại bỏ qua tiến trình để thử nhanh. Không ghi save hoặc thay luật production.");
             if(panel=="npc")GUILayout.Label("“"+(Host.LastDialogue??Dialogue(npc))+"”",GUILayout.Height(85));
             if(panel=="quest"||panel=="npc")GUILayout.Label(S.Objective,GUILayout.Height(48));
             if(panel=="item")GUILayout.Label(Description(SelectedItem),GUILayout.Height(200));

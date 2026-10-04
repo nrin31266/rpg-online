@@ -33,9 +33,9 @@ namespace HuyenLo.Domain
             if(map==Map.Village){
                 yield return Earth("West gate approach",-12,-8,0);
                 yield return Earth("Village square west",-8,2,0);
-                yield return Stone("Lotus pond west bank",2,2.4,-.2);
-                yield return Stone("Lotus pond bed",2.4,4.6,-.35);
-                yield return Stone("Lotus pond east bank",4.6,5,-.2);
+                yield return new Surface("Lotus pond west bank",2.325,-4,.65,8,rise:-.65,stone:true);
+                yield return Stone("Lotus pond bed",2.65,4.35,-.65);
+                yield return new Surface("Lotus pond east bank",4.675,-4,.65,8,rise:.65,stone:true);
                 yield return Earth("Village square east",5,8,0);
                 yield return Stone("Market step",8,9,.3);
                 yield return Stone("Forge terrace",9,17,.6);
@@ -99,7 +99,7 @@ namespace HuyenLo.Domain
         }
         // Feet contact, not XY overlap: bridge/air actors must remain dry.
         public static IEnumerable<WaterRegion> Waters(Map map){
-            if(map==Map.Village)yield return new WaterRegion(2,5,-.4,0);
+            if(map==Map.Village)yield return new WaterRegion(2.2,4.8,-.7,-.2);
             if(map==Map.Mist){
                 yield return new WaterRegion(66,82,-1.6,-.9,.85,false);
             }

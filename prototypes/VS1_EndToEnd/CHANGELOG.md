@@ -2,6 +2,18 @@
 
 Prototype là disposable/reference; findings chưa là luật production hoặc feel acceptance. Các archive refs chỉ local, **không push `archive/*`**.
 
+## Độ mượt và blockout dễ đọc — 2026-10-05
+
+Theo feedback mới, khôi phục F8/nút Debug: chọn giai đoạn/reset phiên RAM, tạm dừng local trong menu debug, Esc tiếp tục. Không khôi phục flags/A-B/save. Bảng phím world hiện đầy đủ; tên preset chỉ rõ Q1–Q6/sân Kiếm/đàn Sói, dùng chuột hoặc bàn phím.
+
+Loại bỏ việc tìm/sort LootCandidate cho từng loot view và quét history theo từng view mỗi frame; dọn object/record loot đã nhặt/hết hạn. Nearest acquisition và neighbor steering dùng duyệt tuyến tính/scratch list. Menu cache mảng bag và refresh actions có hạn; HUD text refresh 10 Hz, HP bars vẫn cập nhật theo frame. Damage text tái sử dụng, chỉ mục tiêu đổi mới cập nhật marker text; history presentation giới hạn và không ghi log mỗi action trong phiên chơi thường. Build thường thay Development build; đây là xử lý các nguồn cấp phát tìm thấy, chưa phải kết luận định lượng về frame stalls trên máy người chơi.
+
+Terrain vẫn blockout: cỏ/đá/wood có mặt riêng, actor có đầu/chân đơn giản, quái quay silhouette cùng hướng nhưng label không bị lật. Lòng hố Vân Khê có bờ dốc/đáy trũng/nước nông không collider; nước dưới cầu theo đúng level thấp của WaterRegion, không cột xanh hoặc tường ở đầu cầu. Spawns/exits/Q1–Q6 và combat stats giữ nguyên. Quái cùng phía tìm điểm tiếp cận theo khoảng trống, con đang lùi không giữ chỗ cũ; chỉ steering, không shoving/formation/token hoặc thay interval/range/speed/HP. Fixture trước ép cả bốn con cắn nhiều lần trong 16 s ở sát mép lane trái với không chồng; regression giờ kiểm bound/windup/bước di chuyển và rear participation, thêm test mục tiêu trống trước windup đứng yên.
+
+EditMode 86/86; PlayMode 17/17; test F8 pause/reset bổ sung pass. Linux release build và fresh Q1–Q6 pass; kiểm trực tiếp cửa sổ game cho hình Vân Khê, bảng phím và preset đàn Sói, không lỗi runtime ghi nhận trong lần kiểm. Chưa đo lại balance/TTK, chưa nghiệm thu feel lâu dài. Chỉ Roadmap đổi wording bản mẫu; GDD/Technical/Analysis/Art giữ nguyên, links/anchors không gãy.
+
+Dọn build Linux cũ và thư mục build lồng (~245 MiB); thư mục lồng đã hash-compare từng file với backup ngoài repo trước xóa. Tool audit InputProbes một phiên chuyển ngoài repo; giữ checker links, source/Unity settings/cache cần thiết và historical evidence mà docs tham chiếu. Không sửa Git history. Build còn một đường dẫn `Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64`.
+
 ## Bản chạy thử một hành vi — 2026-10-05
 
 Chủ dự án duyệt trực tiếp controls/focus/quick items/AI và yêu cầu prototype disposable tối giản. Sáu commit tài liệu theo thứ tự GDD → Technical → Analysis → Art → Roadmap → README: `00e9d9c`, `00d2369`, `34829d5`, `da16b49`, `38fe890`, `f96fc27`. Các đoạn lịch sử chuyển nguyên văn được giữ phía dưới; nội dung hiện hành tra docs/design/README.md.

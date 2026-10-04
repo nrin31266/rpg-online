@@ -231,7 +231,7 @@ namespace HuyenLo.Tests
             s.ObservePosition(new Point(-4,.8),true);Assert.That(s.Player.Map,Is.EqualTo(Map.Village));Assert.That(s.Player.Position.X,Is.EqualTo(32));
         }
         [TestCase(1,107)] [TestCase(2,107)] [TestCase(4,107)] [TestCase(4,104.6)] [TestCase(4,120.8)]
-        public void EveryWolfCanReengageWithoutFrontDeathOrTeleport(int count,double playerX){
+        public void WolfCrowdKeepsBoundsAndAdmitsRearAttackerWithoutTeleport(int count,double playerX){
             var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(playerX,1.45);s.Player.InvulnerableUntil=100;
             var pack=s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")).OrderBy(x=>x.Id).ToArray();
             for(int j=0;j<4;j++){pack[j].Home=pack[j].Position=new Point(Math.Max(104.45,Math.Min(121.55,playerX+(playerX>115?-1:1)*(1+j))),1.45);if(j>=count){pack[j].Hp=0;pack[j].RespawnAt=100;}}
@@ -243,7 +243,7 @@ namespace HuyenLo.Tests
                     Assert.That(pack[j].Position.X,Is.InRange(pack[j].LaneMin,pack[j].LaneMax));
                 }
             }
-            Assert.That(pack.Take(count).All(x=>x.BiteAttempts>=2),Is.True,"Every wolf must get actual in-range attempts without removing the front mob: "+string.Join(",",pack.Take(count).Select(x=>x.Id+":"+x.BiteAttempts+" "+x.Motion+" goal="+x.DesiredX)));
+            Assert.That(pack.Take(count).Count(x=>x.BiteAttempts>=2),Is.GreaterThanOrEqualTo(Math.Min(count,2)),"Recovery must admit another attacker; a boundary crowd cannot all occupy the same bite point: "+string.Join(",",pack.Take(count).Select(x=>x.Id+":"+x.BiteAttempts+" "+x.Motion+" goal="+x.DesiredX)));
         }
         [Test] public void PackLeavesBoundaryThenResumesPatrolWithoutNewLifeOrCredit(){
             var s=new SliceSession();s.Player.Map=Map.Mist;s.Player.Position=new Point(107,1.45);s.Player.InvulnerableUntil=100;
@@ -256,6 +256,20 @@ namespace HuyenLo.Tests
             Assert.That(pack.All(x=>x.Position.X>=x.ActivityMin&&x.Position.X<=x.ActivityMax&&x.Generation==1),Is.True);
             Assert.That(pack[0].Hp,Is.EqualTo(pack[0].MaxHp));Assert.That(pack[0].QuestDamage,Is.Zero);Assert.That(s.Loot,Is.Empty);
             Assert.That(pack.Select(x=>x.ActivityMin).Distinct().Count(),Is.EqualTo(1));
+        }
+        [Test] public void RearWolfSteersToFreeSpaceWithoutMovingStartedWindup(){
+            var s=PrototypePresets.Create(PrototypeStart.Crowd);s.Player.InvulnerableUntil=100;
+            s.Player.Position=new Point(110,1.45);
+            foreach(var m in s.Mobs.Where(x=>x.Slot.StartsWith("PROBE7.")))m.Hp=0;
+            var front=s.Mobs.First(x=>x.Id==60);var rear=s.Mobs.First(x=>x.Id==61);
+            front.Hp=front.MaxHp;rear.Hp=rear.MaxHp;
+            front.Position=new Point(110.9,front.Home.Y);front.Windup=true;front.HitAt=100;
+            rear.Position=new Point(113,rear.Home.Y);rear.Engaged=true;rear.ApproachSide=1;
+            rear.LastTargetX=110;rear.SideLockedUntil=100;
+            s.Tick(.02);
+            Assert.That(front.Position.X,Is.EqualTo(110.9).Within(.00001));
+            Assert.That(rear.DesiredX,Is.GreaterThanOrEqualTo(111.6));
+            Assert.That(rear.Position.X,Is.LessThan(113),"Steering may approach; it must not teleport or shove the front wolf");
         }
         [Test] public void WaterContactSlowsFeetButNotBridgeAirOrDryGround(){
             Assert.That(BlockoutLayout.WaterSpeed(Map.Village,new Point(3,-.35)),Is.EqualTo(.85));

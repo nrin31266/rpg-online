@@ -78,10 +78,14 @@ namespace HuyenLo.Domain
             if(!Player.Inventory.Add(pending)){Emit("Cần ô trống trong hành trang; có thể thử lại.");return false;}
             Receipts.Add(receipt);pendingGrants.Remove(receipt);Emit("Grant "+receipt);return true;
         }
-        public Mob Find(int id,int generation) => Mobs.FirstOrDefault(x=>x.Id==id && x.Generation==generation && x.Map==Player.Map && x.Alive);
+        public Mob Find(int id,int generation) {foreach(var m in Mobs)if(m.Id==id&&m.Generation==generation&&m.Map==Player.Map&&m.Alive)return m;return null;}
         public Anchor NearAnchor() => Anchors.Where(x=>!x.EdgeExit&&x.Map==Player.Map && Player.Position.Distance(x.Position)<=2)
             .OrderBy(x=>Player.Position.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
-        public Loot LootCandidate() => Loot.Where(x=>x.Eligible(Player,Now)).OrderBy(x=>Player.Position.Distance(x.Position)).ThenBy(x=>x.Id).FirstOrDefault();
+        public Loot LootCandidate() {
+            Loot best=null;double distance=double.PositiveInfinity;
+            foreach(var l in Loot){if(!l.Eligible(Player,Now))continue;double d=Player.Position.Distance(l.Position);if(d<distance||d==distance&&(best==null||l.Id<best.Id)){best=l;distance=d;}}
+            return best;
+        }
         public bool Near(string id) => Anchors.Any(x=>x.Id==id && x.Map==Player.Map && Player.Position.Distance(x.Position)<=2);
         public string QuestNpc => Quest==1||Quest==2?"Lam":Quest==3?"Phong":Quest==4?"Bach":Quest==5?"Yen":"Ta";
         private string RouteTo(Map destination){
@@ -327,12 +331,13 @@ namespace HuyenLo.Domain
                 m.PreviousPosition=m.Position;TickMob(m,dt);
             }
             // Tutorial entitlement keeps the same instance; regular world loot expires.
-            foreach(var l in Loot.Where(x=>!x.Claimed&&Now-x.Created>=60)){
+            foreach(var l in Loot){
+                if(l.Claimed||Now-l.Created<60)continue;
                 if(l.Tutorial){l.Position=Mobs.First(x=>x.Slot=="DS2.slot1").Home;l.Created=Now;Emit("Tutorial supply re-offer same instance "+l.Id);}
                 else l.Claimed=true;
             }
         }
-        private static void MoveMob(Mob m,double goal,double dt,Mob[] peers,double speedFactor=1) {
+        private static void MoveMob(Mob m,double goal,double dt,List<Mob> peers,double speedFactor=1) {
             double speed=m.Speed*speedFactor;
             m.DesiredX=Math.Max(Math.Max(m.ActivityMin,m.LaneMin),Math.Min(Math.Min(m.ActivityMax,m.LaneMax),goal));
             double dx=m.DesiredX-m.Position.X,velocity=Math.Sign(dx)*Math.Min(Math.Abs(dx)/dt,speed);
@@ -356,7 +361,7 @@ namespace HuyenLo.Domain
                 m.PatrolPauseUntil=Now+.6+(m.Id%5)*.17;m.Motion="idle";m.VelocityX=0;return;
             }
             m.Motion="patrol";
-            var peers=Mobs.Where(x=>x!=m&&x.Alive&&!x.Dummy&&x.Map==m.Map&&Math.Abs(x.Home.Y-m.Home.Y)<.3&&Math.Abs(x.Home.X-m.Home.X)<8).ToArray();
+            var peers=Neighbors(m);
             MoveMob(m,m.PatrolGoal,dt,peers,.35);if(Math.Abs(m.VelocityX)>.001)m.Facing=m.VelocityX<0?-1:1;
         }
         private void TickMob(Mob m,double dt) {
@@ -396,13 +401,31 @@ namespace HuyenLo.Domain
             unchecked {uint h=2166136261;foreach(char c in slot)h=(h^c)*16777619;return (h^(uint)life)*16777619;}
         }
         public static double StablePhase(Mob m)=>StableLifeHash(m.Slot,m.Generation)%6*.07;
-        private Mob[] Neighbors(Mob m)=>Mobs.Where(x=>x!=m&&x.Alive&&!x.Dummy&&!x.Returning&&x.Map==m.Map&&Math.Abs(x.Home.Y-m.Home.Y)<.3&&Math.Abs(x.Home.X-m.Home.X)<8).ToArray();
+        private readonly List<Mob> neighborScratch=new List<Mob>(8);
+        private List<Mob> Neighbors(Mob m) {
+            neighborScratch.Clear();foreach(var p in Mobs)if(p!=m&&p.Alive&&!p.Dummy&&!p.Returning&&p.Map==m.Map&&Math.Abs(p.Home.Y-m.Home.Y)<.3&&Math.Abs(p.Home.X-m.Home.X)<8)neighborScratch.Add(p);
+            return neighborScratch;
+        }
         public int FreeSide(Mob m) {
             var peers=Neighbors(m);double left=Player.Position.X-m.Range*.9,right=Player.Position.X+m.Range*.9;
-            double l=Math.Abs(Bound(m,left)-left)>.001?double.NegativeInfinity:peers.Length==0?double.PositiveInfinity:peers.Min(x=>Math.Abs(x.Position.X-left));
-            double r=Math.Abs(Bound(m,right)-right)>.001?double.NegativeInfinity:peers.Length==0?double.PositiveInfinity:peers.Min(x=>Math.Abs(x.Position.X-right));
+            double l=double.PositiveInfinity,r=double.PositiveInfinity;
+            foreach(var p in peers){l=Math.Min(l,Math.Abs(p.Position.X-left));r=Math.Min(r,Math.Abs(p.Position.X-right));}
+            if(Math.Abs(Bound(m,left)-left)>.001)l=double.NegativeInfinity;
+            if(Math.Abs(Bound(m,right)-right)>.001)r=double.NegativeInfinity;
             if(l==r)return (StableLifeHash(m.Slot,1)&1)==0?-1:1;
             return l>r?-1:1;
+        }
+        private double FreeApproachGoal(Mob m,double playerX) {
+            // Continuous free-space steering, no reserved slots/rank or attack tokens.
+            double goal=playerX+m.ApproachSide*m.Range*.9;
+            foreach(var p in Neighbors(m)) {
+                if(Math.Sign(p.Position.X-playerX)!=m.ApproachSide||p.RepositionAfterHit&&Now<p.RepositionUntil&&!p.Windup)continue;
+                double front=(p.Position.X-playerX)*m.ApproachSide;
+                double own=(m.Position.X-playerX)*m.ApproachSide;
+                if(front<own-.1&&Math.Abs(goal-p.Position.X)<.75)
+                    goal=p.Position.X+m.ApproachSide*.75;
+            }
+            return Bound(m,goal);
         }
         private void UpdateFacing(Mob m,double dx) {
             if(Math.Abs(dx)<=.15)return;
@@ -426,6 +449,7 @@ namespace HuyenLo.Domain
                 m.SideSwitchPending=false;attackGoal=playerX+m.ApproachSide*m.Range*.9;
             }
             // Return travel consumes existing recovery, never extends the attack deadline.
+            attackGoal=FreeApproachGoal(m,playerX);
             double returnTravel=Math.Abs(m.RepositionGoal-attackGoal)/m.Speed;
             bool reposition=m.RepositionAfterHit&&Now<m.RepositionUntil&&Now<m.NextAttack-returnTravel;
             double goal=reposition?m.RepositionGoal:attackGoal;

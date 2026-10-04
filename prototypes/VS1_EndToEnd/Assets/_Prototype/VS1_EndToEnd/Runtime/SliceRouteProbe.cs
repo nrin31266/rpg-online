@@ -1,4 +1,3 @@
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -130,8 +129,7 @@ namespace HuyenLo.Runtime
             yield return Exit("toVillageA");yield return Talk("Ta",turnIn:true);
             Check(S.Complete&&S.Player.School==School.Sword,"continuous route did not complete");
             Check(Enumerable.Range(1,6).All(i=>S.Receipts.Contains($"Q{i}.completed")),"missing completion receipt");
-            S.Emit("VS1 V6.2.7 Q1→Q6 PASS — physics, auto EdgeExit, keyboard menu adapter, one-press combat; no debug injection.");
+            S.Emit("VS1 Q1→Q6 PASS — physics, auto EdgeExit, keyboard menu adapter, one-press combat; no debug injection.");
         }
     }
 }
-#endif

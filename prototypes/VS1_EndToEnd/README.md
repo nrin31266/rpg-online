@@ -10,7 +10,7 @@ Unity Hub **6000.5.9f1**, mở project này và [VS1.unity](Assets/_Prototype/VS
 ./prototypes/VS1_EndToEnd/Builds/Prototype/VS1_EndToEnd/HuyenLo.x86_64
 ```
 
-Một phiên RAM mới bắt đầu Q1; không save JSON, không resume, không F8/preset menu hoặc cấu hình A/B. Test fixtures vẫn có helpers tạo state riêng, không dùng để bỏ qua route nghiệm thu.
+Một phiên RAM mới bắt đầu Q1; không save JSON, không resume, F8 mở menu debug chọn giai đoạn/reset; không cấu hình A/B. Preset debug dùng helpers tạo state riêng; không dùng để bỏ qua route nghiệm thu. Fresh reset về Q1, không save JSON. Khi mở debug, phiên local tạm dừng để chọn giai đoạn an toàn; Esc đóng và tiếp tục.
 
 | Phím | Thao tác |
 | --- | --- |
@@ -22,6 +22,7 @@ Một phiên RAM mới bắt đầu Q1; không save JSON, không resume, không 
 | I / C / Q | Hành trang / Nhân vật / Quest |
 | Mũi tên/WASD, Tab/Shift+Tab ở menu, Enter/E | Chọn ô/action/tab và xác nhận bằng bàn phím |
 | 4/H, 5/M, F | Bình Máu / Bình Linh lực / Food; 4/5 không chọn skill |
+| F8 hoặc nút Debug | Chọn Fresh/Q2/Q3/Q4/Q5/Q6/Kiếm/đàn Sói và reset phiên RAM |
 | Enter ở world | Mở ô chat local để kiểm UI capture; chưa gửi Map Chat online |
 | Esc | Modal/chat → pending/buffer → focus → no-op; mỗi press xử một tầng |
 | Click | Focus, NPC/loot hoặc menu; cùng command/validation với bàn phím |
@@ -30,12 +31,12 @@ Luật giữ phím/arrival/buffer/focus ở [GDD §3](../../docs/design/1_HUYEN_
 
 ## Phạm vi
 
-Q1–Q6: Vân Khê ↔ Học Viện, Vân Khê ↔ Đồng Sương; giữ layout/collision/spawn/exits hiện có. Player/quái/NPC là hộp màu, terrain/cầu/sàn là mảng phẳng. Không renderer cây/nước/thác/sương/parallax hoặc rig trang trí. Region nước nông và phép giảm tốc hiện có vẫn thuộc layout/domain; bỏ hình nước không đổi luật gameplay. Không mở rộng geometry hoặc roster để làm đẹp mock.
+Q1–Q6: Vân Khê ↔ Học Viện, Vân Khê ↔ Đồng Sương; giữ layout/collision/spawn/exits hiện có. Player/quái/NPC là hộp màu, terrain/cầu/sàn là mảng phẳng. Có viền cỏ, mặt đá, ván cầu, đầu/chân đơn giản cho actor; không cây/thác/sương/parallax hoặc rig trang trí. Nước là overlay không collider theo WaterRegion, nằm thấp dưới cầu. Hố Vân Khê có hai bờ dốc và đáy trũng; chạm nước nông vẫn giảm tốc như trước. Không mở rộng roster.
 
 Giữ marker NPC, đối thoại, HP/MP, target HUD/mini HP, skill text/CD, quest tracker, bag grid/equipment slots. S1/S2/S3 Kiếm giữ số; basic Tân Lữ dùng nhịp được duyệt. Code pending/selection/geometry lấy range từ profile; ranged chỉ fixture, không gameplay Cung. Dedicated/backend/PvP/Boss chưa làm; chat chỉ ô nhập local có nhãn.
 
 ## Kiểm chức năng
 
-EditMode kiểm domain/cost/arrival/life/clock; PlayMode kiểm Input System, physics/UI và fresh route. Development build có `--verify-route` để đi Q1–Q6 bằng Rigidbody2D và menu commands, không preset/inject quest/EXP/HP/position. Driver chỉ log PASS/FAIL, không capture/showcase/evidence directory hoặc đo metric. Automation không thay review feel/usability của người thật.
+EditMode kiểm domain/cost/arrival/life/clock; PlayMode kiểm Input System, physics/UI và fresh route. Build có `--verify-route` để đi Q1–Q6 bằng Rigidbody2D và menu commands, không preset/inject quest/EXP/HP/position. Driver chỉ log PASS/FAIL, không capture/showcase/evidence directory hoặc đo metric. Automation không thay review feel/usability của người thật.
 
 Lịch sử và giới hạn kết quả trước ở [CHANGELOG](CHANGELOG.md). Font [DejaVu Sans](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/DejaVuSans.ttf) giữ [license](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/LICENSE.txt). Production base chưa bắt đầu; G-L production/G-N/G-D chưa nghiệm thu.

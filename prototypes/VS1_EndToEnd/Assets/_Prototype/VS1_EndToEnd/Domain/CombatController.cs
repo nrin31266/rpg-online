@@ -65,9 +65,8 @@ namespace HuyenLo.Domain
         private bool InEnvelope(Mob m,Skill skill) => m!=null && m.Alive && !m.Returning && m.Map==P.Map && m.Position.Distance(P.Position)<=skill.Range+ApproachBudget(skill) && Math.Abs(m.Position.Y-P.Position.Y)<=skill.Vertical;
         private void Acquire(Skill skill) {
             skill=skill??Rules.Novice;
-            double search=(skill?.Range??1.7)+ApproachBudget(skill);
-            var target=session.Mobs.Where(x=>x.Alive&&x.Map==P.Map&&!x.Returning&&x.Position.Distance(P.Position)<=search&&Math.Abs(x.Position.Y-P.Position.Y)<=skill.Vertical)
-                .OrderBy(x=>x.Position.Distance(P.Position)).ThenBy(x=>x.Id).FirstOrDefault();
+            Mob target=null;double nearest=double.PositiveInfinity;
+            foreach(var m in session.Mobs){if(!InEnvelope(m,skill))continue;double d=m.Position.Distance(P.Position);if(d<nearest||d==nearest&&(target==null||m.Id<target.Id)){target=m;nearest=d;}}
             if(target==null){FocusId=FocusGeneration=0;FocusKind=FocusKind.None;return;}
             FocusId=target.Id;FocusGeneration=target.Generation;FocusKind=FocusKind.Auto;
         }

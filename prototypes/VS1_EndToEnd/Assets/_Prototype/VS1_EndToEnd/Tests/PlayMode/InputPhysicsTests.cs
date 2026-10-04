@@ -101,7 +101,7 @@ namespace HuyenLo.Tests
         [UnityTest] public IEnumerator WalkableBasinAndBridgeHaveDistinctMovementSpeeds(){
             var go=new GameObject("Water feet fixture");var host=go.AddComponent<SliceHost>();host.ExternalInput=true;
             try {
-                host.Body.position=new Vector2(3,.37f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
+                host.Body.position=new Vector2(3,(float)BlockoutLayout.BaseGroundTop(Map.Village,3)+.72f);host.Body.transform.position=host.Body.position;host.Body.linearVelocity=Vector2.zero;Physics2D.SyncTransforms();
                 for(int i=0;i<5;i++)yield return new WaitForFixedUpdate();Assert.That(host.Grounded,Is.True);Assert.That(host.Body.position.y,Is.LessThan(.5));
                 host.ExternalAxis=1;for(int i=0;i<4;i++)yield return new WaitForFixedUpdate();
                 Assert.That(host.Body.linearVelocity.x,Is.EqualTo(SliceHost.RunSpeed*.85f).Within(.05));

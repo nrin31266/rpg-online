@@ -57,6 +57,7 @@ namespace HuyenLo.Runtime
         private SpriteRenderer marker,playerBox;
         private int feedbackResultCount;
         private readonly Dictionary<int,double> flashUntil=new Dictionary<int,double>();
+        private readonly Stack<TextMesh> damagePool=new Stack<TextMesh>();
         private readonly List<(TextMesh mesh,float expiry)> floating=new List<(TextMesh,float)>();
         private readonly RaycastHit2D[] contacts=new RaycastHit2D[8];
         public const float RunSpeed=5,JumpSpeed=12;
@@ -82,14 +83,14 @@ namespace HuyenLo.Runtime
             cameraView.transform.position=new Vector3(9,3,-10);
             playerVisual=new GameObject("PlayerPhysics");Body=playerVisual.AddComponent<Rigidbody2D>();Body.gravityScale=2;Body.freezeRotation=true;Body.interpolation=RigidbodyInterpolation2D.Interpolate;Body.collisionDetectionMode=CollisionDetectionMode2D.Continuous;
             playerBox=RectVisual("Player",playerVisual.transform,Vector2.zero,new Vector2(.55f,1.4f),new Color(.3f,.8f,.55f),10);
+            RectVisual("Head",playerVisual.transform,new Vector2(0,.38f),new Vector2(.4f,.4f),new Color(.87f,.7f,.5f),11);
+            RectVisual("Leg divider",playerVisual.transform,new Vector2(0,-.5f),new Vector2(.07f,.35f),cameraView.backgroundColor,11);
             playerVisual.layer=7;playerCollider=playerVisual.AddComponent<BoxCollider2D>();playerCollider.size=new Vector2(.55f,1.4f);
             var mat=new PhysicsMaterial2D("NoFriction"){friction=0,bounciness=0};playerCollider.sharedMaterial=mat;
             marker=RectVisual("CombatFocus",null,Vector2.zero,new Vector2(.9f,.08f),Color.yellow,12);
             Hud=gameObject.AddComponent<SliceHud>();Hud.Host=this;
             BuildMap();
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
             if (System.Environment.GetCommandLineArgs().Contains("--verify-route")) gameObject.AddComponent<SliceRouteProbe>();
-#endif
         }
         private readonly List<Sprite> terrainSprites=new List<Sprite>();
         private SpriteRenderer RectVisual(string name,Transform parent,Vector2 position,Vector2 size,Color color,int order=0) {
@@ -100,6 +101,7 @@ namespace HuyenLo.Runtime
             Color col=wood||(oneWay&&!rearEarth)?new Color(.55f,.39f,.23f):stone?new Color(.35f,.40f,.44f):new Color(.44f,.38f,.27f);
             var sr=RectVisual(name,world.transform,new Vector2(x,y),new Vector2(width,height),col);
             if(rearEarth)sr.sortingOrder=-12;else if(oneWay||wood)sr.sortingOrder=6;else if(stone)sr.sortingOrder=0;
+            if(rearEarth)sr.color=new Color(.39f,.43f,.32f);
             sr.gameObject.layer=6;var box=sr.gameObject.AddComponent<BoxCollider2D>();
             // Full rear soil is visual; only a thin top participates in collision.
             if(rearEarth){box.size=new Vector2(1,.16f/height);box.offset=new Vector2(0,.5f-.08f/height);}
@@ -109,6 +111,15 @@ namespace HuyenLo.Runtime
                 var polygon=sr.gameObject.AddComponent<PolygonCollider2D>();polygon.points=vertices;
                 var shape=Sprite.Create(square.texture,square.rect,new Vector2(.5f,.5f),square.pixelsPerUnit);shape.OverrideGeometry(vertices.Select(v=>new Vector2((v.x+.5f)*square.rect.width,(v.y+.5f)*square.rect.height)).ToArray(),new ushort[]{0,1,2,0,2,3});sr.sprite=shape;terrainSprites.Add(shape);
             }
+            float top=height/2;
+            if(rise==0){
+                var cap=RectVisual(wood?"Timber deck":stone?"Stone surface":"Grass surface",world.transform,new Vector2(x,y+top-.035f),new Vector2(width,.07f),wood?new Color(.8f,.59f,.3f):stone?new Color(.7f,.73f,.7f):new Color(.35f,.65f,.29f),sr.sortingOrder+1);
+                if(wood)for(float offset=-width/2+.5f;offset<width/2;offset+=1)RectVisual("Plank seam",world.transform,new Vector2(x+offset,y),new Vector2(.025f,height),new Color(.3f,.2f,.12f),sr.sortingOrder+1);
+            }
+            if(rise!=0){
+                var lip=RectVisual("Sloped stone surface",world.transform,new Vector2(x,y+top-Mathf.Abs(rise)/2),new Vector2(Mathf.Sqrt(width*width+rise*rise),.065f),new Color(.7f,.73f,.7f),sr.sortingOrder+1);
+                lip.transform.rotation=Quaternion.Euler(0,0,Mathf.Atan2(rise,width)*Mathf.Rad2Deg);
+            }
             if(oneWay){var eff=sr.gameObject.AddComponent<PlatformEffector2D>();eff.useOneWay=true;eff.useOneWayGrouping=true;eff.surfaceArc=160;box.usedByEffector=true;platforms.Add(box);}
         }
         private TextMesh Label(string text,Vector3 position,Transform parent=null,float scale=.12f) {
@@ -117,13 +128,20 @@ namespace HuyenLo.Runtime
         }
         private void BuildMap() {
             foreach(var sprite in terrainSprites)Destroy(sprite);terrainSprites.Clear();
-            foreach(var v in floating)if(v.mesh!=null)Destroy(v.mesh.gameObject);floating.Clear();
+            foreach(var v in floating)if(v.mesh!=null){v.mesh.gameObject.SetActive(false);damagePool.Push(v.mesh);}floating.Clear();
             if(world!=null){world.SetActive(false);Destroy(world);}world=new GameObject("Map "+Session.Player.Map);mobViews.Clear();lootViews.Clear();platforms.Clear();ignored.Clear();renderedMap=Session.Player.Map;renderedRevision=Session.WorldRevision;
             npcMarkers.Clear();speech=null;
             float min=(float)BlockoutLayout.MinX(renderedMap),max=(float)BlockoutLayout.MaxX(renderedMap);
             foreach(var surface in BlockoutLayout.Surfaces(renderedMap))
                 Ground(surface.Name,(float)surface.X,(float)surface.Y,(float)surface.Width,(float)surface.Height,surface.OneWay,surface.Wood,surface.RearEarth,(float)surface.Rise,surface.Stone);
             Ground("LeftBoundary",min,5,1,14);Ground("RightBoundary",max,5,1,14);
+            foreach(var water in BlockoutLayout.Waters(renderedMap)){
+                // A small collider-free overlay follows the authored basin, never a tall column under the bridge.
+                float left=(float)water.Left,right=(float)water.Right,level=(float)water.Level;
+                float bottom=(float)water.Bottom;
+                RectVisual("Shallow water · no collider",world.transform,new Vector2((left+right)/2,(level+bottom)/2),new Vector2(right-left,level-bottom),new Color(.18f,.43f,.58f,.6f),renderedMap==Map.Village?12:3);
+                RectVisual("Water surface",world.transform,new Vector2((left+right)/2,level),new Vector2(right-left,.045f),new Color(.46f,.77f,.85f),renderedMap==Map.Village?13:4);
+            }
             foreach(var a in SliceSession.Anchors.Where(x=>x.Map==renderedMap))RenderNpc(a);
             foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap))SpawnMob(m);
             var spawn=new Vector2((float)Session.Player.Position.X,(float)Session.Player.Position.Y);
@@ -153,14 +171,20 @@ namespace HuyenLo.Runtime
         }
         private void RenderNpc(Anchor a){
             var root=new GameObject(a.Name);root.transform.SetParent(world.transform,false);root.transform.localPosition=new Vector3((float)a.Position.X,(float)a.Position.Y,0);
-            RectVisual(a.EdgeExit?"Map edge":"NPC",root.transform,Vector2.zero,a.EdgeExit?new Vector2(.2f,1.5f):new Vector2(.55f,1.4f),a.EdgeExit?Color.cyan:new Color(.9f,.7f,.3f),9);
+            RectVisual(a.EdgeExit?"Map edge":"NPC",root.transform,Vector2.zero,a.EdgeExit?new Vector2(.2f,1.5f):new Vector2(.55f,1.4f),a.EdgeExit?new Color(.85f,.6f,.18f):new Color(.9f,.7f,.3f),9);
+            if(!a.EdgeExit)RectVisual("NPC head",root.transform,new Vector2(0,.45f),new Vector2(.4f,.32f),new Color(.9f,.74f,.53f),10);
             Label(a.EdgeExit?(a.Id.StartsWith("toVillage")?"← ":"→ ")+a.Name:a.Name,root.transform.position+Vector3.up*1.3f,root.transform,.05f);
             if(!a.EdgeExit)npcMarkers[a.Id]=Label("",root.transform.position+Vector3.up*1.8f,root.transform,.09f);
         }
         private void SpawnMob(Mob m){
             var root=new GameObject(m.Slot);root.transform.SetParent(world.transform,false);root.transform.localPosition=new Vector3((float)m.Position.X,(float)m.Position.Y,0);
             var color=m.Dummy?new Color(.75f,.6f,.4f):m.Name=="Nấm Linh"?new Color(.7f,.3f,.7f):new Color(.55f,.65f,.8f);
-            var view=new MobPresenter{Root=root};view.Parts.Add((RectVisual(m.Name,root.transform,Vector2.zero,new Vector2(.7f,m.Dummy?1.2f:.8f),color,10),color));
+            var visual=new GameObject("Silhouette");visual.transform.SetParent(root.transform,false);
+            var view=new MobPresenter{Root=root,VisualRoot=visual.transform};view.Parts.Add((RectVisual(m.Name,visual.transform,Vector2.zero,new Vector2(.7f,m.Dummy?1.2f:.8f),color,10),color));
+            if(!m.Dummy){
+                RectVisual("Head",visual.transform,new Vector2(.27f,.16f),new Vector2(.3f,.3f),color*.8f,11);
+                RectVisual("Feet",visual.transform,new Vector2(0,-.35f),new Vector2(.5f,.12f),color*.65f,11);
+            }
             Label(m.Name+" Lv"+m.Level,root.transform.position+Vector3.up*.9f,root.transform,.045f);mobViews[m.Id]=view;
         }
         public void Speak(string id)=>SpeakText(id,Hud.Dialogue(id));
@@ -170,20 +194,19 @@ namespace HuyenLo.Runtime
             foreach(var word in words){if(line.Length+word.Length>32){wrapped+=line+"\n";line="";}line+=word+" ";}wrapped+=line;
             speech=Label(wrapped,new Vector3((float)a.Position.X,(float)a.Position.Y+3.3f,0),world.transform,.05f);speechUntil=Session.Now+7;
         }
-        private void BindSession(){Session.OnEvent=x=>Debug.Log("[VS1] "+x);}
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        private void BindSession(){Session.OnEvent=ExternalInput||System.Environment.GetCommandLineArgs().Contains("--verify-route")?x=>Debug.Log("[VS1] "+x):null;}
         public void ResetPrototype(PrototypeStart start){
             Session.OnEvent=null;Session=PrototypePresets.Create(start);BindSession();heldMovement.Clear();heldMask=0;cycleRequest=0;
             combatEvents.Clear();feedbackResultCount=0;flashUntil.Clear();axis=ExternalAxis=0;
             ExternalJump=ExternalDrop=false;jumpBufferedUntil=lastGroundAt=-100;
             Hud.Close();BuildMap();Session.Emit(start==PrototypeStart.Fresh?"Phiên mới — bắt đầu Q1.":"DEBUG "+start+" — preset, không nghiệm thu route.");
         }
-#endif
         public void HandleMenuKey(string key){
             if(key=="up")Hud.Navigate(-1);else if(key=="down")Hud.Navigate(1);else if(key=="tab")Hud.ChangeTab(1);else if(key=="left")Hud.Navigate(-1);else if(key=="right")Hud.Navigate(1);else if(key=="activate")Hud.ActivateSelected();else if(key=="escape")Hud.Back();
         }
         private void Update() {
             if(ExternalInput){combatEvents.Clear();return;}var k=Keyboard.current;if(k==null){combatEvents.Clear();return;}
+            if(k.f8Key.wasPressedThisFrame){Hud.Toggle("debug");axis=0;combatEvents.Clear();cycleRequest=0;return;}
             if(k.escapeKey.wasPressedThisFrame){EscapeWorld();axis=0;combatEvents.Clear();cycleRequest=0;return;}
             if(k.iKey.wasPressedThisFrame){Hud.Toggle("bag");axis=0;combatEvents.Clear();return;}
             if(k.cKey.wasPressedThisFrame){Hud.Toggle("equipment");axis=0;combatEvents.Clear();return;}
@@ -229,6 +252,7 @@ namespace HuyenLo.Runtime
             for(int i=0;i<n;i++)if(contacts[i].normal.y>.5f && (!(contacts[i].collider is BoxCollider2D support)||!ignored.ContainsKey(support)))return true;return false;
         }
         private void FixedUpdate() {
+            if(Hud.Panel=="debug"){Body.simulated=false;return;}
             if(!Body.simulated)Body.simulated=true;
             if(Session.WorldRevision!=renderedRevision)BuildMap();
             if(ignored.Count>0){
@@ -273,25 +297,32 @@ namespace HuyenLo.Runtime
             if(!Session.Player.Alive&&Session.Player.Map==Map.Village&&Body.position.y<-8)Body.position=new Vector2((float)Session.Player.Position.X,.8f);
             cameraView.transform.position=Vector3.SmoothDamp(cameraView.transform.position,CameraTarget(),ref cameraVelocity,.045f,100,Time.deltaTime);
             playerBox.color=!Session.Player.Alive?Color.gray:Session.Now-Session.LastHurtAt<.12?Color.white:Session.Player.School==School.Novice?new Color(.3f,.8f,.55f):new Color(.3f,.6f,1);
-            foreach(var pair in npcMarkers){pair.Value.text=Hud.Marker(pair.Key);pair.Value.color=pair.Value.text=="?"?Color.yellow:Color.white;}
+            foreach(var pair in npcMarkers){var text=Hud.Marker(pair.Key);if(pair.Value.text!=text)pair.Value.text=text;pair.Value.color=text=="?"?Color.yellow:Color.white;}
             if(speech!=null&&Session.Now>speechUntil){Destroy(speech.gameObject);speech=null;}
             foreach(var m in Session.Mobs.Where(x=>x.Map==renderedMap)){
                 if(!mobViews.TryGetValue(m.Id,out var view))continue;view.Root.SetActive(m.Alive);if(!m.Alive)continue;
                 view.Root.transform.localPosition=Vector2.Lerp(new Vector2((float)m.PreviousPosition.X,(float)m.PreviousPosition.Y),new Vector2((float)m.Position.X,(float)m.Position.Y),Mathf.Clamp01((Time.time-Time.fixedTime)/Time.fixedDeltaTime));
+                view.VisualRoot.localScale=new Vector3(m.Facing,1,1);
                 bool hurt=flashUntil.TryGetValue(m.Id,out var until)&&Session.Now<until;
                 foreach(var part in view.Parts)part.sr.color=hurt?Color.white:m.Returning?Color.gray:m.Windup?new Color(1,.55f,.3f):part.baseColor;
             }
-            foreach(var l in Session.Loot.Where(x=>x.Map==renderedMap&&!x.Claimed)){
-                if(!lootViews.TryGetValue(l.Id,out var view)){view=RectVisual("Loot "+l.Id,world.transform,new Vector2((float)l.Position.X,(float)l.Position.Y-.3f),new Vector2(.25f,.25f),Color.cyan,6);lootViews[l.Id]=view;}
-                view.color=Session.LootCandidate()?.Id==l.Id?Color.yellow:Color.cyan;
+            var lootCandidate=Session.LootCandidate();
+            foreach(var l in Session.Loot){
+                if(l.Map!=renderedMap||l.Claimed)continue;
+                if(!lootViews.TryGetValue(l.Id,out var view)){view=RectVisual("Loot "+l.Id,world.transform,new Vector2((float)l.Position.X,(float)l.Position.Y-.3f),new Vector2(.25f,.25f),Color.yellow,6);lootViews[l.Id]=view;}
+                view.color=lootCandidate?.Id==l.Id?Color.white:Color.yellow;
             }
-            foreach(var pair in lootViews)if(Session.Loot.First(x=>x.Id==pair.Key).Claimed)pair.Value.enabled=false;
+            // Retire collected/expired objects once, rather than searching the full history per view every frame.
+            for(int i=Session.Loot.Count-1;i>=0;i--){var l=Session.Loot[i];if(!l.Claimed)continue;if(lootViews.TryGetValue(l.Id,out var view)){Destroy(view.gameObject);lootViews.Remove(l.Id);}Session.Loot.RemoveAt(i);}
             var focus=Session.Combat.Focus;marker.enabled=focus!=null;if(focus!=null)marker.transform.position=new Vector3((float)focus.Position.X,(float)focus.Position.Y-.7f,0);
             for(;feedbackResultCount<Session.Combat.Results.Count;feedbackResultCount++){
                 var result=Session.Combat.Results[feedbackResultCount];var mob=Session.Mobs.First(x=>x.Id==result.Target);if(mob.Map!=renderedMap||mob.Generation!=result.Generation)continue;
-                flashUntil[mob.Id]=Session.Now+.12;var txt=Label(result.Evaded?"NÉ":result.Damage.ToString(),new Vector3((float)mob.Position.X,(float)mob.Position.Y+1.1f,0));txt.color=result.Crit?Color.yellow:Color.white;floating.Add((txt,Time.time+1));
+                flashUntil[mob.Id]=Session.Now+.12;var txt=damagePool.Count>0?damagePool.Pop():Label("",Vector3.zero,transform);txt.transform.position=new Vector3((float)mob.Position.X,(float)mob.Position.Y+1.1f,0);txt.text=result.Evaded?"NÉ":result.Damage.ToString();txt.gameObject.SetActive(true);txt.color=result.Crit?Color.yellow:Color.white;floating.Add((txt,Time.time+1));
             }
-            for(int i=floating.Count-1;i>=0;i--)if(Time.time>=floating[i].expiry){Destroy(floating[i].mesh.gameObject);floating.RemoveAt(i);}else floating[i].mesh.transform.Translate(0,Time.deltaTime*.4f,0);
+            // Disposable UI histories are not durable logs. Keep long sessions bounded after consuming feedback.
+            if(feedbackResultCount>256){Session.Combat.Results.Clear();feedbackResultCount=0;}
+            if(Session.Events.Count>512)Session.Events.RemoveRange(0,Session.Events.Count-256);
+            for(int i=floating.Count-1;i>=0;i--)if(Time.time>=floating[i].expiry){floating[i].mesh.gameObject.SetActive(false);damagePool.Push(floating[i].mesh);floating.RemoveAt(i);}else floating[i].mesh.transform.Translate(0,Time.deltaTime*.4f,0);
         }
         public Vector2 ScreenPoint(Point point)=>cameraView.WorldToScreenPoint(new Vector3((float)point.X,(float)point.Y,0));
         private void OnDestroy(){cycleBinding?.Dispose();foreach(var sprite in terrainSprites)Destroy(sprite);if(combatBindings!=null)foreach(var binding in combatBindings)binding.Dispose();if(world!=null)Destroy(world);if(playerVisual!=null)Destroy(playerVisual);if(cameraView!=null)Destroy(cameraView.gameObject);if(marker!=null)Destroy(marker.gameObject);foreach(var v in floating)if(v.mesh!=null)Destroy(v.mesh.gameObject);}
