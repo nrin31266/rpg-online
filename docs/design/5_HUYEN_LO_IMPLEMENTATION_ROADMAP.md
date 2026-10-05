@@ -2,141 +2,170 @@
 
 ## Tóm tắt
 
-Owner của thứ tự/gates và CURRENT/DEFERRED. Thân §1–6 hướng dẫn việc cần làm; §7–10 là phụ lục lịch sử nguyên văn. VS-1 disposable đồ họa tối giản; production sẽ thiết kế lại. Giữ TARGET Kiếm/Cung/online và khung quản lý hai tháng/bốn người.
+Roadmap sở hữu thứ tự triển khai, điều kiện qua từng giai đoạn và trạng thái CURRENT/DEFERRED. §1–6 hướng dẫn công việc hiện hành; §7–10 giữ lịch sử và bằng chứng của các revision trước, với routing lượt migration mới tại §8. TARGET vẫn có Kiếm, Cung và online đầy đủ, trong khung nguồn lực hai tháng/bốn người. VS-1 là bản mẫu disposable; production cần thiết kế lại.
 
 ## Tìm gì ở đâu
 
-- [CURRENT / TARGET](#target-current-deferred), [VS-1](#vs-1), [phase gates](#phase-gates).
+- [TARGET / CURRENT / DEFERRED](#target-current-deferred), [lát cắt local](#vs-1), [phase gates](#phase-gates).
+- [Các phép kiểm revision mới](#revision-validation), [DEV SPEED và fresh-run acceptance](#dev-speed-acceptance).
 - [Khung quản lý](#management-window), [art workflow](#art-workflow), [điều kiện production](#production-release).
 - [Phụ lục lịch sử §7–10](#roadmap-history-appendix), [SOURCE → DESTINATION](#source-destination).
 
-**Ngày đồng bộ:** 2026-10-04 · **Trạng thái:** DESIGN + PROTOTYPE VALIDATION; VS-1 disposable/reference cũ, production codebase chưa bắt đầu, chưa mở G-N.
+**Ngày đồng bộ:** 2026-10-06 · **Trạng thái:** DESIGN + PROTOTYPE VALIDATION. Công việc hiện hành là di chuyển và đồng bộ tài liệu theo thiết kế mới; production codebase chưa bắt đầu. Các gate của revision mới chưa chạy. VS-1 hiện có giữ nguyên trong lượt migration này.
 
-File này sở hữu **thứ tự làm, CURRENT/DEFERRED, điều kiện mở production và routing hồ sơ bản mẫu** (§10, chi tiết ở CHANGELOG prototype). [GDD](1_HUYEN_LO_GDD.md) giữ game đích; [Technical](2_HUYEN_LO_TECHNICAL.md) giữ cách chạy/tích hợp; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) giữ evidence/quyết định; [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md) giữ chi tiết hình ảnh và production. Không dùng roadmap để sửa luật, duyệt proposal Art hoặc thu nhỏ nghiệm thu cuối.
+[GDD](1_HUYEN_LO_GDD.md) sở hữu luật game; [Technical](2_HUYEN_LO_TECHNICAL.md) sở hữu hợp đồng triển khai; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) sở hữu phân tích, bằng chứng và sổ quyết định; [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md) sở hữu hình ảnh và quy trình sản xuất. Roadmap giữ điều kiện mở rộng và đường dẫn tới [hồ sơ bản mẫu](#prototype-visual-review). Không dùng lịch để tự sửa luật, duyệt đề xuất Art hoặc giảm nghiệm thu TARGET.
 
 <a id="target-current-deferred"></a>
 
 # 1. TARGET, CURRENT và DEFERRED
 
-**TARGET** là toàn bộ P0 hiện hành: Tân Lữ, Kiếm và Cung, hành trình Lv 1–20/Q1–Q12 (Q9 optional), gear/kinh tế, năm farm maps và ba support zones, Linh Biến/Boss, co-farm/chat/PvP; Unity Client + Dedicated Game Server + Spring Boot + PostgreSQL, Login/Character Select/persistence/recovery. Nghiệm thu cuối vẫn tối thiểu hai client đồng thời với backend/DB thật theo [GDD §10](1_HUYEN_LO_GDD.md#acceptance-routing).
+**TARGET** là toàn bộ P0 hiện hành: Tân Lữ, Kiếm và Cung; Lv 1–20 và Q1–Q12, trong đó Q9 tùy chọn; trang bị/kinh tế; năm map farm và ba khu hỗ trợ; Linh Biến, Boss, co-farm, chat và PvP. Kiến trúc đích là Unity Client + Dedicated Game Server + Spring Boot + PostgreSQL, có Login/Character Select, lưu tiến trình và khôi phục phiên. Nghiệm thu cuối theo [GDD §10](1_HUYEN_LO_GDD.md#acceptance-routing) cần tối thiểu hai client đồng thời với backend/DB thật. World và các danh sách nhận thưởng, nhặt đồ, threat phải an toàn với N người; hai client là mức kiểm tối thiểu, không phải trần người chơi hoặc tuyên bố capacity.
 
-**CURRENT** là harvest VS-1 mock đã chạy → sửa docs → movement/UI/art/rig probe → thiết kế production base → implement core base/local slice revision mới → G-N Dedicated với hai client sớm. Không nối network thẳng vào throwaway classes hoặc xem cấu trúc prototype là base đã duyệt. `Offline/local-first` là cách triển khai để kiểm sớm, không đổi game đích thành single-player. `CURRENT` không có nghĩa đã code hoặc đã pass.
+**CURRENT** là đồng bộ tài liệu sau khi thu bài học từ VS-1. Đường triển khai tiếp theo là **thu bài học bản mẫu → đồng bộ docs → probe cảm giác điều khiển/UI/art/rig → review production base → dựng local production slice → Dedicated với ít nhất hai client sớm → mở rộng production**. Local-first giúp kiểm luật và tương tác sớm; TARGET vẫn là game online. CURRENT biểu thị việc đang ưu tiên, không tự có nghĩa đã code hoặc đã pass.
 
-Lịch sử prototype ở [Phụ lục](#roadmap-history-appendix); G-L vẫn PARTIAL, chưa có normal-speed feel/usability review hoặc art production được nghiệm thu.
+Bản mẫu cũ đã có các lượt test và video theo revision riêng. Trạng thái G-L PARTIAL trong hồ sơ cũ không chứng minh G-L production theo thiết kế mới. Chưa có bằng chứng runtime mới cho controls, cadence, mật độ, địa hình hay NPC/quest đã sửa.
 
-**DEFERRED** là phần đã thiết kế và vẫn phải làm trong TARGET, nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung thuộc TARGET P0, **không phải feature P1**. Mọi bảng Cung, projectile, gear, pose/VFX và balance được giữ. Q6/lore vẫn giới thiệu hai phái; trong bản thử sớm, Kiếm chơi được, Cung ghi “Chưa mở trong bản thử nghiệm”. Không dùng nhãn này trong sản phẩm cuối.
+**DEFERRED** là hạng mục vẫn thuộc TARGET nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung là P0. Giữ toàn bộ skill, projectile, gear, pose/VFX và các phép kiểm Kiếm/Cung. Slice sớm triển khai Kiếm trước; Cung vẫn được giới thiệu trong Q6 và có thể ghi “Chưa mở trong bản thử nghiệm” khi chưa playable. Nhãn giới hạn này không dùng trong sản phẩm cuối.
 
-| Nhóm | Trạng thái triển khai hiện tại | Điểm quay lại / điều kiện |
+| Nhóm | Trạng thái hiện hành | Điều kiện quay lại / mở rộng |
 | --- | --- | --- |
-| Tân Lữ → Kiếm, movement, basic/S1, nội tại nền tảng | CURRENT docs/feel/art probe, prototype cũ reference | Base review rồi G-L revision mới Q1–Q6 |
-| Vân Khê, Học Viện, Đồng Sương; Nấm/Sói/Dummy/UI | CURRENT blockout/UX probe, chưa production | Validate EdgeExit, Nấm→Sói, ≥3 Dummy, one-shot input ở tốc độ thường |
-| Kiếm Lv 10/13/17 và các bãi/Q7–Q12 | DEFERRED khỏi VS-1, TARGET P0 giữ nguyên | G-N + G-D; có thể dùng fixture hẹp để kiểm kỹ thuật trước hành trình đầy đủ |
-| Cung: chọn/chơi, mọi skill/gear/projectile/pose/balance | DEFERRED IMPLEMENTATION, TARGET P0 | Sau G-N; giải A01/A02/A05/A14 bằng prototype Cung trước nhân toàn bộ gear |
-| Dedicated Server và ít nhất hai clients | Gate sớm **sau base review và G-L revision mới**, chưa bắt đầu | G-N trước mở production content/art rộng; không attach vào throwaway prototype |
-| Login/Character Select, Spring/PostgreSQL, ticket/lease/checkpoint/reconnect | DEFERRED khỏi local slice, TARGET P0 | G-D sau spike mạng; chưa có DB thật không được gọi final online acceptance |
-| Chat/co-farm/claim shared, Linh Biến/Q8 | DEFERRED khỏi VS-1 | G-N chứng minh recipient/MapId; G-D chứng minh commit; G-C mở content |
-| Boss/full online visual load | DEFERRED prototype và production | G-C; giữ các luật Boss đã có, giải A16/camera/telegraph ở G-F |
-| PvP/Q9/escrow/settlement | DEFERRED khỏi VS-1, TARGET P0 | G-D trước G-P; Q9 optional cho người chơi không có nghĩa được bỏ hệ PvP |
-| Buff R, shield/groggy, QoL/P1/P2 | Chưa duyệt triển khai | Chỉ xét sau core; proposal vẫn ở Analysis, không chen vào VS-1 |
+| Tân Lữ → Kiếm, movement, chọn skill và ExecuteSelected | CURRENT docs và kế hoạch probe; chưa triển khai revision mới | Review production base, rồi kiểm G-L theo controls mới ở tốc độ thường |
+| Vân Khê, Học Viện, Đồng Sương; NPC/Nấm/Sói/Dummy/UI | CURRENT phạm vi blockout và local slice; layout VS-1 cũ chỉ là reference | Kiểm tuyến Q1–Q6, ≥3 Dummy, địa hình mới, mật độ và khu chức năng NPC |
+| Kiếm Lv 10/13/17, Q7–Q12 và các map sau Đồng Sương | DEFERRED khỏi slice đầu, vẫn P0 | G-N và G-D; fixture hẹp chỉ kiểm kỹ thuật, không thay hành trình thật |
+| Cung playable, skill/gear/projectile/pose/balance | DEFERRED IMPLEMENTATION, vẫn P0 | Probe Cung và so Kiếm/Cung sau G-N, trước nhân toàn bộ family; giải các OPEN liên quan |
+| Dedicated với ≥2 client | Gate sớm sau G-B và G-L revision mới; chưa bắt đầu | G-N trước mở production content/art rộng, trên production base |
+| Login/Character Select, Spring/PostgreSQL, ticket/lease/checkpoint/reconnect | DEFERRED khỏi slice local, vẫn P0 | G-D sau gate mạng; adapter RAM không thay DB thật |
+| Co-farm/chat/shared claim, Linh Biến và Q8 | DEFERRED khỏi slice đầu | G-N kiểm N recipients/MapId; G-D kiểm commit; G-C mở route/content |
+| Boss và tải hình ảnh online đầy đủ | DEFERRED khỏi slice đầu | G-C → G-F; giữ luật Boss và kiểm telegraph/camera/TTK thật |
+| PvP/Q9/escrow/settlement | DEFERRED khỏi slice đầu, vẫn P0 | G-D trước G-P; Q9 optional không cho phép bỏ hệ PvP |
+| Buff mới, shield/groggy, QoL/P1/P2 | Đề xuất chưa duyệt | Tra Analysis; phím R trong proposal controls hiện dành cho Food, không suy ra Buff R đã duyệt |
 
-**Bản chạy thử hiện tại:** một hành vi đã duyệt, không ProbeConfig/flag/metric harness; F8/debug chọn giai đoạn và reset được khôi phục theo yêu cầu chủ dự án, chỉ trong bản mẫu local. Dừng A/B, evidence work, hook/Git cleanup và Phase H. Các thông số/hồ sơ cũ chỉ ở [Phụ lục §10](#prototype-visual-review). Budget release, quest và các gate production không đổi. G-L vẫn PARTIAL; không dùng tests để kết luận layout/feel đã được người chơi duyệt.
+Lượt migration này chỉ sửa tài liệu canonical. Không sửa bản mẫu, sinh asset, nối mạng hoặc chạy lại build/test để gọi thiết kế mới đã pass. Các chỉ thị cũ về dừng A/B, evidence work hay Phase H ở §8–10 là lịch sử của phiên trước, không phải trạng thái các gate mới.
 
 <a id="vs-1"></a>
 
-# 2. VS-1 — lát cắt đầu tiên phải chơi được
+# 2. Lát cắt local đầu tiên và reference VS-1
 
-**CURRENT ROADMAP BASELINE:** Q1–Q6, Tân Lữ → Kiếm, ba map **Vân Khê / Học Viện / Đồng Sương** là phạm vi reference/probe và production local slice sau base review. Dùng layout/marker/spawn của GDD cho phần có mặt; Trúc Ảnh mở trong quest state sau Q6 nhưng nằm ngoài build thử, MapExit cần báo phạm vi bản thử thay vì giả đã có map. Theo baseline này, VS-1 không thêm Q7/enhance để thay mục tiêu đang kiểm.
+**BASELINE phạm vi G-L:** Q1–Q6, Tân Lữ → Kiếm, ba map **Vân Khê / Học Viện / Đồng Sương**. Hướng triển khai vẫn Kiếm trước → local trước → gate mạng sớm. Trúc Ảnh mở trong quest state sau Q6 nhưng nằm ngoài build slice đầu; MapExit phải báo giới hạn bản thử. G-L không thêm Q7/enhance để thay mục tiêu đang kiểm. Phạm vi có thể được review sau blockout nếu bằng chứng cho thấy cần đổi; khi đó cập nhật mục này, G-L và kế hoạch kiểm liên quan.
 
-Hướng triển khai đã xác nhận là **Kiếm trước → local/offline trước → gate mạng sớm**. Q1–Q6/ba map là baseline roadmap được dùng hiện tại, có thể thu/phình sau blockout nếu evidence cho thấy scope chưa hợp lý.
+**Phạm vi slice không phải phạm vi định nghĩa quest.** Production phải có đầy đủ 12 `QuestDefinition` cho Q1–Q12, điều kiện, bước hành động, thưởng, NPC nhận/trả và mở khóa theo [GDD §5](1_HUYEN_LO_GDD.md#quests-story). G-B review cách biểu diễn cả tuyến; G-L chỉ chạy đoạn Q1–Q6. Những quest sau phải nằm trong tuyến production thật ở G-C/G-T, không được thay bằng vài con số tracker hoặc preset debug.
 
-Khi review thay phạm vi slice, cập nhật mục này và phần G-L/validation liên quan; không âm thầm đổi quest/map trong GDD, dependency gate mạng hoặc final acceptance.
+VS-1 hiện có là reference của luật/layout/input cũ, không phải production architecture hay art acceptance. Không mang nguyên các bờ dốc, đất one-way hoặc phím alias cũ vào slice revision mới. Probe art/rig mới dùng một sandbox standalone disposable theo [Art](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#first-art-probe); bản VS-1 hiện có giữ nguyên trong migration này. Sandbox art chỉ kiểm hình ảnh/pipeline, không thay production base hoặc route G-L.
 
-**VS-1 là bản chạy thử đồ họa tối giản, thiết kế lại ở production.** Giữ tuyến/bố cục/spawn/EdgeExit Q1–Q6 và vai trò collision; lòng hố Vân Khê được làm trũng với hai bờ dốc. Hộp/capsule màu có silhouette tối giản, viền cỏ/mặt đá/ván cầu, nước nông theo lòng hố để đọc terrain, text/markers/bars và bảng phím đầy đủ. F8 chọn giai đoạn/reset chỉ dành cho prototype; không save hay mở cơ chế debug vào production. Đây là phạm vi prototype, không thay quy định art TARGET.
+Tuyến Q1–Q6 mới: Lâm Bá hướng dẫn qua khu Yên Thảo → Bách Luyện → Mộc An rồi nhận bài nhảy/drop-through ở Học Viện. Q3 nhận và trả tại Bách Luyện, dùng Mộc Kiếm hạ ba Dummy. Q4 đánh Nấm, nhận/mặc Áo và bán sample; Q5 gặp Yên Thảo, chuẩn bị Food/Potion và đánh Sói tới mốc Lv5. Q6 do Lâm Bá giới thiệu; người chơi tự tháo vũ khí cũ, tới Phong Du hoặc Diệp Lam để chọn phái, nhận vũ khí/bí kíp, trang bị/cộng điểm/học, dùng S1 và Bình MP rồi trả tại mentor phái đã chọn. Slice Kiếm chạy Phong Du; production Cung chạy Diệp Lam. Không khôi phục Tạ Minh làm bước trung gian.
 
-Một đường đi revision mới: NPC → nhảy/drop-through/EdgeExit auto-transition → nhận/mặc Mộc Kiếm, hạ ba Dummy đồng thời → Nấm/nhặt supply/mặc Áo/bán sample → chuẩn bị Food/Bình Máu, đánh Sói → catch-up Lv5 → chọn Kiếm/cộng điểm/học bí kíp/S1 + dùng Bình MP → trả Q6. Quest objectives là hành động, tutorial glyph từ bindings. Cung giới thiệu nhưng chưa playable; Đồ và class vẫn hiện tên/slot/stat rõ; không yêu cầu art outfit trong bản chạy thử tối giản. Đồ II/III chỉ fixture hẹp, không route mới.
-
-| Cần có trong slice | Evidence G-L cần giữ |
+| Cần có trong slice revision mới | Bằng chứng cần giữ cho G-L |
 | --- | --- |
-| Local Session authoritative, intent/result/UI tách biệt | Một input chỉ qua resolver một lần; UI/VFX không tự sửa HP/túi/quest. Clock/life/action IDs có log |
-| Movement/jump/drop-through, ba map/camera | Collider/surface khớp; Space/↑ và S/↓; EdgeExit auto/MapId/gate/refused-transition không ping-pong; jump feel/coyote/buffer variable-height manual probe |
-| Basic Tân Lữ đến class transition, Kiếm S1 qua 1, quái melee | One-press approach/cast/no-repeat, cancel/replace pending, range/geometry/clock; melee separation/reposition không pile; action/death đúng life |
-| EXP/điểm/reset Lv 5, item/equip/loot/sell, Food/HP/MP Potion/death | Runtime áp luật GDD cho phần đã hiện diện; full bag/reject/đầy HP không tiêu bình; restart fixture không giả lưu bền |
-| Q1–Q6, NPC/modal/skill/quest/HUD | Route mới + late/retry/grant/full-bag; **manual usability** inventory/equip/shop/quest/pending tại tốc độ thường; automation không UX pass |
-| Art/combat room nhỏ đã nhập Unity | Default + outfit I, Mộc/Kiếm I và một visual khác bằng fixture; Dummy/Nấm/Sói, impact/Death, terrain solid/one-way, font có dấu; đo grip/pivot/phase/độ đọc và công sửa |
+| Local Session authoritative; intent/result/UI tách biệt | Một input đi qua resolver một lần; UI/VFX không tự sửa HP/túi/quest; log clock/life/action IDs |
+| Movement/jump/drop-through, ba map và camera | Trái/phải di chuyển, lên nhảy, xuống drop-through; mặt solid trực giao đúng collider. EdgeExit/MapId/gate/refused-transition không ping-pong; kiểm coyote/buffer/variable-height ở tốc độ thường |
+| Chọn skill và thực thi riêng | 1/2/3 chỉ chọn slot. Chỉ ExecuteSelected tạo intent; giữ phím không lặp. Đổi slot không sửa lệnh pending/buffer/action đã chụp; kiểm hủy/thay thế và revalidate khi tới nơi |
+| Focus và combat Tân Lữ → Kiếm | AUTO/EXPLICIT, tìm/giữ/thực thi có vùng riêng; range/geometry/clock đúng. Chết hủy lệnh combat nhưng giữ focus hợp lệ và HUD HP, kể cả cập nhật HP người chơi khác |
+| Quái và mật độ mới | Cụm melee có Approach/Contact–Staging/Attack/Recovery–Reposition; peer đã chiếm chỗ không bị coi là terrain bị chặn. Quái giữ HomeRegion/WalkRegion/SurfaceId; Return và kiting theo luật chung |
+| EXP/điểm/class, item/equip/loot/sell, Food/Potion/death | Đúng luật cho phần đã có; reject/full bag/đầy HP không tiêu sai item. Dùng điểm chọn phái thực tế để giữ HP liên tục; không dùng fixture reset thay lưu bền |
+| Q1–Q6, NPC và UI | Route thật, late/retry/grant/full-bag; inventory/equipment preview, shop, Skills/Quest/HUD dùng được bằng bàn phím và chuột; automation không chứng minh UX đã pass |
+| Mẫu art nhỏ đã nhập Unity | Default + outfit I, Mộc/Kiếm I và một visual khác qua fixture; Dummy/Nấm/Sói, impact/Death, solid/one-way đúng loại, font có dấu; đo grip/pivot/phase/độ đọc và giờ sửa |
 
-**Chưa bắt buộc cho G-L:** login/backend/DB, network/reconnect, Cung chơi được, PvP, Boss, các bãi sau Đồng Sương. Các phép thử local dùng profile/fixture và kho trạng thái trong RAM; reset/đóng phiên có thể mất dữ liệu, phải ghi rõ trong bản thử. Không tạo save JSON như authority production. Adapter local trả thành công trong RAM chỉ chứng minh flow, chưa chứng minh crash atomicity hay persistence.
+**Chưa bắt buộc cho G-L:** login/backend/DB, network/reconnect, Cung playable, PvP, Boss và các map sau Đồng Sương. Local dùng profile/fixture và RAM; phải báo dữ liệu có thể mất khi reset/đóng phiên. JSON chỉ phục vụ config/fixture/import-export dev. Thành công trong RAM chưa chứng minh crash atomicity hay persistence.
 
-A07 giữ HP60/respawn25 s; GDD author ≥3 Dummy placements đồng thời để solo Q3 không phải chờ. DEF/EVA/timer thay thế/online contention vẫn fixture/prototype, không đổi normal farm respawn. A14 đã duyệt gravity/momentum liên tục; CURRENT probe Novice/S1, S2/S3 air permissions/pose còn OPEN; không ép movement lock để cứu pose count.
+Dummy giữ HP 60/respawn 25 s và ≥3 placements đồng thời để Q3 không buộc solo chờ. Online contention và các phương án DEF/EVA/timer khác vẫn cần kiểm, không đổi normal farm respawn. Gravity/momentum liên tục vẫn giữ. Pose và quyền cast S2/S3 khi nhân vật đang trên không vẫn là OPEN; không ép movement lock để giảm công vẽ.
 
 <a id="phase-gates"></a>
 
 # 3. Các phase và gate mở rộng
 
-Gate là điều kiện kiểm có evidence, không tự pass vì tới tuần dự kiến. [Technical §10](2_HUYEN_LO_TECHNICAL.md#technical-gates) mô tả phép thử và setup. Decision IDs ở Analysis; G-x dưới đây chỉ là gate triển khai, không hệ quyết định gameplay mới.
+Gate chỉ pass khi có bằng chứng đúng revision. [Technical §10](2_HUYEN_LO_TECHNICAL.md#technical-gates) giữ setup và contract kiểm; trạng thái quyết định gameplay nằm ở Analysis. G-x dưới đây là gate triển khai. **Hiện chưa có gate production theo revision mới được xác nhận pass.**
 
-| Phase / gate | Điều kiện vào và công việc | Đủ để ra khỏi gate / cho phép tiếp theo |
+| Phase / gate | Điều kiện vào và công việc | Điều kiện ra / cho phép tiếp theo |
 | --- | --- | --- |
-| Pha R / **Harvest + feel/art/UI probe** | Checkpoint prototype; thu findings, sync docs, mẫu rig/weapon/one-way/kit nhỏ | Chốt lesson learned, assumptions thử và contract; không cần production toàn bộ art hoặc biến mock thành base |
-| Pha B / **G-B: production base review** | Pha R đủ evidence core: review input/intent/pending/clock/IDs/definitions/physics/commit/presentation boundary; thiết kế nhỏ rồi dựng base | Có module/dependency ownership, tests core theo revision mới, playable room production sơ bộ; quyết rõ phần reuse vs rewrite. Không tạo framework cho symmetry. Mở ghép G-L |
-| Pha L / **G-L: local slice revision mới** | G-B pass; ghép Q1–Q6/Kiếm từ production base nhỏ, có art probe/kit đủ đọc | Video/log route mới, normal-speed feel/usability review, rig/pivot/quest/death ổn, giờ art/QA/rework/% dùng được thật. Cho phép G-N; prototype V6.2.0 không substitute |
-| Pha N / **G-N: Dedicated + ≥2 clients sớm** | G-B và G-L revision mới pass; production rules/resolver/timeline chạy headless, adapter RAM dev có nhãn fixture | Hai client độc lập, movement/EdgeExit/MapId/kill/quest/shared claim, replay/stale life/late result đúng; đo correction/latency/headless. Sau pass mở production rộng có chọn lọc |
-| Pha D / **G-D: backend/persistence thật** | G-N pass; thay admission/commit fixtures bằng Spring/PostgreSQL, giữ một writer và cùng domain result | Login → Select → one-time ticket → join; lease/duplicate, checkpoint/SafeAnchor/HP0, một death N recipients và claim/quest commit idempotent; crash/outage/retry trước/sau ACK. Mở gameplay có dữ liệu bền và integration mở rộng |
-| Pha C / **G-C: mở content theo dependency** | G-N pass trước art rộng; hệ reward/quest có DB thật G-D trước nghiệm thu route dài | Kiếm S1/S2/S3 tích lũy/passives; Q7–Q12, bảy identities/sáu rigs, maps/route/Linh/Q8/gear đúng GDD. Cung prototype rồi full branch dùng cùng architecture; kiểm art/balance trước nhân variant. Không thêm content cho gap level |
-| Pha F / **G-F: Boss và full visual load** | Content/skill/world ổn, schema/lifecycle không đổi lớn; mở Boss/Cung load tests | Lịch/telegraph/Slow/Cuồng, corpse/loot/credit/camera đúng; chơi thật hai người và probe 3–4+ với số máy/build/CPU/bytes/latency. Ghi lại TTK/journey, không coi mô phỏng cũ là acceptance |
-| Pha P / **G-P: PvP/chat và ghép hệ online** | G-D trước escrow; movement/combat/recovery đủ ổn | 10 stakes, hai bên escrow, Food/quota, timeout DRAW/forfeit/abort, settlement/crash retry; Map Chat, reconnect, standalone package theo Technical. Online subset pass vẫn chưa có nghĩa full P0 đã xong |
-| **G-T: nghiệm thu TARGET** | Các branch Kiếm/Cung và toàn P0 đã ghép; G-L/N/D/C/F/P có evidence liên quan | Đối chiếu toàn GDD §10 và Technical §12 trên hai Client + Dedicated + backend/DB thật. Không ký done khi thiếu Cung, Q12/Boss/PvP hoặc recovery; không dùng video fallback thay kiểm chạy thật |
+| Pha R — thu bài học và probe | Thu findings VS-1, đồng bộ docs; probe controls/UI/art/rig trong sandbox disposable riêng | Có contract hiện hành, danh sách giả định cần đo và mẫu nhỏ đọc được; không biến mock thành production base |
+| Pha B / **G-B: production base review** | Review input/intent/pending/clock/IDs/definitions/physics/commit/presentation; review toàn bộ Q1–Q12 và class/NPC dependencies rồi dựng base nhỏ | Ownership/dependency rõ; kiểm core theo revision mới; room production sơ bộ; quyết phần reuse/rewrite. Không dựng framework chỉ vì đối xứng |
+| Pha L / **G-L: local slice revision mới** | G-B pass; ghép Q1–Q6/Kiếm từ base, blockout ba map và kit đủ đọc | Route fresh Q1–Q6 cùng log/video, review feel/UX ở tốc độ thường; các phép kiểm áp dụng trong bảng dưới đạt. Art/QA/rework có số đo; mở G-N |
+| Pha N / **G-N: Dedicated + ≥2 client sớm** | G-B/G-L mới pass; rules/resolver/timeline chạy headless; adapter RAM ghi rõ fixture dev | Hai client độc lập kiểm movement/MapId/kill/quest/shared claim, stale life/replay/late result, dead-focus và HP người chơi khác; N-safe recipients/claim/threat. Đo correction/latency/headless; mở rộng có chọn lọc |
+| Pha D / **G-D: backend/persistence thật** | G-N pass; thay fixtures bằng Spring/PostgreSQL, giữ một writer và domain result chung | Login → Select → one-time ticket → join; lease/duplicate, checkpoint/SafeAnchor/HP0; N recipients, claim/quest commit idempotent; crash/outage/retry trước/sau ACK. ClassChosenLevel và class transaction bền vững |
+| Pha C / **G-C: content và hai phái** | G-N trước art rộng; G-D trước nghiệm thu route dài có dữ liệu bền | Kiếm và Cung, skill/passive, gear HP/MP mới; Q7–Q12, bảy mob identities/sáu rigs, các map/Linh/Q8 đúng GDD. Chạy đủ định nghĩa quest trong tuyến thật; kiểm balance/pose trước nhân variants |
+| Pha F / **G-F: Boss và tải online** | Content/skill/world đã ổn; schema/lifecycle không đổi lớn | Lịch/telegraph/Slow/Cuồng, corpse/loot/credit/camera đúng; chơi thật ≥2 người và probe 3–4+ để tìm giả định fixed-pair. Ghi máy/build/CPU/bytes/latency, TTK và journey; không suy capacity từ ca pass |
+| Pha P / **G-P: PvP/chat và ghép online** | G-D trước escrow; movement/combat/recovery đủ ổn | 10 stakes, escrow hai bên, Food/quota, timeout DRAW/forfeit/abort, settlement/crash retry; Map Chat/reconnect/standalone package. Q9 vẫn optional trong route |
+| **G-T: nghiệm thu TARGET** | Hai phái và toàn P0 đã ghép; các gate phụ thuộc có bằng chứng | Đối chiếu GDD §10/Technical §12 trên Client + Dedicated + backend/DB thật, ≥2 người đồng thời; full fresh-run Q1–Q12 từng phái theo mục dưới. Không gọi TARGET done khi thiếu Cung, Q12/Boss/PvP/recovery |
 
-G-N là gate mạng **tương đối sớm trên production base**, dùng phạm vi ba map/combat đã validate lại; không đợi vẽ hết gear/Bow/Boss rồi mới thử authority. Spike không backend phải mang nhãn fixture dev, không phân phối như final online flow. G-D giữ nội dung architecture spike cũ và là gate bắt buộc trước nhận persistence/reliability là hoàn thành.
+G-N dùng phạm vi local đã kiểm lại và diễn ra trước khi làm rộng art/content. Không chờ xong toàn bộ Cung/gear/Boss mới kiểm authority trên Dedicated. Spike không backend chỉ là fixture dev; G-D vẫn bắt buộc trước khi nhận persistence/reliability là hoàn thành.
+
+<a id="revision-validation"></a>
+
+## 3.1. Các phép kiểm bắt buộc sau migration
+
+Đây là những dependency để đóng gate triển khai, không phải sổ quyết định mới. Kết quả cũ chỉ chứng minh revision cũ; tất cả dòng dưới **chưa có bằng chứng runtime theo revision mới**. Các số TUNABLE và phần OPEN phải được ghi cùng setup để người review biết đang thử giả định nào.
+
+| Nội dung cần kiểm | Kết quả đủ để review | Gate phụ thuộc |
+| --- | --- | --- |
+| Controls và ExecuteSelected | Phím mũi tên điều khiển movement. 1/2/3 chỉ chọn, không tiếp cận/cast/tiêu MP/đặt CD. Execute riêng tạo lệnh một lần; đổi slot không sửa snapshot đã có. Kiểm giữ phím, pending/buffer, hủy lệnh và lúc tới tầm; log/video ghi bindings cùng review bàn phím/chuột. Đề xuất E Execute/F Interact/4–5 Potion/R Food/I menu còn TUNABLE, exact keys OPEN | G-B/G-L; G-N kiểm intent qua mạng |
+| Focus khi chết và HP observer | Người chơi chết hủy lệnh combat nhưng giữ focus hợp lệ, marker và HP hiện tại/tối đa; HP vẫn cập nhật khi người khác đánh target. Target chết, despawn, sai life/map hoặc hết điều kiện giữ phải xóa focus đúng. Respawn cùng slot không kế thừa focus đời cũ | G-L; G-N với ≥2 client |
+| Cadence và vai trò S1/S2/S3 | Baseline TUNABLE: S1 0,60 s/2 MP, S2 0,90 s/3 MP, S3 6 s/16 MP; Cung S2 0,70/0,60/0,50 power. Kiểm S2 dùng thường xuyên để farm, thời gian khóa hành động, lúc resolve, đánh nhóm/trạng thái, mức tiêu và hồi MP, TTK. Không thêm đòn thường 0 MP sau chọn phái | G-L cho phần Kiếm đã có; G-C/F cho skill và hai phái đầy đủ |
+| HP và gear mới | So hai phái ở cùng cấp/trang bị/điểm, chọn phái đúng Lv5 và chọn muộn. Cung tăng +8 HP/level sau ClassChosenLevel thực là baseline TUNABLE; HP không tụt khi chọn phái, VIT vẫn +8. Hướng ba slot HP/ba slot MP cần tính lại qua rarity/enhance/chuyển giao với các giá trị TUNABLE. Kết quả sustain/Boss cũ không pass giá trị mới | G-B/D kiểm dữ liệu và transaction; G-C/F kiểm balance |
+| Mật độ và hành vi cụm | Author thêm bãi nhỏ độc lập, giữ IDs/nguồn quest và tuyến đi. Kiểm camera, nhịp tiếp xúc, độ đọc và tranh chấp bãi. 28 groups/66 slots chỉ là seed manifest lịch sử; tổng mới và Hybrid count/identity OPEN. Chỗ có quái (occupied) khác terrain bị chặn (blocked); kiểm staging/Return, chọn threat tới được và kiting hợp lệ. Không thêm AI riêng chống Cung | G-L trên phần có mặt; G-N co-farm; G-C trên năm map |
+| Địa hình và nước | Đất/đá tự nhiên là khối solid dày, mặt đi ngang/mặt đứng trực giao; không mặt đi dốc/ramp/tam giác, đất one-way hay cơ chế leo. One-way hiếm chỉ ở kết cấu mỏng có chống đỡ. Kiểm nhảy/drop-through/EdgeExit và nước: chân tiếp xúc mới làm chậm nhẹ, cầu/đang trên không không làm chậm, không bơi. GroundMelee không rơi/nhảy/drop giữa tầng | G-L trước G-N; G-C kiểm phần map mở thêm |
+| NPC và tuyến chọn phái | Bảy NPC ở khu chức năng. Q3 tại Bách Luyện; Q6 Lâm Bá giới thiệu, nhập phái và trả tại mentor phái đã chọn; Q10–Q12 Lâm Bá, Tẩy Mạch tại Yên Thảo. Người chơi tự tháo/mặc/học/dùng đồ; kiểm từ chối, retry và túi đầy, không dùng preset để bỏ bước | G-B review định nghĩa; G-L Q1–Q6; G-C/G-T hai route |
+| Full quest definitions và fresh-run | Đủ Q1–Q12 definitions và tuyến production thật; giữ IDs/anchors/nguồn credit ổn định. Q9 tùy chọn có ca online riêng. Mỗi phái có route fresh hợp lệ với hành động, thưởng và mở khóa thật; không chỉ đặt tracker hoặc dùng dev tool hoàn thành prerequisite | G-B về schema/definition; G-C/G-T về tuyến đầy đủ |
+| Rig/UI và độ đọc theo luật mới | Slot được chọn đọc rõ và độc lập hành động đang chạy; S2 có feedback đủ đọc ở nhịp mới; HUD vẫn hiện focus khi chết. Kiểm pose/socket/terrain/crowd trong room thật; chưa giải A01/A02/A12/A14 thì chưa nhân family dựa trên giả định | G-L với mẫu nhỏ; G-C/F trước mở rộng hình ảnh |
+
+<a id="dev-speed-acceptance"></a>
+
+## 3.2. DEV SPEED và ACCEPTANCE EVIDENCE
+
+[Dev Mode trong Technical](2_HUYEN_LO_TECHNICAL.md#dev-mode) là tooling dev-only để rút thời gian thử: đặt level/quest/class, hoàn thành prerequisite, cấp item/skill, teleport tới marker đã author, reset encounter/group/Boss hoặc force Linh Biến. Nó không thuộc UI production cho người chơi, không lưu như tiến trình hợp lệ và không bypass authority release. Kết quả có preset phải ghi là fixture/probe.
+
+**DEV SPEED** cho phép đi thẳng tới tình huống để tìm lỗi và so phương án. **ACCEPTANCE EVIDENCE** chứng minh người chơi thực hiện được hành trình bằng các hành động hợp lệ. Ca dùng preset có thể pass kiểm kỹ thuật hẹp, nhưng không pass fresh-run route.
+
+G-L cần fresh-run Q1–Q6 của Kiếm từ trạng thái đầu hợp lệ. G-C/G-T cần fresh-run **toàn Q1–Q12 cho từng phái Kiếm và Cung**, từ tạo/chọn nhân vật tới chọn phái, nhận/trả quest, gear/skill/supply và Boss/credit đúng tuyến. Q9 optional không chặn truyện chính; phải có ca PvP/Q9 riêng để nghiệm thu hệ đó. Không dùng SetQuestState/GiveItem/CompletePrerequisite/teleport dev để thay bước trong bằng chứng route. Kiểm retry/recovery có setup riêng và phải phân biệt với video hành trình fresh.
+
+Mỗi hồ sơ cần ghi revision/build, phái, trạng thái khởi đầu, bindings/setup, log kết quả authority và video/phần review ở tốc độ thường. Ghi rõ bước nào đã quan sát và gate nào còn thiếu. Automation bổ trợ kiểm logic; cảm giác điều khiển, layout và usability vẫn cần review của người chơi.
 
 <a id="management-window"></a>
 
 # 4. Khung quản lý hai tháng, nhóm bốn người
 
-**Hạn nguồn lực thực tế: hai tháng / bốn người.** Chia thành khoảng tám tuần quản lý từ ngày bắt đầu thực hiện; chưa có ngày bắt đầu hoặc số giờ khả dụng từng người để suy deadline lịch hay tổng person-hours. Các tuần dưới là **mục tiêu quản lý**, không cam kết kỹ thuật. Đầu ra ưu tiên là findings/feel/art/UI + production base/local slice đúng contract rồi G-N sớm, sau đó tích hợp G-D và mở TARGET theo evidence. Không tuyên bố toàn bộ TARGET chắc chắn xong trong hai tháng.
+**Hạn nguồn lực thực tế: hai tháng/bốn người.** Dùng khoảng tám tuần quản lý kể từ lúc bắt đầu thực hiện. Chưa có ngày bắt đầu hoặc số giờ khả dụng từng người nên chưa thể suy deadline lịch/tổng person-hours. Bảng dưới là mục tiêu quản lý, không cam kết toàn TARGET chắc chắn hoàn thành trong hai tháng.
 
-| Tuần mục tiêu | Trọng tâm / đầu ra reviewable | Điều kiện và cách xử lý nếu chưa đạt |
+| Tuần mục tiêu | Đầu ra để review | Điều kiện / xử lý nếu chưa đạt |
 | --- | --- | --- |
-| 1 | Harvest prototype, sync feedback; movement/UI/art rig probe và design review base nhỏ | Ghi findings/A01/A02/A12/A14, công sửa/% Free thật; prototype không tự trở thành production |
-| 2 | Implement core production base/local room → G-B; movement/input/clock/IDs/definitions/physics/AI/kit | Review one-shot control/transition/cluster, dependency ownership/core tests; chưa nhân full families |
-| 3 | Ghép Q1–Q6 Nấm→Sói/Kiếm, art nhỏ và UI → **G-L revision mới** | Manual normal-speed route/feel/usability + automation/retry/death; thiếu art/UX thì PARTIAL, không nối network vào mock |
-| 4 | Dedicated build + ít nhất hai clients trên slice → **G-N** | Đây là checkpoint mạng trước production rộng. Nếu phải sửa boundary/headless/recipient, dừng mở rộng content và art để sửa |
-| 5 | Spring/PostgreSQL/auth/ticket/lease/commit/recovery → **G-D mục tiêu**; prototype Cung hẹp nếu G-N đã pass | G-D sai thì chưa nhận persistence done. Art Cung chỉ probe A01/A02/A05; phần chưa làm vẫn DEFERRED TARGET P0 |
-| 6 | Mở Kiếm Lv10/17, gear/Q7–Q8/Linh và route tiếp theo theo G-C; Cung tiếp tục prototype rồi tích hợp | Review throughput/quest/pose và nguồn lực; ưu tiên ghép một đoạn end-to-end thay nhân toàn bộ catalog chưa kiểm |
-| 7 | Mục tiêu tích hợp Boss/recovery/chat; bắt đầu PvP nếu G-D đủ và combat ổn, mở branch Cung đã validate | Phạm vi hoàn thành phụ thuộc gate; ghi từng hệ done/chưa done, giữ TARGET trong backlog, không đổi Cung thành P1 |
-| 8 | Regression, standalone package/evidence và review phạm vi đã chạy; **G-T chỉ nếu đủ toàn P0** | Báo rõ slice/online subset đạt tới đâu. Nếu thiếu thời gian, chọn kéo lịch hoặc trade-off cụ thể với chủ dự án; không đổi nghĩa final acceptance |
+| 1 | Thu findings bản mẫu, sync docs; probe controls/UI/art/rig và review base nhỏ | Ghi assumptions, OPEN và công sửa/% dùng được thật; VS-1 giữ vai trò reference |
+| 2 | Core production base/local room → G-B; definitions Q1–Q12, input/clock/IDs/physics/AI/kit | Review select-only/ExecuteSelected, class/NPC dependencies, terrain/mật độ mới; chưa nhân toàn bộ family |
+| 3 | Ghép Q1–Q6 Nấm→Sói/Kiếm, blockout ba map, art/UI nhỏ → G-L revision mới | Fresh route, review tốc độ thường và logic retry/death; thiếu UX/art thì gate còn PARTIAL |
+| 4 | Dedicated + ≥2 client trên slice → G-N | Checkpoint mạng trước production rộng; nếu boundary/headless/recipients sai, sửa trước mở rộng |
+| 5 | Spring/PostgreSQL/auth/ticket/lease/commit/recovery → G-D mục tiêu; probe Cung hẹp nếu G-N pass | Chưa pass DB thật chưa nhận persistence done; Cung vẫn DEFERRED P0 nếu chưa triển khai |
+| 6 | Kiếm skill/gear, Q7–Q8/Linh rồi mở tuyến theo G-C; Cung probe và tích hợp | Đo cadence/sustain/HP/gear mới và mật độ; ưu tiên đoạn hành trình liên tục đã kiểm |
+| 7 | Boss/recovery/chat; PvP khi G-D và combat đủ ổn; tiếp tục route Cung | Ghi từng hệ đã đạt/chưa đạt, giữ đủ definitions và full-route backlog |
+| 8 | Regression, package standalone và evidence fresh-route; G-T chỉ khi đủ P0 | Báo phạm vi thực đã chạy. Thiếu thời gian thì review lịch/phạm vi bản thử với chủ dự án, giữ nguyên TARGET |
 
-G-C/F/P có thể ghép hạng mục độc lập sau gate phụ thuộc, không đòi mọi người chờ hết phase. Một người có thể chuẩn bị schema fixture/tests hoặc artwork probe sớm; điều đó không mở production rộng trước G-N và không chứng minh gate đã pass.
+Hạng mục độc lập trong G-C/F/P có thể làm song song sau gate phụ thuộc. Schema/fixture và art probe được chuẩn bị sớm, nhưng không tự mở production rộng hoặc chứng minh gate đã pass.
 
 | Vai trò chính trong nhóm bốn người | Trách nhiệm và phối hợp |
 | --- | --- |
-| 1 — Gameplay/authority | Local Session, combat/stat/timeline/lifecycle; thiết kế production base rồi ghép Dedicated cùng người 4; giữ một resolver và clock |
-| 2 — World/quest/AI | Blockout/physics/MapExit/SpecialGate, NPC/Q1–Q6, mob/loot/route; thử với người 1, sau gate mới mở maps/quest tiếp |
-| 3 — Art/UI presentation | Mẫu art/clean/slice/socket, rig/weapon/terrain và common kit; đo với người 2/4; không cần vẽ toàn bộ catalog trước playable |
-| 4 — Integration/QA/backend | Build/log/fixtures, regression hành trình, Dedicated/2-client spike rồi Spring/DB/recovery; hỗ trợ local slice từ tuần 1 |
+| 1 — Gameplay/authority | Local Session, combat/stat/timeline/lifecycle; production base rồi Dedicated với người 4; giữ resolver/clock chung |
+| 2 — World/quest/AI | Blockout/physics/MapExit/SpecialGate, bảy NPC và definitions Q1–Q12; route slice/mob/loot rồi mở phần sau theo gate |
+| 3 — Art/UI | Mẫu nhỏ, clean/slice/socket, rig/weapon/terrain/common kit; đo với người 2/4 trước nhân catalog |
+| 4 — Integration/QA/backend | Fixtures/log/regression route; Dedicated ≥2 client rồi Spring/DB/recovery; hỗ trợ local từ tuần 1 |
 
-Đây là phân trách nhiệm để giảm phụ thuộc, không giả mỗi người đã có năng lực tương đương hoặc làm full-time. Mỗi review dùng giờ **khả dụng còn lại** và giờ thật đã tiêu cho gameplay/art/editor/backend/integration/QA/rework. Không nhân bốn người với estimate 160–240 h cũ để gọi thành ngân sách mới.
+Đây là phân trách nhiệm, không giả mọi người cùng chuyên môn hoặc làm full-time. Review bằng giờ khả dụng còn lại và giờ thực đã tiêu cho gameplay/art/editor/backend/integration/QA/rework. Không nhân bốn người với estimate 160–240 h lịch sử để gọi thành ngân sách mới.
 
 <a id="art-workflow"></a>
 
 # 5. Art cho người chưa thạo vẽ và kỷ luật giao việc
 
-Dùng quy trình nhỏ trong [Art §23.1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-tool-workflow): chọn mẫu, sửa palette/outline/pivot/grip bằng editor pixel, nhập Unity rồi đo.
+Dùng quy trình nhỏ ở [Art §23.1](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-tool-workflow): chọn mẫu, sửa palette/outline/pivot/grip bằng editor pixel, nhập Unity rồi đo. Probe mới chạy trong sandbox standalone disposable riêng; đây là công việc sau migration, không sửa VS-1 hiện có hoặc sinh asset trong lượt tài liệu này.
 
-**TOOL CANDIDATE / CURRENT PROBE:** có thể thử PixelLab bằng Free/free trial trước; nếu không đạt, đổi tool hoặc workflow. Contract visual/import và architecture không phụ thuộc PixelLab.
+**TOOL CANDIDATE:** có thể thử PixelLab bằng Free/free trial rồi đánh giá tool/workflow. Contract visual/import và architecture không phụ thuộc PixelLab. Giới hạn dịch vụ cần kiểm lại từ [FAQ chính thức](https://www.pixellab.ai/docs/faq) tại thời điểm dùng; không giả tool animation/outfit đều miễn phí hoặc hứa số credits. Nếu tính năng cần thiết không có trong Free, ghi “chưa kiểm được với Free”, dùng placeholder kiểm pipeline và đo chi phí trước quyết định mua.
 
-Free có giới hạn generation/tool theo [FAQ chính thức](https://www.pixellab.ai/docs/faq); không giả toàn bộ animation/outfit tools có sẵn miễn phí hay hứa số credits. Nếu tool cần không có, ghi “chưa kiểm được với Free”; dùng placeholder để kiểm pipeline và đánh giá chi phí phần còn thiếu trước quyết định mua.
+Đếm cả output thất bại. `% dùng trực tiếp = output pass không sửa / toàn bộ output tạo`; `% dùng sau sửa = output pass sau sửa / toàn bộ output tạo` là hai nhóm riêng. `% dùng được tổng = tổng hai nhóm pass / toàn bộ output tạo`, không đếm một output hai lần. Chưa tạo mẫu ghi **CHƯA ĐO**. Ghi giờ sửa/import/QA, lỗi pose/alignment và cỡ mẫu cho từng loại. Gate cần mẫu rig/weapon/outfit chạy đúng timing trong room thật, không chỉ một PNG đẹp. Không tạo tool plan, prompts, assets hoặc manifest riêng trong vòng docs này.
 
-Đếm cả output thất bại. `% dùng trực tiếp = output pass không sửa / toàn bộ output tạo`; `% dùng sau sửa = output pass sau sửa / toàn bộ output tạo` là nhóm riêng, không cộng một output hai lần; `% dùng được tổng = (hai nhóm pass) / toàn bộ output tạo`. Khi chưa tạo mẫu ghi **CHƯA ĐO**, không đoán tỷ lệ. Ghi giờ sửa/import/QA, sai pose/alignment và số mẫu cho từng loại. Gate không dựa vào một PNG đẹp: ít nhất mẫu rig/weapon/outfit chạy cùng timing trong room thật phải đọc được. Không tạo PixelLab plan, trial plan, prompts, assets hoặc manifest riêng trong vòng docs này.
-
-Kỷ luật áp dụng cho mọi người và coding agent ở [Technical §1.1](2_HUYEN_LO_TECHNICAL.md#architecture-discipline): gameplay tách UI, ID ổn định, một clock gameplay authority/session, AnimationEvent chỉ presentation; Local và Dedicated dùng cùng rules. Task phải chỉ rõ TARGET/CURRENT, canonical sections, input/result cần thay, gate/test relevant và OPEN dependency. Agent không tự đổi số/range/timer/26-frame/Boots để làm task pass; đề xuất thay đổi phải ghi Analysis rồi sync authority khi đã duyệt.
+Kỷ luật cho mọi người và coding agent nằm ở [Technical §1.1](2_HUYEN_LO_TECHNICAL.md#architecture-discipline): gameplay tách UI, ID ổn định, một clock authority/session; AnimationEvent chỉ presentation; Local và Dedicated dùng cùng rules. Task ghi rõ TARGET/CURRENT, section canonical, input/result, gate cần kiểm và OPEN dependency. Không tự đổi range/timer/26-frame/slot để làm task pass. Giá trị BASELINE/TUNABLE phải có setup và bằng chứng khi đề xuất chỉnh; sổ quyết định ở Analysis, luật đã duyệt sync GDD.
 
 <a id="production-release"></a>
 
 # 6. Khi nào mở production và điều gì được hoãn
 
-Trước G-N chỉ sản xuất mẫu art nhỏ đủ kiểm VS-1: một room mẫu để kiểm art, default/outfit I, Mộc/Kiếm và vài mob/kit primitives. **Với baseline hiện tại, VS-1 cần blockout chơi liên tục qua đủ ba map**; một room mẫu chỉ kiểm art, không thay hành trình. Nếu evidence cần đổi kích thước slice, review baseline theo §2 trước. Trước nhân mỗi family sau G-N phải có pose/socket/readability evidence tương ứng, các OPEN liên quan đã giải hoặc có phạm vi probe rõ. G-N cho phép mở rộng có chọn lọc, **không tự duyệt hybrid/33 pose/13–25 weapon images/camera/terrain counts**.
+Trước G-N chỉ làm mẫu art nhỏ đủ kiểm: room art, default/outfit I, Mộc/Kiếm và vài mob/kit primitives. G-L vẫn cần blockout chơi liên tục đủ ba map; room art không thay hành trình. Trước nhân mỗi family sau G-N cần evidence pose/socket/readability và xử lý các OPEN liên quan trong phạm vi đó. G-N không tự duyệt Hybrid count, 33 pose, 13–25 weapon images, camera hoặc tổng terrain/pocket mới.
 
-Giữ cut ladder: cắt P1/P2 và polish trước; giảm cosmetic variations/shake/sound/summary cầu kỳ, giữ thông tin gameplay/pending/status/telegraph, Storage core và Journey scores. Cung/Boss/backend/PvP DEFER khỏi VS-1 theo thứ tự hiện hành, không xóa khỏi TARGET. Review cuối tuần 2/4 và sau mỗi gate bằng công còn lại; nếu TARGET vượt hai tháng, trình phạm vi bản thử cụ thể và lịch tiếp theo, không âm thầm hạ final DoD. Các rationale và workload từ lịch cũ được giữ đầy đủ ở phần trace dưới đây.
+Cắt P1/P2 và polish trước: giảm cosmetic variations/shake/sound/phần trình bày cầu kỳ, giữ thông tin gameplay/pending/status/telegraph, Storage core và Journey scores. Cung/Boss/backend/PvP hoãn khỏi slice đầu theo thứ tự hiện hành, không xóa khỏi TARGET. Review cuối tuần 2/4 và sau mỗi gate bằng công còn lại. Nếu TARGET vượt hai tháng, trình phạm vi bản thử và lịch tiếp theo cụ thể; không hạ nghĩa final DoD. Rationale, bảng số và workload cũ tiếp tục được giữ trong phần trace.
 
 <a id="legacy-roadmap"></a>
 
@@ -144,7 +173,7 @@ Giữ cut ladder: cắt P1/P2 và polish trước; giảm cosmetic variations/sh
 
 # Phụ lục — lịch sử roadmap và hồ sơ prototype
 
-§7–10 dưới đây được chuyển nguyên văn. Những chữ CURRENT, mặc định OFF, flags/A/B và các version trong phần này mô tả thời điểm cũ; không áp dụng cho bản chạy thử hiện hành. Luật đọc GDD, phạm vi hiện hành đọc §1–6.
+§7–10 giữ các bảng, số đo và routing lịch sử, kèm nhãn để phân biệt với thiết kế hiện hành. Riêng §8 có thêm bảng routing migration 2026-10-06. Các chữ CURRENT, mặc định OFF, flags/A/B và version trong phần lịch sử mô tả thời điểm cũ. Controls, cadence, NPC/quest, mật độ và terrain đã được thay ở revision tài liệu 2026-10-06; bằng chứng cũ không pass gate mới. Luật đọc GDD; thứ tự và trạng thái hiện hành đọc §1–6.
 
 # 7. Trace roadmap cũ — dữ liệu giữ để đối chiếu
 
@@ -204,6 +233,24 @@ Gate art CURRENT đã tách theo class ở §2–3: Kiếm thử trước, Cung 
 
 # 8. SOURCE → DESTINATION — bản đồ bảo toàn nội dung
 
+<a id="canonical-migration-2026-10-06"></a>
+
+## Migration canonical 2026-10-06
+
+Đây là routing của lượt migration hiện hành từ master prompt và các quyết định owner đã chốt. Nội dung luật, số tính lại và contract nằm tại các đích canonical; bảng này chỉ ghi cách xử lý để review, không tự chứng minh gate đã pass. Những bảng consolidation cũ phía sau tiếp tục giữ làm lịch sử.
+
+| SOURCE cần thay / đồng bộ | DESTINATION sở hữu nội dung hiện hành | Cách giữ và trạng thái kiểm |
+| --- | --- | --- |
+| Controls chọn+cast, aliases và focus cũ | [GDD input](1_HUYEN_LO_GDD.md#focus-input), [Technical contract](2_HUYEN_LO_TECHNICAL.md#input-contract), [gate revision](#revision-validation) | Thay bằng chọn/thực thi riêng, giữ focus hợp lệ khi chết; controls cũ ở §8/§10 có nhãn lịch sử |
+| Cadence S1/S2/S3, HP Cung và gear HP/MP cũ | [GDD combat](1_HUYEN_LO_GDD.md#class-combat), [gear](1_HUYEN_LO_GDD.md#gear-economy), [Analysis probe mới](3_HUYEN_LO_DESIGN_ANALYSIS.md#current-balance-probe) | Baseline mới TUNABLE; số cũ giữ tại Analysis với nhãn LEGACY. Tính lại không phải runtime acceptance |
+| Density 28/66, crowd và capability quái | [GDD world/crowd](1_HUYEN_LO_GDD.md#world-farm), [Analysis farm](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression), [Technical combat](2_HUYEN_LO_TECHNICAL.md#combat-data) | Giữ seed IDs/quest sources; re-author mật độ, tổng và Hybrid count OPEN; kiểm Home/Walk/Return dùng chung |
+| Dốc, đất one-way và nhu cầu climb cũ | [GDD terrain](1_HUYEN_LO_GDD.md#terrain-rules), [Art map](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#map-visual), [Technical maps](2_HUYEN_LO_TECHNICAL.md#maps) | Solid tự nhiên trực giao, one-way kết cấu hiếm, không climb; hình/layout VS-1 cũ chỉ là reference |
+| Tám NPC, Q3/Q6 và NPC cuối truyện cũ | [GDD quest](1_HUYEN_LO_GDD.md#quests-story), [Art NPC](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#npc-visual), [slice/gates](#vs-1) | Bảy NPC theo khu chức năng; mentor phái giữ class transaction/turn-in Q6. Quest IDs, thưởng/credit/anchors được giữ |
+| Scope slice bị hiểu thành scope quest / preset debug | [Technical Dev Mode](2_HUYEN_LO_TECHNICAL.md#dev-mode), [DEV SPEED / acceptance](#dev-speed-acceptance), [phase gates](#phase-gates) | Đủ 12 definitions/tuyến production; Q1–Q6 chỉ là slice đầu. Full fresh-run từng phái không dùng preset |
+| CURRENT/evidence/prototype bị hiểu thành production | [TARGET/CURRENT](#target-current-deferred), [hồ sơ lịch sử](#prototype-visual-review), [README routing](README.md) | Docs sync 2026-10-06, không bump prototype; old evidence không pass revision mới. Local-first → G-N ≥2 sớm, giữ TARGET N người |
+
+## Trace consolidation trước cleanup
+
 Bảng dưới ghi lượt consolidation trước cleanup. Một số detail Art nay nằm trong phụ lục; anchor đích cũ vẫn giữ. Vị trí cleanup cụ thể ở [Art — bản đồ MOVE](4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#cleanup-source-destination).
 
 Mọi MOVE đã ghi đích đầy đủ trước khi rút nguồn; nguồn còn summary/link. GIỮ nghĩa là không xóa khi không có đích tốt hơn. Các bảng luật/evidence được giữ nguyên; khác biệt authority/context được ghi để tránh hai nơi cùng sửa số. Bảng lịch cũ/sync proposal cũ vẫn có nhãn trace; không thành lịch hoặc quyết định mới.
@@ -238,7 +285,7 @@ Mọi MOVE đã ghi đích đầy đủ trước khi rút nguồn; nguồn còn 
 
 ## DESIGN LOCK SYNC — SOURCE → DESTINATION và lịch sử sync
 
-Các replacement sau theo review được user duyệt 2026-10-03; không giữ artifact tạm như authority thứ sáu. Lịch sử simulation/art/accounting trong Analysis/Art/§7–9 vẫn đủ số, chưa nghiệm thu runtime.
+Các replacement sau ghi review được user duyệt 2026-10-03. Đây là lịch sử sync; các mô tả select+cast, aliases, E interact và Hybrid 3/1/0 dưới đây không còn là contract hiện hành. Không giữ artifact tạm như authority thứ sáu. Lịch sử simulation/art/accounting trong Analysis/Art/§7–9 vẫn đủ số, chưa nghiệm thu runtime.
 
 | Mã | SOURCE review | DESTINATION canonical | Cách xử lý |
 | --- | --- | --- | --- |
@@ -255,7 +302,7 @@ Các replacement sau theo review được user duyệt 2026-10-03; không giữ 
 | S11 | Interaction consistency mới | [GDD focus](1_HUYEN_LO_GDD.md#focus-input), [Technical input](2_HUYEN_LO_TECHNICAL.md#shared-combat-input) | E act candidate ngay, loot không steal focus |
 | S12 | D26, CURRENT stop gate | [VS-1](#vs-1), [phase gates](#phase-gates) | Chỉ Q1–Q6/ba map/Tân Lữ→Kiếm local, không tự mở G-N |
 
-CURRENT control acceptance V6.2.1: A/D+arrows OR; Space/↑ jump và S/↓ drop; 1–3 select/one-press approach+cast, no J/no-repeat mọi skill, locked slots2/3 trong route. One-action/snapshot/latest buffer, AUTO/EXPLICIT, pending không đổi target; release giữ one-shot, manual/focus/UI/Esc/map cancel. E candidate độc lập; EdgeExit auto không E. Manual feel/usability và revision-matched evidence bắt buộc. S2/S3/Cung production DEFERRED. Không tăng số balance để làm button đẹp; giữ role/sustain gate.
+**LEGACY / SUPERSEDED — control acceptance V6.2.1:** A/D+arrows OR; Space/↑ jump và S/↓ drop; 1–3 select/one-press approach+cast, no J/no-repeat mọi skill, locked slots2/3 trong route. One-action/snapshot/latest buffer, AUTO/EXPLICIT, pending không đổi target; release giữ one-shot, manual/focus/UI/Esc/map cancel. E candidate độc lập; EdgeExit auto không E. Manual feel/usability và revision-matched evidence bắt buộc. S2/S3/Cung production DEFERRED. Không tăng số balance để làm button đẹp; giữ role/sustain gate.
 
 <a id="editorial-source-destination"></a>
 
@@ -276,7 +323,7 @@ Mock project ở `prototypes/VS1_EndToEnd/`, tương lai `game/` là Unity produ
 
 ## Feedback → canonical và migration prototype
 
-Mốc trước sửa `archive/checkpoint-46006c4` (local-only archive, không có trên origin); request feedback 2026-10-03 cho phép sửa tạm và tự xử lý inconsistency. Các đích dưới là nội dung thực, không copy feedback thành authority thứ sáu. Các quyết định numeric/feel chưa có evidence giữ TUNABLE/PROTOTYPE ở Analysis.
+**Trace feedback 2026-10-03; những mapping/input trong bảng có thể đã bị thay bởi thiết kế 2026-10-06.** Mốc trước sửa `archive/checkpoint-46006c4` (local-only archive, không có trên origin); request feedback 2026-10-03 cho phép sửa tạm và tự xử lý inconsistency. Các đích dưới là nội dung thực, không copy feedback thành authority thứ sáu. Các quyết định numeric/feel chưa có evidence giữ TUNABLE/PROTOTYPE ở Analysis.
 
 | Mã | SOURCE feedback | DESTINATION | Xử lý |
 | --- | --- | --- | --- |
@@ -354,16 +401,18 @@ Reader Testing độc lập theo skill doc-coauthoring kiểm scope/gates, autho
 
 # 10. Hồ sơ bản mẫu — không phải luật production
 
-**CURRENT V6.2.7, G-L PARTIAL.** Layout, tọa độ mock, lịch sử V6.2.4–V6.2.7 và bằng chứng đã chuyển sang [CHANGELOG prototype](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-visual-review). Bản nháp V6.2.8 trong hồ sơ chưa được xác minh; không đổi CURRENT. Toàn bộ chi tiết được bảo toàn, gồm chỉnh sửa cảnh quan chưa commit có trước task này; tests cũ không là visual/feel acceptance.
+**Snapshot lịch sử V6.2.7; G-L của bản mẫu cũ PARTIAL.** Layout, tọa độ mock, lịch sử V6.2.4–V6.2.7 và bằng chứng đã chuyển sang [CHANGELOG prototype](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-visual-review). Bản nháp V6.2.8 trong hồ sơ chưa được xác minh. Metadata docs 2026-10-06 không phải prototype version bump; không xác nhận bản nháp hoặc gate mới đã pass. Toàn bộ chi tiết được bảo toàn, gồm chỉnh sửa cảnh quan chưa commit có trước task này; tests cũ không là visual/feel acceptance.
+
+**Snapshot vận hành trước migration:** bản chạy thử cũ dùng một hành vi đã duyệt, không ProbeConfig/flag/metric harness; F8/debug chọn giai đoạn và reset đã được khôi phục, chỉ cho prototype local. Chỉ thị khi đó là dừng A/B, evidence work, hook/Git cleanup và Phase H. Đây là lịch sử, không mở hoặc đóng gate revision mới; budget release và TARGET vẫn theo tài liệu canonical hiện hành.
 
 | Revision | Tóm tắt lịch sử |
 | --- | --- |
 | V6.2.4 | User từ chối layout khối/nước; giữ làm trace. |
 | V6.2.5 | User từ chối hiểu “núi” thành ngoại cảnh. |
 | V6.2.6 | User từ chối slab solid, bridge clearance và cách đọc tầng đất. |
-| V6.2.7 | Bản mẫu hiện hành, tiếp tục review visual/feel; không production base. |
+| V6.2.7 | Snapshot bản mẫu được ghi trong hồ sơ cũ; visual/feel chưa nghiệm thu, không production base. |
 
-**INPUT-01/CMB-01/MOBAI-01:** A/B mới mặc định OFF, [báo cáo probe](../../prototypes/VS1_EndToEnd/CHANGELOG.md#phase-e--kết-quả-ab-và-giới-hạn). Cung gameplay vẫn DEFERRED thuộc TARGET P0; chỉ có ranged fixture. Không nối network/backend vào lớp throwaway. G-B nhận findings sau review, không lấy test pass để mở G-L.
+**Trace INPUT-01/CMB-01/MOBAI-01 của revision cũ:** A/B lúc đó mặc định OFF, [báo cáo probe](../../prototypes/VS1_EndToEnd/CHANGELOG.md#phase-e--kết-quả-ab-và-giới-hạn). Cung gameplay vẫn DEFERRED thuộc TARGET P0; chỉ có ranged fixture. Không nối network/backend vào lớp throwaway. G-B nhận findings sau review, không lấy test pass để mở G-L.
 
 Các anchor dưới đây giữ routing lịch sử cho tài liệu read-only; nội dung thực ở CHANGELOG:
 
@@ -395,4 +444,4 @@ Các anchor dưới đây giữ routing lịch sử cho tài liệu read-only; n
 
 [Analysis — runtime và sequencing](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-runtime-history).
 
-**Feedback prototype 2026-10-05 — địa hình/focus/actor:** vũng Vân Khê chữ nhật dài hơn, có đường đất one-way phía trên để chọn đi khô/lội nước; cầu giữ đường đi solid và nâng mặt nước hình ảnh, không thêm collision dưới nước. Thân đất liền, mặt cỏ/đá lát nông khác nhau; bỏ bờ tam giác và bậc vụn ở quảng trường. Dùng lại rig hình học từ `50f05ed`, cache renderer thay vì dựng mỗi frame; NPC/Sói/Dummy đặt chân đúng support. Hướng dẫn phím world chỉ một panel. Tab/click search thử ±12 u ngang/±6 u dọc; retention ±20/±10, độc lập range/vertical cast nên nhảy không mất focus. Quái có thể crossing ngắn khi recovery, nhưng không bắt đầu windup khi peer quá sát; không slot/token/formation. Đây là sửa disposable probe, chưa nghiệm thu feel hoặc G-L production; chi tiết/tọa độ không chuyển sang docs 1–4.
+**LEGACY / SUPERSEDED — feedback prototype 2026-10-05 về địa hình/focus/actor:** vũng Vân Khê chữ nhật dài hơn, có đường đất one-way phía trên để chọn đi khô/lội nước; cầu giữ đường đi solid và nâng mặt nước hình ảnh, không thêm collision dưới nước. Thân đất liền, mặt cỏ/đá lát nông khác nhau; bỏ bờ tam giác và bậc vụn ở quảng trường. Dùng lại rig hình học từ `50f05ed`, cache renderer thay vì dựng mỗi frame; NPC/Sói/Dummy đặt chân đúng support. Hướng dẫn phím world chỉ một panel. Tab/click search thử ±12 u ngang/±6 u dọc; retention ±20/±10, độc lập range/vertical cast nên nhảy không mất focus. Quái có thể crossing ngắn khi recovery, nhưng không bắt đầu windup khi peer quá sát; không slot/token/formation. Đây là mô tả disposable probe của revision cũ, chưa nghiệm thu feel hoặc G-L production. Đất one-way và các vùng số thử ±12/±6, ±20/±10 không phải luật hiện hành; VS-1 giữ nguyên trong migration. Chi tiết/tọa độ lịch sử không chuyển sang docs 1–4.

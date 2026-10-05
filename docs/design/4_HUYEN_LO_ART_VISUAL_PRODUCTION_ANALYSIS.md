@@ -2,7 +2,7 @@
 
 ## Tóm tắt
 
-Owner của visual/pose/weapon/map/UI/import và production accounting. Giữ nguyên quy định art, 26-frame contract, các bảng và scenarios. Gameplay/input dẫn về GDD; blockout tối giản của bản chạy thử không thay art production.
+Tài liệu này sở hữu hình ảnh nhân vật, tư thế, vũ khí, map, UI, nhập asset và phép tính công sản xuất. Giữ hợp đồng 26 frame cùng các kịch bản có điều kiện; luật gameplay/input dẫn về GDD. Bố cục khối tối giản của bản thử không nghiệm thu art production.
 
 ## Tìm gì ở đâu
 
@@ -10,17 +10,21 @@ Owner của visual/pose/weapon/map/UI/import và production accounting. Giữ ng
 - [Map / terrain / building](#map-visual), [icons / UI](#icons-ui).
 - [Import / First Art Probe](#art-integration), [accounting](#production-accounting), [validation](#art-validation).
 
-**PROJECT STATUS:** DESIGN + PROTOTYPE VALIDATION. VS-1 hiện có là disposable/reference integration prototype, production codebase chưa bắt đầu. Primitive/text UI và video revision cũ không production art/UX acceptance; prototype folders/classes không quyết architecture. CURRENT là harvest/feel/art/UI probe trước base theo Roadmap.
+**PROJECT STATUS:** DESIGN + PROTOTYPE VALIDATION. VS-1 là bản thử tham khảo có thể bỏ; production codebase chưa bắt đầu. Hình khối/text UI và video cũ chỉ chứng minh revision đã chạy, không nghiệm thu art/UX mới. Folder/class prototype không quyết kiến trúc production. CURRENT là thu findings rồi thử feel/art/UI trong sandbox độc lập trước base theo Roadmap.
 
 <a id="huyền-lộ--phân-tích-art-hình-ảnh-và-production"></a>
 
 **Đối chiếu:** [GDD hiện hành](1_HUYEN_LO_GDD.md), Technical và Design Analysis.
 
-**Ngày:** 2026-10-04 · **Vai trò:** tài liệu sống chính thức ART / VISUAL / PRODUCTION. Nguyên tắc được chấp nhận, baseline và proposal OPEN được phân biệt dưới đây; đã có [VS-1 primitive blockout](../../prototypes/VS1_EndToEnd/README.md), chưa có rig/asset production đã nghiệm thu.
+**Ngày:** 2026-10-06 · **Vai trò:** tài liệu sống chính thức ART / VISUAL / PRODUCTION. Nguyên tắc được chấp nhận, mốc dùng để thử và đề xuất OPEN được phân biệt dưới đây; đã có [bố cục khối VS-1 lịch sử](../../prototypes/VS1_EndToEnd/README.md), chưa có bộ ghép nhân vật hay asset production đã nghiệm thu.
 
-File này sở hữu chi tiết visual/pose/weapon/animation/map/UI/import và production accounting. [GDD](1_HUYEN_LO_GDD.md) sở hữu gameplay; [Technical](2_HUYEN_LO_TECHNICAL.md) sở hữu runtime/data/physics; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) sở hữu evidence/quyết định; [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md) sở hữu thứ tự làm. Các kết luận đã sync có phạm vi rõ; proposal gameplay và các con số production chưa kiểm vẫn chưa được duyệt.
+File này giữ chi tiết hình ảnh/tư thế/vũ khí/animation/map/UI, nhập asset và công sản xuất. [GDD](1_HUYEN_LO_GDD.md) giữ gameplay; [Technical](2_HUYEN_LO_TECHNICAL.md) giữ runtime/data/physics; [Analysis](3_HUYEN_LO_DESIGN_ANALYSIS.md) giữ bằng chứng/quyết định; [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md) giữ thứ tự làm. Kết luận có phạm vi rõ; technique và số sản xuất chưa kiểm vẫn OPEN.
 
-**HIỆN HÀNH** = requirement/số đang dùng; **ĐỀ XUẤT** = phương án để duyệt; **SUY RA** = phép tính kèm giả định; **OPEN / NEED VALIDATION** = chưa khóa. Các số art dưới đây là kịch bản authoring để kiểm scope, không phải asset đã tồn tại hay cam kết giờ sản xuất. Mọi thay đổi gameplay được nêu riêng và chỉ sync sau khi duyệt.
+**LOCKED** là luật đã khóa ở owner; **STRONG DIRECTION** là hướng rõ còn cần kiểm cách làm; **BASELINE / TUNABLE** là mốc dùng để thử; **OPEN** là quyết định chưa chốt; **LEGACY / SUPERSEDED** là lịch sử đã bị thay thế. **SUY RA** chỉ phép tính kèm giả định. Các số art dưới đây dùng kiểm phạm vi sản xuất, không phải asset đã tồn tại hay cam kết giờ. Luật gameplay mới đọc GDD; Art diễn đúng luật đó, không tự duyệt thay đổi balance.
+
+### Thuật ngữ Art dùng trong file
+
+`Frame` là ô lấy mẫu trên dòng thời gian; `sprite/raster` là ảnh pixel được xuất, hai đơn vị không luôn bằng nhau. `Rig` là bộ ghép nhân vật; `pose` là tư thế được vẽ/lấy mẫu; `silhouette` là dáng bao giúp nhận diện hình. `Pivot` là điểm gốc của sprite; `socket` là điểm gắn vũ khí/hiệu ứng theo tư thế; `atlas` là ảnh đóng gói nhiều sprite. `Palette/tint` là bảng màu/đổi sắc; `VFX` là hiệu ứng hình ảnh, còn `strip` là chuỗi ảnh hiệu ứng ngắn. `Occlusion` là che khuất, `overdraw` là vẽ chồng nhiều lớp trên cùng pixel. `Topology` mô tả cách các khối/mặt địa hình nối nhau. `Telegraph` là dấu hiệu báo trước đòn; `impact` là dấu trúng đòn, còn `windup/recovery` là chuẩn bị/hồi thế. `Profile/preset` là bộ cấu hình tái dùng; `manifest` là bảng kê ID, ảnh và ánh xạ tư thế. Các identifier runtime giữ nguyên tên để đối chiếu Technical.
 
 ### Đọc nhanh theo việc đang làm
 
@@ -34,43 +38,43 @@ File này sở hữu chi tiết visual/pose/weapon/animation/map/UI/import và p
 
 ## 0. Review và phạm vi được chấp nhận
 
-**APPROVED** là nguyên tắc đủ cơ sở để dùng trong specification, không đồng nghĩa mọi con số trong nhóm đã khóa. **BASELINE** là luật/số GDD hiện dùng; **CURRENT PRIORITY** là phần thử Kiếm/VS-1 trước; **DEFERRED** là implementation/art probe làm sau nhưng vẫn TARGET P0; **OPEN** cần quyết định/evidence. Trạng thái quyết định duy nhất ở [Analysis — A01–A17](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions); phần này phân loại phạm vi Art, không sổ quyết định thứ hai.
+**APPROVED** là nguyên tắc đủ cơ sở để dùng trong specification, không đồng nghĩa mọi con số trong nhóm đã khóa. **BASELINE** là luật/số GDD hiện dùng; **CURRENT PRIORITY** là phần thử Tân Lữ/Kiếm/Q1–Q6 trước; **DEFERRED** là phần triển khai/thử art làm sau nhưng vẫn TARGET P0; **OPEN** cần quyết định/evidence. Trạng thái quyết định duy nhất ở [Analysis — A01–A17](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions); phần này phân loại phạm vi Art, không sổ quyết định thứ hai.
 
 | Nhóm được review | Kết luận sử dụng hiện tại | Phần chưa duyệt / lúc validate |
 | --- | --- | --- |
 | Modular player/Body-Hair-Armor-Lower-Weapon | APPROVED tách part và đồng bộ state/phase; CURRENT Kiếm | A01/A02 exact raster/socket/hybrid và reuse class OPEN |
 | Logical frame / unique sprite | APPROVED phân biệt đơn vị đếm và khai báo giả định | 26 ô tổng có phép cộng thật; ý nghĩa user-lock, 33 pose/S0 OPEN |
 | Default outfit/Mộc và visual progression | APPROVED default khi unequip, đúng bảy weapon visuals theo catalog, band đọc bằng silhouette/accent | Số góc/frame/cách dựng cây Kiếm/Cung OPEN; fixtures không cấp skill sai class |
-| LowerBody/Boots/phụ kiện | BASELINE sáu slots, Boots/Ring/Necklace stat-only; footwear presentation thuộc LowerBody | Bỏ Boots hoặc thêm visual layer là A03 OPEN, chưa sửa catalog/stat/drop |
-| Normal/skill/main VFX/impact/reaction/status | APPROVED phân trách nhiệm và đọc result đúng; CURRENT Novice/Kiếm S1 | Motif/frame exact A04/A06 OPEN; Lv10/17 dùng fixture hẹp rồi route sau |
+| LowerBody/Boots/phụ kiện | Giữ sáu ô; Boots/Ring/Necklace chỉ đổi chỉ số/icon, footwear hình ảnh thuộc LowerBody | Đề xuất bỏ Boots cũ SUPERSEDED; thêm layer footwear chưa được duyệt |
+| Normal/skill/main VFX/impact/reaction/status | APPROVED phân trách nhiệm và đọc result đúng; CURRENT Novice/Kiếm S1 | Motif/frame exact A04/A06 OPEN; Lv 10/17 dùng fixture hẹp rồi route sau |
 | Multi-target/weapon snapshot | BASELINE giữ GDD Arc/Line/Spread/Explosion, đúng cây lúc cast | Cung DEFERRED prototype; logical batch đã duyệt; visual travel/AAA balance A05 cần đo |
-| Mob animation / hit | APPROVED feedback không tự stun, action/death/CC ưu tiên đúng | CURRENT Nấm/Sói; 105 pose và windup exact là probe, rigs khác DEFERRED |
+| Mob animation / hit | APPROVED feedback không tự stun, action/death/CC ưu tiên đúng | CURRENT Nấm/Sói; 105 pose là kịch bản lịch sử có điều kiện ba Hybrid, capability/count hiện OPEN; rig khác DEFERRED |
 | Mob death/corpse | APPROVED terminal gameplay tách corpse visual, timer không theo clip | Hold/fade/flight/loot ground points và terminal event A08/A15 OPEN |
-| Training Dummy | BASELINE HP60/25 s Q3/Q6 và ≥3 placements đồng thời; prototype solo | DEF/EVA/timer alternatives và online contention A07 OPEN; không giảm timer chỉ để giải chờ solo |
-| Terrain/readability | APPROVED cue solid/one-way/prop/back/front và surface rõ | CURRENT room ba map; cell32/module17+4/camera A09/A12 OPEN |
-| Building/structural/maps↔mob | APPROVED surfaces/route/spawn/leash/loot reachable được kiểm cùng art | Exact kit/logical lane/LoS A/B/hybrid/unreachable response A09/A10 OPEN |
+| Training Dummy | BASELINE HP 60/25 s Q3/Q6 và ≥3 placements đồng thời; prototype solo | DEF/EVA/timer alternatives và online contention A07 OPEN; không giảm timer chỉ để giải chờ solo |
+| Terrain/readability | LOCKED đất/đá solid trực giao, one-way kết cấu hiếm và có đỡ; không slope/climb | Bốn grammar ở §12; cell 32/module 17+4/camera A09/A12 OPEN |
+| Building/structural/maps↔mob | Mặt đứng, tuyến đi, spawn/leash và loot tới được phải kiểm cùng art; kit tái dùng | Exact kit/LoS A/B/Hybrid/Return còn OPEN; mật độ 28/66 cũ SUPERSEDED |
 | Animated environment | BASELINE flow/ripple cosmetic; shallow slowdown theo GDD, không swimming/hazard | Puddle nhỏ nếu có trong slice; thác/Bạch/full environment DEFERRED, strip counts OPEN |
-| NPC | APPROVED reuse source/props và chức năng đọc bằng silhouette/text | CURRENT NPC Q1–Q6; full sprites/16–22 frames và work gestures là probe |
+| NPC | Bảy NPC hiện hành, khu chức năng riêng và dấu nhận/trả quest đúng owner GDD | 14–20 hình idle/gesture là kịch bản thử; tọa độ OPEN, 16–22 cũ lịch sử |
 | VFX ngoài skill | APPROVED Freeze khác Slow, một status/target, ưu tiên telegraph | Burn/Freeze/Boss load phần sau; texture/frame count/concept OPEN |
-| Items/icons | APPROVED binding tách motif/rarity/+n overlays, UI đọc được band | CURRENT items VS-1; 49/64 bindings là derived scope, 63 bitmap/size OPEN |
+| Items/icons | APPROVED binding tách motif/rarity/+n overlays, UI đọc được band | CURRENT items Q1–Q6; 49/64 bindings là số suy ra có giả định, 63 bitmap/size OPEN |
 | Common UI Kit | APPROVED compose panel/button/slot, text Việt và pending/error đúng result | CURRENT HUD/NPC/bag/shop/quest/class; 21 functions không khóa 21 textures |
 | Local/online presentation | APPROVED visual đọc session authority, không AnimationEvent damage | Harvest/feel/art/UI probe → production base → G-L mới → G-N sớm; pose/âm anticipation A11 OPEN; tentative gameplay projectile/rollback DROP P0 |
 | Login/Character Select preview | TARGET P0 giữ đủ flow; DEFERRED khỏi local slice | A13 default/exact gear data dependency OPEN |
-| Technical art pipeline | BASELINE canvas64/PPU32/pivot; APPROVED pose/physics tách | Exact atlas/padding/flip mechanism/package/camera cần Unity test, A01/A02/A12 |
+| Technical art pipeline | BASELINE canvas 64/PPU32/pivot; APPROVED pose/physics tách | Exact atlas/padding/flip mechanism/package/camera cần Unity test, A01/A02/A12 |
 | Accounting/production cost | APPROVED tách pose/variant/export/editor/QA/rework, đo % dùng được | CURRENT Free sample + Kiếm; S0/exact totals/hours A17 OPEN |
-| Prototype matrix | Giữ đầy đủ P01–P15, CHƯA CHẠY; CURRENT chọn phần VS-1 | Bow/Boss/full online load DEFERRED, quay lại trước production branch tương ứng |
+| Prototype matrix | Giữ đầy đủ P01–P15, CHƯA CHẠY; CURRENT chọn phần Tân Lữ/Kiếm/Q1–Q6 trong sandbox riêng | Bow/Boss/full online load DEFERRED, quay lại trước production branch tương ứng |
 
-Lượt consolidation trước không chọn option gameplay; DESIGN LOCK 2026-10-03 đã sync target resolution/ba skill/control, vẫn chưa duyệt technique/count. REJECTED cho production hiện tại: vẽ hàng loạt trước G-N, lấy animation/VFX làm damage authority hoặc dùng số giả định làm nghiệm thu. Các phân tích Cung/Boss còn đủ dưới đây; DEFERRED không đổi chúng thành P1.
+Lượt consolidation và DESIGN LOCK 2026-10-03 là lịch sử; migration 2026-10-06 đã sync luật input/terrain/NPC/gear hiện hành từ GDD, vẫn chưa duyệt technique/count. REJECTED cho production hiện tại: vẽ hàng loạt trước G-N, lấy animation/VFX làm damage authority hoặc dùng số giả định làm nghiệm thu. Các phân tích Cung/Boss còn đủ dưới đây; DEFERRED không đổi chúng thành P1.
 
 Reasoning từ các phát hiện ban đầu được giữ tại [Phụ lục A](#art-initial-findings).
 
-Ưu tiên chi phí: silhouette gear, tư thế Kiếm/Cung, thời điểm release/hit, telegraph và status là core. Cắt particle thừa, idle phụ và cảnh tổng kết cầu kỳ trước khi cắt các dấu hiệu đó. Không thêm class, slot ngoài ba combat slots đã duyệt, CC, companion, swimming, hệ ánh sáng hay active R P0.
+Ưu tiên công cho dáng trang bị, tư thế Kiếm/Cung, thời điểm phát/trúng đòn, telegraph và trạng thái. S2 là ứng viên farm dùng thường xuyên, phải được đầu tư pose/impact dễ đọc cùng S1 và S3. Giảm hạt thừa, idle phụ và cảnh tổng kết cầu kỳ trước khi giảm thông tin này. Không thêm class, combat slot, CC, companion, swimming, hệ ánh sáng hay buff chủ động P0.
 
 <a id="player-visual"></a>
 
 ## 1. Kiến trúc hình ảnh player
 
-**Đọc từ:** GDD §0/§9, Technical §8. Giữ canvas 64×64, PPU 32, một cơ thể nam; không tạo full rig cho từng bộ đồ.
+**Đọc từ:** GDD §0/§9, Technical §8. Giữ canvas 64×64 (khung ảnh nguồn), PPU 32 (32 pixel trên một world unit) và một cơ thể nam; không tạo rig đầy đủ cho từng bộ đồ.
 
 | Part | Sở hữu hình gì | Reuse và giới hạn |
 | --- | --- | --- |
@@ -80,11 +84,11 @@ Reasoning từ các phát hiện ban đầu được giữ tại [Phụ lục A]
 | LowerBody | Quần **và footwear về presentation** | Chân chạy/nhảy/ngã/death cần thay pose; hai class có thể dùng cùng chân khi stance khớp. Giày stat-only không thay pixel footwear này |
 | Weapon | Cây đang dùng, grip/string và vị trí trước/sau thân | Tra theo visual ID của action, không hard-code Sword_Common/Bow_Common trong Attack/Skill |
 
-**Default outfit bắt buộc:** áo vải và quần/footwear đơn giản khi Lv1–2 hoặc unequip. Đây là fallback khi slot trống, không item mới, không stat và không tính là Band I. Q3 Quần I, Q4 Áo I phải tạo khác biệt nhìn thấy; có thể sửa màu/vạt áo trên cùng pose template, nhưng không mặc sẵn nguyên bộ I rồi claim progression đã hữu hình. Không equip weapon thì hai tay trung tính; không phát đòn giả với cây kiếm không tồn tại. Điều kiện attack khi chưa có vũ khí vẫn thuộc gameplay hiện hành, không tự thêm combat tay không.
+**Default outfit bắt buộc:** áo vải và quần/footwear đơn giản khi Lv 1–2 hoặc unequip. Đây là fallback khi slot trống, không item mới, không stat và không tính là Band I. Q3 Quần I, Q4 Áo I phải tạo khác biệt nhìn thấy; có thể sửa màu/vạt áo trên cùng pose template, nhưng không mặc sẵn nguyên bộ I rồi claim progression đã hữu hình. Không equip weapon thì hai tay trung tính; không phát đòn giả với cây kiếm không tồn tại. Điều kiện attack khi chưa có vũ khí vẫn thuộc gameplay hiện hành, không tự thêm combat tay không.
 
 ### 1.1. Contract 26 frame thực sự đếm gì
 
-Tám state và phép cộng `4+6+2+2+3+4+2+3=26` là dữ liệu hiện hành. **ĐỀ XUẤT A01, chưa đổi lock:** xem 26 là ô lấy mẫu của một profile; một ô có thể reuse sprite/hold hoặc chọn pose class khác. Logical sample không đồng nghĩa hình raster khác nhau. Việc duyệt nghĩa profile thay giới hạn tổng ảnh còn OPEN; timeline presentation bám clock gameplay, không bắt buộc mọi pose dài bằng nhau.
+Tám state và phép cộng `4+6+2+2+3+4+2+3=26` giữ nguyên. **ĐỀ XUẤT A01, chưa đổi lock:** xem 26 là ô lấy mẫu của một profile; một ô có thể dùng lại sprite, giữ hình hoặc chọn tư thế class khác. Ô timeline không đồng nghĩa ảnh raster mới. Ý nghĩa 26 là tổng ảnh hay ô/profile vẫn OPEN; timeline hình ảnh bám đồng hồ gameplay, không buộc mọi pose dài bằng nhau.
 
 | State / ô hiện hành | Lý do đủ cho baseline | Ít hơn mất gì / nhiều hơn được gì |
 | --- | --- | --- |
@@ -93,21 +97,21 @@ Tám state và phép cộng `4+6+2+2+3+4+2+3=26` là dữ liệu hiện hành. *
 | Jump 2 / 8 FPS | Rời đất và tư thế đi lên; hold hình thứ hai khi còn đi lên | Một hình mất dấu takeoff; thêm landing không được tự thêm action lock mới |
 | Fall 2 / 8 FPS | Chuyển từ apex sang tư thế rơi; hold, không loop rung chân vô hạn | Một hình có thể đủ nhưng mất chuyển apex; landing riêng chỉ thêm nếu tiếp đất khó đọc |
 | Attack 3 / 12 FPS | Kiếm: chuẩn bị → quét/hit → trả thế; Cung: kéo → release → trả thế | Hai hình làm hit/release khó đọc; bốn–sáu hình cho draw dài/arc đẹp hơn, cần kiểm timing trước tăng cost |
-| Skill 4 / 12 FPS | Chuẩn bị → tụ lực → phát → trả thế; reuse cho nhập môn/tiến cảnh/đại chiêu bằng hold/VFX | Ba hình mất nhịp tụ; hơn bốn chỉ đáng làm nếu Lv17 vẫn không đọc signature sau đổi VFX |
+| Skill 4 / 12 FPS | Chuẩn bị → tụ lực → phát → trả thế; reuse cho nhập môn/tiến cảnh/đại chiêu bằng hold/VFX | Ba hình mất nhịp tụ; hơn bốn chỉ đáng làm nếu Lv 17 vẫn không đọc signature sau đổi VFX |
 | Hit 2 / 10 FPS | Recoil → hồi pose khi rảnh; còn flash/impact cho lúc đang action | Một hình vẫn đủ overlay; hơn hai dễ tạo cảm giác bị khóa lâu. Không mặc định Hit interrupt |
 | Death 3 / 8 FPS | Mất thăng bằng → đổ → nằm; hold hình cuối | Hai hình dễ giống biến mất; thêm hình làm fall đẹp hơn, không tăng hậu quả gameplay |
 
-**SUY RA có điều kiện:** 19 ô chung (Idle/Run/Jump/Fall/Hit/Death) + 7 ô Attack/Skill Kiếm + 7 ô Attack/Skill Cung = **33 pose cơ thể nếu tất cả khác nhau**, không phải hai rig 26×2. Tay idle cầm cung, nock và chuẩn bị Lv17 có thể cần thêm pose; 33 chưa phải trần. Ngược lại Hair/LowerBody có thể dùng ít hình hơn 33. Nếu 26 là giới hạn **hình raster toàn bộ hai class** chứ không phải profile baseline, phải trình lại trade-off; không gọi bộ 33 hình là tuân thủ nguyên văn lock cũ.
+**SUY RA có điều kiện:** 19 ô chung (Idle/Run/Jump/Fall/Hit/Death) + 7 ô Attack/Skill Kiếm + 7 ô Attack/Skill Cung = **33 pose cơ thể nếu tất cả khác nhau**, không phải hai rig 26×2. Tay idle cầm cung, nock và chuẩn bị Lv 17 có thể cần thêm pose; 33 chưa phải trần. Ngược lại Hair/LowerBody có thể dùng ít hình hơn 33. Nếu 26 là giới hạn **hình raster toàn bộ hai class** chứ không phải profile baseline, phải trình lại trade-off; không gọi bộ 33 hình là tuân thủ nguyên văn lock cũ.
 
 ### 1.2. Ba cách làm và recommendation
 
-Ba phương án cần đối chiếu là raster từng pose, skeletal/socket toàn thân và hybrid. Hybrid đang là phương án prototype A01/A02, chưa phải technique đã duyệt. Bảng trade-off và hướng xử lý lỗi socket/stance được giữ tại [Phụ lục A — technique](#art-technique-rationale).
+Ba phương án cần đối chiếu: vẽ ảnh riêng cho từng pose (`raster`), ghép các part trên xương/điểm gắn rồi xoay (`skeletal/socket`) và kết hợp ảnh sửa theo góc với điểm gắn (`hybrid`). Hybrid đang là phương án thử A01/A02, chưa phải kỹ thuật đã duyệt. Bảng lợi/hại và hướng sửa lỗi điểm gắn/tư thế đứng (`stance`) được giữ tại [Phụ lục A — technique](#art-technique-rationale).
 
-**A14 — ra đòn khi chạy/nhảy/rơi:** giữ gravity và horizontal momentum đã duyệt; CURRENT thử Novice/S1, permissions skill S2/S3 còn gate. Upper action/lower locomotion cần chung phase/root/socket; không thêm movement lock hoặc animation set để cứu 26/33. Hit flash không restart action; pose đọc accepted SkillId snapshot, không mutable selectedSlot.
+**A14 — ra đòn khi chạy/nhảy/rơi:** giữ gravity và đà ngang; CURRENT thử Tân Lữ/S1, quyền dùng S2/S3 trên không còn OPEN. Ghép phần thân trên ra đòn với chân chạy/nhảy phải cùng phase/root/socket; không khóa movement hoặc thêm animation set để cứu 26/33. Flash khi bị đánh không bắt đầu lại action; pose đọc SkillId đã chụp của action được nhận, không selection mới.
 
 ### 1.3. Pivot, flip và overlap
 
-Canvas căn một mốc chân `(32,0)` theo pivot hiện hành; artwork có thể chừa 1–2 px transparent và foot anchor offset chung, không auto-crop làm đổi điểm chân. Head/hand/grip author tọa độ pixel **theo pose**, không theo bounds ảnh. Grip lệch 1 px đã dễ thấy ở cây cung mảnh.
+Canvas căn mốc chân `(32,0)` theo pivot hiện hành. Có thể chừa 1–2 px trong suốt và offset chân chung, không crop tự động làm đổi điểm chân. Điểm đầu/tay/nắm (`grip`) được author bằng tọa độ pixel **theo pose**, không theo khung bao ảnh. Grip lệch 1 px dễ thấy trên cây cung mảnh.
 
 Giữ một SortingGroup/actor để part của hai player không chen nhau. Unity xác nhận SortingGroup phù hợp nhân vật gồm nhiều SpriteRenderer chồng lấp. [Nguồn Unity — SortingGroup](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Rendering.SortingGroup.html).
 
@@ -128,7 +132,7 @@ Order hiện tại là baseline, không áp một thứ tự cứng cho mọi po
 | Vân Nham Kiếm / Cung | Guard/limb chắc, accent đá/đồng, silhouette khác I | Cùng socket, pose, effect class |
 | Huyền Ấn Kiếm / Cung | Dấu cổ văn, hình lưỡi/đầu cung có đặc trưng; sáng tiết chế | Cùng hit timing, pool VFX; không làm dài hitbox vì ảnh lớn |
 
-Palette đơn thuần rẻ nhưng dễ bỏ lỡ progression. Khuyến nghị mỗi band đổi **ít nhất một dấu silhouette** (guard/lưỡi hoặc đầu limb cung) và accent; Common/Rare/Epic cùng template vẫn cùng hình, rarity đọc qua UI. Không giả mọi món cùng band là cùng stat/rarity/item; `ItemDefinition → visualId`, instance giữ stat state riêng.
+Chỉ đổi palette giảm công nhưng progression dễ khó thấy. Khuyến nghị mỗi band đổi **ít nhất một dấu dáng bao** ở chuôi/lưỡi kiếm hoặc đầu cánh cung và một accent. Common/Rare/Epic cùng template giữ cùng hình; phẩm chất đọc qua UI. Các món cùng band không đồng nghĩa cùng stat/rarity/item: `ItemDefinition → visualId`, instance giữ chỉ số riêng.
 
 | Vũ khí / phương án | Hình cần author cho mỗi variant | Vì sao / trade-off |
 | --- | --- | --- |
@@ -140,7 +144,7 @@ Palette đơn thuần rẻ nhưng dễ bỏ lỡ progression. Khuyến nghị m�
 
 Kịch bản hybrid đầy đủ: 4 Kiếm×4 + 3 Cung×3 = **25 ô hình vũ khí**, trong đó 7 canonical/shape nền và 18 góc/deformation thêm; 1 tên chung tính riêng. Nếu cả bốn Kiếm dùng xoay canonical tốt, chỉ cần 4+9=13; đây là khoảng **13–25** có cơ sở, không asset budget đã khóa. Nhìn đúng cây đang equip cần kiểm **mỗi visual trên Attack và các Skill hợp lệ với nó**, không chỉ Idle; không cấp skill class cho Tân Lữ chỉ để thử Mộc Kiếm.
 
-Cast snapshot giữ visualId vũ khí lúc bắt đầu action, cùng profile/pose/timeline; equip đổi giữa action không được morph thành cây khác khi hit. Đề xuất áp visual gear mới ở biên pose/action gần nhất, còn damage action cũ giữ snapshot hiện hành. Việc có chặn equip khi cast hay không là **OPEN**, không tự thêm equip lock. Remote nhận visual snapshot/revision đủ để diễn cùng cây; không suy ngược từ damage hoặc gear mới nhất.
+Action giữ visualId vũ khí, profile/pose/timeline đã chụp lúc bắt đầu; đổi equip giữa action không làm cây vũ khí đang đánh đổi hình. Đề xuất áp hình gear mới ở biên pose/action hợp lệ, damage action cũ giữ snapshot. Có chặn equip khi cast hay không vẫn **OPEN**. Remote cần visual snapshot/revision để diễn đúng cây, không đoán từ damage hay gear mới nhất.
 
 Skill VFX là sức mạnh phái, không baked vào ảnh cây kiếm/cung. Anchor ở grip/tip do pose track; nhập môn/tiến cảnh/đại chiêu đổi preset theo skill profile, dùng được với mọi visual hợp lệ. Vũ khí mạnh hơn vẫn đọc bằng silhouette khi effect sáng lên.
 
@@ -153,13 +157,13 @@ Skill VFX là sức mạnh phái, không baked vào ảnh cây kiếm/cung. Anch
 | Armor I/II/III | Ba thiết kế áo trên pose template; redraw khi tay/thân đổi | Ba template icon, rarity và enhance ngoài ảnh | Vải → viền/miếng giáp → cổ văn; tránh áo dài che chân và bow grip |
 | LowerBody I/II/III | Ba thiết kế quần **kèm footwear mỹ thuật** | Ba item Quần, không thêm slot footwear | Đổi viền/gối/cạp và footwear theo band; chân chạy/nhảy phải theo pose |
 | Ring / Necklace | Không world sprite | Sáu template icons, stat và tooltip | Giữ stat-only; vẽ trên body 44–48 px khó đọc, ít lợi ích so cost |
-| Boots | Không world sprite; footwear do LowerBody trình bày | Ba template icons, DEF/EVA/tốc chạy và enhance/Tinh Hoa | **Giữ slot stat-only P0**, tooltip mô tả đây là slot chỉ số; đừng hứa footwear world khớp item Boots |
+| Boots | Không sprite trong world; footwear do LowerBody trình bày | Ba icon; HP/DEF/EVA/tốc chạy và enhance/Tinh Hoa đọc [GDD §6](1_HUYEN_LO_GDD.md#gear-economy) | **Giữ ô chỉ số P0**, tooltip không hứa hình footwear đổi theo item Boots |
 
 Armor có thể giữ cùng silhouette gốc nhưng cần accent band đủ nhìn; LowerBody phải khác ở vùng không bị áo che. Đổi outfit không thay collider, shadow footprint hay range. Không sản xuất 18 full rigs, không sản xuất hình cho mỗi mức +.
 
-### 3.1. Nếu bỏ Boots thì chuyện gì thay đổi
+### 3.1. Giữ Boots và tra đề xuất cũ
 
-Baseline vẫn là sáu slot; Boots stat-only và footwear mỹ thuật thuộc LowerBody. Bỏ Boots hoặc cho Boots đổi world visual là hai option A03 còn OPEN. Xem [Phụ lục A — Boots](#art-boots-rationale) để tra đủ tác động lên catalog, chỉ số, loot, shop và UI trước khi đề xuất thay đổi.
+Hiện hành giữ sáu ô; Boots chỉ đổi chỉ số/icon, footwear hình ảnh thuộc LowerBody. Armor/Pants/Boots là nhóm HP; Weapon/Ring/Necklace là nhóm MP theo GDD, không suy chỉ số từ vị trí slot trên UI. Đề xuất bỏ Boots đã SUPERSEDED; [Phụ lục A — Boots](#art-boots-rationale) giữ phép tính/trade-off lịch sử để tra, không mở lại số ô. Thêm layer footwear chưa được duyệt và không thuộc công sản xuất hiện hành.
 
 <a id="combat-visual"></a>
 
@@ -180,26 +184,28 @@ Baseline vẫn là sáu slot; Boots stat-only và footwear mỹ thuật thuộc 
 | Status | Bỏng/Đóng Băng/Làm Chậm theo lifetime thực | Màu lạnh lúc cast không chứng minh đã proc Freeze |
 | Beneficial | Heal/MP/Food/miễn thương hồi sinh được xác nhận | Hạt hồi máu không thêm regen ngoài luật |
 
-### 4.1. Framework Lv1 → Lv20
+### 4.1. Framework Lv 1 → Lv 20
 
-Concept đề xuất dựa lore **linh mạch/Mạch Ấn**: Kiếm là nét khắc ấn ấm, gọn và dứt; Cung là đường linh khí lạnh căng qua dây. Có thể thay thành linh ảnh/phong/hỏa/băng khác sau test, nhưng phải giữ shape và timing hiện hành. Chưa khóa phải có thú, băng cầu hoặc kiếm khí dạng projectile.
+Concept đề xuất dựa **linh mạch/Mạch Ấn**: Kiếm là nét khắc ấn ấm, gọn và dứt; Cung là đường linh khí lạnh căng qua dây. Có thể thử linh ảnh/phong/hỏa/băng khác nhưng vẫn giữ hình đòn và thời điểm gameplay hiện hành. Chưa khóa hình thú, băng cầu hay kiếm khí bay. Dấu trấn ấn, nét gỗ/đá và cổ văn nối với thế giới sơn cước, không thêm cơ chế hoặc thực thể đánh phụ.
 
 | Mốc / action | Hình tối thiểu và progression | Gameplay-critical / phần có thể cắt |
 | --- | --- | --- |
-| Lv1–2 | Movement/outfit mặc định; không fake skill trước Q6 | Đọc player/NPC/platform; bụi chân phụ có thể bỏ |
+| Lv 1–2 | Movement/outfit mặc định; không fake skill trước Q6 | Đọc player/NPC/platform; bụi chân phụ có thể bỏ |
 | Q3/Tân Lữ normal | Mộc Kiếm thật, swing ba pose, một dấu quét ngắn và impact tại target | Hit moment/weapon là core; trail dài/sparks là polish |
 | Kiếm S1 sau class | Single Phong Trảm giữ cue riêng, reuse Attack/Skill pose hợp lệ | Không dựng class Normal executor hoặc zero-MP fallback |
 | Cung S1 sau class | Draw/release + logical single/visual arrow | Không gap normal Cung executor: action class là S1; visual không damage |
-| Lv5 Phong Trảm | Cùng cây kiếm, dấu linh ấm ở release; nét chém rõ hơn normal nhưng chỉ một target 1,7 u | Một nhịp cast/shape riêng; không vẽ quét rộng ám chỉ ba con đều nhận damage |
-| Lv5 Linh Tiễn | Cùng cây cung draw/release; tên có tip/trail linh khí mảnh, khác tên thường | Logical single result; một visual arrow, không nhiều bóng tên giả |
-| Lv10 Phong Trảm | Dấu quét 120° liên tục, accent Mạch Ấn; tối đa ba impact ở hit moment | Sweep và multi-target feedback core; không ba explosion lớn |
-| Lv10 Linh Tiễn | Một lần kéo/phóng, ba nhánh tên đồng motif; cùng logical resolve +0,12 s | Ba visual arrows; đừng diễn thành ba cast kéo cung. A/A/A vẫn ba tên, status một roll/unique target |
-| Lv13 nội tại | Icon/tooltip mở, hit đủ điều kiện có accent nhỏ tùy chọn | Không thêm aura liên tục hay skill slot; không làm accent thành proc gameplay mới |
-| Lv17 Kiếm Khí | Chuẩn bị/tụ rõ hơn, đường ấn 5,5 u, width 0,6 u mở trong một release; tối đa năm impact | Signature bằng silhouette/nhịp/âm sắc; không cần projectile server mới cho Line |
-| Lv17 Hàn Tiễn | Một tên mạnh, arrival rõ, nổ lạnh radius 2 u; primary tâm và secondary cùng nhịp nổ | Logical primary + explosion authority; flash tâm ngắn, vành nổ gọn. Không thêm tên phụ gây damage |
-| Lv18–20 | Gear III và signature giữ nhận diện, status theo loại target | Không tự thêm evolution Lv20 hoặc tăng effect vô hạn theo enhancement |
+| Lv 5 Phong Trảm | Cùng cây kiếm, dấu linh ấm ở release; nét chém rõ hơn normal nhưng chỉ một target 1,7 u | Một nhịp cast/shape riêng; không vẽ quét rộng ám chỉ ba con đều nhận damage |
+| Lv 5 Linh Tiễn | Cùng cây cung draw/release; tên có tip/trail linh khí mảnh, khác tên thường | Logical single result; một visual arrow, không nhiều bóng tên giả |
+| Lv 10 Phong Trảm | Dấu quét 120° liên tục, accent Mạch Ấn; tối đa ba impact ở hit moment | Sweep và multi-target feedback core; không ba explosion lớn |
+| Lv 10 Linh Tiễn | Một lần kéo/phóng, ba nhánh tên đồng motif; cùng logical resolve +0,12 s | Ba visual arrows; đừng diễn thành ba cast kéo cung. A/A/A vẫn ba tên, status một roll/unique target |
+| Lv 13 nội tại | Icon/tooltip mở, hit đủ điều kiện có accent nhỏ tùy chọn | Không thêm aura liên tục hay skill slot; không làm accent thành proc gameplay mới |
+| Lv 17 Kiếm Khí | Chuẩn bị/tụ rõ hơn, đường ấn 5,5 u, width 0,6 u mở trong một release; tối đa năm impact | Signature bằng silhouette/nhịp/âm sắc; không cần projectile server mới cho Line |
+| Lv 17 Hàn Tiễn | Một tên mạnh, arrival rõ, nổ lạnh radius 2 u; primary tâm và secondary cùng nhịp nổ | Logical primary + explosion authority; flash tâm ngắn, vành nổ gọn. Không thêm tên phụ gây damage |
+| Lv 18–20 | Gear III và signature giữ nhận diện, status theo loại target | Không tự thêm evolution Lv 20 hoặc tăng effect vô hạn theo enhancement |
 
-Lv5 khác normal bằng pose tụ ngắn, release accent, tip/shape và impact cùng motif; không chỉ đổi màu. Lv10 tăng độ rộng/số nhánh cùng thông tin đánh lan. Lv17 tạo “wow” bằng **anticipation rõ → một hình signature lớn nhưng rỗng tâm → kết thúc sạch**, thay vì giữ màn hình trắng. Không kéo action lock để lấy chỗ diễn nếu chưa duyệt timing.
+Lv 5 khác basic bằng tư thế tụ ngắn, dấu phát đòn, đầu tên/nét chém và impact cùng motif. Lv 10 tăng độ rộng/số nhánh để đọc đánh lan. Lv 17 tạo cảm giác mạnh bằng **chuẩn bị rõ → hình đòn lớn có khoảng trống → kết thúc sạch**. Không kéo action lock để thêm thời gian diễn.
+
+**STRONG DIRECTION — S2 thường xuyên:** S1 và S2 đều phản hồi nhanh; S2 có thể là kỹ năng player chọn để farm qua nhiều lần Execute. Ưu tiên thế chuẩn bị gọn, nét quét/ba nhánh rõ, impact thỏa mãn và kết thúc sạch khi lặp liên tục. Không để S3 là đòn duy nhất có art tốt. Thử S2 trên camera đông nhiều bãi và nhiều player: tái dùng strip/preset, giảm trail/hạt thừa, giữ silhouette actor và telegraph. Exact frame/VFX count vẫn OPEN; không kéo thời gian khóa hành động để chứa hiệu ứng.
 
 Khởi điểm authoring: slash/wave **4 hình** (mở–active–co–tan), burst **5 hình** (arrival–mở–vành–vỡ–tan), impact **3 hình** (bật–tách–mất). Ít hơn mất hướng/nhịp hoặc thành nhấp nháy; thêm frame chỉ giúp decay mượt, không thêm hit. Dùng lại strip bằng scale/tint/rotation và duration theo profile; không nhân bảy weapon visuals. Đây là dải probe chất lượng, không bộ sprite đã khóa.
 
@@ -219,13 +225,13 @@ Travel/streak duration/aim là presentation probe, dẫn tới result clock ho�
 
 Arc/sweep là tự nhiên với Kiếm; fan projectile tự nhiên với Cung; AoE vòng dùng cho explosion. Link cực mảnh có thể thử như **nét Mạch Ấn** ở cùng tick landed results, không chạy chuyền qua từng target. Mặc định bỏ link: thêm đường dễ bị đọc thành chain skill, trong khi impact và sweep đã giải thích đủ. Nếu giữ, không bám target chưa hit/đã invalid, không phủ kín đội hình.
 
-Giảm spam theo camera: một main VFX/cast, một impact nhỏ/landed target, một status instance/type/target. Giữ projectile nguy hiểm và Boss telegraph; giảm hạt/trail/shake của remote trước. Không che kết quả bằng dồn mọi impact vào primary; không dùng thời gian decay effect làm trì hoãn HP/damage feedback. Chạy 2/4+ player và trường hợp 5 target; cap cosmetic phải đo, không giới hạn world ở bốn người.
+Giảm rối trên camera: một hiệu ứng chính/cast, một impact nhỏ/mục tiêu trúng và một status instance/loại/target. Giữ đường đòn nguy hiểm và Boss telegraph; giảm hạt/trail/shake remote trước. Impact đặt đúng từng victim, HP/damage không chờ hiệu ứng tan. Thử 2/4+ player và 5 target; giới hạn cosmetic phải đo, bốn người không là player cap.
 
 <a id="mob-visual"></a>
 
 ## 6. Mob: animation theo hành vi
 
-**Đọc từ:** GDD §4; bảy identities/sáu rigs giữ nguyên, Sói Trúc reuse Sói Sương bằng palette/name. Không ép 26 frame player lên mob. Bảng là **kịch bản pose khởi điểm**, chưa assets và chưa lock frame count.
+**Đọc từ:** GDD §4; bảy loại quái/sáu rig giữ nguyên, Sói Trúc dùng lại Sói Sương bằng palette/name. Không ép 26 frame player lên mob. **Bảng sau là kịch bản lịch sử có điều kiện ba Hybrid**, giữ để đối chiếu công vẽ; Hybrid count/identity hiện OPEN, không khóa 3/1/0. Pose ranged ở ba dòng candidate chỉ sản xuất nếu capability đó được chọn; 105 không là budget hiện hành.
 
 | Base rig / hành vi | Idle | Move / Flying | Melee | Ranged | Hit rảnh | Death | Tổng hình nếu các ô mới đều khác |
 | --- | ---: | --- | ---: | ---: | ---: | ---: | ---: |
@@ -237,19 +243,19 @@ Giảm spam theo camera: một main VFX/cast, một impact nhỏ/landed target, 
 | Cổ Môn Vệ Binh, hybrid 1,8 u/s | 2 | 6 bước và áo/giáp chuyển | 4 | 4 | 1 | 4 | 21 |
 | Sói Trúc Ảnh | Reuse | Reuse | Reuse | — | Reuse | Reuse | **0 pose mới**, một palette identity |
 
-**SUY RA:** 14+17+13+21+19+21 = **105 hình rig trong kịch bản này**, không bảy lần cùng một animation count. Nếu ranged recovery reuse idle hoặc Hit chỉ flash, số hình thực giảm; cần ghi pose map, không tự giảm bảng mà vẫn claim tất cả ô unique.
+**SUY RA có điều kiện ba Hybrid:** 14+17+13+21+19+21 = **105 hình rig**, giữ phép cộng lịch sử. Nếu không chọn ranged capability, hoặc recovery dùng idle/Hit chỉ flash, số ảnh thực giảm; phải kê pose map thật. Không gọi 105 là budget hiện hành hoặc tự giảm số mà vẫn tuyên bố mọi ô khác nhau.
 
 Lý do bốn ô attack: nhận thế/aim → windup silhouette → hit/release → recovery. Ba ô vẫn được nếu aim đọc từ facing/hold; hai ô dễ mất báo trước, nhất là ranged. Thêm frame chỉ làm chuyển động mượt, không tăng attack rate. Wolf cần stride/lunge đọc hơn Nấm; Stone bốn move đủ tạo sức nặng; Ong không cần bộ đi bộ hoặc melee không có gameplay. Wing bốn pose có thể loop nhanh hơn thân (probe 12–16 FPS), nhưng release đọc bằng thân/dấu phát đạn, không theo nhịp cánh.
 
 Nấm Death ba ô: xẹp→đổ→bẹp. Sói bốn: gục đầu→khuỵu→đổ→nằm; bớt một chuyển vẫn có thể pass. Đạo Tặc/Cổ Vệ bốn cho trọng lượng thân người/giáp; Thạch bốn cho nứt→rụng→sụp→tàn, không debris physics. Ong bốn cho mất wing→rơi presentation→chạm/rụng→tàn; không bắt chước corpse Sói nằm giữa không khí. Hit một hình chỉ dùng lúc rảnh; flash/impact cho mọi action ở §7.
 
-Hybrid mobs cần **pose ranged**, dù dùng cùng Linh Đạn generic: Đạo Tặc phóng/ném; Thạch tụ/phóng mảnh linh lực; Cổ Vệ đưa vũ khí/ấn phát. Đó là khác gesture, không ba projectile families mới. Đạn generic visual reuse tint/scale/trail; tốc 5/4/6 và Ong 5,5 u/s chỉ là control travel visual từ baseline cũ, không clock damage. Roster giữ ba hybrid đến prototype/content approval 3/1/0, không trừ poses trước duyệt. Idle 2 thay 4 tiết kiệm vì thở không phải core; thêm work flourish không phục vụ mob AI P0.
+Nếu chọn Hybrid thì cần **tư thế đánh xa**, dù dùng cùng Linh Đạn: Đạo Tặc phóng/ném, Thạch tụ/phóng mảnh linh lực, Cổ Vệ đưa vũ khí/ấn phát. Đây là gesture candidate, không ba họ projectile mới. Đạn dùng chung, chỉnh tint/scale/trail; tốc 5/4/6 và Ong 5,5 u/s là tham số hình ảnh giữ từ mốc cũ, không quyết clock damage. Chốt capability và pose cần thật trước production; không tự thêm ranged cho Sói hoặc quái melee phía sau để cân Cung. Idle 2 thay4 giảm công vì nhịp thở ít quan trọng hơn windup/release; không thêm flourish không phục vụ hành vi P0.
 
 ### 6.1. Boss là dependency art bắt buộc ngoài bảng sáu rig
 
-GDD có một Cự Thú, basic + Nham Trảo + Địa Chấn + ba vùng Nham Thạch Rơi + Cuồng Mạch. Không được bỏ Boss khỏi scope chỉ vì checklist nhấn normal mob. Kịch bản: Idle4 + Move6 + Basic/Claw4 dùng chung motion + Slam4 + Cast4 + Death6 = **28 hình**, thêm Roar4 **tùy chọn** =32. Move6 chỉ cần nếu reposition có đi; bốn frame death sẽ rẻ hơn nhưng thân lớn sụp dễ thiếu trọng lượng, sáu là probe có lý do. Claw khác basic bằng telegraph/config, chỉ redraw nếu silhouette không phân biệt được.
+GDD có một Cự Thú, basic + Nham Trảo + Địa Chấn + ba vùng Nham Thạch Rơi + Cuồng Mạch. Không được bỏ Boss khỏi scope chỉ vì checklist nhấn normal mob. Kịch bản: Idle 4 + Move6 + Basic/Claw4 dùng chung motion + Slam4 + Cast4 + Death6 = **28 hình**, thêm Roar4 **tùy chọn** =32. Move6 chỉ cần nếu reposition có đi; bốn frame death sẽ rẻ hơn nhưng thân lớn sụp dễ thiếu trọng lượng, sáu là probe có lý do. Claw khác basic bằng telegraph/config, chỉ redraw nếu silhouette không phân biệt được.
 
-Canvas Boss **OPEN** theo kích thước world cần đánh/né; giữ PPU32, thử 128/192 px thay vì phóng ảnh 64px thành khối thô. 28 frame Boss không ngang cost 28 frame player: diện tích, cleanup và telegraph QA lớn hơn. Ba telegraph shape: cone, ground AoE, landing zones; vùng đá dùng cùng shape ba lần, không ba asset riêng. Địa Chấn phải báo vùng nhảy né, landing zones không ám chỉ double-hit overlap.
+Canvas Boss **OPEN** theo kích thước world cần đánh/né; giữ PPU32, thử 128/192 px thay vì phóng ảnh 64 px thành khối thô. 28 frame Boss không ngang cost 28 frame player: diện tích, cleanup và telegraph QA lớn hơn. Ba telegraph shape: cone, ground AoE, landing zones; vùng đá dùng cùng shape ba lần, không ba asset riêng. Địa Chấn phải báo vùng nhảy né, landing zones không ám chỉ double-hit overlap.
 
 Cuồng Mạch tint/glow/roar feedback theo ngưỡng server; không chen Roar animation làm ngắt action/telegraph hiện tại hoặc thêm stun/lock. Nếu không có khoảng rảnh để roar, dùng accent/âm thanh và giữ pose chính. Boss Slow giữ telegraph/action đã start nguyên tốc độ; Dư Ảnh chỉ đổi tên per viewer, không rig/entity/phase mới.
 
@@ -266,19 +272,19 @@ Cuồng Mạch tint/glow/roar feedback theo ngưỡng server; không chen Roar a
 | Recovery | Giữ recovery đến mốc authoritative | Recoil visual chỉ nếu không che return pose | Cấp đòn kế sớm vì Hit clip ngắn |
 | Frozen thật | Cancel pending action theo server; giữ pose ngắt dưới overlay băng | Freeze entry/tan; hết CC về state mới của server | Resume windup cũ rồi phát pending hit đã bị hủy |
 | Boss/PvP Slow | Main action giữ nguyên thời gian | Lam mờ/status icon theo expiry | Dùng Hit/ice-block hoặc giảm animation tốc độ action |
-| HP0/Death | Terminal death pose, clear status theo server | Hit cuối gọn dẫn vào Death, bỏ Hit dài | Cố phát nốt hit/spawn chưa giải quyết hoặc đợi Hit clip xong mới chết |
+| HP 0/Death | Terminal death pose, clear status theo server | Hit cuối gọn dẫn vào Death, bỏ Hit dài | Cố phát nốt hit/spawn chưa giải quyết hoặc đợi Hit clip xong mới chết |
 
-Flash nên ngắn, probe 60–100 ms; recoil 1–2 px/60–120 ms chỉ trên visual và khi không làm sai hướng đòn. Ít hơn khó thấy ở tốc chơi, nhiều hơn giống stun và làm nhấp nháy nhiều người; các số này **NEED VALIDATION**, không hit-stop gameplay. Hitstop/crit shake/material audio DEFERRED, không requirement CURRENT. Với packet gộp nhiều hit, debounce flash cường độ nhưng vẫn giữ từng result đúng; không reset action clock theo số hit.
+Flash thử 60–100 ms; giật hình nhẹ 1–2 px/60–120 ms chỉ trên visual khi không sai hướng đòn. Quá ngắn khó thấy, quá dài giống stun và tăng nhấp nháy; số này **TUNABLE**, không dừng clock gameplay. Hitstop/crit shake/âm theo vật liệu DEFERRED. Packet nhiều hit có thể giảm cường độ flash lặp nhưng giữ từng result; không reset action clock.
 
 ## 8. Mob death lifecycle và corpse
 
 **Đọc từ:** GDD §4/§6, Technical §6/§7. Respawn normal/Linh hiện tính **deathUtc+25 s**, không tính từ lúc corpse tan hoặc DB ACK. Body không gây contact damage/blocking hiện hành; corpse càng không được tạo chướng ngại mới.
 
-**Giả định review A15 cho bảng/ví dụ dưới:** đặt `t0` ở lethal HP0 và giả định `deathUtc=t0` để thử ACK trễ; chưa khóa API/event/timestamp capture hoặc thời điểm release Linh cap ở terminal-pending. Invariant đã có là không reward/respawn trước finalize, và corpse không reset deadline. [Technical gate](2_HUYEN_LO_TECHNICAL.md#pending-ordering-probes) phải kiểm/chốt các chi tiết này trước production lifecycle; presentation terminal trước ACK vẫn là proposal.
+**Giả định review A15 cho bảng/ví dụ dưới:** đặt `t0` ở lethal HP 0 và giả định `deathUtc=t0` để thử ACK trễ; chưa khóa API/event/timestamp capture hoặc thời điểm release Linh cap ở terminal-pending. Invariant đã có là không reward/respawn trước finalize, và corpse không reset deadline. [Technical gate](2_HUYEN_LO_TECHNICAL.md#pending-ordering-probes) phải kiểm/chốt các chi tiết này trước production lifecycle; presentation terminal trước ACK vẫn là proposal.
 
 | Mốc | Gameplay / persistence | Presentation đề xuất |
 | --- | --- | --- |
-| Hit cuối/HP0 tại t0 server | Terminal-pending; loại khỏi target/hurtbox queries, dừng AI/threat action, cancel pending hit/spawn; chụp ledger/deathID/generation | Last impact ngắn dẫn thẳng Death; bỏ Hit clip dài, clear status đang phủ thân. Phải có terminal state server, không client tự đoán chết |
+| Hit cuối/HP 0 tại t0 server | Terminal-pending; loại khỏi target/hurtbox queries, dừng AI/threat action, cancel pending hit/spawn; chụp ledger/deathID/generation | Last impact ngắn dẫn thẳng Death; bỏ Hit clip dài, clear status đang phủ thân. Phải có terminal state server, không client tự đoán chết |
 | Chờ commit | Không nhận hit, không reward/loot/quest success và không respawn; payload giữ bất biến | Có thể chạy Death theo terminal state; đây là **đề xuất bổ sung event presentation** cho Technical, không publish reward sớm. Lỗi kéo dài dùng thông báo gián đoạn chung |
 | ACK death transaction | Finalize reward/loot/credit một lần; deadlines vẫn từ t0 | Loot hiện ở điểm death hợp lệ, không chờ Death animation. Banner Boss/quest success chỉ sau ACK |
 | Death clip xong | Entity gameplay terminal; corpse chỉ là hình có lifetime riêng | Ground giữ frame cuối; flying dùng nhánh rơi/tàn phía dưới. Không hurtbox/AI ở frame corpse |
@@ -293,41 +299,53 @@ ACK tới t0+30 s thì deadline 25 s đã qua: chỉ được spawn sau finalize
 
 **Player khác mob:** death camera/corpse phải còn tới revive/về làng; không áp auto-fade/despawn normal lên player. Corpse Boss contributor ≥10% còn trong area vẫn hợp lệ theo GDD, không pickup tới khi sống. [Recovery gameplay](1_HUYEN_LO_GDD.md#consumables-death) quyết vị trí corpse/SafeAnchor; trạng thái corpse art không quyết định quest eligibility. PvPDefeated dùng kết thúc trận, không mở lựa chọn Hồi Sinh Phù/PvE death.
 
+**Player chết vẫn quan sát mục tiêu:** theo [GDD — CombatFocus](1_HUYEN_LO_GDD.md#focus-input), death hủy PendingCast/buffer/approach và khóa combat input, nhưng không tự xóa focus. Marker, mini HP và HUD tên/cấp/current-max HP vẫn cập nhật khi người khác đánh target còn sống, đúng life/generation/MapId và trong retention range. Target chết/despawn/đổi đời, MapId không hợp lệ, vượt vùng giữ hoặc Esc/chọn đích khác mới xóa/thay focus. Mob hồi sinh cùng SpawnSlot không kế thừa HUD life cũ. Hiển thị này dùng state authority, không camera corpse tự giữ GameObject đã tái dùng.
+
 ## 9. Bù Nhìn dùng chung tutorial và training
 
-**Đọc từ:** Q3/Q6 và Analysis farm matrix. Hiện Dummy HP60, không đánh/không thưởng, ≥3 placements cùng lúc, respawn25 s **BASELINE / TEST-TUNABLE** (số hiện dùng cần đo, chưa đổi thành timer nhanh); Q3 hạ ba life với ≥20% đóng góp/life, Q6 cast active tại yard. Ba placements cùng pool/rig/credit/lifecycle, không ba identity hoặc dummy tutorial/training logic khác. Q3 không bắt chờ respawn nếu solo yard còn đủ ba life; online contention vẫn cần probe.
+**Đọc từ:** Q3/Q6 và Analysis farm matrix. Hiện Dummy HP 60, không đánh/không thưởng, ≥3 placements cùng lúc, respawn 25 s **BASELINE / TEST-TUNABLE** (số hiện dùng cần đo, chưa đổi thành timer nhanh); Q3 hạ ba life với ≥20% đóng góp/life, Q6 cast active tại yard. Ba placements cùng pool/rig/credit/lifecycle, không ba identity hoặc dummy tutorial/training logic khác. Q3 không bắt chờ respawn nếu solo yard còn đủ ba life; online contention vẫn cần probe.
 
 | Nhu cầu | Kiểm baseline | Recommendation / trade-off |
 | --- | --- | --- |
-| Q3 Lv3/Mộc Kiếm | ATK suy ra: 12+1,2×2+0,7×4+10=27,2; HP60 khoảng ba landed normal nếu DEF thấp. DEF/EVA dummy chưa ghi đủ | Giữ HP60 cho probe Q3; author rõ DEF/EVA, không lấy ngầm từ mob bất kỳ. TTK tùy miss/DEF, chưa claim chính xác |
-| Quest ba kills | Một slot hồi25 s gây ít nhất hai quãng chờ sau các kill, dù combat ngắn | Thử **một prefab/loại**, 3 điểm đứng trong cùng yard và respawn3–5 s; số ba để ba objective kills có sẵn. Đây là thay authoring/timer cần duyệt, không baseline mới |
-| Player level cao quay lại | Lv20 Common III cân bằng ATK91,6 có thể one-shot60; không đủ test nhiều action/status liên tục | Đủ xem per-hit damage và đúng weapon/cast; không hứa DPS Meter hay test rotation dài P0. Không tự tăng HP làm Q3 dài |
+| Q3 Lv 3/Mộc Kiếm | ATK suy ra: 12+1,2×2+0,7×4+10=27,2; HP 60 khoảng ba landed normal nếu DEF thấp. DEF/EVA dummy chưa ghi đủ | Giữ HP 60 cho probe Q3; author rõ DEF/EVA, không lấy ngầm từ mob bất kỳ. TTK tùy miss/DEF, chưa claim chính xác |
+| Quest ba kills | Một slot hồi25 s gây ít nhất hai quãng chờ sau các kill, dù combat ngắn | Thử **một prefab/loại**, 3 điểm đứng trong cùng yard và respawn 3–5 s; số ba để ba objective kills có sẵn. Đây là thay authoring/timer cần duyệt, không baseline mới |
+| Player level cao quay lại | Lv 20 Common III cân bằng ATK 91,6 có thể one-shot60; không đủ test nhiều action/status liên tục | Đủ xem per-hit damage và đúng weapon/cast; không hứa DPS Meter hay test rotation dài P0. Không tự tăng HP làm Q3 dài |
 | N player cùng đánh | Một shared HP/life và ledger; one-shot của người mạnh có thể chiếm toàn life; Q3 không dựa last hit | Server serialize damage/death/respawn, credit từng requester ≥20%; HUD không báo đã hạ nếu chỉ nhìn người khác đánh. Nhiều slot/respawn nhanh giảm chờ, không đảm bảo mọi requester credit cùng life |
 
-**Visual tối thiểu:** Idle1 (dáng tĩnh), Hit2 (cong→bật lại), Break3 (nứt→gãy→đống rơm), dùng frame cuối làm corpse = **6 hình nếu đều khác**. Ít hơn Break dễ giống despawn, hơn hai Hit chỉ làm lắc mượt không dạy mechanic mới. Dummy không Run/Attack; Hit không dừng server action của player. Repeated hit reset/cộng lắc phải clamp, không lắc tới che body/HP bar. Có HP/name, damage/Crit/NÉ cùng pipeline; Death/Break terminal rồi respawn như life mới, không reward vật phẩm/EXP.
+**Visual tối thiểu:** Idle 1 (dáng tĩnh), Hit2 (cong→bật lại), Break3 (nứt→gãy→đống rơm), dùng frame cuối làm corpse = **6 hình nếu đều khác**. Ít hơn Break dễ giống despawn, hơn hai Hit chỉ làm lắc mượt không dạy mechanic mới. Dummy không Run/Attack; Hit không dừng server action của player. Repeated hit reset/cộng lắc phải clamp, không lắc tới che body/HP bar. Có HP/name, damage/Crit/NÉ cùng pipeline; Death/Break terminal rồi respawn như life mới, không reward vật phẩm/EXP.
 
-**OPEN A07:** (a) giữ60/25 s nguyên trạng rẻ nhất nhưng contention; (b) giữ60, một pool nhiều standpoints và timer nhanh — recommendation để test; (c) adaptive HP theo player hiện diện/life hoặc cá nhân hóa — phức tạp, thay ledger/counter, không nên P0; (d) HP lớn cố định — test mạnh dễ hơn nhưng hại Q3. Prototype hành trình Q3/Q6, late quest và một người mạnh cùng yard trước đổi timer. Muốn rotation test sâu dùng fixture dev HP cao trong validation, không thêm loại dummy player-facing.
+**OPEN A07:** (a) giữ 60/25 s nguyên trạng rẻ nhất nhưng contention; (b) giữ 60, một pool nhiều standpoints và timer nhanh — recommendation để test; (c) adaptive HP theo player hiện diện/life hoặc cá nhân hóa — phức tạp, thay ledger/counter, không nên P0; (d) HP lớn cố định — test mạnh dễ hơn nhưng hại Q3. Prototype hành trình Q3/Q6, late quest và một người mạnh cùng yard trước đổi timer. Muốn rotation test sâu dùng fixture dev HP cao trong validation, không thêm loại dummy player-facing.
 
 <a id="art-timing"></a>
 
 ## 10. Timing presentation và vai trò skill
 
-Bảng timing/probe, phép so tốc độ Kiếm/Cung, occupancy Novice/skill, sustain Lv5/10/20 và proc cadence đã chuyển **đầy đủ** sang [Analysis — timing](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-combat-timing-evidence), [sustain](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-sustain-evidence) và [proc](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-proc-evidence). Nhãn DERIVED/PROPOSAL, giả định và mọi số giữ nguyên; GDD §3 vẫn là luật. Không dùng các ranges đó làm acceptance mới.
+Bảng timing/probe, phép so Kiếm/Cung, tỷ lệ thời gian khóa hành động, sustain Lv 5/10/20 và nhịp proc đã chuyển **đầy đủ** sang [Analysis — timing](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-combat-timing-evidence), [sustain](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-sustain-evidence) và [proc](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-proc-evidence). Các số cũ là **LEGACY / SUPERSEDED** khi dùng class Normal, cadence/gear/HP cũ. [GDD §3](1_HUYEN_LO_GDD.md#class-combat) giữ mốc mới BASELINE/TUNABLE; [Analysis — phép thử hiện hành](3_HUYEN_LO_DESIGN_ANALYSIS.md#current-balance-probe) giữ giả định và tính lại. Không dùng bảng cũ nghiệm thu revision mới.
 
-Art author **anticipation → release/hit mốc authority → recovery**, phân biệt interval/CD/action lock/flight/VFX decay. Attack3/Skill4 không chạy FPS đều rồi ép timeline gameplay chạy theo: ánh xạ duration/hold từng pose để release khớp clock; VFX được tan sau khi actor về Idle. Phần recovery được chuyển ở action boundary hợp lệ; bỏ frame không queue thêm hit. CURRENT kiểm Tân Lữ/Kiếm/Lv5, phần S2/S3 dùng fixture hẹp khi cần xác minh reuse; Cung draw/release và visual travel DEFERRED prototype, không xóa nhu cầu test.
+Art author **chuẩn bị → phát/trúng đòn đúng mốc authority → hồi thế**. Tách interval/CD/action lock khỏi thời gian tên hình ảnh bay và VFX tan. Attack3/Skill4 dùng duration/hold từng pose để khớp clock; không ép gameplay chạy theo FPS sprite đều. VFX có thể tan sau actor về Idle; recovery chuyển ở biên action hợp lệ, bỏ frame không tạo hit thêm. CURRENT kiểm Tân Lữ/Kiếm/Lv 5; S2/S3 dùng fixture hẹp khi cần thử reuse. Cung draw/release/travel thử trước branch Cung, vẫn TARGET P0.
 
-Basic chỉ Tân Lữ; sau class không có zero-MP Normal để lấp CD. S1 single efficiency, S2 group farm, S3 burst; artwork/icon có thể reuse motif/pose nhưng ba entries và six SkillIds độc lập. Legacy occupancy/sustain tables ở Analysis giữ nhãn lịch sử. Proc overlay thử bằng fixture, không đổi chance cho dễ thấy. Chạy lại rotation/resource/TTK trước retune.
+Basic chỉ Tân Lữ; sau class không có Normal miễn MP để lấp CD. S1 nhanh và tiết kiệm trên một mục tiêu; S2 cũng nhanh, ưu tiên farm thường xuyên và đánh nhóm; S3 là đòn đặc trưng/burst. Art/icon tái dùng motif/pose nhưng ba entry và sáu SkillIds độc lập. Pose Attack/Skill là ngôn ngữ hình ảnh, không đồng nghĩa S1 là Attack mặc định. Status được thử bằng fixture có chủ đích, không đổi chance để dễ thấy. Bow range/kite là lợi thế hợp lệ; thay đổi HP sau nhập phái và chỉ số gear đọc GDD, Art không tự cân HP hoặc giảm VIT của Cung.
 
 <a id="map-visual"></a>
 
 ## 11. Kiến trúc visual map
 
-**Đọc từ:** GDD §4/§9, Technical §2/§8. Năm farm + ba support roots là **tám layout**, không tám tileset mới. Forest/Mountain/Ancient là ba họ chất liệu, vẫn phải có landmark/route phân biệt từng map.
+**Đọc từ:** GDD §4/§9, Technical §2/§8. Năm farm + ba support roots là **tám bố cục**, không tám tileset mới. Giữ ba họ chất liệu `Forest / Mountain / Ancient` và các ID/folder kỹ thuật ổn định; từng map có dấu mốc và tuyến đi riêng.
+
+**STRONG DIRECTION hình ảnh:** vùng sơn cước Việt Nam tiền hiện đại giả tưởng, không khóa vào triều đại hay tái dựng trang phục lịch sử. Sắc thái **dân dã → hiểm trở → huyền bí** đến từ dáng nhà gỗ/mái ngói giản lược, tre, cầu gỗ, lò rèn, giỏ dược thảo, khe/thác, đèo đá, bia và trấn ấn. Dùng lại địa hình, kit công trình nhỏ, mob rigs, palette Sói, male modular rig và motif VFX; không thêm environment family, tileset riêng từng map hoặc hàng chục công trình độc nhất.
+
+| Họ environment giữ nguyên | Cách diễn giải sơn cước Việt | Phần tái dùng |
+| --- | --- | --- |
+| Forest | Làng/đồng/trúc/rừng ẩm; gỗ, vải, tre và thảo mộc | Chung đất/cỏ/gỗ/cây, đổi palette và cụm props; Vân Khê/Học Viện dùng kit phù hợp |
+| Mountain | Núi/vách/thác/đá đỏ; địa hình bậc solid nối thành khối | Bạch Vân lạnh và Xích Nham ấm trên cùng cấu trúc nối tile |
+| Ancient | Phế tích/trấn ấn/Huyền Môn; bia, đá khép góc và mạch cổ | Chung stone/ruin kit và motif ấn; không một bộ art riêng mỗi landmark |
+
+**Tên và chữ trong hình:** giữ Huyền Lộ, Linh Biến, Huyền Môn, Mạch Ấn/Trấn Ấn, Nấm Linh, Sói Sương, Sói Trúc Ảnh, Ong Giáp, Đoạt Mạch Đạo Tặc, Xích Thạch Linh và Cổ Môn Vệ Binh. Thanh Mộc/Vân Nham/Huyền Ấn vẫn là ba family gear. Hán-Việt của quái/cổ vật/địa danh cổ hợp thế giới; signage dịch vụ dùng lời gần gũi. Không đổi display name tốt thành tên tầm thường hoặc thêm Thiên/Thần/Đế/Tôn để gây vẻ lớn lao. Nếu sau này đổi display name, giữ stable internal ID; không đổi folder/definition chỉ vì tên hiển thị.
 
 | Nhóm | Nội dung/đơn vị production | Unity/presentation và reuse |
 | --- | --- | --- |
 | Background | Silhouette xa, trời/núi/rừng/phế tích; mảng nền theo family | Sprite lớn hoặc BackgroundTilemap không collider; giảm contrast, reuse palette/crop. Parallax phụ nếu camera cần, không framework riêng |
-| Terrain Kit | Ground cap/fill/edge/corner/one-way theo ngữ nghĩa | Tilemap collider và platform tách; topology dùng chung, texture ba họ khác |
+| Terrain Kit | Mặt trên/fill/cạnh/góc của khối solid; one-way thuộc kết cấu riêng | Collision solid/platform tách; cấu trúc nối dùng chung, texture ba họ khác |
 | Decoration | Cỏ/trúc/đá vụn/cột đổ/biển đường | Sprite/prefab cụm; đặt sparse trong combat lanes, không collider vô cớ |
 | Structural/Full Assets | Cầu/mái/cổng/tầng phế tích/lò rèn/ấn | Một visual nhiều mảng nhưng chỉ vài collider surfaces; §13 |
 | Animated Environment | Thác/nước/lửa/khói/lá/bụi | Sprite loop/animated tile/ParticleSystem/static overlay theo §14 |
@@ -335,41 +353,56 @@ Basic chỉ Tân Lữ; sau class không có zero-MP Normal để lấp CD. S1 si
 
 | Map | Dấu hình ảnh phải phục vụ layout hiện có | Reuse tiết kiệm |
 | --- | --- | --- |
-| Đồng Sương | Đồng thoáng, safe strip, ledge1–2 tầng, bãi Sói thấy đường về | Forest grass/soil, background thưa |
-| Trúc Ảnh | Cầu2–3 tuyến cao độ, broken seal dưới cầu; lối xuống thật nhìn được | Forest đổi trúc/palette, mini bridge kit |
-| Bạch Vân | Ba terrace, waterfall landmark, route vòng nhìn nối nhau | Mountain terrain lạnh, thác một họ effect |
-| Xích Nham | Hai nhánh nhập, ngoại vi/deep route, ba seal và Huyền Môn ngoài cổng | Mountain ấm; cùng seal base ba anchors, không ba hệ puzzle |
-| Huyền Tích | Phế tích nhiều surface, Boss clearing và normal spawn exclusion rõ | Ancient + stone structure kit; landmark không xây Boss scene mới |
-| Vân Khê/Học Viện/Lôi Đài | NPC services, ledge/drop tutorial, yard, sàn đấu và lối ra | Hub architectural props dùng lại; độ sáng/props phân khu, không ba bộ art độc lập |
+| Đồng Sương | Đồi bậc thấp nối khối, tuyến dưới và bãi Sói độc lập; thấy lối về | Forest đất/cỏ; nền thoáng để đọc quái mới gặp |
+| Trúc Ảnh | Nhánh cầu trên, nhánh trấn ấn dưới và vòng về; đường jump/drop rõ | Forest đổi trúc/palette, kit cầu nhỏ |
+| Bạch Vân | Terrace solid quanh thác, tuyến vòng/mỏm cụt; cụm trên/dưới cùng nhìn thấy | Mountain lạnh, một họ hiệu ứng thác |
+| Xích Nham | Ngoại vi tách nhánh sâu/hốc/khe đá; ba seal, Huyền Môn ở nhánh phù hợp | Mountain ấm; một motif seal ở ba anchors |
+| Huyền Tích | Phế tích có tuyến cao/thấp/ngách; vùng Boss tách quái thường | Ancient + kit kết cấu đá; không tạo Boss scene riêng |
+| Vân Khê/Học Viện/Lôi Đài | Khu NPC chức năng, ledge/drop tutorial, yard, sàn đấu và lối ra | Props kiến trúc dùng chung; ánh sáng/palette/biển phân khu |
 
-SafeAnchor, entrance6–8 u và MapExit approach phải có mặt đứng/đường rõ; không decorate thành bãi nguy hiểm. Kích thước root theo actual layout, không nhân background bằng offset200 u. Một palette environment không đủ thay gameplay room/placement/QA.
+SafeAnchor, lối vào an toàn 6–8 u BASELINE/TUNABLE và đường tới exit phải có mặt đứng/đường đọc được; không đặt quái/props che chỗ hồi phục. Kích thước root theo bố cục thật, không nhân background bằng offset 200 u. World graph giữ kết nối GDD; đường bên trong có nhánh trên/dưới, loop, ngách cụt, ledge/hollow và jump/drop vừa đủ. Exit có thể ở một nhánh, không buộc cuối bên phải. EdgeExit dùng vùng thoát có hướng/tên đích và reason khóa, không vòm portal/Interact cho mọi lối; SpecialGate chỉ Huyền Môn/Arena hoặc cửa gameplay đặc biệt. Map asset tồn tại không tự mở quyền vào: gate dùng level/unlock/quest **Completed** theo GDD/Technical.
+
+**Mật độ — STRONG DIRECTION:** tăng số bãi độc lập, giữ đường vào/về an toàn, tránh một group 8–10 quái thành đống. Một camera có thể thấy các cụm dưới/giữa/trên với 5–8+ quái; đây là ví dụ bố cục, không chỉ tiêu population khóa. Tách SpawnGroup bằng HomeRegion/WalkRegion, địa hình/tuyến tiếp cận và aggro riêng; nhiều cụm nhìn gần nhau vẫn không báo động dây chuyền. Tổng group/slot từng map còn OPEN/TUNABLE. 28 groups/66 slots và spacing tâm 18–20 u là **LEGACY seed**, không budget cuối hoặc luật khoảng cách mới; ID nguồn quest vẫn giữ. Kiểm cùng target marker/HP/telegraph/loot/chat, không lấy palette reuse làm bằng chứng giảm công đặt map và QA.
 
 ## 12. Terrain readability và tile variants
+
+**Luật gameplay ở [GDD — terrain](1_HUYEN_LO_GDD.md#terrain-rules); Art làm rõ hình đọc được.** Đất/đá tự nhiên là khối chắn đầy (`solid`) có độ dày: mặt trên ngang, vật liệu lấp khối, mặt đứng, đáy/bóng và cạnh/góc khép. Các bậc ghép thành một khối địa chất; hốc/hang/khe/mỏm không biến núi thành dải tự nhiên mỏng nổi. Không mặt dốc chơi được (`slope/ramp`), địa hình tam giác, collider xoay hoặc mặt chéo để đứng/đi. Mái/cành/núi nền vẽ chéo được; mặt chơi vẫn ngang/đứng, route mái dùng bậc ngang.
+
+### Bốn grammar địa hình/cảnh — cách ghép khối và tuyến chơi, có thể trộn trong một map
+
+| Grammar | Hình khối và tuyến chơi | Giới hạn sản xuất/đọc hình |
+| --- | --- | --- |
+| Đồi tự nhiên có bậc | Khối đất/đá solid nối liền, thềm và jump giữa bậc; nhiều bãi độc lập | Mặt đứng/vật liệu khép; không dải đất mỏng nổi giả đồi |
+| Khối đá/hốc/khe dọc | Một khối lớn có hốc/khe/mỏm/ngách; tuyến đi nhìn thấy trong khối | Không tam giác/ramp để giả núi; nền và mặt đứng tách rõ |
+| Công trình/cầu | Sàn/cột/dầm/tường/mái tái dùng, tuyến trên/dưới và surface được author | Collision là vài mặt sạch trực giao, không polygon theo mọi chi tiết |
+| One-way đặc biệt | Ván/giàn/lối ván cao/ban công nhẹ/sàn tạm treo hoặc tựa vách | Hiếm, mỏng, khoảng trống dưới và dây/dầm/cột/giá đỡ rõ; không đất/đá tự nhiên |
+
+Ảnh AI hoặc concept reference chỉ giúp trao đổi hình, **không là authority** cho collider, route hay grammar. Text spec và GDD quyết định.
 
 | Ngữ nghĩa | Cue khi nhìn hình | Collider / kiểm |
 | --- | --- | --- |
 | Solid ground | Mặt trên cap liên tục, khối fill có trọng lượng, edge đậm hơn background | Solid, không đổi một tile giống hệt thành pass-through tùy chỗ |
 | Cliff/step | Mép/corner khép, mặt đứng tách mặt trên; cao độ theo block rõ | Step thật, không trang trí gờ nhỏ khiến tưởng đứng được |
-| One-way/platform | Mặt sàn mỏng, chân trống hoặc dầm mảnh; edge top đọc rõ | One-way từ dưới, DropThrough xuống riêng actor; hint tutorial lấy glyph binding hiện hành |
+| One-way/platform | Kết cấu mỏng có khoảng trống dưới và support rõ; khác đất/đá solid | Chỉ structural one-way, DropThrough riêng actor; hint lấy glyph binding đang thử |
 | Pass-through prop | Ít contrast/outline khép, chân không nối solid cap; texture nền | Không collider; tránh rock foreground đậm cùng hình rock solid |
 | Overpass/cầu | Sàn trên rõ, khoảng đi dưới có chiều cao và route hai đầu; cột không giả blocked tunnel | Có surface trên + đường dưới nếu author; không cần hệ depth lane mới |
 | Background | Saturation/contrast thấp, silhouette mềm, không cap standable | Không physics; rìa background không trùng rìa ground |
 | Foreground | Crop/occlusion viền, ít chi tiết vùng action; không làm giả platform | Không collider; hở silhouette actor/telegraph/loot |
 
-Một vật liệu có thể xuất hiện ở solid và background **nếu hình cue khác rõ**: cap/edge/contrast và chân nối nền khác, không chỉ opacity5% mà mắt thường không thấy. Kiểm grayscale, nền sáng/tối và khi Freeze/Burn/Linh aura bật; không dựa chỉ màu đỏ/xanh để phân loại.
+Một vật liệu có thể xuất hiện ở solid và background **nếu dấu mặt trên/cạnh/contrast và chân nối nền khác rõ**; giảm opacity 5% thường chưa đủ. Vật trông như cầu thang/sàn phải chơi đúng hình hoặc đổi hình đủ rõ để không lừa player. Kiểm grayscale, nền sáng/tối và lúc Freeze/Burn/Linh aura bật; không phân collider bằng màu đơn thuần. **Không ladder, rope/vine/pole/wall climb, Climb action/state/animation**; movement vẫn Move/Jump/Fall/DropThrough. Cầu thang dùng block steps trực giao hoặc decor nhìn rõ, không animation leo riêng.
 
-**Kịch bản Terrain Kit khởi điểm, OPEN A09:** ô32×32 ở PPU32 =1 u; platform có thể sprite trong ô nhưng mặt ván chỉ8–12 px. Player64 px không suy ra tile64 px. 32 là probe để người cao44–48 px đứng trên ledge dễ đọc; 16px chi tiết hơn nhưng tăng placement/corners, 64px coarse với các bước nhỏ. Chọn sau room test, không đổi PPU theo family.
+**Kịch bản Terrain Kit khởi điểm, OPEN A09:** ô 32×32 ở PPU32 =1 u; platform có thể sprite trong ô nhưng mặt ván chỉ 8–12 px. Player 64 px không suy ra tile 64 px. 32 là probe để người cao 44–48 px đứng trên ledge dễ đọc; 16 px chi tiết hơn nhưng tăng placement/corners, 64 px coarse với các bước nhỏ. Chọn sau room test, không đổi PPU theo family.
 
 | Tập module topology | Số hình trong kịch bản | Vì sao cần / nếu cắt |
 | --- | ---: | --- |
-| Solid3×3: fill1, edges4, outer corners4 | 9 | Đủ khối chữ nhật liên tục; thiếu corner làm mép không khép |
+| Solid3×3: fill 1, edges4, outer corners4 | 9 | Đủ khối chữ nhật liên tục; thiếu corner làm mép không khép |
 | Inner corners | 4 | Hốc/routes concave; nếu map không có hốc có thể hoãn, không vẽ rồi không dùng |
 | Isolated block | 1 | Block độc lập đọc được; nếu tất cả nền ≥2 ô dày có thể không cần |
-| One-way left/mid/right | 3 | Hai mép + lặp sàn; mirror có thể giảm hình mới nếu vật liệu đối xứng |
-| Cosmetic alternatives: top2, fill2 | 4 | Bớt pattern lặp trên đường dài; không đổi collision meaning |
-| **Tổng/họ chất liệu** | **17 semantic +4 cosmetic=21** | Ba family tối đa63 hình terrain nếu vẽ từng họ; cùng topology/data, chưa cam kết mỗi họ cần đủ variant |
+| One-way kết cấu left/mid/right | 3 | Hai mép + lặp ván/sàn có support; không ba tile đất one-way. Mirror có thể giảm ảnh |
+| Cosmetic alternatives: top 2, fill 2 | 4 | Bớt pattern lặp trên đường dài; không đổi collision meaning |
+| **Tổng/họ chất liệu** | **17 semantic +4 cosmetic=21** | Ba family tối đa 63 hình terrain nếu vẽ từng họ; cùng topology/data, chưa cam kết mỗi họ cần đủ variant |
 
-Không gọi đây là autotile47 đầy đủ: staircase dùng block, chưa yêu cầu slopes/moving platform/hazard. Cột mỏng, cap đặc biệt hoặc asset lớn có thể cần module riêng nếu room test chứng minh; ghi tăng scope thay vì nhét collider lệch vào hình cũ. Tile variants cosmetic không tự tạo collider mới.
+17+4 là kịch bản tối đa của topology và kết cấu được chọn, không yêu cầu mỗi material có đủ ba one-way tiles; chúng có thể dùng mini kit chung. Không gọi đây là autotile47: cầu thang dùng block, slope/climb bị loại, moving platform/hazard ngoài P0. Cột mỏng/mặt trên đặc biệt hoặc asset lớn chỉ thêm module khi room test chứng minh cần; ghi delta công thật. Variant trang trí không tạo ngữ nghĩa collider mới.
 
 ## 13. Building/structural là không gian gameplay
 
@@ -381,13 +414,13 @@ Không gọi đây là autotile47 đầy đủ: staircase dùng block, chưa yê
 | Mini Building Kit | Cầu/mái/dầm/cột hoặc vòm lặp ở nhiều vị trí | Một bộ nhỏ cap/mid/support theo grid; đủ reuse, không hệ building procedural/placement của player |
 | Full Asset | Landmark độc nhất, lò rèn, Huyền Môn, phế tích silhouette lớn | Vẽ đẹp theo layout; vẫn chia back/front và surfaces, không collider theo từng chi tiết ảnh |
 
-Một mái nhà nhỏ có thể có mặt đứng và exploration route nếu nối được bằng jump hiện hành; phần dưới vẫn là prop/pass-through có cue. Một ruin lớn có nhiều sàn, cầu/mái/cổng, mob spawn và combat: art author **surface map** riêng gồm ID/mặt trên/cao độ/solid hay one-way/route nối/spawn/leash/Bow line-of-sight. Full asset không có nghĩa một polygon collider toàn bộ cửa sổ/gạch/vines.
+Kit tái dùng cột/support, dầm, sàn, cầu, ban công, tường, mái, vòm/cổng và block step; không procedural building hoặc công trình độc nhất cho mọi map. Mái nhà có route chỉ khi đã author mặt ngang/bậc nối bằng jump hiện hành; không mái dốc đứng được. Phần dưới là prop/pass-through có cue. Phế tích lớn có nhiều sàn/cầu/cổng, spawn và combat cần **bảng mặt đứng (`surface map`)** với ID/cao độ/solid hay one-way/route nối/spawn/HomeRegion/WalkRegion/leash và đường ngắm Cung. Full asset không phải một polygon collider bám toàn cửa sổ/gạch/cây leo.
 
 Collider đề xuất: vài rectangle/edge được làm sạch trên physics root, solid nền + one-way sàn riêng; trang trí khung cửa/cột/vòm sau/trước không collider nếu route không cần. Giữ landing lip khớp mặt pixel, loại khe collider làm chân mắc. Ground tile tiếp tục Composite Operation Merge; one-way dùng PlatformEffector2D và drop-through theo actor hiện hành. [Nguồn Unity — TilemapCollider2D](https://docs.unity3d.com/6000.3/Documentation/Manual/tilemaps/work-with-tilemaps/tilemap-collider-2d-reference.html), [PlatformEffector2D](https://docs.unity3d.com/6000.3/Documentation/Manual/2d-physics/effectors/platform-effector-2d-reference.html).
 
-Ground mob logical movement trên lane/home bounds authored; không navigation graph/DropLink/jump/drop AI. Surfaces vẫn phục vụ player collision/route/spawns. Mọi quest encounter phải có đường player tiếp cận thật; không thiết kế layout cần mob parkour rồi thêm universal ranged fallback. Hybrid roster/LoS A-B/unreachable response là prototype riêng, không art khóa gameplay mask/immune.
+Ground mob chỉ đi trong HomeRegion/WalkRegion/SurfaceId đã author. Mép không có nền nối thì quay đầu, không tự rơi/jump/drop; hai terrace chỉ nối AI nếu có đường đất trực giao liên tục thật. Route player phải jump/drop không tự là route mob. Passive aggro ưu tiên ngữ cảnh local tới được; hostile hit ngoài aggro vẫn wake/threat, chỉ báo động cùng SpawnGroup. Không navigation graph/DropLink hoặc ranged fallback chung để cứu bố cục. Hybrid roster, LoS A/B, grace/Return/regen/invulnerability/targetability vẫn OPEN/TUNABLE; Art phải cho người chơi đọc Returning reason, không tự khóa immune.
 
-Mini kit giả định gỗ gồm bridge-floor3 +roof3 +support2 +wall/arch2 =**10 logical modules**, **8 hình** nếu hai cặp cap trái/phải thật sự mirror được. Nếu motif không đối xứng thì10 hình. Đây là ví dụ derivation, không bắt phải có đủ roof trên mọi map; stone kit có thể dùng terrain hoặc một bộ cap/mid/support riêng sau route test. Landmark độc nhất không ép thành kit mười loại chỉ để “modular”.
+Mini kit giả định gỗ gồm bridge-floor3 +roof3 +support2 +wall/arch2 =**10 logical modules**, **8 hình** nếu hai cặp cap trái/phải thật sự mirror được. Nếu motif không đối xứng thì 10 hình. Đây là ví dụ derivation, không bắt phải có đủ roof trên mọi map; stone kit có thể dùng terrain hoặc một bộ cap/mid/support riêng sau route test. Landmark độc nhất không ép thành kit mười loại chỉ để “modular”.
 
 Test một công trình: lower lane và upper standable surface, một spawn đúng platform, đường tiếp cận Kiếm, so LoS A/B qua solid roof với cue đọc được, mob Return không mắc cột, người drop-through không làm người khác rơi. Khoảng trống Boss15 u TEST và telegraph tránh bị mặt sàn foreground che.
 
@@ -404,52 +437,57 @@ Các sơ đồ, tọa độ và capture của bản mẫu được quản lý ri
 | Waterfall top | Sprite loop riêng ở mép nguồn | 4 hình crest đổi hướng/nhịp; hai hình dễ nhấp nháy, hơn bốn chỉ thêm mượt |
 | Waterfall fall | Animated tile/strip repeat dọc, phase ổn định | 4 hình flow streak; không vẽ toàn thác cao mỗi frame. Test seam và không làm pattern như climbable ladder |
 | Waterfall splash | Sprite loop ở chân + hạt thưa nếu cần | 4 hình mở/đổi/tan/trở lại; reuse ripple motif, không emitter dày che terrain |
-| Stream/water | Static base + flow overlay hoặc animated tile4 | Base giữ palette/mặt nền; loop4 chỉ cho phần có dòng thấy rõ, puddle tĩnh không cần cùng loop |
-| Puddle | **WaterBase + FrontOverlay**, base static1, front static1 | Base sau chân, front chỉ che phần chân thấp. Hai lớp không hai vật lý nước; ít hơn một lớp mất cảm giác chân trong nước |
-| Actor ripple/splash | Một strip3 hoặc4 hình spawn theo bước/contact presentation | Một prefab chung; ba hình mở/lan/tan, thêm một cho decay. Có throttle local/remote theo camera, không mọi network transform tick |
-| Lá rơi | ParticleSystem với1–2 leaf sprites | Random vị trí/lifetime, tránh giả từng tile có animation; hai silhouette bớt lặp, nhiều lá không thêm gameplay |
-| Khói | ParticleSystem1 soft/pixel puff, hoặc sprite loop4 cho nguồn rõ | Forge/fire reuse puff, ít emitter. Không lighting framework |
-| Bụi | ParticleSystem1 puff hoặc ripple/impact strip reuse | Chân/mob nặng/đổ dùng chung texture; cắt ở crowd trước core feedback |
-| Lửa/ánh sáng | Sprite flame loop4 + static emissive-looking accent | Reuse flame với Burn có chỉnh scale/tint; không buộc Dynamic Light/URP2D lighting nếu chưa cần |
+| Stream/water | Static base + flow overlay hoặc animated tile 4 | Base giữ palette/mặt nền; loop 4 chỉ cho phần có dòng thấy rõ, puddle tĩnh không cần cùng loop |
+| Puddle | **WaterBase + FrontOverlay**, base static 1, front static 1 | Base sau chân, front chỉ che phần chân thấp. Hai lớp không hai vật lý nước; ít hơn một lớp mất cảm giác chân trong nước |
+| Actor ripple/splash | Một strip3 hoặc 4 hình spawn theo bước/contact presentation | Một prefab chung; ba hình mở/lan/tan, thêm một cho decay. Có throttle local/remote theo camera, không mọi network transform tick |
+| Lá rơi | ParticleSystem với 1–2 leaf sprites | Random vị trí/lifetime, tránh giả từng tile có animation; hai silhouette bớt lặp, nhiều lá không thêm gameplay |
+| Khói | ParticleSystem 1 soft/pixel puff, hoặc sprite loop 4 cho nguồn rõ | Forge/fire reuse puff, ít emitter. Không lighting framework |
+| Bụi | ParticleSystem 1 puff hoặc ripple/impact strip reuse | Chân/mob nặng/đổ dùng chung texture; cắt ở crowd trước core feedback |
+| Lửa/ánh sáng | Sprite flame loop 4 + static emissive-looking accent | Reuse flame với Burn có chỉnh scale/tint; không buộc Dynamic Light/URP2D lighting nếu chưa cần |
 
-Thác ba strip×4 =**12 ô chuyển động** theo kịch bản, không chiều cao thác×12. Top/fall/splash không nhất thiết cùng hình dù dùng cùng clock; fall đặt sau actor nếu route phía trước, không làm lớp nước opaque ngang mặt. Stream4 và ripple3–4 chỉ thêm nếu layout có chức năng visual đó. Foreground nước đứng yên vẫn có thể đẹp bằng base/accent, không phải mọi puddle đều loop.
+Thác ba strip×4 =**12 ô chuyển động** theo kịch bản, không chiều cao thác×12. Top/fall/splash không nhất thiết cùng hình dù dùng cùng clock; fall đặt sau actor nếu route phía trước, không làm lớp nước opaque ngang mặt. Stream 4 và ripple 3–4 chỉ thêm nếu layout có chức năng visual đó. Foreground nước đứng yên vẫn có thể đẹp bằng base/accent, không phải mọi puddle đều loop.
 
-Contact ripple chỉ cosmetic; tốc độ lội nước theo feet contact của GDD, không thêm CC/Burn/HP hazard; pooling reset phase/scale/owner. Actor đi trên cầu phía trên nước không splash vì chỉ chồng hình2D; cần surface/contact tag presentation đúng lane. P0 không deep-water, breath, buoyancy/swimming. Nếu thác là background, không vẽ ledge giả hoặc trigger tương tác không có luật.
+Contact ripple chỉ cosmetic; tốc độ lội nước theo feet contact của GDD, không thêm CC/Burn/HP hazard; pooling reset phase/scale/owner. Actor đi trên cầu phía trên nước không splash vì chỉ chồng hình 2D; cần surface/contact tag presentation đúng lane. P0 không deep-water, breath, buoyancy/swimming. Nếu thác là background, không vẽ ledge giả hoặc trigger tương tác không có luật.
 
 ## 15. Map ↔ mob ↔ vũ khí
 
 | Ca gameplay hiện có | Failure mode visual/route | Hợp đồng authoring và validation |
 | --- | --- | --- |
 | Spawn platform/công trình | Chân ở giữa không khí, slot trên sàn không tới được | Spawn anchor trên surface hợp lệ, clearance đủ body/HP bar, hurtbox không xuyên sàn; identity/level giữ manifest |
-| Chase/Return | Mob rơi tầng dưới rồi teleport lên, hoặc mắc dầm/cột | Route cùng lane/linked surfaces có hành vi AI hỗ trợ; leash8 u và spawn reachable. Return không dùng đường ảnh tưởng có mà collider chặn |
-| Melee Kiếm | Cao độ khiến range1,2/1,7 u không chạm, ngay cả nhìn gần | Kiểm vertical hit band/originY+0,8 u với geometry; không dời hitbox theo trail để “sửa art” |
+| Chase/Return | Mob rơi tầng dưới rồi teleport lên, hoặc mắc dầm/cột | Chân giữ WalkRegion, nền nối thật và home/leash đã author; leash 8 u là TUNABLE. Return đọc được, không dùng đường ảnh giả |
+| Melee Kiếm | Cao độ khiến range 1,2/1,7 u không chạm, ngay cả nhìn gần | Kiểm vertical hit band/originY+0,8 u với geometry; không dời hitbox theo trail để “sửa art” |
 | Cung/ranged hybrid | Visual xuyên roof có thể trái LoS mode của prototype | A không LoS so B SolidWall, one-way không chặn trong B; chưa production lock. Visual chỉ đọc logical result, không collision damage |
 | Flying Ong | Hover box6×3 u khiến ở cao ngoài tầm Kiếm vô hạn | Engage approach vào melee-accessible band như GDD; room có route/jump thật, không yêu cầu Kiếm có skill mới để tới |
 | Multi-floor | Target distance gần nhưng khác tầng, target lock/hit xuyên đá | Authority MapId/line/arc/logical range/vertical validation; foreground và platforms đọc được khoảng cách thực |
-| Linh scale1,20–1,30 | Sprite overlap roof, người hiểu hurtbox lớn hơn trong khi physics không scale | Aura/name/HP bar chính, scale vừa phải theo clearance. Nếu scale mờ pixel, thử tint/accent trước đổi physics |
-| Pocket spacing | Cầu nối khiến aggro5 u kéo cả map hoặc leash cắt route | Kiểm tâm18–20 u/terrain tách, safe strip, line/arc grouping; không ép mọi pocket thành blob0,8–1,5 u |
+| Linh scale 1,20–1,30 | Sprite overlap roof, người hiểu hurtbox lớn hơn trong khi physics không scale | Aura/name/HP bar chính, scale vừa phải theo clearance. Nếu scale mờ pixel, thử tint/accent trước đổi physics |
+| Nhiều pocket cùng camera | Cầu nối làm báo động lan cả map hoặc leash cắt route | Kiểm SpawnGroup/HomeRegion/WalkRegion độc lập, route cao/thấp và lối an toàn; 18–20 u cũ không là luật mật độ mới |
 | Loot sau flying death | Món nằm trên ledge kín hoặc trên không | Server-owned điểm pickup đứng được; collider route/1,5 u pickup test cùng lifecycle §8 |
 
-Không phải mọi mob đều đi mọi tầng của công trình: author phạm vi hợp lệ và thể hiện bằng vị trí/spawn/route, ba hybrid giữ tới content approval, không tự bỏ ranged hoặc thêm ranged cho mọi loài. Nhưng mọi encounter bắt buộc quest phải có cách Kiếm và Cung tiếp cận/đánh/nhặt bằng bộ kỹ năng hiện hành; không dùng effect đẹp che softlock. Không thêm body blocking, knockback, hazard, moving platforms hoặc navigation framework trước khi room prototype chứng minh cần.
+Không phải mọi mob đi mọi tầng công trình: author phạm vi và thể hiện bằng chân/spawn/route. Hybrid count/identity còn OPEN, không tự thêm ranged cho mọi loài. Mọi encounter bắt buộc quest phải có cách Kiếm/Cung tiếp cận, đánh và nhặt bằng mechanic hiện hành. Cung liên tục kite trên route hợp lệ có thể no-hit pure melee; safe perch đứng spam mãi là lỗi geometry cần sửa map và Return đơn giản, không thêm đòn chống Cung cho Sói. Không dùng effect đẹp che softlock hoặc thêm body blocking/knockback/hazard/moving platform/navigation framework.
 
 <a id="npc-visual"></a>
 
-## 16. Tám NPC
+## 16. Bảy NPC và các khu chức năng
 
-**Đọc từ:** GDD §5/§9. Menu/quest làm NPC có chức năng; không cần tám animation set như player. Đề xuất **full sprite NPC** chia sẻ pose template/palette/props trong source; không dùng module gear runtime nếu không có thay outfit. Full sprite dễ giữ silhouette nghề nghiệp; modular runtime tiết kiệm ít nhưng tăng controller/sorting QA.
+**Owner quest/service:** [GDD §5](1_HUYEN_LO_GDD.md#quests-story) và [§9](1_HUYEN_LO_GDD.md#ux-art). Art làm rõ nghề, khu vực và đường tìm NPC; không giữ bảng luật quest thứ hai. Dùng sprite toàn thân NPC với pose template/palette/props chung trong source; NPC không thay outfit thì không cần module gear runtime. Chức năng phải nhận ra bằng dáng bao, props, biển và text; không xếp NPC thành một hàng như menu.
 
-| NPC | Idle khởi điểm | Work/gesture và props | Recommendation |
-| --- | --- | --- | --- |
-| Lâm Bá | 2 hình thở nhẹ | Gậy/ghế hoặc áo nghề; nói bằng text/marker | Không gesture riêng P0; dáng ấm và khác thầy class |
-| Yên Thảo | 2 | Bàn thuốc/giỏ, tùy chọn2 hình đưa/chỉ thuốc | Prop tĩnh đủ; chỉ vẽ gesture nếu tương tác khó đọc |
-| Bách Luyện | 2 | Lò/đe/búa; tùy chọn4 hình nâng→đập→recoil→nghỉ | Work loop đáng ưu tiên nhất nếu forge nhìn rõ; đừng play đập liên tục trong lúc modal enhance chờ ACK |
-| Mộc An | 2 | Rương/ghế nghỉ dùng prop chung | Không sleeping/heal rig riêng; heal feedback player dùng pool |
-| Tạ Minh | 2 | Bàn/ấn Huyền Môn motif dùng lại | Silhouette trang nghiêm + UI class choice; không cinematic/ritual set |
-| Phong Du | 2 | Kiếm/giá binh khí, stance Kiếm | Không attack-demo loop vì Q3 dạy bằng player/dummy; nếu cần pose minh họa reuse template player |
-| Diệp Lam | 2 | Cung/giá binh khí, stance Cung | Không draw-release set đầy đủ khi không có objective biểu diễn |
-| Hạo Vũ | 2 | Cờ/sàn tỷ thí motif Arena | Menu/invite/countdown là tín hiệu chính; không bộ đánh nhau NPC |
+| NPC / khu đặt — ý đồ, tọa độ OPEN | Idle khởi điểm | Props/gesture và chức năng cần đọc |
+| --- | --- | --- |
+| Lâm Bá — khu công cộng dễ thấy ở Vân Khê | 2 hình thở nhẹ | Ghế/gậy hoặc bia/biển nhỏ dùng motif sẵn; hub truyện, giới thiệu Q6 và diễn tiến trấn ấn/Huyền Môn |
+| Yên Thảo — khu dược/thảo mộc/thuốc | 2 | Bàn thuốc/giỏ/bình; Food/Potion/Hồi Sinh/Tẩy Mạch. Gesture đưa/chỉ thuốc +2 hình chỉ nếu giúp đọc tương tác |
+| Bách Luyện — lò rèn/đe | 2 | Đe/búa/lò; Q3 vũ khí, Q4 bán đồ, Q7 enhance và gear/transfer. Work loop +4 nâng→đập→hồi→nghỉ là option ưu tiên nếu lò dễ thấy |
+| Mộc An — nhà kho/nghỉ | 2 | Rương/ghế/nhà trọ dùng kit chung; gửi đồ/nghỉ, không sleeping/heal rig riêng |
+| Phong Du — khu Kiếm ở Học Viện | 2 | Kiếm/giá binh khí, stance Kiếm; mentor/giao dịch nhập phái và trả Q6 Kiếm, không ôm Q3 |
+| Diệp Lam — khu Cung ở Học Viện | 2 | Cung/giá binh khí, stance Cung; mentor/giao dịch nhập phái và trả Q6 Cung, đọc ngang hàng với Phong Du |
+| Hạo Vũ — gần biển/lối sang Lôi Đài | 2 | Cờ/biển tỷ thí và motif Arena; Q9/PvP, không bộ đánh nhau NPC |
 
-**SUY RA:** tám NPC×2 idle =**16 hình** nếu mỗi NPC khác silhouette. Work Bách+4, gesture Yên+2 tùy chọn →**22**, không 8×26. Idle2 đủ một nhịp thở nhẹ ở2–4 FPS/hold; một hình tiết kiệm nhưng hub tĩnh, bốn hình mượt hơn nhưng không đổi service readability. Props tĩnh tính riêng theo motif thực; không tám portrait bắt buộc, dialogue có thể dùng tên + sprite trong world. NPC không combat/death rig nếu gameplay không cho đánh.
+**SUY RA hiện hành có điều kiện:** 7 NPC×2 idle = **14 hình** nếu mỗi silhouette khác; work Bách+4 và gesture Yên+2 tùy chọn → **20**. Đây là kịch bản **14–20**, không 7×26, không cam kết frame count. Idle 2 ở 2–4 FPS/hold đủ nhịp thở; một hình rẻ nhưng hub tĩnh, bốn hình tăng công mà không thêm dịch vụ. Props tính riêng theo motif thật; không cần bảy portraits hoặc combat/death rig. Khi modal enhance đang chờ ACK, work loop không được giả kết quả thành công.
+
+**Tạ Minh — LEGACY/SUPERSEDED:** roster cũ có 8 NPC, 16 idle và optional+6 →22; giữ số này để đối chiếu lịch sử. Không sản xuất NPC thứ tám hoặc NPC thay thế. Motif bàn/ấn cũ có thể chuyển thành prop của khu Lâm Bá/Huyền Môn; class cue thuộc hai mentor, Tẩy Mạch thuộc Yên Thảo. Stable internal IDs hiện có chỉ migrate references theo Technical; không mass-rename identifier vì display roster thay đổi.
+
+Q1 phải dẫn player qua khu dược → lò rèn → kho/nghỉ và đọc lối ra/về, không chỉ click ba người cạnh nhau. Q2 tới ledge/sàn one-way kết cấu có đỡ rồi quay về làng; Q3 nhận Mộc Kiếm tại Bách Luyện, tới Dummy Yard rồi trả Bách Luyện. Q6 từ Lâm Bá tới Học Viện, player tự tháo Mộc Kiếm, chọn một mentor rồi nhận/learn/equip/cast/dùng MP Potion và trả đúng mentor đó. Hai khu mentor và yard phải nhìn ra route, không dàn Kiếm như default trước Cung. Q10–Q12/trấn ấn dẫn về Lâm Bá theo owner; không thêm NPC trung gian.
+
+Hội thoại nhận 1–3 câu, phản hồi ngắn ở bước giữa và một câu trả; tracker nêu **việc → khu vực/đường đi → NPC tiếp theo**. Text có giọng riêng vừa đủ, giữ fantasy Việt nhưng không lặp “ngươi/bổn tọa/linh căn” mọi câu. Player không thấy QuestId/counter nội bộ hay reward dạng debug. Marker/quest/service menu đọc committed state; UI không tự hoàn quest vì đã phát thoại. Exact NPC coordinates và số props chốt sau blockout, không bịa pixel tọa độ.
 
 ## 17. VFX ngoài active skill
 
@@ -457,7 +495,7 @@ Không phải mọi mob đều đi mọi tầng của công trình: author phạ
 
 | Feedback | Presentation tối thiểu | Reuse / giới hạn |
 | --- | --- | --- |
-| Bỏng | Flame/viền ấm nhỏ dưới thân hoặc cạnh target; tick feedback nhỏ mỗi1 s | Một instance/target; loop4 dùng lại flame môi trường khi hợp palette. Refresh không phát lại explosion |
+| Bỏng | Flame/viền ấm nhỏ dưới thân hoặc cạnh target; tick feedback nhỏ mỗi 1 s | Một instance/target; loop 4 dùng lại flame môi trường khi hợp palette. Refresh không phát lại explosion |
 | Freeze normal/Linh | Ice silhouette ôm target, trạng thái đứng yên rõ; crack/thaw khi hết | Probe2 static shapes shell/crack +strip3 thaw; scale theo visual bounds nhưng không collider. Không che aura/name. Shell ít hơn vẫn test được; nhiều shard chủ yếu polish |
 | Slow Boss/PvP | Lam mờ/1 cold particle motif, icon/expiry khi cần | Không ice-block; không slow current cast animation; một overlay refresh deadline |
 | Linh Biến aura | Vòng/ấn tím bên chân/nameplate, nhẹ và bền | Một sigil sprite +rotation/pulse presentation; cùng mọi rig, khác palette Sói. Non-integer scale phải test pixel fidelity |
@@ -473,7 +511,7 @@ Không phải mọi mob đều đi mọi tầng của công trình: author phạ
 | Crit | Font weight/scale/glyph khác normal, impact accent nhỏ | Reuse damage renderer; không tăng hit-stop mọi remote crit |
 | NÉ | Text/glyph rõ, không wound impact hoặc proc overlay | Có thể vẫn thấy đường đòn đi qua; damage0, không flash target như đã landed |
 
-Priority khi overlap: Boss telegraph/projectile nguy hiểm → state/action silhouette → local hit/status → loot/UI → remote cosmetic → môi trường. Beneficial và status không bật mảng opaque che boss markers. Freeze trước Death phải bị clear khi server terminal; aura Linh còn corpse chỉ nếu decay cosmetic không khiến tưởng mob còn sống. Pool reset color/material/owner/expiry/action/life IDs để Burn cũ không gắn vào mob respawn.
+Ưu tiên khi hình chồng nhau: Boss telegraph/đường đòn nguy hiểm → dáng actor/action → hit/status local → loot/UI → cosmetic remote → môi trường. Hồi phục/status không phủ mảng đặc che Boss marker. Server terminal thì clear Freeze; aura Linh chỉ còn tan cosmetic nếu không làm corpse giống mob sống. Pool reset màu/material/owner/expiry/action/life IDs để Bỏng cũ không gắn vào respawn.
 
 <a id="icons-ui"></a>
 
@@ -494,12 +532,12 @@ Priority khi overlap: Boss telegraph/projectile nguy hiểm → state/action sil
 | Thỏi Vàng | 1 | Khác coin currency vì phải pickup+bán, không auto-credit |
 | Manuals | 6=2 class×3 milestones | Hai sách motif +ba accent/ordinal, cần output nhận biết nhập môn/tiến cảnh/chân quyết |
 | Currency | 1 Vàng | Một coin glyph dùng HUD/shop/cost, không thêm tiền linh lực |
-| Active profiles | 6=Kiếm/Cung×Lv5/10/17 | Hai motif class với độ mở/rune khác theo milestone; Lv5/10/17 là ba SkillIds/slot riêng, reuse motif icon nếu vẫn phân biệt được |
+| Active profiles | 6=Kiếm/Cung×Lv 5/10/17 | Hai motif class với độ mở/rune khác theo milestone; Lv 5/10/17 là ba SkillIds/slot riêng, reuse motif icon nếu vẫn phân biệt được |
 | Passives | 4 | Kiếm Tâm/Kiếm Thế/Ưng Nhãn/Xạ Tâm cần cue khiên/gần/mắt/xa; derive hai motif class, không thêm tree/rank |
 | Status HUD | 4 loại presentation: Burn/Freeze/Slow/Food | Ba glyph status mới; Food dùng lại icon Food đang active. Freeze/Slow không chung một hình ice-block |
 | Virtual quest feedback | Dấu Trọc Khí, Vật Chứng, Mảnh1/2/3:5 binding nếu dùng hình | Reuse sigil/ấn/glyph +ordinal/text; không năm inventory items. Có thể dùng text/glyph chung thay unique bitmap |
 
-**SUY RA:** gear22 +Food3 +Potion6 +phù2 +stone1 +materials8 +ingot1 +manual6 =**49 physical ItemDefinition icon bindings**. Thêm Gold1 →50; active6 +passive4 →60; status4 →**64 nhóm binding cơ sở**, trong đó Food status trỏ ảnh item đã có nên tối đa **63 ảnh phân biệt** ở kịch bản xuất đầy đủ, chưa tính glyph kit/UI/virtual feedback. Đây không phải63 motif vẽ từ đầu; rarity/frame/+n là overlay reuse. Revive invulnerability/Linh/Boss có thể dùng icon item/sigil sẵn, nếu quyết định thêm badge riêng phải ghi delta, không âm thầm tăng con số64.
+**SUY RA:** gear22 +Food3 +Potion6 +phù 2 +stone1 +materials8 +ingot1 +manual6 =**49 physical ItemDefinition icon bindings**. Thêm Gold1 →50; active6 +passive4 →60; status4 →**64 nhóm binding cơ sở**, trong đó Food status trỏ ảnh item đã có nên tối đa **63 ảnh phân biệt** ở kịch bản xuất đầy đủ, chưa tính glyph kit/UI/virtual feedback. Đây không phải63 motif vẽ từ đầu; rarity/frame/+n là overlay reuse. Revive invulnerability/Linh/Boss có thể dùng icon item/sigil sẵn, nếu quyết định thêm badge riêng phải ghi delta, không âm thầm tăng con số 64.
 
 Nguồn icon dự kiến32×32 transparent, hiển thị scale nguyên và tooltip lớn khi cần, **OPEN** theo HUD/reference resolution. Không lấy PPU world để quyết pixel UI. Inventory30/storage40 dùng cùng slot primitive; stack count/+level/rarity/locked/quest-bound hiển thị text/glyph, không bake vào từng PNG. Icon màu band không được giống rarity border đến mức nhầm band III=Epic.
 
@@ -535,7 +573,7 @@ Nguồn icon dự kiến32×32 transparent, hiển thị scale nguyên và toolt
 
 | View P0 | Visual riêng thực sự cần | Phần compose/reuse |
 | --- | --- | --- |
-| Character | Layout sáu slots, silhouette/preview rig hiện tại, nhóm attributes/stat | Kit/equipment glyph; không portrait bitmap cho mỗi outfit |
+| Character | Sáu ô + preview, Thuộc tính và Thông số tách chức năng | Kit/glyph trang bị, dùng rig hiện tại; không portrait bitmap mỗi outfit |
 | Enhance | Vùng preview trước/sau, hai mốc Tinh Hoa khóa/mở, success/fail accent | Item icons/cost/result kit; không lò rèn fullscreen |
 | Transfer | Hai item/source-consumed/target-before-after và flow arrow | Kit/arrow glyph; không art mới từng pair item |
 | Skill | Ba active, hai passive; selected slot/CD riêng và manual/level lock lý do | Mười profile/passive icons §18, rows/tooltips; không talent tree |
@@ -545,22 +583,24 @@ Nguồn icon dự kiến32×32 transparent, hiển thị scale nguyên và toolt
 | Login/Character Select | Logo/title giản dị, list và selected preview, feedback kết nối/lỗi | Kit và rig; dependency §21 |
 | Stage Summary | Ba title/chương, reward/progression/story completion text | Một modal template, ba accent/thumb crop map sẵn; không ba tranh full-screen bắt buộc |
 | Inventory/Storage/Shop/Sell | Grid/list, capacity30/40, stack count/ownership, price/stock state | Cùng kit; Storage không item background riêng |
-| Class choice/manual use/attributes reset | Choice cards +reason/preview/confirm | Hai class motifs/kit; không thêm tạo nhân vật hoặc menu học riêng NPC |
-| Dialogue/Rest/Death | NPC text/action, confirm heal/death choices khác PvP | Panel/buttons; Hồi Sinh icon, không tám portraits bắt buộc |
+| Class choice/manual use/attributes reset | Hai mentor/choice cues ngang hàng, reason/preview/confirm | Hai motif class/kit; học sách từ bag, Tẩy Mạch tại Yên Thảo |
+| Dialogue/Rest/Death | Text/action NPC, confirm nghỉ/death choices khác PvP | Panel/buttons; icon Hồi Sinh, không bảy portraits bắt buộc |
 | HUD/world UI/chat/map exits | Bars, quest tracker, food/bình, focus marker/mini HP + screen name/level/current-max HP, reward tooltip, bubble hai dòng, signpost, Boss timer/banner | Kit/typography/marker glyphs; edge arrow + destination name/NPC marker P0; không HP bars Party hoặc quest navigation xuyên map P0 |
 
-Ba skill entries/class dùng selected/locked/CD/MP cues; Tân Lữ entry 1 Mộc Kiếm, 2/3 khóa. Input/pending/cancel theo [GDD §3](1_HUYEN_LO_GDD.md#pending-cast); Art chỉ thể hiện cue “Đang tiếp cận” và reason blocked/quá xa/chưa sẵn. Không hiện accepted cast animation trước validation/commit. Accepted action presentation bind snapshotted SkillId, không selection mới.
+Ba skill entry/class hiện **selected, đã học/chưa học, locked, CD và MP** riêng. Tân Lữ slot 1 Mộc Kiếm, 2/3 khóa. `1/2/3` chỉ đổi selection: highlight mới, không pose ra đòn/approach/cost/CD. HUD có cue/glyph `ExecuteSelected` riêng và tên kỹ năng sẽ dùng; không giả S1 luôn là Attack. Chọn S2 rồi Execute nhiều lần phải đọc rõ. Select khi pending/buffer/action đã chạy không đổi SkillId intent cũ; accepted presentation lấy snapshot, không slot highlight mới. Input/cancel/revalidate theo [GDD §3](1_HUYEN_LO_GDD.md#pending-cast); Art hiện “Đang tiếp cận” hoặc lý do blocked/quá xa/chưa sẵn, không giả cast đã nhận trước validation/commit.
 
-**Navigation/controls/readability probe:** edge exit thường dùng arrow ở mép + tên đích khi tới gần, không vẽ teleport arch hoặc E prompt. Huyền Môn/Arena có SpecialGate cue khác; NPC marker cơ bản đủ thấy nơi nhận/trả. Quest arrow xuyên map vẫn P1. Tutorial glyph lấy Jump/DropThrough/UseFood/UsePotion/Interact binding, không bake S+Space/F/M vào dialogue/art. Default panels I/C/Q theo GDD; skill view trong C, không B/K/L overrides từ prototype.
+**Điều hướng/input/readability:** ←/→ Move, ↑ Jump, ↓ DropThrough và 1/2/3 Select đã khóa theo GDD. Execute/Interact/QuickHP/QuickMP/Food/menu dùng semantic actions và glyph từ binding đang thử. E Execute, F Interact,4/5 Potion,R Food,I menu chỉ là **PROPOSAL / TUNABLE DEFAULT**, không khóa phím; C/Q chưa được gán mechanic mới. EdgeExit thường dùng mũi tên vùng thoát + tên đích, không arch dịch chuyển hay Interact prompt. Huyền Môn/Arena có SpecialGate cue khác; marker NPC đủ thấy nơi nhận/trả, quest arrow xuyên map vẫn P1. Không bake key vào thoại/quest/ảnh; lời “nhảy/xuyên sàn/dùng Bình Linh lực” đi với glyph action hiện tại.
+
+**RPG shell — preferred UX direction / PROPOSAL:** có thể hợp nhất Hành trang, Trang bị, Thuộc tính, Thông số, Kỹ năng và Nhiệm vụ trong một shell/menu action. Giữ đủ sáu gear slots/preview, grid inventory, attributes/unspent, derived stats và keyboard access; exact shell/layout/menu binding I/C/Q còn OPEN. Navigate/Confirm/Back và Tab/Shift+Tab theo context UI, mouse gọi cùng command. Modal/chat giữ input: Move/Jump/DropThrough/Select/Execute không lọt gameplay; input mở modal không xác nhận tiếp trong cùng frame.
 
 **UI usability gate P11:** dùng kit panel/button/slot/tooltip/list hiện có để review ở tốc độ thường: tìm món/equip/bán sample không nhầm, nhận/trả quest và next action dễ hiểu, dismiss modal không lọt attack, pending approach có thể hủy rõ, locked skill/exit có reason; thử cả lỗi full bag/đầy HP/sai NPC. Log do dự/misclick/số bước/giờ sửa và nhận xét người chơi; không khóa ngưỡng thời gian hoặc gọi text-only automation là UX PASS.
 
 **Movement/mob feel presentation:** probe jump tap/hold/apex/landing/coyote/drop với rig và camera thật, pose không lái gravity; soft separation/reposition phải đọc vị trí Sói, không telegraph lệch do visual steering. Không tự thêm animation set, knockback, ring slots hoặc pose budget; exact movement/AI thuộc GDD/Technical/PHY-01.
- World focus marker+mini HP và screen name/level/HP current-max/bar dùng cùng target life; không portrait/element/rarity/generic buff panel. Loot candidate highlight/E prompt độc lập, nhặt ngay không đổi CombatFocus.
+World marker+mini HP và tên/level/current-max HP/bar trên màn hình cùng bind focus life/generation/MapId; không portrait/element/rarity/generic buff panel. Player chết vẫn thấy/cập nhật HP target hợp lệ khi người khác đánh; target đổi đời/xóa hoặc rời retention thì dọn đúng HUD cũ. Loot highlight/Interact glyph độc lập, nhặt ngay không đổi CombatFocus. EXPLICIT xa/khác tầng/blocked vẫn có marker trong vùng giữ, Execute hiện reject reason và không tự swap target.
 
-Pending là core online: khóa thao tác lặp cần thiết, giữ dữ liệu committed, cho biết đang xử lý; timeout/network error không dùng success/fail RNG animation. Equip preview có thể xem trước visual, nhưng HUD/world nhận canonical result đúng revision. Success enhance kể cả fail cost đã tiêu chỉ sau ACK, không kéo animation giả để che một request chưa có kết quả.
+UI đang xử lý là thông tin core online: chặn thao tác lặp cần thiết, giữ dữ liệu đã commit và báo chờ. Timeout/network error khác RNG enhance fail. Preview có thể xem trước hình gear, HUD/world chỉ cập nhật canonical result đúng revision. Enhance success hoặc fail đã tiêu cost chỉ diễn sau ACK; không dùng animation giả làm người chơi tưởng request đã xong.
 
-**Dependency bổ sung:** font có đủ dấu tiếng Việt, số/+/% dễ đọc; test tên dài “Đóng Băng”, “Huyền Nham Cự Thú”, trạng thái thiếu X ô, wager10.000 và chat80 ký tự/hai dòng. Text dynamic không bake thành sprite. Chọn world reference resolution/zoom và UI scale **OPEN A12** trước export: thử480×270 hoặc640×360 cho16:9 (1920×1080 scale4 hoặc3); world view rộng15 hoặc20 u ở PPU32, ảnh hưởng đọc Bow6,5 u/telegraph. Đây là probe camera, không requirement render resolution đã khóa hay scene mới.
+**Dependency bổ sung:** font có đủ dấu tiếng Việt, số/+/% dễ đọc; test tên dài “Đóng Băng”, “Huyền Nham Cự Thú”, trạng thái thiếu X ô, wager 10.000 và chat 80 ký tự/hai dòng. Text dynamic không bake thành sprite. Chọn world reference resolution/zoom và UI scale **OPEN A12** trước export: thử 480×270 hoặc 640×360 cho 16:9 (1920×1080 scale 4 hoặc 3); world view rộng 15 hoặc 20 u ở PPU32, ảnh hưởng đọc Bow6,5 u/telegraph. Đây là probe camera, không requirement render resolution đã khóa hay scene mới.
 
 <a id="online-presentation"></a>
 
@@ -572,7 +612,8 @@ Bảng flow dưới là **phương án presentation để thử A11**, không to
 
 | Bước | Local player | Game Server / remote |
 | --- | --- | --- |
-| Bấm Attack/Skill | Ngay frame input: đổi pose chuẩn bị/draw, weapon đúng visual, âm/tụ lực cosmetic; ghi action request đang chờ | Intent có binding/sequence/aim; client không gửi trusted targets/damage |
+| SelectSkillSlot1/2/3 | Chỉ đổi highlight kỹ năng, không chuẩn bị/cast/approach/cost/CD | Selection không là lệnh damage; action đang chạy giữ SkillId snapshot |
+| Bấm ExecuteSelected | Có thể thử pose/âm chuẩn bị cosmetic khi intent đủ điều kiện; ghi request đang chờ, không giả accepted cast | Intent chụp requested SkillId/target life/MapId; client không gửi trusted targets/damage |
 | Validate/start | Giữ UI resource/cooldown canonical, có pending cue nhẹ khi cần; không hiện target impact/HP trừ giả | Server kiểm alive/MapId/class/learned/profile/MP/CD/action lock, chụp source/action origin/weapon visual và startClock, commit cost realtime |
 | Accept/reject | Ghép request với actionId, căn phase theo server clock; reject trả pose phù hợp và reason, clear cosmetic anticipation | Remote bắt đầu từ phase còn hiệu lực, không chạy lại windup từ đầu ở packet trễ |
 | Release/projectile | Local slash/cast accent có thể anticipate cosmetic; khuyến nghị chờ authoritative spawn để tạo projectile chính trong slice | Authority schedule logical hit; visual event có action/hitIndex/life/origin/aim/travel phase để render |
@@ -584,7 +625,7 @@ Nếu latency làm visual projectile xuất hiện muộn, render ở phase trav
 
 **Data/clock proposal** về correlation/action/life/MapId/profile/visual revision, projectile flight, hit resolveTime và status/terminal fields đã chuyển đầy đủ sang [Technical — presentation data](2_HUYEN_LO_TECHNICAL.md#presentation-data). Schema vẫn OPEN A11/A15. Art cần state/phase/result để diễn và dedup, không sở hữu message schema hay quyết server tick/transport.
 
-Dedup VFX theo actionId/projectileIndex/hitIndex/targetGeneration thích hợp; cache status theo state revision, không replay entry trên mọi snapshot. Death terminal của life cũ thắng Hit/Status đến trễ; mob respawn không nhận effect life trước. Join/reconnect snapshot dựng status còn hiệu lực, không replay damage/reward; map transition clear visuals của map cũ, visual map cũ được dọn, không giữ callback gameplay. Một actor disconnected trong grace15 s vẫn bị đánh; không biến ghost render thành invulnerable. Map filter chỉ presentation, không disable server root/player khác.
+Loại VFX lặp theo actionId/projectileIndex/hitIndex/targetGeneration; cache status theo revision, không phát entry lại ở mọi snapshot. Target death đời cũ thắng Hit/Status đến trễ, respawn không nhận effect cũ. Player death là trạng thái riêng: giữ marker/HUD của target còn hợp lệ, hủy pending và khóa combat. Join/reconnect dựng status còn hiệu lực, không phát lại damage/reward; map transition dọn hình map cũ và target MapId cũ. Actor disconnect trong grace15 s vẫn bị đánh; hình ghost không thành invulnerable. Map filter chỉ trình diễn, không disable server root/player khác.
 
 Ở2–4+ player: giữ unique target/arrow/status rules, tránh tốn VFX theo N×mọi khả năng thay vì events thực. WorldUI priority local/selected/Boss, status một instance/target; giảm remote cosmetic ở crowd. Đo frame time/overdraw/allocations/bytes và latency; bốn player là probe, acceptance hiện tối thiểu hai, không capacity claim.
 
@@ -613,10 +654,10 @@ Một rig preview reuse Body/Hair/outfit/weapon assets, không sprite-sheet riê
 
 | Contract | Giữ / đề xuất | Căn cứ và cách kiểm |
 | --- | --- | --- |
-| Player canvas/body | Giữ64×64, body44–48 px, hướng phải | Vừa silhouette nhân vật; weapon/VFX có thể renderer riêng vượt canvas, không scale body để nhét |
-| PPU | Giữ32 toàn world sprite; icon/UI theo UI scale riêng | Body≈1,375–1,5 u hợp collider cao1,45 TUNABLE;64px canvas=2 u không phải hurtbox |
+| Player canvas/body | Giữ 64×64, body 44–48 px, hướng phải | Vừa silhouette nhân vật; weapon/VFX có thể renderer riêng vượt canvas, không scale body để nhét |
+| PPU | Giữ 32 toàn world sprite; icon/UI theo UI scale riêng | Body≈1,375–1,5 u hợp collider cao 1,45 TUNABLE;64 px canvas=2 u không phải hurtbox |
 | Pivot/alignment | GiữBottom-Center(0,5;0); mốc chân/offset chung trên grid pixel | Không crop mỗi pose; part cùng pose key, đường chân không nhảy khi equip |
-| Padding/transparency | Alpha thật; probe margin transparent1–2 px nếu không làm đổi anchor; sheet gutter2–4 px ngoài cell; atlas padding4 px khởi điểm | Margin/gutter/atlas padding là ba việc khác nhau. Canvas64 không bị cộng thêm gutter vào sprite rect |
+| Padding/transparency | Alpha thật; probe margin transparent1–2 px nếu không làm đổi anchor; sheet gutter 2–4 px ngoài cell; atlas padding 4 px khởi điểm | Margin/gutter/atlas padding là ba việc khác nhau. Canvas64 không bị cộng thêm gutter vào sprite rect |
 | Palette | Swatch chung da/outline, ba gear/environment families; skill ấm/lạnh/Linh tím có cue hình riêng | Không hard-lock số màu trước test; outline/contrast và band/rarity phân biệt. Không shader palette system bắt buộc |
 | Sheet | Mỗi state/profile có grid cell cố định; manifest `poseKey → spriteRef/socket/order/duration` | Shared spriteRef hợp lệ; duplicate sheet cells không tính thành hình vẽ mới. Sheet layout không quyết định damage |
 | FPS/duration | Giữ preview baseline6/10/8/8/12/12/10/8 theo player state; timeline duration riêng | Attack release/hit đúng GDD; mob loops chọn theo cadence/hành vi, không ép cùng FPS/frame count |
@@ -634,7 +675,7 @@ Một rig preview reuse Body/Hair/outfit/weapon assets, không sprite-sheet riê
 
 Unity hướng dẫn cùng PPU, Point filter và Compression None cho sprite pixel; atlas có padding mặc định4 và setting rotation/texture riêng. Đây là cơ sở kiểm import, **không tự pin phiên bản Unity/URP**; spike pin Editor/package thực dùng theo Technical. [Nguồn Unity — chuẩn bị sprite pixel](https://docs.unity.com/en-us/engine/6000.6/manual/unity2d/2d-urp/2d-pixelperfect/prep-sprites), [Sprite Atlas reference](https://docs.unity3d.com/6000.3/Documentation/Manual/sprite/atlas/sprite-atlas-reference.html).
 
-ObjectPool cung cấp cơ chế reuse object, còn reset/dedup/generation ở trên là contract đề xuất của Huyền Lộ, không engine tự bảo đảm. [Nguồn Unity — ObjectPool](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Pool.ObjectPool_1.html). Không thêm lighting stack, Addressables hay skeletal package chỉ để đạt contract này.
+ObjectPool cung cấp cơ chế reuse object, còn reset/dedup/generation ở trên là contract đề xuất của Huyền Lộ, không engine tự bảo đảm. [Nguồn Unity — ObjectPool](https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Pool.ObjectPool_1.html). Không thêm lighting stack, Addressables hay package skeletal chỉ để đạt contract này.
 
 Pipeline và phép đếm trước review nằm tại [Phụ lục C — pipeline](#legacy-visual-flow) / [accounting cũ](#legacy-art-accounting). Contract đang dùng ở §22; các anchor lịch sử vẫn được giữ.
 
@@ -653,7 +694,9 @@ Pipeline và phép đếm trước review nằm tại [Phụ lục C — pipelin
 
 ### 22.2. File lifecycle và pose/socket data
 
-**Đường đi của file:** editable source ở `ArtSource/Probes/Sword01/` → PNG export vào `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` → Unity import tạo sprite refs + `.meta` → definition/prefab tham chiếu refs. PNG export chính là imported asset; không chép thêm một bản PNG “runtime”. Cache Library không version. Khi production base đã duyệt, chuyển asset được chọn sang `game/Assets/GameArt/`, giữ GUID khi move và đưa refs vào presentation definition; prototype source không tự thành production architecture.
+**Đường đi hiện hành — chưa tạo trong task docs:** editable source → PNG trong một sandbox art/rig disposable độc lập → Unity import tạo sprite refs + `.meta` → definition/prefab của probe tham chiếu refs. Exact sandbox path còn là lựa chọn tooling. PNG export chính là imported asset, không thêm bản PNG “runtime”; Library cache không version. Sau production base review, asset đã chọn mới chuyển sang `game/Assets/GameArt/`, giữ GUID khi move và refs trong presentation definition. Probe trước base không tự là production architecture.
+
+**HISTORICAL export path:** `ArtSource/Probes/Sword01/` → `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` từng là đề xuất. Giữ để tra lịch sử, không chỉ định sửa VS-1 đang đóng băng để chạy probe revision mới; migration này không tạo/chạy sandbox hoặc asset.
 
 Mỗi export có stable asset ID, source path và revision. Sửa source rồi export đè đúng file; retain `.meta` khi rename/move. Sheet layout đổi thì kiểm lại slice refs, không chỉ tên PNG. Font/license và file gốc của asset ngoài được giữ cùng nguồn.
 
@@ -665,7 +708,7 @@ Mỗi export có stable asset ID, source path và revision. Sửa source rồi e
 
 Status: **style sample để kiểm**, dùng các baseline canvas/palette/readability hiện hành; chưa khóa technique/camera mới.
 
-- Character: body 44–48 px trong cell64, silhouette/hand-grip ưu tiên. Thử outline tối 1 px, ít mức sáng/tối và một hướng sáng thống nhất; không để palette gear che tay/vũ khí.
+- Character: body 44–48 px trong cell 64, silhouette/hand-grip ưu tiên. Thử outline tối 1 px, ít mức sáng/tối và một hướng sáng thống nhất; không để palette gear che tay/vũ khí.
 - Environment: lane/edge đứng được tương phản rõ; background giảm contrast, foreground không che silhouette/telegraph. Cùng vật liệu vẫn phân biệt solid và one-way bằng cạnh/shape.
 - Kiếm/Cung: chém ấm, cung lạnh, Linh tím kèm hình/nhịp riêng; cue release/impact gọn và ăn clock. Không chỉ dùng màu để phân Freeze/Slow.
 - UI: panel dùng kit chung, text Việt đọc ở camera/output thực; selected focus và disabled/error khác nhau. Icon/slot/tooltip hỗ trợ thông tin, không thay bằng màn bitmap hoặc bắt click để chơi.
@@ -678,9 +721,9 @@ Một record cho mỗi nguồn/pack với asset IDs liên quan: URL hoặc sourc
 
 ## 23. Production accounting: đếm công cần làm, không đếm item×animation
 
-**Đơn vị:** pose key là hình dáng cần đọc; frame/ô logical là mẫu trên timeline; sprite outcome là ảnh raster khác được xuất; variant là sửa từ template; module là một family part; preset là config VFX; placement là instance trong map. Một ảnh dùng ở năm ô vẫn một ảnh, nhưng năm chỗ sync phải được kiểm. Một recolor xuất PNG khác là variant outcome, không công vẽ silhouette mới.
+**Đơn vị đếm:** pose key là tư thế cần đọc; frame/ô logical là mẫu trên timeline; sprite outcome là ảnh raster khác được xuất; variant là sửa từ mẫu; module là họ part; preset là cấu hình VFX; placement là instance đặt trong map. Một ảnh dùng ở năm ô vẫn một ảnh, nhưng cả năm chỗ ghép/timing phải kiểm. Recolor xuất PNG khác là ảnh variant, không công vẽ dáng bao mới.
 
-**Cách dùng accounting hiện tại:** tách công tạo pose, sửa variant, export/slice, socket/import, placement, QA và rework. CURRENT đo mẫu Kiếm/outfit I/room/UI đã nhập chạy được; tổng ảnh và tổng giờ vẫn OPEN A17.
+**Cách tính công hiện tại:** tách vẽ pose mới, sửa variant, xuất/cắt ảnh, gắn socket/nhập Unity, đặt map, QA và sửa lại. CURRENT phải đo mẫu Kiếm/outfit I/room/UI nhập chạy được; hiện CHƯA ĐO, tổng ảnh/giờ vẫn OPEN A17.
 
 Tra đầy đủ [S0 player](#player-s0) và [các family/công sản xuất](#family-scenarios) tại Phụ lục B. Các bảng giữ toàn bộ giả định/dedup, phép cộng, workload và ma trận QA; số suy ra chưa phải số asset đã sản xuất. [Accounting cũ](#legacy-art-accounting) nằm riêng trong trace để tránh dùng làm budget hiện tại.
 
@@ -688,21 +731,21 @@ Tra đầy đủ [S0 player](#player-s0) và [các family/công sản xuất](#f
 
 ### 23.1. Quy trình art nhỏ cho người chưa thạo vẽ
 
-**TOOL CANDIDATE / CURRENT PROBE:** PixelLab là công cụ ứng viên để thử chất lượng đầu vào bằng Free/free trial nếu phù hợp. Nếu mẫu không đạt hoặc thiếu tool, có thể đổi công cụ/workflow; art contract và architecture không phụ thuộc PixelLab. Không mua/generate full catalog theo S0.
+**TOOL CANDIDATE / CURRENT PROBE:** PixelLab là công cụ ứng viên để thử mẫu đầu vào bằng Free/free trial nếu phù hợp. Mẫu không đạt hoặc thiếu công cụ thì đổi cách làm; contract Art và kiến trúc không phụ thuộc PixelLab. Không mua/tạo full catalog theo S0.
 
-Trước probe, kiểm [FAQ chính thức](https://www.pixellab.ai/docs/faq) và quyền tool thực trên tài khoản Free/trial; không giả animation/outfit/size/features đều miễn phí. Chưa có mẫu nào được tạo trong vòng này.
+Trước khi làm probe, kiểm [FAQ chính thức](https://www.pixellab.ai/docs/faq) và quyền thực của tài khoản Free/trial; không giả mọi tính năng animation/outfit/kích thước đều miễn phí. Vòng migration docs này không tạo mẫu.
 
-Chọn mẫu nhỏ phục vụ CURRENT: cùng character/default outfit, Mộc/Kiếm/outfit I, pose Attack/Skill và một surface/icon/impact. Giữ reference/palette/canvas/pivot; xuất ảnh rồi sửa outline/transparent/palette/hand-grip/alignment trong editor pixel (ví dụ Pixelorama), slice/import và chạy room Unity ở camera thực. Nếu Free không hỗ trợ công đoạn cần kiểm, ghi thiếu evidence, dùng placeholder cho pipeline; không gọi thiếu tool là đã chứng minh hybrid đạt.
+Chọn mẫu nhỏ: cùng nhân vật/outfit mặc định, Mộc/Kiếm/outfit I, pose Attack/Skill và một mặt địa hình/icon/impact. Giữ reference/palette/canvas/pivot; xuất ảnh, sửa outline/alpha/màu/tay nắm/căn lớp trong editor pixel (ví dụ Pixelorama), rồi cắt/nhập Unity ở camera thật. Dùng sandbox disposable độc lập trước base. Free thiếu công đoạn cần kiểm thì ghi thiếu evidence và dùng placeholder cho pipeline; không kết luận hybrid đạt khi chưa thử.
 
-Ghi mỗi output vào nhóm **dùng trực tiếp / dùng sau sửa / loại bỏ**; một output chỉ một nhóm sau QA. `Dùng trực tiếp% = pass không sửa / tổng output`; `dùng sau sửa% = pass đã sửa / tổng output`; `dùng được tổng% = (hai nhóm pass) / tổng output`. Đếm cả lần thất bại và sample size, cùng giờ clean/slice/socket/import/QA/rework theo loại. Khi chưa chạy ghi **CHƯA ĐO**, không đoán 70/80/90%. Nếu PNG đẹp nhưng chuỗi pose/tay áo/socket lệch, mẫu animation chưa pass; không tính mọi frame trong strip là đạt chỉ vì một frame đạt.
+Mỗi output sau QA thuộc đúng một nhóm **dùng trực tiếp / dùng sau sửa / loại bỏ**. `Dùng trực tiếp% = pass không sửa / tổng output`; `dùng sau sửa% = pass đã sửa / tổng output`; `dùng được tổng% = (hai nhóm pass) / tổng output`. Đếm cả output thất bại và cỡ mẫu, giờ sửa/cắt/gắn socket/nhập/QA/làm lại theo loại. Chưa chạy ghi **CHƯA ĐO**, không đoán 70/80/90%. PNG đẹp nhưng chuỗi pose/tay áo/socket lệch thì animation chưa pass; một frame đạt không chứng minh cả strip đạt.
 
-Dùng số đo để chọn tiếp tục tool, sửa tay nhiều hơn, giảm polish hoặc lấy asset tham khảo có nguồn rõ; đánh giá chi phí **mẫu đã nhập chạy được**, không theo credits/ảnh đẹp nhất. Quyết định chi tiền là bước sau evidence, không tự mua gói. Đây là quy trình art của tài liệu sống, không PixelLab/trial plan, prompts hoặc asset manifest riêng. Gate/nguồn lực xem [Roadmap §4–6](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#art-workflow).
+Dùng số đo để quyết tiếp tục công cụ, sửa tay thêm, giảm polish hoặc dùng asset có nguồn rõ. Đánh giá công của **mẫu đã nhập chạy được**, không theo credits/ảnh đẹp nhất. Chi tiền là bước sau evidence; không tự mua gói. Quy trình này không tạo PixelLab/trial plan, prompt pack hay manifest riêng trong migration. Gate/nguồn lực xem [Roadmap §4–6](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#art-workflow).
 
 <a id="art-validation"></a>
 
 ## 24. Prototype/validation trước production hàng loạt
 
-Đây là **ma trận validation visual**, thứ tự làm nằm ở Roadmap; quy trình mẫu/công cụ ứng viên ở §23.1, không kế hoạch tool hoặc generate asset riêng. Các ca dưới **CHƯA CHẠY**; dùng placeholder/fixture phù hợp khi làm Unity slice, chưa nghiệm thu bằng tài liệu. Các “dấu hiệu đủ” là câu hỏi để validate proposal: riêng P12 “Immediate local pose” kiểm phương án A11, không tự khóa anticipation. G-N cần result/life/phase đúng với chế độ đã thử, không buộc triển khai anticipation chưa duyệt hoặc thêm tentative projectile branch.
+Đây là **ma trận kiểm hình ảnh**, thứ tự làm ở Roadmap, cách thử mẫu ở §23.1. Mọi ca **CHƯA CHẠY**; tài liệu không nghiệm thu Unity/art. Dùng placeholder/fixture có nhãn trong sandbox hoặc slice phù hợp. Các dấu hiệu đủ giúp quyết option đang thử; P12 chỉ thử anticipation A11 nếu chọn, không khóa pose xuất hiện ngay. G-N cần result/life/phase đúng, không buộc thêm projectile tạm hoặc rollback.
 
 **Ưu tiên kiểm:**
 
@@ -726,38 +769,38 @@ DoD là chất lượng asset probe. “Có PNG” hoặc “build chạy” ch�
 | P01 Modular player | Default +I/II/III Armor/Lower, mix-band, unequip, cả state và hai hướng | Không hở thân/grip sai/nhảy pivot; xác nhận pose refs nào thật sự reuse; quyết26 logical hay physical và delta class/airborne |
 | P02 Hai Sword cùng action | Mộc và Huyền Ấn dùng cùng track Attack; hai Kiếm class khác band dùng cùng Skill; thử swap giữa action hợp lệ | Đúng cây ở cả Idle/release, không sprite Common baked; socket/góc raster đủ; visual snapshot không morph sai; không cấp skill class cho Tân Lữ chỉ để test Mộc |
 | P03 Bow | Ít nhất hai band rest/draw/release/Skill, S1 và triple | Tay/string/arrow nock khớp; spawn đúng timeline, ba tên một cast; quyết có partial-draw thêm và logical hit/visual timing contract |
-| P04 Multi-target | Arc3, Line5, Hàn1+4, spreadA/B/C–A/B/A–A/A/A, no-target/invalid | Arc/line/nổ impact cùng resolve phase; spread đúng flight, không chain false; không double status/impact/projectile |
+| P04 Multi-target | Arc3, Line5, Hàn1+4, spreadA/B/C–A/B/A–A/A/A, no-target/invalid | Impact cùng phase resolve của profile, spread ba tên một cast, không chain giả; không double status/impact/projectile |
 | P05 Hit không stun | Mỗi rig bị hit Idle/Move/Windup/Attack/Ranged; Freeze trước/sau release; lethal | Main action không restart/hit trễ vì flash; CC server cancel unresolved đúng life; resolved result bất biến, visual travel không gameplay callback, Death thắng stale Hit |
 | P06 Death/corpse | Ground/Ong/Boss; chết ở ledge, late viewer, ACK chậm/retry, normal respawn 25 s | Corpse không target/collider/AI, loot đứng được, timer từ death không từ clip/ACK, đời mới không nhận effect cũ |
-| P07 Dummy online | Q3/Q6 solo, hai ngườiLv3, Lv3+Lv20,3–4 requesters | HP/Break/respawn thật, credit≥20% đúng từng life, không hai loại dummy; đo chờ để chọn timer/standpoints |
-| P08 Terrain room | Solid/step/one-way/pass-through/overpass và background cùng chất liệu | Người chưa biết collider đoán đúng trước khi nhảy; drop một actor không làm người kia rơi; Kiếm/Cung đọc được target |
-| P09 Công trình | Hai surfaces/routes +spawn/hybrid/Ong/chase/leash/Return/melee/Bow | Không stuck/unreachable/spawn trên không; projectile mask đúng solid/platform; không ngầm cần mob Jump/navigation mới |
+| P07 Dummy online | Q3/Q6 solo, hai người Lv 3, Lv 3+Lv 20, 3–4 requesters | HP/Break/respawn thật, credit≥20% đúng từng life, không hai loại dummy; đo chờ để chọn timer/standpoints |
+| P08 Terrain room | Bốn grammar: đồi bậc solid, khối đá/hốc/khe, công trình/cầu và one-way có support; decor cùng chất liệu | Người chưa biết collider đoán đúng; không slope/climb/natural one-way/floating bars; drop một actor không làm người kia rơi |
+| P09 Công trình | Hai surface/routes, HomeRegion/WalkRegion, spawn/Ong/chase/leash/Return/Kiếm/Cung; Hybrid chỉ fixture khi cần | Không stuck/spawn trên không/perch spam vĩnh viễn; ground quay ở mép, không jump/drop; kite hợp lệ; mask LoS A/B còn probe |
 | P10 Nước | Puddle base/front, thác seam, actor dưới nước/đi trên cầu, cả facing | Front chỉ che chân, không telegraph; bridge không splash, không thay physics; quyết sprite/particle reuse |
-| P11 UI kit | Inventory/Storage/Shop cùng kit, Character/Enhance/Transfer, Vietnamese text/tooltip | Không bitmap screens riêng, rarity/band/+level rõ; pending/error/RNG fail khác, focus/input không phát attack |
-| P12 Online presentation | 2 clients Dedicated baseline; thêm4+, RTT0/100/200 ms, jitter/loss probe | Immediate local pose, no trusted client damage, one effect per result, late death/status/action đúng generation, map/reconnect không replay reward |
-| P13 Combat/balance | Intervals/timing control; Lv5/10/17, MP zero-INT/cân bằng, TTK solo/cụm và PvP Food/quota | Ghi số Novice/S1/S2/S3 casts, thời gian chờ MP, proc/TTK/visual travel; đổi một nhóm số mỗi lượt, chạy lại model sau khi timeline thay |
-| P14 Boss/camera | Telegraph0,5/1,0/1,2 s, ba landing zones, Cuồng dưới30%, Slow, nhiều VFX/người | Telegraph không bị che/cắt hoặc time-stretch, đọc/né bằng movement hiện có; camera/zoom đọc được range |
-| P15 Chi phí slice | Một outfit family, Sword/Bow, mob hybrid và room/UI primitive nhập hoàn chỉnh | Manifest unique/dedup/variant/setup và giờ thật; derive lại accounting, không production hàng loạt với frame count chưa kiểm |
+| P11 UI kit | Inventory/Storage/Shop cùng kit, sáu RPG views, text Việt; Select→Execute, pending đổi selection, Q1 khu NPC/Q3 Bách/Q6 mentor | Select không cast/cost/approach, S2 selected/execution cue rõ; modal không lọt input, glyph không khóa proposal key; rarity/band/+level và error khác RNG fail |
+| P12 Online presentation | Hai Client Dedicated tối thiểu; thêm 4+, RTT 0/100/200 ms/jitter/loss; player chết khi người khác đánh target | Thử anticipation A11 nếu chọn; một effect/result, HP focus hợp lệ tiếp tục cập nhật, same-slot respawn xóa life cũ, map/reconnect không replay reward |
+| P13 Combat/balance | Intervals/timing control; Lv 5/10/17, MP zero-INT/cân bằng, TTK solo/cụm và PvP Food/quota | Ghi số Novice/S1/S2/S3 casts, thời gian chờ MP, proc/TTK/visual travel; đổi một nhóm số mỗi lượt, chạy lại model sau khi timeline thay |
+| P14 Boss/camera | Telegraph 0,5/1,0/1,2 s, ba landing zones, Cuồng dưới 30%, Slow, nhiều VFX/người | Telegraph không bị che/cắt hoặc time-stretch, đọc/né bằng movement hiện có; camera/zoom đọc được range |
+| P15 Chi phí slice | Một outfit family, Kiếm/Cung, mob theo capability được chọn và room/UI nhập hoàn chỉnh | Kê ảnh mới/reuse/variant/setup và giờ thật; tính lại công, Hybrid chỉ khi chọn; không nhân frame count chưa kiểm |
 
-Ghi build/Editor/packages, camera scale, machine và seed/fixture; không claim benchmark capacity từ một ca chạy mượt. Nếu vấn đề là pose không đọc, sửa art/timing presentation trước; nếu cần đổi hit/spawn/CD/collider/loot position/timer, trình như gameplay/Technical proposal, chạy ca phụ thuộc. Validation không tự khóa mọi số đề xuất trong file này.
+Ghi build/Editor/packages, camera scale, máy và seed/fixture; một ca chạy mượt chưa chứng minh capacity. Pose khó đọc thì sửa art/timing hình ảnh; đổi hit/spawn/CD/collider/loot position/timer phải đi đúng owner và kiểm lại ca phụ thuộc. Các phép thử không tự khóa số đề xuất trong file. Dev Mode phục vụ test nhanh, không là UI production hoặc evidence fresh-run; route canonical Q1–Q12 vẫn thật theo GDD/Technical/Roadmap.
 
 ## 25. Tra cứu OPEN decisions
 
 Options, trade-off, recommendation và cách chốt của **A01–A17 đã chuyển nguyên** sang [Analysis — sổ quyết định Art](3_HUYEN_LO_DESIGN_ANALYSIS.md#art-open-decisions), cùng trạng thái và gate BAL/ART/PHY/TECH liên quan. File này giữ reasoning chi tiết/ma trận thử; không giữ một bảng trạng thái thứ hai.
 
-A01/A02/A14 chi phối pose/modular và chi phí; A03 liên quan Boots; A04/A05/A06 liên quan concept/timing/Cung; A07 Dummy; A08/A15 death/corpse/loot; A09/A10 terrain/route/projectile; A11/A13 online/Select; A12 camera; A16 Boss; A17 accounting. CURRENT/DEFERRED do Roadmap sở hữu. Chưa prototype không biến recommendation thành LOCKED; giữ nguyên GDD baseline đến khi quyết định thay được duyệt.
+A01/A02/A14 chi phối pose/modular và công; A03 giữ sáu ô/stat-only, đề xuất bỏ Boots cũ SUPERSEDED; A04/A05/A06 liên quan concept/timing/Cung; A07 Dummy; A08/A15 death/corpse/loot; A09/A10 terrain/route/LoS và Hybrid còn OPEN; A11/A13 online/Character Select; A12 camera; A16 Boss; A17 accounting. CURRENT/DEFERRED do Roadmap sở hữu. Chưa probe không biến đề xuất technique/count thành LOCKED; mốc gameplay hiện hành đọc GDD.
 
 ---
 
 <a id="working-spec-end"></a>
 
-**CURRENT WORKING SPEC ENDS HERE.** Phần dưới là reasoning, accounting scenarios và lịch sử để tra khi cần; người làm probe bắt đầu ở §22.1, không phải đọc hết phụ lục. Các bảng được giữ nguyên để bảo toàn evidence.
+**KẾT THÚC SPEC LÀM VIỆC HIỆN HÀNH.** Phần dưới là rationale, kịch bản tính công và lịch sử. Người làm probe bắt đầu ở §22.1; các bảng giữ để bảo toàn evidence, mỗi nhóm chỉ có hiệu lực theo nhãn của nó.
 
 <a id="art-rationale"></a>
 
 ## Phụ lục A. Rationale và ghi chú thiết kế
 
-Phần này giữ các phát hiện và trade-off đã dẫn tới spec ở trên. Recommendation là phương án để thử; trạng thái quyết định vẫn ở Analysis A01–A17.
+Phần này giữ phát hiện và trade-off đã dẫn tới spec. **Bảng phát hiện ban đầu là HISTORICAL EVIDENCE**: flight/spawn lệch, class Normal, bốn SkillIds và bộ MP/CD cũ đã SUPERSEDED. Những option không đụng luật mới vẫn là phương án thử; trạng thái hiện hành đọc Analysis A01–A17, không lấy chữ “OPEN” trong trace làm quyền đổi luật.
 
 <a id="art-initial-findings"></a>
 
@@ -767,7 +810,7 @@ Phần này giữ các phát hiện và trade-off đã dẫn tới spec ở trê
 | --- | --- | --- |
 | Một rig nam, 26 frame đồng bộ cho mọi part | Đúng tổng ô một profile, chưa chứng minh đủ hình cho cả chém kiếm và kéo cung; index đồng bộ không đồng nghĩa mỗi part cần một PNG mới ở mỗi ô | Giữ tám state và nhịp mẫu; tách profile Kiếm/Cung, bảng ánh xạ pose và hình thực. Việc diễn giải lại user-lock 26 frame phải được duyệt |
 | 12 module = ba band × bốn loại | Chưa tính visual Mộc Kiếm và outfit trước khi nhận Áo/Quần; cũng chưa tính redraw tay/áo theo class | 13 module gear world, thêm hai fallback outfit; không nhân item × 26 |
-| VFX accounting cũ: bốn active presets | Sáu profile Lv5/10/17, normal, impact, status và telegraph có nhiệm vụ đọc gameplay khác nhau | Lịch sử bốn SkillIds; hiện sáu bindings độc lập, reuse preset family; thêm các primitive dùng chung, không sáu bộ VFX độc lập |
+| VFX accounting cũ: bốn active presets | Sáu profile Lv 5/10/17, normal, impact, status và telegraph có nhiệm vụ đọc gameplay khác nhau | Lịch sử bốn SkillIds; hiện sáu bindings độc lập, reuse preset family; thêm các primitive dùng chung, không sáu bộ VFX độc lập |
 | Attack/Skill 12 FPS, action lock 0,26–0,40 s | Ba frame mất 0,25 s, bốn frame mất 0,333 s ở tốc đều; hit 0,10–0,18 s không luôn nằm đúng biên frame. Bow cần draw/release thật | Author thời lượng từng pose theo server timeline; FPS chỉ mốc preview, không clock damage |
 | Multi-target và projectile Cung | Arc/line/nổ có thể cùng mốc; ba tên hiện spawn lệch 30 ms và có thời gian bay. Không thể tuyên bố mọi skill resolve đồng thời mà vẫn giữ luật này | Một cast đọc được như một nhịp; impact theo thời điểm server. OPEN riêng nếu muốn đổi ba tên thành resolve đồng thời |
 | Mob Hit/Death chưa có bảng production | Damage thường dễ bị diễn thành stun; corpse dễ kéo dài hurtbox hoặc respawn | Hit feedback chồng lên action, Death terminal tách khỏi corpse và reward |
@@ -790,15 +833,17 @@ Phần này giữ các phát hiện và trade-off đã dẫn tới spec ở trê
 
 ### Tác động nếu bỏ Boots hoặc thêm footwear visual
 
+**LEGACY / SUPERSEDED — đề xuất bỏ Boots:** bảng sau giữ đủ tác động và số cũ để đối chiếu, không dùng làm option hiện hành. GDD giữ sáu ô và nay thêm HP trên Boots; vì vậy phép trừ chỉ số dưới đây không là phép tính cho catalog revision mới.
+
 | Dependency | Tác động nếu duyệt bỏ | Việc bắt buộc đo/sync |
 | --- | --- | --- |
 | Catalog / scope | 6→5 slots; 18→15 family; 21→18 mẫu thường, cộng Mộc Kiếm thành 19 gear definitions | Bỏ ba icon nhưng **không giảm world animation**, vì Boots vốn stat-only |
 | Chỉ số | Mất DEF 2/4/6, EVA 4/8/12, flat +2 EVA/cấp, Tinh Hoa Giày; mất tốc chạy +1/2/3% | Build survival/accuracy, kite/chase/run-back và PvP phải tính lại; không tự chuyển tất cả stat sang Quần |
-| Loot | Các nguồn 6 slots thành 5, nguồn Lv2/4 từ 5 thành 4 | Nếu giữ chọn đều, mỗi non-weapon ở nguồn đủ slot tăng 1/6→1/5; xác suất một loại weapon khi gear roll thành công tăng 1/12→1/10. Đây là thay economy dù tổng gear roll giữ nguyên |
+| Loot | Các nguồn 6 slots thành 5, nguồn Lv 2/4 từ 5 thành 4 | Nếu giữ chọn đều, mỗi non-weapon ở nguồn đủ slot tăng 1/6→1/5; xác suất một loại weapon khi gear roll thành công tăng 1/12→1/10. Đây là thay economy dù tổng gear roll giữ nguyên |
 | Shop / sinks | Mất dòng mua/bán và đường enhance/transfer một slot | Tính lại vendor-all, nhu cầu Gold/Stone và giá trị loot; không giả sink thực giảm đúng 1/6 vì player không đầu tư đều |
 | UI / progression | Character/equipment filters/tooltip/preview/QA đổi; Q7 Nhẫn vẫn giữ | Cập nhật item refs, evaluator, fixtures, bảng Analysis và acceptance; không rename slot rồi bỏ qua stat |
 
-**OPEN A03:** bỏ Boots chỉ hợp nếu mục tiêu là đơn giản hóa gear, không phải tiết kiệm art. Recommendation hiện tại giữ. Nếu muốn footwear world thực sự theo Boots, đó là option thứ ba tăng một visual layer và kiểm overlap, không tự đưa vào P0.
+**Kết luận lịch sử A03:** bỏ Boots từng được cân nhắc để đơn giản gear, không tiết kiệm world art vì Boots vốn stat-only. Đề xuất này đã SUPERSEDED; hiện giữ sáu ô và footwear của LowerBody. Hình footwear đổi theo Boots sẽ tăng layer/overlap QA và chưa được duyệt P0.
 
 <a id="derived-production-scenarios"></a>
 
@@ -814,19 +859,19 @@ S0 giả định hybrid, 19 ô chung đều có body riêng; bảy ô action/cla
 
 | Family | Tập pose/hình trong S0 | Variants / sprite outcomes | Reuse thực sự |
 | --- | --- | --- | --- |
-| BodyBase | 19 common +7 Kiếm +7 Cung=33 | 1 body /33 | Hai profile có52 logical ô nhưng chỉ33 body pose; không52 full redraw |
-| Hair/Head | Idle1+Run2+Jump1+Fall1+Hit1+Death2=8; action7 dùng chung giữa class=15 | 1 family /tối đa15 theo tập giả định | Offset dùng chung; nếu đầu giữ cùng góc phải trỏ lại ảnh và giảm số, không vẽ15 chỉ để đúng bảng |
-| Armor | 19 common +14 action=33 /thiết kế | Default+3 bands=4 thiết kế →132 outcomes | 33 pose template; ba variant sửa chất liệu/silhouette/tay áo, không132 body drawings |
-| LowerBody | Idle2+Run6+Jump1+Fall1+Hit1+Death3=14; Attack3+Skill4 chân chung=7 →21 /thiết kế | Default+3 bands=4 →84 outcomes | Chân chung class; chỉ hợp nếu upper/lower pose khớp. Thêm bow stance thì delta được ghi, không âm thầm nhân33 |
-| Sword | 4 canonical +tối đa4×3 góc sửa=16 | 4 visual /4–16 outcomes | Grip/transform/Skill góc reuse;4 là option socket thuần,16 là option hybrid nhiều sửa |
+| BodyBase | 19 common +7 Kiếm +7 Cung=33 | 1 body /33 | Hai profile có 52 logical ô nhưng chỉ 33 body pose; không 52 full redraw |
+| Hair/Head | Idle 1+Run2+Jump1+Fall1+Hit1+Death2=8; action7 dùng chung giữa class=15 | 1 family /tối đa 15 theo tập giả định | Offset dùng chung; nếu đầu giữ cùng góc phải trỏ lại ảnh và giảm số, không vẽ 15 chỉ để đúng bảng |
+| Armor | 19 common +14 action=33 /thiết kế | Default+3 bands=4 thiết kế →132 outcomes | 33 pose template; ba variant sửa chất liệu/silhouette/tay áo, không 132 body drawings |
+| LowerBody | Idle 2+Run6+Jump1+Fall1+Hit1+Death3=14; Attack3+Skill4 chân chung=7 →21 /thiết kế | Default+3 bands=4 →84 outcomes | Chân chung class; chỉ hợp nếu upper/lower pose khớp. Thêm bow stance thì delta được ghi, không âm thầm nhân33 |
+| Sword | 4 canonical +tối đa 4×3 góc sửa=16 | 4 visual /4–16 outcomes | Grip/transform/Skill góc reuse;4 là option socket thuần,16 là option hybrid nhiều sửa |
 | Bow | 3 shapes×3 bands=9 | 3 visual /9 | Track draw/string/arrow dùng chung; mỗi cây vẫn có silhouette riêng |
 | Arrow | 1 | 1 outcome | Normal/skills dùng tip/trail/palette config, không một ảnh mỗi item |
 
-**SUY RA S0:** body33 +hair15 +armor132 +lower84 =**264 raster outcomes** nếu toàn bộ tập giả định được xuất thành hình khác. Weapon13–25 +arrow1 →**278–290 outcomes player/weapon/arrow**. Đây là kiểm tổng từ tập pose, **không 278–290 tranh vẽ độc lập**, không trần cuối dự án. Nếu recolor runtime thay PNG hoặc nhiều pose reuse, số ảnh giảm; nếu stance/airborne cần sửa, tăng đúng delta.
+**SUY RA S0:** body 33 +hair15 +armor132 +lower84 =**264 raster outcomes** nếu toàn bộ tập giả định được xuất thành hình khác. Weapon13–25 +arrow1 →**278–290 outcomes player/weapon/arrow**. Đây là kiểm tổng từ tập pose, **không 278–290 tranh vẽ độc lập**, không trần cuối dự án. Nếu recolor runtime thay PNG hoặc nhiều pose reuse, số ảnh giảm; nếu stance/airborne cần sửa, tăng đúng delta.
 
-13 **gear world modules** =4 Sword +3 Bow +3 Armor +3 LowerBody. Hai fallback outfit →15 outfit/weapon modules kể cả default; Body/Hair là hai base families riêng. 26-frame contract cũ phải được làm rõ trước duyệt S0. Không xem con số33,264 hoặc290 là lock thay thế26 trong lượt này.
+13 **gear world modules** =4 Sword +3 Bow +3 Armor +3 LowerBody. Hai fallback outfit →15 outfit/weapon modules kể cả default; Body/Hair là hai base families riêng. 26-frame contract cũ phải được làm rõ trước duyệt S0. Không xem con số 33,264 hoặc 290 là lock thay thế 26 trong lượt này.
 
-Công vẽ mới tách khỏi export: Body33 pose; Armor33 template +3×33 lần sửa variant; Lower21 template +3×21 sửa; Hair theo số góc thực, tối đa15 của S0;7 weapon canonical +tối đa18 sửa góc/deformation. Công sạch/slice/manifest/socket/order/import/QA tính riêng. Một shape crop dùng hai render slice không thành hai thiết kế nhưng vẫn có setup/QA.
+Công vẽ mới tách khỏi export: Body33 pose; Armor33 template +3×33 lần sửa variant; Lower21 template +3×21 sửa; Hair theo số góc thực, tối đa 15 của S0;7 weapon canonical +tối đa 18 sửa góc/deformation. Công sạch/slice/manifest/socket/order/import/QA tính riêng. Một shape crop dùng hai render slice không thành hai thiết kế nhưng vẫn có setup/QA.
 
 <a id="family-scenarios"></a>
 
@@ -834,23 +879,23 @@ Công vẽ mới tách khỏi export: Body33 pose; Armor33 template +3×33 lần
 
 | Asset family | Unique frame/sprite trong kịch bản | Variants/reuse | Workload chưa thể quy thành số ảnh/giờ |
 | --- | --- | --- | --- |
-| Normal mobs | 6 rigs /105 pose §6 | Wolf palette identity thứ7; nếu xuất PNG palette, thêm 17 recolor outcomes nhưng 0 pose mới; không rig Linh mới | Clean và windup/hurtbox/flight/death QA theo từng behavior |
+| Normal mobs | 6 rigs; 105 pose là kịch bản lịch sử có điều kiện ba Hybrid §6 | Wolf palette identity thứ 7; xuất PNG palette thêm 17 recolor outcomes nhưng0 pose mới; không rig Linh mới | Chốt capability OPEN rồi kê pose thật; clean/windup/hurtbox/death QA |
 | Boss | 1 rig /28 core pose, optional+4 roar | Claw reuse Basic, Dư Ảnh chỉ tên; Cuồng/Slow overlays | Canvas/area lớn, telegraph/scheduler/3-zone QA; không lấy cost/frame player áp Boss |
 | Dummy | 1 prefab visual /6 pose | Một pool dùng Q3/Q6/training, số placement theo validation | Shared HP/life/credit/respawn, không dummy system/DPS Meter |
-| NPC | 8 full sprites /16 idle outcomes; optional+6 work/gesture | Props/source templates chung | Setup menus/anchors/occlusion; không8×26, không8 portraits bắt buộc |
-| VFX | **10 family chức năng** bên dưới, không10 PNG | Profile/weapon/target reuse config | Frame count sau chọn sprite/particle/mask; overdraw/pool/reset/online QA |
-| Terrain | 3 chất liệu, topology17 +cosmetic4/họ →tối đa63 hình §12 | Collider semantics/template chung, mirror/dedup có thể giảm | Room authoring và edge/route QA, không8 maps×63 |
-| Mini building | Ví dụ gỗ10 logical modules /8–10 hình §13 | Cầu/mái/cột lặp; stone có thể dùng terrain | Chưa có layout hoàn tất để chốt stone kit và full-asset dimensions |
+| NPC | 7 sprite toàn thân /14 idle; optional+6 →20 hình | Props/source templates chung; 8/16–22 là lịch sử đã bỏ Tạ Minh | Setup menu/khu chức năng/anchors/occlusion; không 7×26 hoặc 7 portraits bắt buộc |
+| VFX | **10 family chức năng** bên dưới, không 10 PNG | Profile/weapon/target reuse config | Frame count sau chọn sprite/particle/mask; overdraw/pool/reset/online QA |
+| Terrain | 3 chất liệu, topology 17 +cosmetic4/họ →tối đa 63 hình §12 | Collider semantics/template chung, mirror/dedup có thể giảm | Room authoring và edge/route QA, không 8 maps×63 |
+| Mini building | Ví dụ gỗ 10 logical modules /8–10 hình §13 | Cầu/mái/cột lặp; stone có thể dùng terrain | Chưa có layout hoàn tất để chốt stone kit và full-asset dimensions |
 | Full structural assets | Danh mục cần review: forge station, broken/quest seals, Huyền Môn, Boss landmark | Ba seal anchors dùng một motif, back/front slice; waterfall ở nhóm riêng | Chốt mỗi landmark sau blockout; không tự áp một asset độc nhất mỗi map |
 | Background/decoration | 3 environment families; hub reuse | Palette/crop/clusters, props dùng lại nhiều roots | Số silhouette/prop phải từ blockout+camera; chưa derive được tổng nên không đoán |
-| Animated environment | Thác12 ô; nếu dùng: flow4, ripple3–4; puddle2 static, leaf1–2, puff1, flame4 | Flame Burn dùng chung khi phù hợp; puff/dust dùng lại | Không cộng flame/texture hai lần vào tổng; cần manifest shared refs |
-| Items/icons | 49 physical item bindings +Gold1 +skills10 +status4 =64 binding cơ sở | Food status reuse, rarity/+n overlay; tối đa63 ảnh outcome trước glyph/virtual | Motif mới/clean crop/tier accent phải ghi riêng; không64 tranh hoàn toàn mới |
+| Animated environment | Thác12 ô; nếu dùng: flow4, ripple 3–4; puddle2 static, leaf 1–2, puff 1, flame 4 | Flame Burn dùng chung khi phù hợp; puff/dust dùng lại | Không cộng flame/texture hai lần vào tổng; cần manifest shared refs |
+| Items/icons | 49 physical item bindings +Gold1 +skills10 +status4 =64 binding cơ sở | Food status reuse, rarity/+n overlay; tối đa 63 ảnh outcome trước glyph/virtual | Motif mới/clean crop/tier accent phải ghi riêng; không 64 tranh hoàn toàn mới |
 | Common UI | 21 primitives/chức năng §19 | Panel/button/slot compose; nhiều states tint/mask/text | Layout/bindings/font/focus/pending/error; screen-specific art chỉ phần thật cần |
-| Map content placement | 8 roots,5 farm maps/28 pockets/66 slots hiện hành | Reuse art không reuse toàn route | Colliders/spawns/MapExit/SpecialGate/safe strips/Boss exclusion/traversal/combat QA là cost editor thật |
+| Map content placement | 8 roots/5 farm maps; số pocket/slot mới OPEN/TUNABLE | 28 pockets/66 slots là LEGACY seed, ID nguồn quest vẫn giữ | Re-author nhánh/nhiều tầng/cụm độc lập, colliders/exit/safe strips/Boss exclusion; reuse art vẫn tốn công editor/QA |
 
 Mười VFX family để không giấu scope trong “4 active”: **(1)** sword slash, **(2)** arrow/flight kể cả generic mob config, **(3)** signature line/wave, **(4)** explosion/burst, **(5)** landed impact, **(6)** telegraph cone/ground/landing, **(7)** statuses Burn/Freeze/Slow, **(8)** aura Linh/Cuồng, **(9)** beneficial heal/MP/Food/revive, **(10)** kết quả reward/loot/enhance/death cosmetic. Family là nhóm reuse/QA, không buộc một prefab đa năng. Status family cần ba ngôn ngữ khác nhau, không gọi cùng một tint là đủ cả ba.
 
-Frame probe slash4/wave4/burst5/impact3/Freeze shell2+thaw3/flame4 ở §4/§14/§17 có lý do theo phase. Particle/glint/sigil thường chỉ một primitive; không cộng mỗi lifetime tick thành frame. Main active có sáu SkillId bindings; unique preset/bitmap theo reuse manifest, không ép sáu families; normal/telegraph/status ngoài active được tính độc lập. Tổng sprite VFX chỉ chốt sau manifest xác định shared textures và technique, tránh double-count flame/aura/arrow.
+Frame probe slash4/wave4/burst5/impact 3/Freeze shell 2+thaw 3/flame 4 ở §4/§14/§17 có lý do theo phase. Particle/glint/sigil thường chỉ một primitive; không cộng mỗi lifetime tick thành frame. Main active có sáu SkillId bindings; unique preset/bitmap theo reuse manifest, không ép sáu families; normal/telegraph/status ngoài active được tính độc lập. Tổng sprite VFX chỉ chốt sau manifest xác định shared textures và technique, tránh double-count flame/aura/arrow.
 
 **Cách ra production cost thực:** đo giờ riêng cho tạo pose template mới, sửa silhouette variant, recolor/cleanup, export/slice, socket/sorting setup, integration, QA và rework. Ước lượng `Σ(số pose mới×giờ/pose mới + số sửa variant×giờ/sửa + công setup/QA)` từ slice đạt chất lượng, không từ credit hoặc phép nhân item count. Ghi cả lần sửa Bow và Death thất bại; không dùng lần recolor nhanh nhất làm tốc độ vẽ toàn bộ Boss. Chưa có asset/slice nên **không có căn cứ chốt tổng giờ**; mốc160–240 h cũ đã bị Technical loại là estimate hiện hành.
 
@@ -870,7 +915,7 @@ Bảng sau chuyển nguyên từ GDD §9 để bảo toàn trình tự productio
 
 | Pipeline | Thứ tự và ranh giới |
 | --- | --- |
-| Nhân vật | Source sprite → canvas64×64 / PPU 32 → slice 26 frames → chung pivot chân → male BodyBase / HairHead / Pants / Armor / Weapon → đồng bộ state / frame → palette / accent ba gear bands → actor SortingGroup → status / VFX overlays. Hurtbox / collider độc lập visual, đổi gear / scale Linh không đổi physics. |
+| Nhân vật | Source sprite → canvas 64×64 / PPU 32 → slice 26 frames → chung pivot chân → male BodyBase / HairHead / Pants / Armor / Weapon → đồng bộ state / frame → palette / accent ba gear bands → actor SortingGroup → status / VFX overlays. Hurtbox / collider độc lập visual, đổi gear / scale Linh không đổi physics. |
 | Map | Forest / Mountain / Ancient → tileset / palette → background → Ground / one-way Platform → back props → landmark → foreground → anchors quái / NPC / MapExit/SpecialGate → colliders → camera bounds → kiểm contrast / telegraph / loot / chat. Không thêm lighting framework P0; dùng màu / VFX hiện có. |
 | Gắn layout với art | Đồng thoáng / sparse; Trúc nhiều tầng / cầu; Bạch bậc thác; Xích hẻm núi / ba dấu ấn; Huyền phế tích / landmark Boss. Hub reuse props; safe strips và đường về phải đọc được. |
 
