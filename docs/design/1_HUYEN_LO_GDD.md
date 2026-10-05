@@ -298,23 +298,95 @@ Mỗi điểm sinh quái chọn một **mob identity có level cố định**, v
 | Xích Nham / Q8 Completed + Lv 12 | Ngoại vi tách nhánh sâu, hốc/khe đá và ba khu trấn ấn; lối Huyền Môn ở nhánh phù hợp | 35–55 s |
 | Huyền Tích / Q11 Completed | Cấu trúc phế tích có tuyến cao/thấp và ngách, khoảng Boss tách normal spawn | 45–60 s |
 
-**STRONG DIRECTION mật độ:** tăng số bãi/cụm độc lập để world online đông và khắc nghiệt hơn; không tăng một group thành 8–10 quái chồng đống. Một camera có thể thấy cụm terrace dưới/giữa/trên, khoảng 5–8+ quái là ví dụ bố cục, không ngưỡng khóa. Mỗi SpawnGroup giữ aggro/AI riêng. Tổng population và pocket count từng map còn **OPEN / TUNABLE**, phải kiểm contention, tầm nhìn, CPU/network và run-back trước chốt.
+**STRONG DIRECTION mật độ:** Tăng số lượng bãi/cụm độc lập trên các tuyến và độ cao để thế giới trực tuyến đông đúc, khắc nghiệt và có nhịp độ hợp lý hơn; tuyệt đối **không tăng quy mô một cụm thành khối dồn cục (blob) 8–10 quái**. Mục tiêu là trong một khung hình camera (khung nhìn tiêu chuẩn), người chơi có thể quan sát thấy nhiều cụm nằm ở các thềm đá/tầng cao/tuyến nhánh khác nhau (khoảng 5–8+ quái cùng xuất hiện trong tầm mắt), nhưng mỗi cụm là một `SpawnGroup` độc lập với vùng đi lại (`WalkRegion`) và giới hạn đuổi (`LeashRegion`) riêng biệt. Khi chiến đấu, người chơi chỉ kích hoạt từng nhóm nhỏ, không gây báo động dây chuyền sang các cụm lân cận.
 
-**28 cụm / 66 điểm sinh quái là LEGACY / SUPERSEDED về mật độ cuối.** Manifest cũ bên dưới chỉ là seed để giữ ID quest và đối chiếu prototype; không phải ngân sách hiện hành hoặc giới hạn số group. Thêm/re-author pocket phải giữ nguồn nhiệm vụ và fixed-level identity, không đổi kill count chỉ vì bố cục mới.
+### Đặc tả thiết kế không gian và topology nội bộ 8 bản đồ logic
 
-Sơ đồ thế giới quyết định các map nối nhau thế nào; bố cục bên trong quyết định nhánh, vòng, gờ, hốc, đoạn nhảy/drop và vị trí lối thoát. Mỗi map dùng tổ hợp vừa đủ để có nhận diện riêng, không ép tất cả thành hành lang trái→phải.
+Đồ thị thế giới (`World Graph`) quyết định cách các bản đồ liên kết với nhau, trong khi đồ thị nội bộ (`Internal Map Graph`) định hình trải nghiệm điều khiển, tầm nhìn và nhịp độ chiến đấu. **Tuyệt đối không thiết kế các bản đồ theo kiểu hành lang phẳng một chiều đơn điệu (vào bên trái → chạy thẳng một mạch → thoát bên phải)**. Mỗi bản đồ phải sở hữu nhận diện không gian riêng biệt thông qua sự kết hợp của: các nhánh rẽ (branches), đường vòng lặp quay về (loops), thềm đá cao thấp (terraces), gờ nhảy (ledges), hốc hang khoét sâu (hollows), đoạn rơi xuyên sàn (drops) và các ngõ cụt đặt bãi tài nguyên/quái tinh anh (dead-ends).
 
-Năm map farm + Vân Khê/Học Viện/Lôi Đài = tám root logic. Huyền Tích vào từ Lv 17, khuyến nghị 18; Q12 yêu cầu Lv 20 nhưng Boss không có gate Lv 20 riêng. Vân Khê/Học Viện mở khi onboarding; Lôi Đài vào qua Challenge. Luôn quay lại được map cũ; tới map farm không tự nhận nhiệm vụ.
+Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài và 5 map farm dã ngoại):
 
+#### 1. Làng Vân Khê — Hub bình yên & Điểm tựa sơn cước
+- **Vai trò:** Khu vực an toàn tuyệt đối, không có quái vật. Nơi tập trung toàn bộ dịch vụ cốt lõi, tiếp nhận nhiệm vụ và là điểm trở về sau các chuyến thám hiểm.
+- **Phân khu chức năng không gian (Spatial Layout):**
+  + *Khu trung tâm công cộng:* Nơi già làng Lâm Bá đứng bên gốc đa cổ thụ và bảng chỉ dẫn, đón tiếp người chơi mới (Q1/Q2), dẫn dắt cốt truyện chính và phong ấn Huyền Môn (Q8, Q10–Q12).
+  + *Khu Dược thảo (phía Đông):* Nhà thuốc mộc mạc của Yên Thảo, bày các sọt thảo mộc phơi khô, phục vụ mua bán bình Máu/Linh lực, thức ăn, bùa Hồi Sinh và dịch vụ Tẩy Mạch Phù.
+  + *Khu Lò rèn (phía Tây tựa vách đá):* Xưởng rèn rực lửa than của Bách Luyện với đe thép và bễ thổi, phụ trách rèn trang bị, cường hóa, chuyển giao và nhiệm vụ Mộc Kiếm (Q3/Q4/Q7).
+  + *Khu Kho lương & Nhà nghỉ (phía Bắc):* Gian nhà gỗ yên tĩnh của Mộc An, cung cấp dịch vụ cất giữ đồ đạc (`Storage`) và nghỉ ngơi hồi phục toàn bộ sinh lực/linh lực.
+  + *Các lối thông map:* Nhánh Tây nối sang Học Viện (`EdgeExit`); Nhánh Đông nối sang Đồng Sương (`EdgeExit`); Nhánh Nam dẫn xuống Lôi Đài của Hạo Vũ (`SpecialGate`).
+- **Triết lý Onboarding Q1:** Người chơi không đứng một chỗ bấm hội thoại menu mà phải thực sự di chuyển bộ qua từng khu vực chức năng, nhận diện vị trí các NPC để hình thành bản đồ nhận thức không gian (mental map) vững chắc.
 
-**MapExit / EdgeExit:** nối map thường bằng vùng mép có mũi tên chỉ hướng + tên vùng đích khi tới gần; player đi/chạm exit hợp lệ thì tự chuyển map, **không bấm E và không dựng cổng dịch chuyển**. Village↔Academy, Village↔Đồng Sương và các đường nối bãi thường dùng loại này. RequiredLevel/unlock vẫn kiểm ở authority; exit khóa hiện lý do, không kéo player hoặc tạo transition retry liên tục. Liên kết giữ hướng không gian: đi trái Vân Khê sang Học Viện thì xuất hiện ở mép phải Học Viện; đi phải về làng thì xuất hiện ở mép trái Vân Khê. Đi phải Vân Khê sang Đồng Sương thì vào mép trái Đồng Sương, chiều về ngược lại. Spawn phía trong mép đích, ngoài trigger trả về; mỗi actor chỉ một transition đang pending. Chi tiết validation/ACK ở Technical.
+#### 2. Thiên Môn Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
+- **Vai trò:** Khu vực bán an toàn dành riêng cho tập luyện kỹ năng cơ bản, thử nghiệm di chuyển và nghi thức chọn phái (Q2, Q3, Q6).
+- **Phân khu 3 khu vực cốt lõi:**
+  + *Tuyến vượt chướng ngại vật Q2 (`HV_ObstacleCourse`):* Bắt đầu từ cửa vào (`HV_Entrance`), người chơi phải nhảy qua gờ đá cao (`HV_JumpLedge`), tiếp cận sàn gỗ mỏng trên cao rồi bấm `↓` để rơi xuyên sàn (`DropThrough`) đáp xuống thềm dưới (`HV_DropLanding`), sau đó men theo đường vòng quay lại lối ra làng. Tuyến này kiểm tra trực quan toàn bộ năng lực di chuyển cơ bản (Move, Jump, DropThrough) trước khi cho phép cầm vũ khí.
+  + *Sân tập Bù Nhìn (`HV_DummyYard`):* Bãi đất bằng phẳng bố trí **tối thiểu 3 cọc Bù Nhìn rơm độc lập** (HP 60, hồi sinh 25 s). Việc đặt nhiều cọc ngăn chặn tình trạng người chơi chen lấn tranh giành mục tiêu khi làm Q3 và Q6.
+  + *Điện Nhập Phái (`HV_ClassHall`):* Gian điện uy nghiêm đặt ở tầng cao phía Tây, thiết kế đối xứng hoàn hảo hai cánh tả hữu: Mentor Phong Du (Kiếm Sĩ) đứng bên cánh tả cùng giá gươm thép; Mentor Diệp Lam (Xạ Thủ) đứng bên cánh hữu cùng giá cung tên. Cách bố trí này khẳng định tính bình đẳng tuyệt đối giữa hai phái, không đặt Kiếm Sĩ làm lựa chọn mặc định trước Xạ Thủ.
 
-**SpecialGate / Portal:** chỉ cửa đặc biệt có ý nghĩa gameplay như Huyền Môn/Q11, Arena/Challenge hoặc teleport được thiết kế riêng; activation/interact theo quest/mode. Map transition là tên chung cho cả hai loại; mọi cancel/checkpoint/MapId rule áp cho cả hai. Huyền Môn khóa vẫn tương tác từ phía ngoài, không biến thành EdgeExit để bỏ qua ritual. Mũi tên mép + tên vùng và NPC marker cơ bản là P0; quest navigation arrow xuyên map/auto-route vẫn P1 hoặc ngoài scope.
+#### 3. Lôi Đài Vân Khê — Đấu trường 1v1 PvP
+- **Vai trò:** Không gian thi đấu đối kháng trực tiếp giữa hai người chơi theo giao kèo cược (Q9 và hệ thống PvP tự do).
+- **Thiết kế không gian:** Sàn đấu đá tảng nguyên khối hoàn toàn phẳng lặng, sạch chướng ngại vật, không có bậc địa hình nhấp nhô hay sàn one-way ngẫu nhiên để đảm bảo tính công bằng và thuần túy kỹ năng. Phía sau là hàng rào gỗ mộc, cờ hiệu truyền thống và cảnh núi xa mờ ảo; tuyệt đối không dựng khán đài huyên náo hay màn hình kỹ thuật số lạc lõng.
+
+#### 4. Đồng Sương (Lv 1–5) — Đồi nương bậc thấp & Bờ suối sương mai
+- **Ý đồ không gian & Topology:** Môi trường mở, dốc thoải, thoáng đãng với đồi cỏ bậc thấp và nương rẫy ven suối cạn. Giúp người chơi làm quen với nhịp độ chiến đấu, di chuyển vượt bậc nhỏ và gom nhặt chiến lợi phẩm.
+- **Phân bố 2 tuyến đường:**
+  + *Tuyến dưới (Lower Lane):* Men theo bờ suối cạn nước nông và vạt nương thấp, nền đất bằng phẳng, bố trí các bãi Nấm Linh Lv 2 di chuyển chậm (cụm `DS1`, `DS2` cho Q4, cùng `DS7`, `DS8` mở rộng).
+  + *Tuyến đồi giữa và trên (Middle/Upper Terrace):* Các thềm đồi cỏ bậc solid vững chãi, liên kết nhau bằng các bước nhảy ngắn (cao độ 1–1,5 u), nơi bầy Sói Sương Lv 4 nhanh nhẹn tuần tra (cụm `DS3–DS6` cho Q5, cùng `DS9`, `DS10` mở rộng).
+- **Ranh giới an toàn & Lối thoát:** Dải vào an toàn 6–8 u tại cửa ngõ phía Tây giáp Vân Khê; lối thoát sang Trúc Ảnh (`EdgeExit`) nằm ở thềm đồi phía Đông.
+
+#### 5. Trúc Ảnh (Lv 5–10) — Rừng trúc u tịch & Cầu gỗ đa tầng
+- **Ý đồ không gian & Topology:** Chênh lệch cao độ bắt đầu rõ rệt với rừng trúc dày đặc, vách đá phủ rêu và hệ thống cầu giàn ván bắc qua đèo. Đây là nơi kiểm tra khả năng phối hợp kỹ năng mới nhận sau khi nhập phái (Lv 5+).
+- **Phân bố 3 tuyến đường & Vòng lặp (Loops):**
+  + *Tuyến cầu trên cao (Upper Bridge Route):* Kết cấu giàn ván mỏng (sàn one-way) vắt ngang giữa hai mỏm đá, nơi Ong Giáp Lv 10 bay lơ lửng, tạo áp lực tấn công tầm cao (cụm `TA5`, `TA9`, `TA10`).
+  + *Tuyến rừng trúc trung tâm (Mid Bamboo Forest):* Thềm đất ẩm ướt dưới tán trúc quanh trụ Trấn Ấn cổ bị nứt (`TA4_BrokenSeal`), nơi bầy Sói Trúc Ảnh Lv 8 hung hãn mai phục (cụm `TA4` với `slot 1` cố định cho Q8 Linh Biến, cụm `TA6`, `TA7`, `TA8`).
+  + *Tuyến ven suối trũng (Lower Stream Trail):* Ranh giới phía Tây còn sót lại các cụm Sói Sương Lv 4 (`TA1–TA3`).
+- **Vòng lặp cơ động:** Người chơi có thể đứng trên cầu gỗ bấm `↓` để nhảy xuyên sàn rơi xuống bãi trúc dưới chân, hoặc đi vòng qua bậc đá trực giao phía sau để leo ngược lên cầu, tạo nhịp cơ động tự nhiên khi thả diều quái.
+
+#### 6. Bạch Vân (Lv 8–13) — Vách đá thác nước & Đèo mây ba tầng
+- **Ý đồ không gian & Topology:** Bản đồ thẳng đứng và hiểm trở nhất, chia thành **3 tầng thềm đá vững chắc (terrace solid)** ôm quanh ngọn thác nước trắng xóa cuồn cuộn đổ xuống vực mây.
+- **Phân bố cao độ & Lợi thế class:**
+  + *Thềm trên cao quanh đỉnh thác (Upper Falls Terrace):* Không gian mở lộng gió trên vách đá vôi xám lạnh, nơi Ong Giáp Lv 10 bay lượn trên cao (cụm `BV1`, `BV2`, `BV6`).
+  + *Tuyến terrace bậc giữa và hốc hang (Middle Cliff Terraces):* Các thềm đá bậc nối tiếp và các hốc đá khoét sâu vào lòng vách núi, nơi các toán Đoạt Mạch Đạo Tặc Lv 13 đóng trại khai thác khoáng (cụm `BV3–BV5` cho Q10/farm, cùng `BV7`, `BV8`).
+  + *Mỏm đá cụt nhìn ra vực (Dead-end Overlook):* Điểm ngắm cảnh mây mù và bãi farm phụ với góc nhìn bao quát toàn bộ thác nước.
+- **Tương tác chiến đấu:** Cung thủ tận dụng tầm bắn xa 6,5 u đứng từ thềm trên tỉa xuống các toán đạo tặc bên dưới; Kiếm Sĩ tận dụng góc hang hẹp của hốc đá để gom cụm 3 quái tung Phong Trảm tiến cảnh diện rộng.
+
+#### 7. Xích Nham (Lv 12–17) — Hẻm sa thạch đỏ & Mạch ngầm phong ấn
+- **Ý đồ không gian & Topology:** Bản đồ có diện tích rộng lớn nhất thế giới, đặc trưng bởi sa thạch đỏ cằn cỗi, khe nứt địa chất sâu hoắm và các mạch khoáng ngầm rực lửa. Cấu trúc không gian dựa trên **2 nhánh lớn hội tụ (Two Branches Merge)**.
+- **Phân bố 2 nhánh chiến lược:**
+  + *Nhánh hẻm núi ngoại vi (Canyon Branch):* Tuyến đèo dốc đá đỏ khô cằn dẫn từ Bạch Vân vào, nơi các toán Đoạt Mạch Đạo Tặc Lv 13 rải rác đào trộm cổ vật (cụm `XN1–XN3` cho Q10, cụm `XN7`).
+  + *Nhánh khe nứt khoáng mạch ngầm (Deep Rift Branch):* Tuyến đường ăn sâu vào lòng núi đá đỏ rực, nơi bố trí **3 trụ phong ấn cổ xưa** (`XN4_SealA`, `XN5_SealB`, `XN6_SealC`) được canh gác nghiêm ngặt bởi quái đá khổng lồ Xích Thạch Linh Lv 16 trâu bò (cụm `XN4–XN6` cho Q11, cùng `XN8`, `XN9`).
+- **Điểm kết nối tối thượng:** Cuối nhánh sâu là đại môn Huyền Môn (`XN_HuyenMon_Outer`) sừng sững tựa vào vách núi nguyên khối — một `SpecialGate` phong tỏa lối vào cấm địa, chỉ mở ra khi hoàn thành nghi thức thu thập đủ 3 Mảnh Cổ Ấn trong Q11.
+
+#### 8. Huyền Tích (Lv 17–20) — Phế tích cấm địa & World Boss Huyền Nham Cự Thú
+- **Ý đồ không gian & Topology:** Di tích cấm địa cổ đại chìm trong u tối, rêu phong và tàn tích cấm thuật. Kiến trúc đá nguyên khối đồ sộ với các hàng cột gãy, bậc thang đá khổng lồ và hoa văn Mạch Ấn phát sáng tím mờ.
+- **Phân khu chức năng nghiêm ngặt:**
+  + *Tiền môn và hành lang ngoài (Outer Gate & Corridors):* Các thềm đá bậc dẫn vào phế tích, do Xích Thạch Linh Lv 16 trấn giữ lối vào (cụm `HT1`, `HT6`).
+  + *Trung sảnh và hai cánh tả/hữu (Great Hall & Wings):* Dãy hành lang đá cổ uy nghiêm với các bậc thang cao, nơi Cổ Môn Vệ Binh Lv 20 giáp nặng đứng gác (cụm `HT2–HT5` cho Q12, cùng `HT7`, `HT8`).
+  + *Khu vực cấm điện trung tâm — BossCombatArea:* Một đại sàn đấu đá tảng cổ xưa rộng lớn, bằng phẳng, hoàn toàn sạch sẽ chướng ngại vật; **tách biệt tuyệt đối khỏi quái thường (normal-spawn exclusion)**. Đây là đấu trường dành riêng cho World Boss Huyền Nham Cự Thú trong Q12, đảm bảo telegraph đòn đánh của Boss luôn rõ ràng, không bị quái thường quấy nhiễu hay gây nhiễu loạn mục tiêu.
+
+---
+
+### Quy chuẩn địa hình trực giao và cơ chế di chuyển thế giới
+
+Để đảm bảo tính nhất quán tuyệt đối giữa mỹ thuật, vật lý và trí tuệ nhân tạo (AI), toàn bộ thế giới tuân thủ các quy tắc bất biến sau:
+
+1. **Khối đặc tự nhiên (Natural Terrain = SOLID MASS):** Đất, đá, gờ núi, thềm đồi tự nhiên luôn là khối chắn đặc có độ dày thực tế: mặt trên nằm ngang, khối vật liệu lấp kín bên trong, vách đứng thẳng góc, đáy và bóng đổ khép kín. Tuyệt đối không vẽ các dải đất tự nhiên mỏng manh lơ lửng giả làm đồi núi.
+2. **Không dốc chơi được (`no playable slope/ramp/triangle`):** Toàn bộ bề mặt di chuyển trong gameplay đều là mặt phẳng ngang hoặc vách đứng trực giao. Mái nhà, cành cây, núi xa ở phông nền có thể vẽ chéo cho mềm mại thẩm mỹ, nhưng mặt va chạm gameplay tiếp xúc với chân nhân vật vẫn phải là các bậc ngang/đứng.
+3. **Đất đá tự nhiên không bao giờ là sàn xuyên thấu (`no natural one-way`):** Nền đất đá tự nhiên luôn cản trở hai chiều.
+4. **Sàn One-way là kết cấu mỏng nhân tạo đặc biệt:** Chỉ các cấu trúc mỏng nhẹ hợp lý như ván gỗ, giàn tre/catwalk, ban công, sàn treo tựa vách có dầm đỡ/dây treo rõ ràng mới được dùng làm sàn one-way. Khi đứng trên sàn one-way, người chơi có thể bấm `↓` để rơi xuyên sàn (`DropThrough`). Một lần bấm chỉ xuyên qua một tầng sàn, không xuyên liên tiếp nhiều tầng khi giữ nút.
+5. **Tuyệt đối không có cơ chế leo trèo (`no ladder/rope/vine/climb`):** Không có thang dây, dây leo, cột đu hay bám tường leo trèo; toàn bộ di chuyển dọc dựa vào Nhảy (`Jump` - `↑`), Rơi tự do (`Fall`) và Xuyên sàn (`DropThrough` - `↓`). Mọi cầu thang trong game đều là khối bậc trực giao hoặc chi tiết trang trí.
+6. **Vùng nước nông (Shallow Water):** Lòng nước nông có đáy đất thật, người chơi lội qua thì chân tiếp xúc mặt nước sẽ giảm nhẹ tốc độ chạy (hệ số TUNABLE); khi đi trên cầu gỗ hoặc nhảy trên không qua mặt nước thì không bị giảm tốc. Tuyệt đối không có cơ chế bơi lội, chết đuối hay vật lý thủy động lực học.
+7. **Cơ chế chuyển tiếp bản đồ:**
+   - `EdgeExit`: Vùng mép bản đồ thông thường có mũi tên chỉ hướng và tên vùng đích; nhân vật đi chạm vào vùng này bằng di chuyển thủ công sẽ tự động chuyển map, không cần bấm phím tương tác và không dựng vòm cổng dịch chuyển. Điểm xuất hiện ở map đích luôn nằm phía trong mép, bên ngoài vùng trigger trả về để chống hiện tượng giật chuyển map liên tục (ping-pong transition).
+   - `SpecialGate`: Cổng đặc biệt đòi hỏi tương tác xác thực bằng phím (Huyền Môn Q11 cần đủ 3 Mảnh Ấn; Lôi Đài cần giao kèo thách đấu).
+   - `SafeAnchor`: Mỗi map có một tọa độ an toàn cố định. Khi mất kết nối hoặc máy chủ khởi động lại, người chơi sẽ xuất hiện tại SafeAnchor của map đó.
+
+---
 
 **Fixed monster ladder — canonical:** 7 identities, 6 base sprite/AI rigs; Sói Trúc Ảnh reuse Sói Sương bằng palette. Hai Sói xám lạnh/lục tối có nameplate riêng; Linh dùng aura tím/ấn sáng chung, không dùng màu sói làm dấu Linh.
 
 | Mob identity | Lv | HP | ATK | EXP | Gold | Visual / AI reuse |
-| --- | ---: | ---: | ---: | ---: | --- | --- |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
 | Nấm Linh | 2 | 48 | 9 | 15 | 7–12 | Base rig |
 | Sói Sương | 4 | 107 | 13 | 22 | 11–18 | Base rig |
 | Sói Trúc Ảnh | 8 | 339 | 22 | 38 | 19–30 | Sói rig; palette lục tối |
@@ -325,7 +397,55 @@ Năm map farm + Vân Khê/Học Viện/Lôi Đài = tám root logic. Huyền Tí
 
 Level là nhận diện nội dung; không tạo thêm variant chỉ để mỗi level có một quái. Số bảng derive từ formula dưới; `MobDefinition.fixedLevel` và manifest phải khớp.
 
-**LEGACY seed manifest — không phải mật độ final:** giữ dòng/cụm/slot để đối chiếu. Các ID nguồn quest ở §5 vẫn là ràng buộc hiện hành; bố cục và các pocket bổ sung phải được author lại. Level trên từng slot giữ cố định theo identity, không random trong khoảng. `TA4.slot1` là slot đầu của TA4. ID cụm là authored ID ổn định, không index player hoặc live instance.
+### Kế hoạch mật độ và phân bổ bãi quái hiện hành — CURRENT / TUNABLE AUTHORING PLAN
+
+Dưới đây là kế hoạch phân bổ bãi quái (pockets) cho 5 bản đồ farm nhằm phục vụ việc authoring màn chơi (level design blockout) và kiểm thử hiệu năng. Các mốc số là **PROBE BASELINE / TUNABLE RANGE**, không phải trần cố định.
+
+| Map farm | Ý đồ bãi và phân bố không gian | Số cụm dự kiến (Pockets) | Số quái hoạt động (Active Mob Budget) | Quy mô mỗi cụm (Group Size) | Phân bố tầng / nhánh | Quest Anchors bắt buộc bảo toàn | Điểm an toàn & Ranh giới cách ly |
+| --- | --- | ---: | ---: | ---: | --- | --- | --- |
+| **Đồng Sương** (Lv 1–5) | Onboarding, đồi thấp, nương dốc thoải và bìa rừng. Nhiều bãi nhỏ, không gian mở, tránh áp lực dồn dập. | 8–10 cụm | 14–20 quái | 1–2 quái / cụm | Tuyến dưới/ven suối: Nấm Linh (Lv 2). Đồi bậc giữa và thềm đông: Sói Sương (Lv 4). | `DS1` (Nấm Lv2), `DS2` (Q4 Nấm Linh), `DS3–DS6` (Q5 Da Sói) | Dải vào an toàn 6–8 u từ Vân Khê; các bãi Sói cách biệt đường về làng. |
+| **Trúc Ảnh** (Lv 5–10) | Rừng trúc rậm rạp, cầu gỗ, thềm đá cao thấp, kiểm tra di chuyển bậc và đánh quái theo nhóm. | 9–11 cụm | 20–28 quái | 2–3 quái / cụm | Tuyến dưới ven suối: Sói Sương (Lv 4). Bãi trúc trung tâm & quanh ấn: Sói Trúc Ảnh (Lv 8). Tuyến cầu trên cao & vách đá: Ong Giáp (Lv 10). | `TA1–TA3` (Sói Sương), `TA4` (với `TA4.slot1` giữ cho Q8 Linh Biến), `TA5` (Ong Giáp), `TA6` (Sói Trúc Ảnh) | Vùng an toàn 6–8 u tại cửa Đồng Sương và cầu nối sang Bạch Vân. |
+| **Bạch Vân** (Lv 8–13) | Vách đá dựng đứng, thác nước, thềm đá bậc liên tục, mỏm cụt và đường vòng. Cung phát huy tầm xa, Kiếm gom góc hẹp. | 8–10 cụm | 20–28 quái | 2–3 quái / cụm | Thềm trên cao quanh thác: Ong Giáp (Lv 10). Các terrace đá bậc giữa, hốc hang và lối đèo: Đoạt Mạch Đạo Tặc (Lv 13). | `BV1`, `BV2` (Ong Giáp Lv 10), `BV3–BV5` (Q10/farm Đoạt Mạch Đạo Tặc Lv 13) | Thềm nghỉ an toàn 6–8 u đầu đèo và trước cửa sang Xích Nham. |
+| **Xích Nham** (Lv 12–17) | Mỏ khoáng cằn cỗi, đất đá đỏ, khe nứt sâu và ba khu vực trấn ấn. Quái trâu, áp lực chiến đấu tăng cao. | 9–11 cụm | 24–32 quái | 2–4 quái / cụm | Vành đai ngoại vi và lối vào: Đạo Tặc (Lv 13). Hốc nứt mạch sâu và 3 khu trấn ấn: Xích Thạch Linh (Lv 16). | `XN1–XN3` (Q10 Đạo Tặc Lv 13), `XN4–XN6` (Q11 Xích Thạch Linh Lv 16 tại 3 phong ấn) | Vùng an toàn 8 u cửa ngõ vào và hành lang dẫn đến cổng Huyền Môn. |
+| **Huyền Tích** (Lv 17–20) | Phế tích cổ, đền thờ phong ấn, hành lang đá nguyên khối. Tách bạch hoàn toàn quái thường và khu vực Boss. | 8–10 cụm thường + 1 Boss | 20–26 quái thường + 1 Boss | 2–3 quái / cụm | Tiền môn / ngoài cổng: Xích Thạch Linh (Lv 16). Hành lang / nội điện: Cổ Môn Vệ Binh (Lv 20). Trung điện (BossCombatArea): Boss độc lập. | `HT1` (Thạch Linh), `HT2–HT5` (Q12 Cổ Môn Vệ Binh Lv 20), `HT_BossLandmark` (Q12 Boss) | **Boss Exclusion:** Tuyệt đối cấm quái thường trong BossCombatArea. Vùng vào Huyền Môn an toàn 8 u. |
+
+**Bảng danh mục bãi quái hiện hành (Candidate Manifest — PROBE / TUNABLE):**
+Các ID cụm mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) là các mã định danh authoring ổn định, không dùng chỉ số thực thể sống (live instance index). Level cố định theo loài quái vật (`fixedLevel`), không ngẫu nhiên hóa cấp độ trong cùng loài.
+
+| Nhóm cụm / Map | Cụm ID | Mob identity | Level | Slots dự kiến | Vai trò / Ghi chú bố cục |
+| --- | --- | --- | ---: | ---: | --- |
+| **Đồng Sương** | `DS1` | Nấm Linh | 2 | 1 | Quest anchor: Nấm khởi đầu ven đường |
+| | `DS2` | Nấm Linh | 2 | 1 | Quest anchor: Q4 Nấm Sương tutorial |
+| | `DS3`–`DS6` | Sói Sương | 4 | 2 mỗi cụm (8) | Quest anchors: Q5 Da Sói (4 cụm đồi cỏ bậc giữa) |
+| | `DS7`, `DS8` | Nấm Linh | 2 | 2 mỗi cụm (4) | Bổ sung: Dải nương thấp và bờ suối phía nam |
+| | `DS9`, `DS10` | Sói Sương | 4 | 2 mỗi cụm (4) | Bổ sung: Gờ đồi phía đông và lối rẽ lên Trúc Ảnh |
+| **Trúc Ảnh** | `TA1`–`TA3` | Sói Sương | 4 | 2 mỗi cụm (6) | Quest anchors: Bìa rừng trúc giáp ranh Đồng Sương |
+| | `TA4` | Sói Trúc Ảnh | 8 | 2 | Quest anchor: `TA4.slot1` cố định cho Q8 Linh Biến |
+| | `TA5` | Ong Giáp | 10 | 3 | Quest anchor: Nhịp cầu gỗ trên cao |
+| | `TA6` | Sói Trúc Ảnh | 8 | 2 | Quest anchor: Bãi trúc quanh trụ trấn ấn nứt |
+| | `TA7`, `TA8` | Sói Trúc Ảnh | 8 | 2 mỗi cụm (4) | Bổ sung: Tuyến rừng trúc trũng và khe đá phụ |
+| | `TA9`, `TA10` | Ong Giáp | 10 | 2–3 mỗi cụm (5) | Bổ sung: Mỏm đá cao nhìn ra vực và giàn ván bắc qua đèo |
+| **Bạch Vân** | `BV1`, `BV2` | Ong Giáp | 10 | 2 mỗi cụm (4) | Quest anchors: Vùng trời thềm thác nước phía tây |
+| | `BV3`–`BV5` | Đoạt Mạch Đạo Tặc | 13 | 3 mỗi cụm (9) | Quest anchors: Ba thềm đá bậc giữa đường đèo |
+| | `BV6` | Ong Giáp | 10 | 2 | Bổ sung: Thềm đá gần đỉnh thác đổ |
+| | `BV7`, `BV8` | Đoạt Mạch Đạo Tặc | 13 | 2–3 mỗi cụm (5) | Bổ sung: Hốc đá cụt phía bắc và đường vòng chân vách |
+| **Xích Nham** | `XN1`–`XN3` | Đoạt Mạch Đạo Tặc | 13 | 2/3/2 (7) | Quest anchors: Q10 Vật Chứng (khu mỏ ngoại vi) |
+| | `XN4`–`XN6` | Xích Thạch Linh | 16 | 3/3/4 (10) | Quest anchors: Q11 Mảnh Ấn (ba cụm trấn ấn A/B/C) |
+| | `XN7` | Đoạt Mạch Đạo Tặc | 13 | 2 | Bổ sung: Ngách đá hẹp phía tây |
+| | `XN8`, `XN9` | Xích Thạch Linh | 16 | 3 mỗi cụm (6) | Bổ sung: Thềm đá nứt mạch ngầm và lối dốc vào phế tích |
+| **Huyền Tích** | `HT1` | Xích Thạch Linh | 16 | 2 | Quest anchor: Tiền môn phế tích |
+| | `HT2`, `HT3` | Cổ Môn Vệ Binh | 20 | 3/2 (5) | Quest anchors: Hành lang ngoài và cầu thang đá dẫn vào cấm điện |
+| | `HT4`, `HT5` | Cổ Môn Vệ Binh | 20 | 3 mỗi cụm (6) | Quest anchors: Q12 Vệ Binh trước cửa Boss |
+| | `HT6` | Xích Thạch Linh | 16 | 2 | Bổ sung: Ngách phế tích phía đông |
+| | `HT7`, `HT8` | Cổ Môn Vệ Binh | 20 | 2–3 mỗi cụm (5) | Bổ sung: Cánh tả và cánh hữu sảnh tế lễ |
+| | `HT_Boss` | Huyền Nham Cự Thú | 20 | 1 | Khu vực Boss độc lập (`BossCombatArea`), cấm quái thường |
+
+---
+
+### Bảng dữ liệu gốc lịch sử (LEGACY seed manifest — 28 cụm / 66 điểm sinh quái)
+
+> [!NOTE]
+> Bảng manifest 28 cụm dưới đây là **dữ liệu lịch sử (LEGACY seed)** được giữ lại nhằm phục vụ việc đối chiếu với bản prototype cũ và bảo toàn các `SpawnGroup` ID dùng làm mốc neo cho nhiệm vụ (Quest Anchors ở §5). Đây **không phải là trần mật độ hay giới hạn số cụm của bản hoàn chỉnh**. Khi mở rộng bản đồ, các ID nguồn quest (`DS2`, `DS3–DS6`, `TA4.slot1`, `TA5`, `TA6`, `XN1–XN6`, `HT4–HT5`) phải được giữ nguyên vị trí và vai trò logic.
 
 | Cụm | Mob identity | Level | Slots |
 | --- | --- | ---: | ---: |

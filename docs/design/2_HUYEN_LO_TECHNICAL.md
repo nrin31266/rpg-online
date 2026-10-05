@@ -91,7 +91,15 @@ Một world scene có **8 logical map roots**: Village, Academy, Arena và năm 
 
 ### MapRoot, địa hình và collision
 
-Mỗi MapRoot gồm BackgroundTilemap/GroundTilemap/PlatformTilemap/ForegroundTilemap, structural back/front visuals, các mặt collision, SpawnPoints, MapExits/SpecialGates và NPC anchors. Nước có thể có overlay riêng; visual không tự tạo collider.
+Mỗi `MapRoot` là một prefab/GameObject gốc đại diện cho một bản đồ logic trong World Scene, bao gồm hệ thống Tilemap phân tầng chuẩn tắc, structural visuals, các mặt collision vật lý, `SpawnPoints`, `SafeAnchor`, `MapExits/SpecialGates`, vùng nước nông và các mốc neo NPC (`NPC anchors`). Nước có thể có visual overlay riêng; tuyệt đối không để visual sprite tự động sinh collider ngẫu nhiên:
+
+| Tầng Tilemap / Component | Layer & Phân loại vật lý | Cấu hình Collider & Quy chuẩn kỹ thuật |
+| --- | --- | --- |
+| **GroundTilemap** | Layer `SolidGround` (Đất/đá tự nhiên và khối kiến trúc đặc) | `TilemapCollider2D` + `CompositeCollider2D` ([Unity 6 Composite Operation = Merge](https://docs.unity3d.com/6000.3/Documentation/Manual/tilemaps/work-with-tilemaps/tilemap-collider-2d-reference.html)) + `Rigidbody2D Static`. Chỉ gồm các mặt phẳng ngang và mặt đứng trực giao. Cản trở hai chiều tuyệt đối; không có dốc xoay hay mặt chéo. |
+| **PlatformTilemap** | Layer `OneWayPlatform` (Sàn mỏng nhân tạo: ván gỗ, giàn tre, ban công) | `TilemapCollider2D` + `PlatformEffector2D` (Bật `Use One Way`, góc bề mặt 0°); nếu dùng Composite thì `UsedByEffector` do CompositeCollider điều khiển. Cho phép nhảy từ dưới lên và bấm `↓` (`DropThrough`) để rơi xuống. |
+| **WaterRegion** | Layer `Water` (Vùng nước nông ven suối/hồ) | `BoxCollider2D` thiết lập `Is Trigger`. Script `WaterSlowdownTrigger` kiểm tra va chạm của chân nhân vật (`feet contact` với GroundCheck); khi tiếp xúc sẽ áp dụng hệ số giảm tốc chạy nhẹ (TUNABLE); khi nhảy trên không hoặc đi trên cầu gỗ bắc ngang thì không kích hoạt trigger. |
+| **BackgroundTilemap** | Sorting Layer `Background` / `MidBackground` | Hoàn toàn **không có Collider**. Độ tương phản và bão hòa màu thấp hơn các lớp chơi để tạo chiều sâu không gian. |
+| **ForegroundTilemap** | Sorting Layer `Foreground` (Cành cây, mỏm đá viền mép màn hình) | Hoàn toàn **không có Collider**. Thiết lập độ che khuất (occlusion) cẩn thận, tuyệt đối không che khuất nameplate, target marker, thanh máu quái, telegraph đòn đánh hay bãi rơi đồ (loot). |
 
 **Địa hình LOCKED:** mặt đứng được chỉ ngang; tường đứng và block/step trực giao. Không playable slope/ramp/triangle, collider đi được xoay hoặc diagonal surface. Đất/đá tự nhiên là solid mass có độ dày, mặt trên, mặt đứng và mép khép; đồi/núi bậc liên tục, không dải đất tự nhiên mỏng nổi. Mái/cành/background có thể vẽ chéo, nhưng route chơi trên mái phải author mặt ngang/bậc riêng. Landmark/công trình chỉ dùng vài mặt collision sạch, không polygon collider theo toàn silhouette. **Không ladder/rope/vine/pole/wall climb; không Climb InputAction/state/animation.**
 
@@ -105,11 +113,28 @@ Mỗi MapRoot gồm BackgroundTilemap/GroundTilemap/PlatformTilemap/ForegroundTi
 
 **Camera:** Cinemachine chỉ follow character owner, chết vẫn nhìn corpse. Transition đổi confiner theo root và snap/cancel damping qua offset; invalidation cache khi shape/lens đổi, không follow player từ xa.
 
-**Authoring gate:** thử một farm room trước nhân pockets; giữ source IDs quest, SafeAnchor/entrance/route về làng và đường tới loot. Mật độ phải author lại theo [GDD §4](1_HUYEN_LO_GDD.md#world-farm): nhiều SpawnGroup độc lập trong cùng camera, không một blob lớn. **28 groups/66 slots là LEGACY seed**, không budget final; population/pocket totals OPEN/TUNABLE. Tách aggro bằng WalkRegion/topology/vùng địa hình thật, không áp tâm18–20 u cũ vào mọi group. Đo traversal/run-back/contention/CPU/network. Scale visual Linh Biến không tự scale hurtbox/aggro/leash; physics bounds do definition/PHY-01 quyết.
+**Authoring gate và phân bổ bãi quái hiện hành:** Thử nghiệm trước trên một farm room đại diện trước khi nhân rộng toàn map; bảo toàn tuyệt đối các Quest Anchor IDs (`DS2`, `DS3–DS6`, `TA4.slot1`, `TA5`, `TA6`, `XN1–XN6`, `HT4–HT5`), SafeAnchor, dải vào an toàn 6–8 u từ cửa map, tuyến rút lui về làng và đường tiếp cận bãi rơi đồ (loot).
+
+Mật độ bãi quái phải được author lại theo [Kế hoạch mật độ GDD §4](1_HUYEN_LO_GDD.md#world-farm):
+- **Nguyên tắc phân bổ:** Tăng số lượng bãi/cụm độc lập (`SpawnGroup`) trải trên các thềm đá, tầng cao/thấp và các tuyến nhánh; tuyệt đối không dồn thành một blob lớn 8–10 quái. Khung hình camera tiêu chuẩn có thể hiển thị 5–8+ quái thuộc 2–3 tầng khác nhau, nhưng mỗi cụm giữ AI/aggro độc lập, không báo động dây chuyền sang cụm bên cạnh.
+- **Kế hoạch authoring mục tiêu (PROBE / TUNABLE RANGE):**
+  + *Đồng Sương:* 8–10 cụm, 14–20 quái active (Nấm Linh Lv 2 tuyến dưới; Sói Sương Lv 4 đồi giữa/trên). Authored IDs mới: `DS7`–`DS10`.
+  + *Trúc Ảnh:* 9–11 cụm, 20–28 quái active (Sói Sương Lv 4, Sói Trúc Ảnh Lv 8, Ong Giáp Lv 10 trên cầu/vách). Authored IDs mới: `TA7`–`TA10`.
+  + *Bạch Vân:* 8–10 cụm, 20–28 quái active (Ong Giáp Lv 10 thềm thác; Đạo Tặc Lv 13 thềm đá bậc). Authored IDs mới: `BV6`–`BV8`.
+  + *Xích Nham:* 9–11 cụm, 24–32 quái active (Đạo Tặc Lv 13 ngoại vi; Xích Thạch Linh Lv 16 hốc sâu và 3 khu phong ấn). Authored IDs mới: `XN7`–`XN9`.
+  + *Huyền Tích:* 8–10 cụm thường, 20–26 quái active thường + 1 Boss. Quái thường rải ở tiền môn (`HT1`, `HT6`) và hành lang/nội điện (`HT2`–`HT5`, `HT7`, `HT8`).
+- **Boss Exclusion Rule:** Khu vực giao chiến Huyền Nham Cự Thú (`BossCombatArea`) tại trung tâm Huyền Tích cấm tuyệt đối việc sinh quái hoặc tuần tra của quái thường (`normal-spawn exclusion`), ngăn chặn việc quấy nhiễu trận Boss hoặc kéo quái thường vào bãi Boss.
+- **Định danh ổn định:** Các ID cụm mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) là mã authored ID ổn định trong `MapDefinition`, không dùng live instance index. Cấp độ trong `SpawnSlot.level` luôn phản ánh đúng `MobDefinition.fixedLevel`, không ngẫu nhiên hóa cấp trong cùng loài.
+- **Dữ liệu lịch sử:** Con số 28 cụm / 66 slots là **LEGACY seed** cho bản thử nghiệm cũ; tổng dân số và số cụm cuối cùng vẫn là **OPEN / TUNABLE**, cần đo đạc traversal, run-back, contention, CPU và băng thông mạng trên scene thực tế.
+- **Quy tắc cách ly:** Tách biệt vùng aggro và tuần tra bằng `WalkRegion` và khối địa hình thực tế; không áp dụng khoảng cách tâm cứng 18–20 u cũ vào mọi cụm. Scale visual của Linh Biến không tự scale hurtbox/aggro/leash; kích thước vật lý do definition và PHY-01 quyết định.
 
 MapDefinition giữ `requiredLevel`, `unlockFlag` và required quest IDs; authority kiểm **Completed**, không ReadyToTurnIn hoặc counter. Locked exit trả lý do rõ, không invisible wall im lặng. Mỗi player có MapId riêng; root activity tính từ toàn player collection trên server, không từ map local của một Client. Render filter không disable simulation/NetworkObject của player khác.
 
-**MapTransition:** EdgeExit giữ targetMap/targetExit/spawn anchor đã author. Authority kiểm actor alive, MapId/generation, overlap đúng exit do manual movement, connected destination và unlock; không nhận arbitrary destination từ Client. SpecialGate có activation riêng theo GDD (Huyền Môn/Arena), không generic Interact cho mọi exit. Cả hai đi qua cùng MapId/checkpoint/cancel pipeline. Một pending transition/actor, dedup trigger/request; destination spawn ngoài return trigger, re-arm sau khi rời exit. Reject báo lý do một lần, phải rời rồi vào lại mới retry; actor khác vẫn dùng được exit. Commit destination checkpoint trước publish (§6); fail giữ nguồn, không gửi destination snapshot giả. Transition dọn target/threat/interaction/visuals map cũ. Collider/safe spawn/camera/pending ACK cần kiểm riêng, không lấy trigger local cũ nghiệm thu online.
+**MapTransition và Cơ chế chống lặp (Anti-Pingpong):**
+- `EdgeExit` giữ `targetMap`, `targetExit` và `spawnAnchor` đã author. Game Server kiểm tra thẩm quyền: nhân vật còn sống, đúng `MapId`/generation, chuyển động vào vùng exit là do người chơi chủ động điều khiển (`manual movement`), đích đến đã mở khóa (`requiredLevel`, `unlockFlag`, `quest Completed`); tuyệt đối không nhận tọa độ hay đích đến tùy ý từ Client.
+- `SpecialGate` có logic kích hoạt xác thực riêng theo GDD (Huyền Môn Q11 cần tương tác kiểm đủ 3 Mảnh Ấn; Lôi Đài cần chấp nhận thách đấu), không dùng generic Interact cho mọi lối đi.
+- **Cơ chế chống giật chuyển cảnh liên tục (Anti-Pingpong Transition):** Tọa độ xuất hiện (`spawnAnchor`) ở bản đồ đích luôn được đặt cách mép collider trigger chuyển cảnh tối thiểu 2,5–3 u về phía trong lòng map (`safe inner offset`), nằm hoàn toàn ngoài phạm vi trigger trả về. Hệ thống duy trì cờ `isTransitioning` và chỉ kích hoạt chuyển cảnh tiếp theo sau khi người chơi đã rời khỏi vùng an toàn hoặc qua thời gian ân hạn (`re-arm upon exit`).
+- **Xử lý lỗi và đồng bộ:** Một pending transition cho mỗi actor, loại bỏ trùng lặp (dedup trigger/request). Nếu bị từ chối (Locked), hệ thống gửi thông báo lý do một lần; người chơi phải bước ra ngoài vùng exit rồi bước vào lại mới có thể thử lại. Commit checkpoint đích vào cơ sở dữ liệu trước khi gửi snapshot cho Client; nếu commit thất bại thì giữ nguyên vị trí ở bản đồ cũ, không gửi snapshot giả. Quá trình chuyển map dọn dẹp sạch sẽ target, threat, action pending và visuals của map cũ.
 
 <a id="combat-data"></a>
 

@@ -324,7 +324,12 @@ Bảng timing/probe, phép so Kiếm/Cung, tỷ lệ thời gian khóa hành đ�
 
 Art author **chuẩn bị → phát/trúng đòn đúng mốc authority → hồi thế**. Tách interval/CD/action lock khỏi thời gian tên hình ảnh bay và VFX tan. Attack3/Skill4 dùng duration/hold từng pose để khớp clock; không ép gameplay chạy theo FPS sprite đều. VFX có thể tan sau actor về Idle; recovery chuyển ở biên action hợp lệ, bỏ frame không tạo hit thêm. CURRENT kiểm Tân Lữ/Kiếm/Lv 5; S2/S3 dùng fixture hẹp khi cần thử reuse. Cung draw/release/travel thử trước branch Cung, vẫn TARGET P0.
 
-Basic chỉ Tân Lữ; sau class không có Normal miễn MP để lấp CD. S1 nhanh và tiết kiệm trên một mục tiêu; S2 cũng nhanh, ưu tiên farm thường xuyên và đánh nhóm; S3 là đòn đặc trưng/burst. Art/icon tái dùng motif/pose nhưng ba entry và sáu SkillIds độc lập. Pose Attack/Skill là ngôn ngữ hình ảnh, không đồng nghĩa S1 là Attack mặc định. Status được thử bằng fixture có chủ đích, không đổi chance để dễ thấy. Bow range/kite là lợi thế hợp lệ; thay đổi HP sau nhập phái và chỉ số gear đọc GDD, Art không tự cân HP hoặc giảm VIT của Cung.
+Basic chỉ Tân Lữ; sau class không có Normal miễn MP để lấp CD. S1 nhanh (0,60 s) và tiết kiệm trên một mục tiêu; S2 cũng nhanh (0,90 s), chi phí thấp (3 MP), ưu tiên farm thường xuyên và đánh nhóm; S3 là đòn đặc trưng/burst (6 s).
+
+**S2 là ưu tiên hình ảnh tần suất cao (High-Frequency Visual Priority):**
+Trong vòng lặp chơi thực tế, chọn S2 rồi bấm Execute liên tục là cách đánh phổ biến nhất để dọn bãi. Do đó, **animation của S2 (Phong Trảm tiến cảnh / Linh Tiễn tiến cảnh) phải được đầu tư tư thế chuẩn bị (windup/draw), thời điểm phát đòn (release) và cảm giác trúng đích (impact) cực kỳ rõ ràng, dứt khoát và sướng mắt**, không được coi S2 là kỹ năng phụ mà dồn hết công sức sang S3. Animation của S2 phải gọn ghẽ, không vẽ động tác giật/khựng dài làm kẹt cảm giác ra đòn.
+
+Art/icon tái dùng motif/pose nhưng ba entry và sáu SkillIds độc lập. Pose Attack/Skill là ngôn ngữ hình ảnh, không đồng nghĩa S1 là Attack mặc định. Status được thử bằng fixture có chủ đích, không đổi chance để dễ thấy. Bow range/kite là lợi thế hợp lệ; thay đổi HP sau nhập phái và chỉ số gear đọc GDD, Art không tự cân HP hoặc giảm VIT của Cung.
 
 <a id="map-visual"></a>
 
@@ -334,11 +339,11 @@ Basic chỉ Tân Lữ; sau class không có Normal miễn MP để lấp CD. S1 
 
 **STRONG DIRECTION hình ảnh:** vùng sơn cước Việt Nam tiền hiện đại giả tưởng, không khóa vào triều đại hay tái dựng trang phục lịch sử. Sắc thái **dân dã → hiểm trở → huyền bí** đến từ dáng nhà gỗ/mái ngói giản lược, tre, cầu gỗ, lò rèn, giỏ dược thảo, khe/thác, đèo đá, bia và trấn ấn. Dùng lại địa hình, kit công trình nhỏ, mob rigs, palette Sói, male modular rig và motif VFX; không thêm environment family, tileset riêng từng map hoặc hàng chục công trình độc nhất.
 
-| Họ environment giữ nguyên | Cách diễn giải sơn cước Việt | Phần tái dùng |
+| Environment Family | Sắc thái văn hóa và cảnh quan sơn cước | Bản đồ áp dụng & Kế hoạch tái sử dụng |
 | --- | --- | --- |
-| Forest | Làng/đồng/trúc/rừng ẩm; gỗ, vải, tre và thảo mộc | Chung đất/cỏ/gỗ/cây, đổi palette và cụm props; Vân Khê/Học Viện dùng kit phù hợp |
-| Mountain | Núi/vách/thác/đá đỏ; địa hình bậc solid nối thành khối | Bạch Vân lạnh và Xích Nham ấm trên cùng cấu trúc nối tile |
-| Ancient | Phế tích/trấn ấn/Huyền Môn; bia, đá khép góc và mạch cổ | Chung stone/ruin kit và motif ấn; không một bộ art riêng mỗi landmark |
+| **Family 1 — Làng / nương / tre / rừng ẩm** | Gỗ mộc, mái lá/ngói giản lược, hàng rào tre, đồi nương đất đỏ pha cỏ xanh, suối mát; gợi không khí làng bản vùng cao Việt Nam. | **Vân Khê, Đồng Sương, Trúc Ảnh:** Dùng chung structural kit gỗ/tre, chỉ đổi palette và biến thể cây cối. |
+| **Family 2 — Núi / vách đá / thác / xích nham** | Vách đá vôi dựng đứng, đèo dốc hiểm trở, thác nước trắng xóa, chuyển tiếp sang các phiến sa thạch đỏ khô cằn. | **Bạch Vân (đá xám lạnh, thác nước) và Xích Nham (đá đỏ ấm, khe nứt):** Cùng chung bộ kết cấu đá khối bậc solid, khác biệt về màu sắc và ánh sáng. |
+| **Family 3 — Phế tích cổ / trấn ấn / Huyền Môn** | Phế tích đá tảng nguyên khối rêu phong, bia đá mang hoa văn Mạch Ấn cổ xưa, tàn tích cổng phong ấn thâm u. | **Huyền Tích và các khu cấm địa phong ấn:** Dùng chung bộ đá cổ (`ancient ruin kit`) và hoa văn ấn khắc; không vẽ riêng mỗi khu vực. |
 
 **Tên và chữ trong hình:** giữ Huyền Lộ, Linh Biến, Huyền Môn, Mạch Ấn/Trấn Ấn, Nấm Linh, Sói Sương, Sói Trúc Ảnh, Ong Giáp, Đoạt Mạch Đạo Tặc, Xích Thạch Linh và Cổ Môn Vệ Binh. Thanh Mộc/Vân Nham/Huyền Ấn vẫn là ba family gear. Hán-Việt của quái/cổ vật/địa danh cổ hợp thế giới; signage dịch vụ dùng lời gần gũi. Không đổi display name tốt thành tên tầm thường hoặc thêm Thiên/Thần/Đế/Tôn để gây vẻ lớn lao. Nếu sau này đổi display name, giữ stable internal ID; không đổi folder/definition chỉ vì tên hiển thị.
 
@@ -351,22 +356,89 @@ Basic chỉ Tân Lữ; sau class không có Normal miễn MP để lấp CD. S1 
 | Animated Environment | Thác/nước/lửa/khói/lá/bụi | Sprite loop/animated tile/ParticleSystem/static overlay theo §14 |
 | Foreground | Cành, mỏm đá viền camera, lớp nước trước chân | Riêng layer/order và vùng occlusion; không che telegraph/name/loot |
 
-| Map | Dấu hình ảnh phải phục vụ layout hiện có | Reuse tiết kiệm |
-| --- | --- | --- |
-| Đồng Sương | Đồi bậc thấp nối khối, tuyến dưới và bãi Sói độc lập; thấy lối về | Forest đất/cỏ; nền thoáng để đọc quái mới gặp |
-| Trúc Ảnh | Nhánh cầu trên, nhánh trấn ấn dưới và vòng về; đường jump/drop rõ | Forest đổi trúc/palette, kit cầu nhỏ |
-| Bạch Vân | Terrace solid quanh thác, tuyến vòng/mỏm cụt; cụm trên/dưới cùng nhìn thấy | Mountain lạnh, một họ hiệu ứng thác |
-| Xích Nham | Ngoại vi tách nhánh sâu/hốc/khe đá; ba seal, Huyền Môn ở nhánh phù hợp | Mountain ấm; một motif seal ở ba anchors |
-| Huyền Tích | Phế tích có tuyến cao/thấp/ngách; vùng Boss tách quái thường | Ancient + kit kết cấu đá; không tạo Boss scene riêng |
-| Vân Khê/Học Viện/Lôi Đài | Khu NPC chức năng, ledge/drop tutorial, yard, sàn đấu và lối ra | Props kiến trúc dùng chung; ánh sáng/palette/biển phân khu |
+### Visual Bible chi tiết cho 8 bản đồ logic
+
+Mỗi bản đồ sở hữu một bộ nhận diện hình ảnh (Visual Identity) rõ rệt, gắn liền với nhịp độ gameplay và tiến trình cảm xúc của người chơi từ **dân dã mộc mạc → hiểm trở cheo leo → huyền bí cổ xưa**:
+
+#### 1. Làng Vân Khê — Hub bình yên & Bờ cõi sơn cước
+- **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
+- **Tone & Mood:** Thanh bình, mộc mạc, gần gũi, khơi gợi cảm giác thân thuộc của một bản làng vùng cao Việt Nam.
+- **Palette chuẩn:** Gỗ mộc ấm áp (`warm timber`), xanh xám lá xô thơm (`sage green`), đá xám tự nhiên (`gray stone`), vải gai lanh màu ngà (`cream linen`), ngói xám xanh nhạt (`muted teal roofs`).
+- **Ánh sáng & Thời gian:** Ban mai hoặc xế chiều ấm áp, nắng xiên nhẹ qua rặng tre và tán cây rừng; không khí trong lành, sương mỏng tan dần.
+- **Landmarks & Hình khối:** Nhà gỗ mái lá/ngói mộc, hàng rào tre, bảng gỗ chỉ đường, sọt dược thảo phơi khô của Yên Thảo, lò rèn rực lửa than của Bách Luyện, hòm gỗ nhà kho của Mộc An. Tuyệt đối không vẽ thành kinh thành lộng lẫy hay phố xá đồ sộ.
+
+#### 2. Thiên Môn Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
+- **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
+- **Tone & Mood:** Trang nghiêm, chuẩn mực, khơi dậy tinh thần rèn giũa võ học sơn cước.
+- **Palette chuẩn:** Gỗ sáng thanh nhã (`pale wood`), đá thanh xám nhạt (`pale stone`), cờ ngọc bích mờ (`muted jade banners`), vải lanh trắng ngà.
+- **Ánh sáng & Không khí:** Ánh sáng rọi đều, rõ ràng, không có góc tối mập mờ, tối ưu cho việc quan sát thao tác nhân vật.
+- **Landmarks & Hình khối:** Tuyến nhảy gờ đá (`HV_JumpLedge`), giàn ván gỗ mỏng (`one-way platform`), sân tập Bù Nhìn rơm (`HV_DummyYard`), và Điện Nhập Phái (`HV_ClassHall`) với hai giá vũ khí Kiếm/Cung đặt đối xứng tuyệt đối hai bên tả hữu.
+
+#### 3. Lôi Đài Vân Khê — Đấu trường 1v1 PvP
+- **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
+- **Tone & Mood:** Căng thẳng, tập trung cao độ, mang tinh thần thượng võ thuần khiết.
+- **Palette chuẩn:** Nền đá xanh xám phẳng lặng (`slate gray`), gỗ sẫm màu, cờ hiệu truyền thống đỏ thẫm pha vàng mờ.
+- **Ánh sáng:** Nắng rọi trực tiếp vuông góc xuống sàn đấu, tạo bóng đổ ngắn sắc nét, giúp nhận biết chính xác hitbox/hurtbox và hướng quay mặt của đấu thủ.
+- **Cấu trúc:** Sàn đấu đá tảng trực giao phẳng phiu, sạch bóng chướng ngại vật; phông nền là hàng rào gỗ mộc và rặng núi xa; không có khán đài ồn ào hay màn hình công nghệ.
+
+#### 4. Đồng Sương (Lv 1–5) — Đồi nương bậc thấp & Suối cạn sương mai
+- **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
+- **Tone & Mood:** Thoáng đãng, hoang sơ nhẹ nhàng, bước chân mở đầu đầy hiếu kỳ.
+- **Palette chuẩn:** Cỏ xanh non mát mắt (`cool grass`), đất nương nâu đỏ ấm (`warm dirt`), đá xám viền rêu, sương mù lam nhạt (`fog blue`).
+- **Ánh sáng & Không khí:** Sương mai bảng lảng trôi trên mặt suối cạn, ánh mặt trời le lói qua tầng sương.
+- **Landmarks & Hình khối:** Đồi đất cỏ bậc solid thoai thoải, dòng suối cạn nước nông, vạt nương hoang; bãi Nấm Linh lúp búp ven bờ suối và bầy Sói Sương xám tro rải rác trên đồi cỏ. Dải vào an toàn 6–8 u tại cửa làng thoáng đãng.
+
+#### 5. Trúc Ảnh (Lv 5–10) — Rừng trúc u tịch & Cầu gỗ đa tầng
+- **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
+- **Tone & Mood:** U huyền, tĩnh mịch, bắt đầu cảm nhận rõ mối đe dọa từ tà khí Linh Biến.
+- **Palette chuẩn:** Rừng trúc xanh ngọc bích sẫm (`jade green`), rêu ẩm xanh đen (`dark moss`), sương rừng lam biếc (`blue mist`), gỗ cầu đẫm nước (`damp timber`).
+- **Ánh sáng & Không khí:** Ánh sáng lốm đốm tán xạ qua kẽ lá trúc dày đặc; hơi ẩm bốc lên từ lòng thung lũng rêu phong.
+- **Landmarks & Hình khối:** Cầu gỗ giàn ván mỏng vắt ngang vực đá, trụ Trấn Ấn cổ bị nứt rỉ vệt trọc khí tím dưới chân cầu (`TA4_BrokenSeal`), bầy Sói Trúc Ảnh lục tối ẩn hiện dưới bóng trúc và đàn Ong Giáp bay lượn trên cao.
+
+#### 6. Bạch Vân (Lv 8–13) — Vách đá thác nước & Đèo mây ba tầng
+- **Environment Family:** Family 2 — Núi / vách đá / thác / xích nham (`Mountain`).
+- **Tone & Mood:** Hùng vĩ, hiểm trở, gió núi lồng lộng, lạnh lẽo và choáng ngợp.
+- **Palette chuẩn:** Vách đá vôi xám lạnh (`pale gray-blue rocks`), bọt thác nước trắng xóa (`white water foam`), bụi cây lá kim cằn cỗi (`muted green shrubs`), biển mây trắng bồng bềnh.
+- **Ánh sáng & Không khí:** Hơi nước mịt mù bắn ra từ chân thác, ánh sáng núi cao trong vắt nhưng lạnh lùng.
+- **Landmarks & Hình khối:** 3 tầng thềm đá solid ôm sát vách núi thẳng đứng; thác nước đổ ầm vang ở trung tâm; hốc hang đá nơi Đoạt Mạch Đạo Tặc dựng lều trại cướp bóc; mỏm đá cụt nhìn ra biển mây bao la.
+
+#### 7. Xích Nham (Lv 12–17) — Hẻm sa thạch đỏ & Mạch ngầm phong ấn
+- **Environment Family:** Family 2 — Núi / vách đá / thác / xích nham (`Mountain`).
+- **Tone & Mood:** Khô cằn, khắc nghiệt, nóng bức, báo hiệu trung tâm của sự biến động mạch đất.
+- **Palette chuẩn:** Sa thạch đỏ sắt (`iron red`), đất hoàng thổ (`ochre`), đá phiến tối màu (`dark slate`), đồng rỉ mờ (`muted copper`), bóng đổ lam bụi (`dusty cyan shadow`).
+- **Ánh sáng & Không khí:** Không khí oi ả, bụi đá đỏ cuốn theo gió rít; khe nứt khoáng mạch ngầm phát ra ánh sáng ấm nóng kỳ dị (tuyệt đối không vẽ dung nham núi lửa).
+- **Landmarks & Hình khối:** Hẻm núi sâu hoắm với 2 nhánh lớn hội tụ; 3 trụ phong ấn đá cổ khắc hoa văn Mạch Ấn (`XN4_SealA/B/C`); đại môn Huyền Môn (`XN_HuyenMon_Outer`) sừng sững tựa vào vách núi nguyên khối ở cuối hẻm sâu.
+
+#### 8. Huyền Tích (Lv 17–20) — Phế tích cấm địa & World Boss Huyền Nham Cự Thú
+- **Environment Family:** Family 3 — Phế tích cổ / trấn ấn / Huyền Môn (`Ancient`).
+- **Tone & Mood:** Tối tăm, uy nghiêm, ngột ngạt, bí ẩn cổ sơ, tràn ngập cảm giác trận chiến cuối cùng của Chương III.
+- **Palette chuẩn:** Đá than đen (`charcoal stone`), xanh mực xám (`ink blue-gray`), ngọc bích cổ rêu phong (`muted jade`), đồng cổ phong hóa (`aged bronze`), tia sáng trọc khí tím ma mị được tiết chế (`restrained violet aura`).
+- **Ánh sáng & Không khí:** Ánh sáng u tối, sương lạnh mờ ảo bao phủ các phiến đá nguyên khối; bầu không khí nặng trĩu áp lực tâm linh.
+- **Landmarks & Hình khối:** Cổng đá đổ nát, dãy cột gãy khổng lồ phủ rêu, hành lang đá có Cổ Môn Vệ Binh canh gác; và **đại sảnh cấm điện trung tâm — BossCombatArea:** sàn đấu đá tảng nguyên khối khổng lồ, rộng rãi, phẳng phiu, sạch bóng quái thường, nơi World Boss Huyền Nham Cự Thú thức tỉnh uy dũng.
 
 SafeAnchor, lối vào an toàn 6–8 u BASELINE/TUNABLE và đường tới exit phải có mặt đứng/đường đọc được; không đặt quái/props che chỗ hồi phục. Kích thước root theo bố cục thật, không nhân background bằng offset 200 u. World graph giữ kết nối GDD; đường bên trong có nhánh trên/dưới, loop, ngách cụt, ledge/hollow và jump/drop vừa đủ. Exit có thể ở một nhánh, không buộc cuối bên phải. EdgeExit dùng vùng thoát có hướng/tên đích và reason khóa, không vòm portal/Interact cho mọi lối; SpecialGate chỉ Huyền Môn/Arena hoặc cửa gameplay đặc biệt. Map asset tồn tại không tự mở quyền vào: gate dùng level/unlock/quest **Completed** theo GDD/Technical.
 
-**Mật độ — STRONG DIRECTION:** tăng số bãi độc lập, giữ đường vào/về an toàn, tránh một group 8–10 quái thành đống. Một camera có thể thấy các cụm dưới/giữa/trên với 5–8+ quái; đây là ví dụ bố cục, không chỉ tiêu population khóa. Tách SpawnGroup bằng HomeRegion/WalkRegion, địa hình/tuyến tiếp cận và aggro riêng; nhiều cụm nhìn gần nhau vẫn không báo động dây chuyền. Tổng group/slot từng map còn OPEN/TUNABLE. 28 groups/66 slots và spacing tâm 18–20 u là **LEGACY seed**, không budget cuối hoặc luật khoảng cách mới; ID nguồn quest vẫn giữ. Kiểm cùng target marker/HP/telegraph/loot/chat, không lấy palette reuse làm bằng chứng giảm công đặt map và QA.
+**Mật độ visual và kế hoạch authoring hiện hành — STRONG DIRECTION:**
+Tăng số bãi/cụm độc lập (`pockets`), giữ dải vào an toàn (safe strip 6–8 u) tại cửa map, tuyệt đối tránh dồn một group thành blob 8–10 quái.
+- **Thị giác trên một camera:** Khung hình camera tiêu chuẩn bao quát được 5–8+ quái trải trên nhiều thềm/tầng (ví dụ: tầng dưới 1–2 quái, tầng giữa 1–3 quái, tầng trên 1–2 quái, nhánh phụ 1–2 quái), mang lại cảm giác thế giới online hoang dã, đông đúc.
+- **Cách ly hành vi:** Mỗi cụm là một `SpawnGroup` độc lập với `HomeRegion` và `WalkRegion` riêng; các cụm nằm cạnh nhau trên màn hình nhưng không chain aggro (không kích hoạt dây chuyền khi đánh một cụm).
+- **Mục tiêu tác giả hiện hành (Current Authoring Targets):**
+  + *Đồng Sương:* 8–10 cụm, 14–20 quái active (Nấm Linh Lv 2 tuyến dưới; Sói Sương Lv 4 đồi giữa). Authored IDs mới: `DS7`–`DS10`.
+  + *Trúc Ảnh:* 9–11 cụm, 20–28 quái active (Sói Sương Lv 4, Sói Trúc Ảnh Lv 8, Ong Giáp Lv 10 vách trên/cầu). Authored IDs mới: `TA7`–`TA10`.
+  + *Bạch Vân:* 8–10 cụm, 20–28 quái active (Ong Giáp Lv 10 thềm thác; Đạo Tặc Lv 13 bậc đá). Authored IDs mới: `BV6`–`BV8`.
+  + *Xích Nham:* 9–11 cụm, 24–32 quái active (Đạo Tặc Lv 13 ngoại vi; Xích Thạch Linh Lv 16 hốc sâu và phong ấn). Authored IDs mới: `XN7`–`XN9`.
+  + *Huyền Tích:* 8–10 cụm thường, 20–26 quái active thường + 1 Boss. Quái thường ở tiền môn và hành lang ngoài (`HT1`–`HT8`).
+- **Boss Exclusion Rule:** Khu vực giao chiến Boss (`BossCombatArea`) tại trung tâm Huyền Tích cấm tuyệt đối việc sinh hoặc tuần tra của quái thường, tạo sàn đấu tập trung, sạch sẽ cho trận đánh đỉnh cao.
+- **Dữ liệu lịch sử:** Bảng 28 cụm / 66 slots cũ là **LEGACY seed** để giữ các mốc neo nhiệm vụ (`DS2`, `DS3–DS6`, `TA4.slot1`, `TA5`, `TA6`, `XN1–XN6`, `HT4–HT5`) và trace prototype; tổng số quái và số cụm cuối cùng còn **OPEN / TUNABLE**.
 
 ## 12. Terrain readability và tile variants
 
-**Luật gameplay ở [GDD — terrain](1_HUYEN_LO_GDD.md#terrain-rules); Art làm rõ hình đọc được.** Đất/đá tự nhiên là khối chắn đầy (`solid`) có độ dày: mặt trên ngang, vật liệu lấp khối, mặt đứng, đáy/bóng và cạnh/góc khép. Các bậc ghép thành một khối địa chất; hốc/hang/khe/mỏm không biến núi thành dải tự nhiên mỏng nổi. Không mặt dốc chơi được (`slope/ramp`), địa hình tam giác, collider xoay hoặc mặt chéo để đứng/đi. Mái/cành/núi nền vẽ chéo được; mặt chơi vẫn ngang/đứng, route mái dùng bậc ngang.
+**Luật gameplay ở [GDD — terrain](1_HUYEN_LO_GDD.md#terrain-rules); Art làm rõ hình đọc được.**
+- **Natural terrain = SOLID MASS (Khối đặc dày):** Đất/đá tự nhiên luôn luôn là khối chắn đặc có độ dày thực tế: mặt trên nằm ngang, khối vật liệu lấp đầy bên trong, mặt đứng thẳng góc, đáy/bóng đổ và các mép/góc khép kín. Các bậc ghép thành một khối địa chất liền mạch; hốc/hang/khe nứt/mỏm đá không bao giờ biến núi đồi thành dải đất tự nhiên mỏng manh lơ lửng.
+- **Không dốc chơi được (`no playable slope/ramp`):** Tuyệt đối không có mặt dốc nghiêng để nhân vật chạy lên/xuống, không có địa hình tam giác, không có collider xoay góc. Mái nhà, cành cây hoặc núi xa ở lớp nền có thể vẽ chéo cho mềm mại, nhưng toàn bộ mặt tiếp xúc gameplay vẫn phải là các bậc ngang/đứng trực giao.
+- **Đất đá tự nhiên KHÔNG BAO GIỜ là one-way platform:** Nền đất, đá tảng, gờ núi không bao giờ cho phép nhảy xuyên từ dưới lên hoặc xuyên xuống (`no natural one-way`).
+- **One-way CHỈ dành cho kết cấu nhân tạo đặc biệt:** Chỉ các cấu trúc mỏng nhẹ hợp lý như ván gỗ, giàn tre/catwalk, ban công, sàn treo tựa vách có dầm đỡ/dây treo rõ ràng mới được làm sàn one-way.
+- **Không leo trèo (`no ladder/rope/vine/climb`):** Không có thang dây, dây leo, cột đu hay cơ chế bám tường leo trèo; toàn bộ di chuyển dọc dựa vào nhảy (`Jump`) và rơi (`Fall/DropThrough`).
 
 ### Bốn grammar địa hình/cảnh — cách ghép khối và tuyến chơi, có thể trộn trong một map
 
@@ -551,7 +623,7 @@ Nguồn icon dự kiến32×32 transparent, hiển thị scale nguyên và toolt
 | 2 Button | Confirm/use/cancel | Normal/hover/pressed/disabled; tint/border/offset, không bốn ảnh bắt buộc |
 | 3 Item slot | Bag/storage/shop | Empty/filled/selected/unavailable/pending; icon +overlays |
 | 4 Equipment slot | Character/equip picker | Reuse3 +slot glyph; empty/filled/off-class/level-lock |
-| 5 Skill slot | HUD/panel | Reuse3 +locked/cooldown/manual-missing/pending |
+| 5 Skill slot | HUD/panel | Thể hiện rõ: Slot 1/2/3 được chọn (`SelectedSkillSlot`), hồi chiêu (`Cooldown`), chưa học (`ManualMissing`), và phân biệt rõ với thao tác thực thi (`ExecuteSelected`) |
 | 6 Tabs | Bag categories/NPC menus | Normal/hover/selected/disabled; button derivative |
 | 7 Tooltip | Item/skill/reason | Panel1 +title/stat rows/cost/rarity/lock; compare layout reused |
 | 8 List row | Quest/Journey/character/opponents | Normal/hover/selected/disabled; text/icon/progress |
