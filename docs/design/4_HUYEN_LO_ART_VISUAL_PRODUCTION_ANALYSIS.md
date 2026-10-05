@@ -342,7 +342,7 @@ Art/icon tái dùng motif/pose nhưng ba entry và sáu SkillIds độc lập. P
 | Environment Family | Sắc thái văn hóa và cảnh quan sơn cước | Bản đồ áp dụng & Kế hoạch tái sử dụng |
 | --- | --- | --- |
 | **Family 1 — Làng / nương / tre / rừng ẩm** | Gỗ mộc, mái lá/ngói giản lược, hàng rào tre, đồi nương đất đỏ pha cỏ xanh, suối mát; gợi không khí làng bản vùng cao Việt Nam. | **Vân Khê, Đồng Sương, Trúc Ảnh:** Dùng chung structural kit gỗ/tre, chỉ đổi palette và biến thể cây cối. |
-| **Family 2 — Núi / vách đá / thác / xích nham** | Vách đá vôi dựng đứng, đèo dốc hiểm trở, thác nước trắng xóa, chuyển tiếp sang các phiến sa thạch đỏ khô cằn. | **Bạch Vân (đá xám lạnh, thác nước) và Xích Nham (đá đỏ ấm, khe nứt):** Cùng chung bộ kết cấu đá khối bậc solid, khác biệt về màu sắc và ánh sáng. |
+| **Family 2 — Núi / vách đá / thác / xích nham** | Vách đá vôi dựng đứng, đèo bậc hiểm trở, thác nước trắng xóa, chuyển tiếp sang các phiến sa thạch đỏ khô cằn. | **Bạch Vân (đá xám lạnh, thác nước) và Xích Nham (đá đỏ ấm, khe nứt):** Cùng chung bộ kết cấu đá khối bậc solid, khác biệt về màu sắc và ánh sáng. |
 | **Family 3 — Phế tích cổ / trấn ấn / Huyền Môn** | Phế tích đá tảng nguyên khối rêu phong, bia đá mang hoa văn Mạch Ấn cổ xưa, tàn tích cổng phong ấn thâm u. | **Huyền Tích và các khu cấm địa phong ấn:** Dùng chung bộ đá cổ (`ancient ruin kit`) và hoa văn ấn khắc; không vẽ riêng mỗi khu vực. |
 
 **Tên và chữ trong hình:** giữ Huyền Lộ, Linh Biến, Huyền Môn, Mạch Ấn/Trấn Ấn, Nấm Linh, Sói Sương, Sói Trúc Ảnh, Ong Giáp, Đoạt Mạch Đạo Tặc, Xích Thạch Linh và Cổ Môn Vệ Binh. Thanh Mộc/Vân Nham/Huyền Ấn vẫn là ba family gear. Hán-Việt của quái/cổ vật/địa danh cổ hợp thế giới; signage dịch vụ dùng lời gần gũi. Không đổi display name tốt thành tên tầm thường hoặc thêm Thiên/Thần/Đế/Tôn để gây vẻ lớn lao. Nếu sau này đổi display name, giữ stable internal ID; không đổi folder/definition chỉ vì tên hiển thị.
@@ -367,14 +367,14 @@ Mỗi bản đồ sở hữu một bộ nhận diện hình ảnh (Visual Identi
 - **Ánh sáng & Thời gian:** Ban mai hoặc xế chiều ấm áp, nắng xiên nhẹ qua rặng tre và tán cây rừng; không khí trong lành, sương mỏng tan dần.
 - **Landmarks & Hình khối:** Nhà gỗ mái lá/ngói mộc, hàng rào tre, bảng gỗ chỉ đường, sọt dược thảo phơi khô của Yên Thảo, lò rèn rực lửa than của Bách Luyện, hòm gỗ nhà kho của Mộc An. Tuyệt đối không vẽ thành kinh thành lộng lẫy hay phố xá đồ sộ.
 
-#### 2. Thiên Môn Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
+#### 2. Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
 - **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
 - **Tone & Mood:** Trang nghiêm, chuẩn mực, khơi dậy tinh thần rèn giũa võ học sơn cước.
 - **Palette chuẩn:** Gỗ sáng thanh nhã (`pale wood`), đá thanh xám nhạt (`pale stone`), cờ ngọc bích mờ (`muted jade banners`), vải lanh trắng ngà.
 - **Ánh sáng & Không khí:** Ánh sáng rọi đều, rõ ràng, không có góc tối mập mờ, tối ưu cho việc quan sát thao tác nhân vật.
-- **Landmarks & Hình khối:** Tuyến nhảy gờ đá (`HV_JumpLedge`), giàn ván gỗ mỏng (`one-way platform`), sân tập Bù Nhìn rơm (`HV_DummyYard`), và Điện Nhập Phái (`HV_ClassHall`) với hai giá vũ khí Kiếm/Cung đặt đối xứng tuyệt đối hai bên tả hữu.
+- **Landmarks & Hình khối:** Tuyến nhảy gờ đá (`HV_JumpLedge`), giàn ván gỗ mỏng (`one-way platform`), sân tập Bù Nhìn rơm (`HV_DummyYard`), và khu vực Điện Nhập Phái (`HV_ClassHall`) với hai giá vũ khí Kiếm/Cung đại diện cho hai phái được bố trí bình đẳng, dễ thấy (bố cục tả/hữu là đề xuất blockout).
 
-#### 3. Lôi Đài Vân Khê — Đấu trường 1v1 PvP
+#### 3. Lôi Đài — Đấu trường 1v1 PvP
 - **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
 - **Tone & Mood:** Căng thẳng, tập trung cao độ, mang tinh thần thượng võ thuần khiết.
 - **Palette chuẩn:** Nền đá xanh xám phẳng lặng (`slate gray`), gỗ sẫm màu, cờ hiệu truyền thống đỏ thẫm pha vàng mờ.
@@ -386,7 +386,7 @@ Mỗi bản đồ sở hữu một bộ nhận diện hình ảnh (Visual Identi
 - **Tone & Mood:** Thoáng đãng, hoang sơ nhẹ nhàng, bước chân mở đầu đầy hiếu kỳ.
 - **Palette chuẩn:** Cỏ xanh non mát mắt (`cool grass`), đất nương nâu đỏ ấm (`warm dirt`), đá xám viền rêu, sương mù lam nhạt (`fog blue`).
 - **Ánh sáng & Không khí:** Sương mai bảng lảng trôi trên mặt suối cạn, ánh mặt trời le lói qua tầng sương.
-- **Landmarks & Hình khối:** Đồi đất cỏ bậc solid thoai thoải, dòng suối cạn nước nông, vạt nương hoang; bãi Nấm Linh lúp búp ven bờ suối và bầy Sói Sương xám tro rải rác trên đồi cỏ. Dải vào an toàn 6–8 u tại cửa làng thoáng đãng.
+- **Landmarks & Hình khối:** Đồi đất cỏ với chuỗi bậc thấp tạo cảm giác thoải khi nhìn tổng thể, dòng suối cạn nước nông, vạt nương hoang; bãi Nấm Linh lúp búp ven bờ suối và bầy Sói Sương xám tro rải rác trên đồi cỏ. Dải vào an toàn 6–8 u tại cửa làng thoáng đãng.
 
 #### 5. Trúc Ảnh (Lv 5–10) — Rừng trúc u tịch & Cầu gỗ đa tầng
 - **Environment Family:** Family 1 — Làng / nương / tre / rừng ẩm (`Forest`).
@@ -395,19 +395,19 @@ Mỗi bản đồ sở hữu một bộ nhận diện hình ảnh (Visual Identi
 - **Ánh sáng & Không khí:** Ánh sáng lốm đốm tán xạ qua kẽ lá trúc dày đặc; hơi ẩm bốc lên từ lòng thung lũng rêu phong.
 - **Landmarks & Hình khối:** Cầu gỗ giàn ván mỏng vắt ngang vực đá, trụ Trấn Ấn cổ bị nứt rỉ vệt trọc khí tím dưới chân cầu (`TA4_BrokenSeal`), bầy Sói Trúc Ảnh lục tối ẩn hiện dưới bóng trúc và đàn Ong Giáp bay lượn trên cao.
 
-#### 6. Bạch Vân (Lv 8–13) — Vách đá thác nước & Đèo mây ba tầng
+#### 6. Bạch Vân (Lv 8–13) — Vách đá thác nước & Đèo mây nhiều bậc cao độ
 - **Environment Family:** Family 2 — Núi / vách đá / thác / xích nham (`Mountain`).
 - **Tone & Mood:** Hùng vĩ, hiểm trở, gió núi lồng lộng, lạnh lẽo và choáng ngợp.
 - **Palette chuẩn:** Vách đá vôi xám lạnh (`pale gray-blue rocks`), bọt thác nước trắng xóa (`white water foam`), bụi cây lá kim cằn cỗi (`muted green shrubs`), biển mây trắng bồng bềnh.
 - **Ánh sáng & Không khí:** Hơi nước mịt mù bắn ra từ chân thác, ánh sáng núi cao trong vắt nhưng lạnh lùng.
-- **Landmarks & Hình khối:** 3 tầng thềm đá solid ôm sát vách núi thẳng đứng; thác nước đổ ầm vang ở trung tâm; hốc hang đá nơi Đoạt Mạch Đạo Tặc dựng lều trại cướp bóc; mỏm đá cụt nhìn ra biển mây bao la.
+- **Landmarks & Hình khối:** Bố cục blockout tham khảo khoảng 3 tầng thềm đá solid (TUNABLE, không khóa số tầng) ôm sát vách núi; thác nước đổ ầm vang ở trung tâm; hốc hang đá nơi Đoạt Mạch Đạo Tặc dựng lều trại cướp bóc; mỏm đá cụt nhìn ra biển mây bao la.
 
 #### 7. Xích Nham (Lv 12–17) — Hẻm sa thạch đỏ & Mạch ngầm phong ấn
 - **Environment Family:** Family 2 — Núi / vách đá / thác / xích nham (`Mountain`).
 - **Tone & Mood:** Khô cằn, khắc nghiệt, nóng bức, báo hiệu trung tâm của sự biến động mạch đất.
 - **Palette chuẩn:** Sa thạch đỏ sắt (`iron red`), đất hoàng thổ (`ochre`), đá phiến tối màu (`dark slate`), đồng rỉ mờ (`muted copper`), bóng đổ lam bụi (`dusty cyan shadow`).
 - **Ánh sáng & Không khí:** Không khí oi ả, bụi đá đỏ cuốn theo gió rít; khe nứt khoáng mạch ngầm phát ra ánh sáng ấm nóng kỳ dị (tuyệt đối không vẽ dung nham núi lửa).
-- **Landmarks & Hình khối:** Hẻm núi sâu hoắm với 2 nhánh lớn hội tụ; 3 trụ phong ấn đá cổ khắc hoa văn Mạch Ấn (`XN4_SealA/B/C`); đại môn Huyền Môn (`XN_HuyenMon_Outer`) sừng sững tựa vào vách núi nguyên khối ở cuối hẻm sâu.
+- **Landmarks & Hình khối:** Hẻm núi sâu với bố cục blockout tham khảo khoảng 2 nhánh lớn hội tụ (TUNABLE, không khóa tổng nhánh); 3 trụ phong ấn đá cổ khắc hoa văn Mạch Ấn (`XN4_SealA/B/C`); đại môn Huyền Môn (`XN_HuyenMon_Outer`) sừng sững tựa vào vách núi nguyên khối ở cuối hẻm sâu.
 
 #### 8. Huyền Tích (Lv 17–20) — Phế tích cấm địa & World Boss Huyền Nham Cự Thú
 - **Environment Family:** Family 3 — Phế tích cổ / trấn ấn / Huyền Môn (`Ancient`).
@@ -429,7 +429,7 @@ Tăng số bãi/cụm độc lập (`pockets`), giữ dải vào an toàn (safe 
   + *Xích Nham:* 9–11 cụm, 24–32 quái active (Đạo Tặc Lv 13 ngoại vi; Xích Thạch Linh Lv 16 hốc sâu và phong ấn). Authored IDs mới: `XN7`–`XN9`.
   + *Huyền Tích:* 8–10 cụm thường, 20–26 quái active thường + 1 Boss. Quái thường ở tiền môn và hành lang ngoài (`HT1`–`HT8`).
 - **Boss Exclusion Rule:** Khu vực giao chiến Boss (`BossCombatArea`) tại trung tâm Huyền Tích cấm tuyệt đối việc sinh hoặc tuần tra của quái thường, tạo sàn đấu tập trung, sạch sẽ cho trận đánh đỉnh cao.
-- **Dữ liệu lịch sử:** Bảng 28 cụm / 66 slots cũ là **LEGACY seed** để giữ các mốc neo nhiệm vụ (`DS2`, `DS3–DS6`, `TA4.slot1`, `TA5`, `TA6`, `XN1–XN6`, `HT4–HT5`) và trace prototype; tổng số quái và số cụm cuối cùng còn **OPEN / TUNABLE**.
+- **Dữ liệu lịch sử:** Bảng 28 cụm / 66 slots cũ là **LEGACY seed** để giữ các mốc neo nhiệm vụ (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `TA4.slot1`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`) cùng các stable seed IDs (`TA5`, `BV1–BV5`, v.v.) và trace prototype; tổng số quái và số cụm cuối cùng còn **OPEN / TUNABLE**.
 
 ## 12. Terrain readability và tile variants
 

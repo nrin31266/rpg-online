@@ -101,7 +101,7 @@ Mỗi `MapRoot` là một prefab/GameObject gốc đại diện cho một bản 
 | **BackgroundTilemap** | Sorting Layer `Background` / `MidBackground` | Hoàn toàn **không có Collider**. Độ tương phản và bão hòa màu thấp hơn các lớp chơi để tạo chiều sâu không gian. |
 | **ForegroundTilemap** | Sorting Layer `Foreground` (Cành cây, mỏm đá viền mép màn hình) | Hoàn toàn **không có Collider**. Thiết lập độ che khuất (occlusion) cẩn thận, tuyệt đối không che khuất nameplate, target marker, thanh máu quái, telegraph đòn đánh hay bãi rơi đồ (loot). |
 
-**Địa hình LOCKED:** mặt đứng được chỉ ngang; tường đứng và block/step trực giao. Không playable slope/ramp/triangle, collider đi được xoay hoặc diagonal surface. Đất/đá tự nhiên là solid mass có độ dày, mặt trên, mặt đứng và mép khép; đồi/núi bậc liên tục, không dải đất tự nhiên mỏng nổi. Mái/cành/background có thể vẽ chéo, nhưng route chơi trên mái phải author mặt ngang/bậc riêng. Landmark/công trình chỉ dùng vài mặt collision sạch, không polygon collider theo toàn silhouette. **Không ladder/rope/vine/pole/wall climb; không Climb InputAction/state/animation.**
+**Địa hình LOCKED:** mặt đi được chỉ nằm ngang; tường đứng và block/step trực giao. Không playable slope/ramp/triangle, collider đi được xoay hoặc diagonal surface. Đất/đá tự nhiên là solid mass có độ dày, mặt trên, mặt đứng và mép khép; đồi/núi bậc liên tục, không dải đất tự nhiên mỏng nổi. Mái/cành/background có thể vẽ chéo, nhưng route chơi trên mái phải author mặt ngang/bậc riêng. Landmark/công trình chỉ dùng vài mặt collision sạch, không polygon collider theo toàn silhouette. **Không ladder/rope/vine/pole/wall climb; không Climb InputAction/state/animation.**
 
 **Solid:** Ground baseline dùng TilemapCollider2D + CompositeCollider2D + Static Rigidbody2D; [Unity 6 Composite Operation = Merge](https://docs.unity3d.com/6000.3/Documentation/Manual/tilemaps/work-with-tilemaps/tilemap-collider-2d-reference.html), không checkbox UsedByComposite cũ. Natural earth/rock luôn solid.
 
@@ -113,7 +113,7 @@ Mỗi `MapRoot` là một prefab/GameObject gốc đại diện cho một bản 
 
 **Camera:** Cinemachine chỉ follow character owner, chết vẫn nhìn corpse. Transition đổi confiner theo root và snap/cancel damping qua offset; invalidation cache khi shape/lens đổi, không follow player từ xa.
 
-**Authoring gate và phân bổ bãi quái hiện hành:** Thử nghiệm trước trên một farm room đại diện trước khi nhân rộng toàn map; bảo toàn tuyệt đối các Quest Anchor IDs (`DS2`, `DS3–DS6`, `TA4.slot1`, `TA5`, `TA6`, `XN1–XN6`, `HT4–HT5`), SafeAnchor, dải vào an toàn 6–8 u từ cửa map, tuyến rút lui về làng và đường tiếp cận bãi rơi đồ (loot).
+**Authoring gate và phân bổ bãi quái hiện hành:** Thử nghiệm trước trên một farm room đại diện trước khi nhân rộng toàn map; bảo toàn tuyệt đối các Quest Anchor IDs (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `TA4.slot1`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`), giữ ổn định các stable authored seed IDs (`TA5`, `BV1–BV5`, v.v.), SafeAnchor, dải vào an toàn 6–8 u từ cửa map, tuyến rút lui về làng và đường tiếp cận bãi rơi đồ (loot).
 
 Mật độ bãi quái phải được author lại theo [Kế hoạch mật độ GDD §4](1_HUYEN_LO_GDD.md#world-farm):
 - **Nguyên tắc phân bổ:** Tăng số lượng bãi/cụm độc lập (`SpawnGroup`) trải trên các thềm đá, tầng cao/thấp và các tuyến nhánh; tuyệt đối không dồn thành một blob lớn 8–10 quái. Khung hình camera tiêu chuẩn có thể hiển thị 5–8+ quái thuộc 2–3 tầng khác nhau, nhưng mỗi cụm giữ AI/aggro độc lập, không báo động dây chuyền sang cụm bên cạnh.

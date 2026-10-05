@@ -35,10 +35,10 @@ Luật controls/focus/pending/dùng đồ nhanh đọc GDD; contract đọc Tech
 | --- | --- |
 | Character / attributes / EXP | [GDD §2](1_HUYEN_LO_GDD.md#character-power) + [Analysis §2](3_HUYEN_LO_DESIGN_ANALYSIS.md#character-evidence) |
 | Skills / nội tại / bí kíp / status / cadence | [GDD §3](1_HUYEN_LO_GDD.md#class-combat), [Analysis baseline mới](3_HUYEN_LO_DESIGN_ANALYSIS.md#current-balance-probe) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
-| 1/2/3 chọn skill / ExecuteSelected / bindings | [GDD focus/input](1_HUYEN_LO_GDD.md#focus-input), [UX/phím đề xuất](1_HUYEN_LO_GDD.md#ux-art) + [Technical input](2_HUYEN_LO_TECHNICAL.md#input-contract) |
+| 1/2/3 chọn skill / ExecuteSelected / bindings | [GDD focus/input](1_HUYEN_LO_GDD.md#focus-input), [GDD §9 UX/phím đề xuất](1_HUYEN_LO_GDD.md#ux-art) + [Technical input](2_HUYEN_LO_TECHNICAL.md#input-contract) |
 | Đổi mục tiêu / AUTO / click / world Tab / focus khi chết | [GDD focus](1_HUYEN_LO_GDD.md#focus-input) + [Technical CycleTarget](2_HUYEN_LO_TECHNICAL.md#input-contract) |
 | Pending / giữ phím / buffer / arrival / Esc | [GDD pending](1_HUYEN_LO_GDD.md#pending-cast), [Esc](1_HUYEN_LO_GDD.md#escape-priority) + [Technical contract](2_HUYEN_LO_TECHNICAL.md#input-contract) |
-| Dùng Potion/Food / phím đề xuất chưa chốt | [GDD Quick Potion / Food](1_HUYEN_LO_GDD.md#quick-items) + [bảng phím](1_HUYEN_LO_GDD.md#ux-art) |
+| Semantic actions: QuickHP / QuickMP / Food / Interact | [GDD Quick Potion / Food](1_HUYEN_LO_GDD.md#quick-items) + [GDD §9 bảng phím đề xuất](1_HUYEN_LO_GDD.md#ux-art) |
 | Quái / crowd / staging / Home–Walk–Return | [GDD crowd](1_HUYEN_LO_GDD.md#melee-crowd) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
 | World / mob / Linh / Boss | [GDD §4](1_HUYEN_LO_GDD.md#world-farm) + [Technical §7](2_HUYEN_LO_TECHNICAL.md#timers) |
 | Farm Lv 1 → 20 / density và seed manifest lịch sử | [GDD world](1_HUYEN_LO_GDD.md#world-farm) + [Analysis §3](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression) |
@@ -88,13 +88,13 @@ GDD ưu tiên tiếng Việt; Technical giữ identifier tiếng Anh khi cần c
 | Mốc để thử / số có thể chỉnh | BASELINE / TUNABLE | Giả định hiện hành cho probe/triển khai; phải đo và ghi setup, chưa tự là balance pass. |
 | Luật đã chốt / hướng cần kiểm | LOCKED / STRONG DIRECTION | LOCKED là quyết định rõ; STRONG DIRECTION giữ hướng nhưng exact numbers/implementation còn cần kiểm. |
 | Chưa quyết / đã bị thay | OPEN / LEGACY–SUPERSEDED | OPEN cần quyết định hoặc bằng chứng; LEGACY–SUPERSEDED giữ lịch sử, không dùng làm luật hiện hành. |
-| Chọn kỹ năng / thực thi kỹ năng đã chọn | SelectSlot / ExecuteSelected | Chọn chỉ đổi slot; Execute tạo intent riêng. Đổi slot không sửa pending/buffer/action đã chụp. |
+| Chọn kỹ năng / thực thi kỹ năng đã chọn | SelectSlot / ExecuteSelected | 1/2/3 chỉ chọn slot; ExecuteSelected là action riêng (phím vật lý còn OPEN, đề xuất E, xem [GDD §9](1_HUYEN_LO_GDD.md#ux-art)). Đổi slot không sửa pending/buffer/action đã chụp. |
 | Mục tiêu chiến đấu | CombatFocus | NONE/AUTO/EXPLICIT; giữ đúng identity/life, độc lập selected skill và interaction candidate. |
 | Đổi mục tiêu | CycleTarget | World Tab/Shift+Tab; context modal vẫn UI navigation. |
 | Vùng tìm / giữ / thực thi | Search / Retention / Execution | Ba điều kiện riêng; mục tiêu giữ được chưa chắc nằm trong range/geometry hợp lệ để cast. |
 | Lệnh chờ tiếp cận | PendingCast / Approach | Một intent chưa commit tài nguyên, đi ngang có giới hạn theo profile; không tạo map transition. |
 | Đệm lệnh mới nhất | Latest buffer | Một intent có expiry/readiness theo GDD; không hàng đợi cast dài. |
-| Dùng đồ nhanh | QuickHP / QuickMP / Food | Lệnh riêng qua consumable validator, độc lập selected skill; exact hotkeys đọc proposal ở GDD. |
+| Dùng đồ nhanh / tương tác | QuickHP / QuickMP / Food / Interact | Các action ngữ nghĩa (semantic actions) độc lập với selected skill; phím vật lý cụ thể (đề xuất E/F/4/5/R/I) vẫn OPEN/TUNABLE, xem binding hiện hành tại [GDD §9](1_HUYEN_LO_GDD.md#ux-art). H/M là alias lịch sử (LEGACY), không dùng trong core hiện hành. |
 | Cụm quái | SpawnGroup | Bố trí một bãi quái do designer author; **không phải Party**. |
 | Điểm sinh quái | SpawnSlot | Vị trí có ID cố định, tham chiếu mob identity; hồi sinh đúng loài / level đó. |
 | Vùng nhà / vùng đi / mặt đứng | HomeRegion / WalkRegion / SurfaceId | Ràng buộc map cho AI dùng chung; không suy ra quái GroundMelee được nhảy/drop hoặc leo tầng. |
