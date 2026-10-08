@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only checker for local links/anchors in design docs. --json writes to stdout."""
+"""Read-only checker for local links/anchors in all docs and the root README. --json writes to stdout."""
 import argparse,json,re,sys,unicodedata
 from pathlib import Path
 from urllib.parse import unquote
@@ -14,7 +14,7 @@ def anchors(text):
 
 def scan():
  broken=[];links=0
- for source in sorted((ROOT/'docs/design').glob('*.md')):
+ for source in sorted([*(ROOT/'docs').rglob('*.md'), ROOT/'README.md']):
   text=source.read_text()
   for m in re.finditer(r'\[[^\]\n]*\]\(([^)\s]+)\)',text):
    dest=unquote(m.group(1));line=text.count('\n',0,m.start())+1

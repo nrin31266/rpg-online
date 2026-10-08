@@ -1,9 +1,9 @@
 # Huyền Lộ
 
-[Bộ tài liệu thiết kế](docs/design/README.md) giữ luật và hợp đồng của dự án; README thiết kế là điểm vào và routing tới năm tài liệu canonical. [Game mẫu](prototypes/VS1_EndToEnd/README.md) là Unity project disposable dùng thử gameplay/UX và debug nhanh.
+[Documentation map](docs/README.md) là điểm vào bộ tài liệu hiện hành theo domain: design, technical, art và production/evidence. [Game mẫu](prototypes/VS1_EndToEnd/README.md) là Unity project disposable dùng thử gameplay/UX và debug nhanh.
 
 ```text
-docs/design/                 GDD, Technical, Analysis, Art, Roadmap
+docs/                       Canonical docs theo domain + archive + old-path redirects
 prototypes/VS1_EndToEnd/      Unity project mẫu + evidence theo revision
 research/                    source/ghi chú tham khảo
 ```

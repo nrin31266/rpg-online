@@ -16,7 +16,7 @@ Dọn build Linux cũ và thư mục build lồng (~245 MiB); thư mục lồng 
 
 ## Bản chạy thử một hành vi — 2026-10-05
 
-Chủ dự án duyệt trực tiếp controls/focus/quick items/AI và yêu cầu prototype disposable tối giản. Sáu commit tài liệu theo thứ tự GDD → Technical → Analysis → Art → Roadmap → README: `00e9d9c`, `00d2369`, `34829d5`, `da16b49`, `38fe890`, `f96fc27`. Các đoạn lịch sử chuyển nguyên văn được giữ phía dưới; nội dung hiện hành tra docs/design/README.md.
+Chủ dự án duyệt trực tiếp controls/focus/quick items/AI và yêu cầu prototype disposable tối giản. Sáu commit tài liệu theo thứ tự GDD → Technical → Analysis → Art → Roadmap → README: `00e9d9c`, `00d2369`, `34829d5`, `da16b49`, `38fe890`, `f96fc27`. Các đoạn lịch sử chuyển nguyên văn được giữ phía dưới; nội dung hiện hành tra [documentation map](../../docs/README.md).
 
 Bỏ ProbeConfig/flags/F8, harness và tests so sánh A/B, capture/showcase và rig/trang trí. Giữ kiểm thử hành vi; snapshot phím giữ, latest buffer/arrival validation, EdgeExit manual-only, Esc theo tầng, Tab/Shift+Tab, 4/H và 5/M; Mộc Kiếm 0,70/0,32/0,10 s. Quái không lật cánh sau cắn, giữ hysteresis/free-space/SpawnSlot tie và facing deadband; không đổi combat stats. Layout/collision/spawn/route hiện tại được giữ. Water region domain còn như trước, renderer nước bị bỏ. Chat chỉ ô nhập local kiểm UI capture, chưa online.
 
@@ -439,7 +439,7 @@ Bản mẫu mới kiểm one-press approach/cast, Nấm→Sói, EdgeExit và men
 
 User yêu cầu sửa theo feedback và tự xử lý inconsistency; đây là nguồn của lượt sửa, không NSO recommendation tự thành luật. V6.2.0 prototype tại checkpoint `archive/checkpoint-46006c4` (local-only archive, không có trên origin) được giữ làm reference; build/tests/video cũ vẫn đúng cho revision đó, **không chứng minh V6.2.1 đạt G-L**. Production codebase chưa bắt đầu, không lấy các class prototype làm architecture authority.
 
-[Review Art](../../docs/design/4_HUYEN_LO_ART_VISUAL_PRODUCTION_ANALYSIS.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT thu hoạch mock, probe feel/art/UI rồi review/dựng production base; G-L revision mới trước gate Dedicated hai Client và production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
+[Review Art](../../docs/03-art/art-and-visual-production.md#art-review) đã tách nguyên tắc đủ dùng và con số chưa duyệt. CURRENT thu hoạch mock, probe feel/art/UI rồi review/dựng production base; G-L revision mới trước gate Dedicated hai Client và production rộng; gate backend thật và toàn TARGET giữ trong [Roadmap](../../docs/04-production/roadmap.md#phase-gates). Cung/Boss/PvP/SAVE giữ TARGET dù DEFER implementation khỏi slice.
 
 Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. VS-1 disposable/reference prototype đã chạy Unity với route/tests **revision V6.2.0**; [evidence cũ](README.md) không nghiệm thu V6.2.1, production architecture, UX hoặc các mô hình balance/TARGET. Production codebase chưa bắt đầu.
 
@@ -661,7 +661,7 @@ Các đoạn dưới đây giữ nguyên văn trước đồng bộ luật đư�
 ### Source fragment 3.1
 
 ````text
-Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. Các mô hình dưới đây không nghiệm thu runtime; kết quả bản mẫu thuộc [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
+Bộ power/MP/CD/gear làm control V6.2.4 giữ nguyên, nhưng rotation/resolve đã đổi; các bảng dưới đây là phép kiểm, không thay thế GDD. **TÍNH TỪ LUẬT** là phép tính xác định; **MÔ PHỎNG** phụ thuộc giả định; **ĐỀ XUẤT** chưa là luật. PvP có Food/Potion và recovery checkpoint mới nên mô hình PvP cũ chỉ là đối chiếu sát thương trực tiếp, không dự báo thắng/hòa; farm scheduler cũ cũng cần rerun vì combat/resource đổi. Các mô hình dưới đây không nghiệm thu runtime; kết quả bản mẫu thuộc [Roadmap](../../docs/90-archive/production-history.md#prototype-runtime-history).
 ````
 
 ### Source fragment 3.2
@@ -803,7 +803,7 @@ Research claims về CPU/GPRS/T9 motive là HISTORICAL INFERENCE; “1000 mobs <
 ### Source fragment 3.20
 
 ````text
-User yêu cầu sửa theo feedback và tự xử lý inconsistency là nguồn của lượt sửa design; NSO recommendation không tự thành luật. Lịch sử code/checkpoint được giữ tại [Roadmap](5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-runtime-history).
+User yêu cầu sửa theo feedback và tự xử lý inconsistency là nguồn của lượt sửa design; NSO recommendation không tự thành luật. Lịch sử code/checkpoint được giữ tại [Roadmap](../../docs/90-archive/production-history.md#prototype-runtime-history).
 ````
 
 ### Source fragment 3.21
@@ -843,7 +843,7 @@ User yêu cầu sửa theo feedback và tự xử lý inconsistency là nguồn 
 ### Source fragment 3.25
 
 ````text
-Các đề xuất dưới đây được giữ để không mất thiết kế đang cân nhắc. **P1 / PROPOSAL, chưa duyệt triển khai**, không cộng vào balance / acceptance P0. Chọn hoặc bỏ sau core gate theo [GDD scope](1_HUYEN_LO_GDD.md#vision); không phải Open Decision chặn code P0.
+Các đề xuất dưới đây được giữ để không mất thiết kế đang cân nhắc. **P1 / PROPOSAL, chưa duyệt triển khai**, không cộng vào balance / acceptance P0. Chọn hoặc bỏ sau core gate theo [GDD scope](../../docs/01-design/game-design.md#vision); không phải Open Decision chặn code P0.
 ````
 
 ### Source fragment 3.26
@@ -930,18 +930,18 @@ Feedback V6.2.4 đã sync: ba skill tích lũy/class, keyboard-complete menus, 1
 ````text
 | Tôi đang làm | Authority / evidence / contract |
 | --- | --- |
-| Character / attributes / EXP | [GDD §2](1_HUYEN_LO_GDD.md#character-power) + [Analysis §2](3_HUYEN_LO_DESIGN_ANALYSIS.md#character-evidence) |
-| Skills / nội tại / bí kíp / status / cast | [GDD §3](1_HUYEN_LO_GDD.md#class-combat) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
-| World / mob / Linh / Boss | [GDD §4](1_HUYEN_LO_GDD.md#world-farm) + [Technical §7](2_HUYEN_LO_TECHNICAL.md#timers) |
-| Farm Lv 1 → 20 / density | [Analysis §3 matrix / model](3_HUYEN_LO_DESIGN_ANALYSIS.md#farm-progression) từ GDD §4 |
-| Story / Q1–Q12 | [GDD §5](1_HUYEN_LO_GDD.md#quests-story) + [Technical §3](2_HUYEN_LO_TECHNICAL.md#combat-data) |
-| Gear / cường hóa / chuyển giao / loot / economy | [GDD §6](1_HUYEN_LO_GDD.md#gear-economy) + [Analysis §4](3_HUYEN_LO_DESIGN_ANALYSIS.md#economy-analysis) |
-| Food / Potion / death | [GDD §7](1_HUYEN_LO_GDD.md#consumables-death) + [Analysis gates](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
-| Online / PvP cược Vàng / chat | [GDD §8](1_HUYEN_LO_GDD.md#online-social) + [Technical §4–6](2_HUYEN_LO_TECHNICAL.md#network-authority) |
-| Save / SafeAnchor / reconnect | [GDD §7–8](1_HUYEN_LO_GDD.md#consumables-death) + [Technical §5–6](2_HUYEN_LO_TECHNICAL.md#profile-authority) |
-| UX / controls / art | [GDD §9](1_HUYEN_LO_GDD.md#ux-art) + [Technical §8–9](2_HUYEN_LO_TECHNICAL.md#art-contract) |
-| Acceptance / demo / QA | [GDD §10](1_HUYEN_LO_GDD.md#acceptance-routing) + [Technical §12](2_HUYEN_LO_TECHNICAL.md#qa) |
-| Quyết định và phần cần kiểm khi chơi thử | [Analysis §5](3_HUYEN_LO_DESIGN_ANALYSIS.md#open-decisions) |
+| Character / attributes / EXP | [GDD §2](../../docs/01-design/combat-and-character.md#character-power) + [Analysis §2](../../docs/04-production/playtest-and-balance.md#character-evidence) |
+| Skills / nội tại / bí kíp / status / cast | [GDD §3](../../docs/01-design/combat-and-character.md#class-combat) + [Technical §3](../../docs/02-technical/gameplay-runtime.md#combat-data) |
+| World / mob / Linh / Boss | [GDD §4](../../docs/01-design/world-and-content.md#world-farm) + [Technical §7](../../docs/02-technical/online-and-persistence.md#timers) |
+| Farm Lv 1 → 20 / density | [Analysis §3 matrix / model](../../docs/04-production/playtest-and-balance.md#farm-progression) từ GDD §4 |
+| Story / Q1–Q12 | [GDD §5](../../docs/01-design/quests-and-narrative.md#quests-story) + [Technical §3](../../docs/02-technical/gameplay-runtime.md#combat-data) |
+| Gear / cường hóa / chuyển giao / loot / economy | [GDD §6](../../docs/01-design/items-and-economy.md#gear-economy) + [Analysis §4](../../docs/04-production/playtest-and-balance.md#economy-analysis) |
+| Food / Potion / death | [GDD §7](../../docs/01-design/items-and-economy.md#consumables-death) + [Analysis gates](../../docs/04-production/playtest-and-balance.md#open-decisions) |
+| Online / PvP cược Vàng / chat | [GDD §8](../../docs/01-design/game-design.md#online-social) + [Technical §4–6](../../docs/02-technical/online-and-persistence.md#network-authority) |
+| Save / SafeAnchor / reconnect | [GDD §7–8](../../docs/01-design/items-and-economy.md#consumables-death) + [Technical §5–6](../../docs/02-technical/online-and-persistence.md#profile-authority) |
+| UX / controls / art | [GDD §9](../../docs/01-design/combat-and-character.md#ux-art) + [Technical §8–9](../../docs/02-technical/gameplay-runtime.md#art-contract) |
+| Acceptance / demo / QA | [GDD §10](../../docs/04-production/playtest-and-balance.md#acceptance-routing) + [Technical §12](../../docs/04-production/playtest-and-balance.md#qa) |
+| Quyết định và phần cần kiểm khi chơi thử | [Analysis §5](../../docs/04-production/playtest-and-balance.md#open-decisions) |
 ````
 
 ### Source fragment readme.3
@@ -1002,7 +1002,7 @@ Chỉ là lịch sử, không hướng dẫn chạy hiện tại.
 ````text
 # Huyền Lộ — game mẫu V6.2.7
 
-Đây là **disposable/reference prototype**, không production base. Unity project mẫu nằm riêng tại `prototypes/VS1_EndToEnd/`; tương lai `game/` dùng cho Unity Client/Dedicated và `backend/` cho Spring/PostgreSQL, chưa dựng. Gameplay authority là [GDD hiện hành](../../docs/design/1_HUYEN_LO_GDD.md), integration contract ở [Technical](../../docs/design/2_HUYEN_LO_TECHNICAL.md), thứ tự ở [Roadmap](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md).
+Đây là **disposable/reference prototype**, không production base. Unity project mẫu nằm riêng tại `prototypes/VS1_EndToEnd/`; tương lai `game/` dùng cho Unity Client/Dedicated và `backend/` cho Spring/PostgreSQL, chưa dựng. Gameplay authority là [GDD hiện hành](../../docs/01-design/game-design.md), integration contract ở [Technical](../../docs/02-technical/architecture.md), thứ tự ở [Roadmap](../../docs/04-production/roadmap.md).
 
 ## Chạy và thử nhanh
 
@@ -1034,7 +1034,7 @@ Mở folder này bằng Unity Hub **6000.5.9f1**, scene [VS1.unity](Assets/_Prot
 
 Học Viện nằm tây Vân Khê, Đồng Sương phía đông; reciprocal exits giữ nguyên. Đất tiền cảnh solid có thân chắn và mép cỏ liền. Đất bậc phía sau nhìn đầy xuống nền, màu trầm và mép cỏ đứt đoạn; thân không chắn actor, chỉ mặt trên đỡ khi rơi xuống. Có thể nhảy xuyên từ dưới, hoặc S/↓ chủ động xuống support phía sau. Ngoại cảnh xa/prop vẫn là lớp riêng. Cung đường/Diệp Lam ở top6,4; đồi Tạ Minh vẫn solid3,6. DS5 và PROBE8 có đất phía sau cùng đường thấp phía trước, không slab lơ lửng. Home/lane của đàn chọn support riêng, không AI đa tầng. DS1–DS6 giữ10 slots + PROBE7/4 + PROBE8/3 riêng mock, tổng17; PROBE không credit Q5.
 
-Cầu solid top1,2 cách nước trang trí2,4 u, có trụ/chống chéo/lan can sau không chắn đường. Hai đầu nối đường thấp/dốc đất, đi qua hai chiều không nhảy. S không xuyên cầu. Vũng nhỏ Vân Khê vẫn đi qua và giảm tốc ×0,85; không save JSON/swimming. Chi tiết mock ở [Roadmap §10](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-visual-review).
+Cầu solid top1,2 cách nước trang trí2,4 u, có trụ/chống chéo/lan can sau không chắn đường. Hai đầu nối đường thấp/dốc đất, đi qua hai chiều không nhảy. S không xuyên cầu. Vũng nhỏ Vân Khê vẫn đi qua và giảm tốc ×0,85; không save JSON/swimming. Chi tiết mock ở [Roadmap §10](../../docs/90-archive/production-history.md#prototype-visual-review).
 
 F9 bật/tắt trace dev live: target → desired position → occupancy → velocity → range/windup/bite count. Không đổi range hoặc cho bite xa để cứu đàn. V6.2.3 dùng rank + peer clipping làm rear wolf kẹt; V6.2.4 recovery/cross + bounded neighbor correction giữ tất cả có cơ hội re-engage. Crossings ngắn là hợp lệ, không body-block/formation/token.
 
@@ -1056,7 +1056,7 @@ HUYEN_LO_EDITOR=/home/nguyenvanrin/Unity/Hub/Editor/6000.5.9f1/Editor/Unity
 python3 prototypes/VS1_EndToEnd/PrototypeEvidence/V6_2_7/verify_revision.py
 ```
 
-[Evidence revision mới](PrototypeEvidence/V6_2_7/validation.json) và [audit docs](PrototypeEvidence/V6_2_7/document-audit.json). V6.2.4/V6.2.5/V6.2.6 pass tests/route nhưng user từ chối hình địa hình; không là visual acceptance. Các thông số, hình và lỗi riêng mock nằm trong [Roadmap §10](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#prototype-visual-review), không chen vào production docs 1–4. Acceptance driver `--verify-route --evidence-path /tmp/huyenlo-route` đi fresh Q1–Q6 bằng Rigidbody2D, auto exits và keyboard menu adapter; không dùng debug preset hoặc set quest/EXP/HP/position để skip. TimeScale4 chỉ cho automation; đây không manual playtest. Real Input System tests kiểm NPC/shop/inventory/debug và air cast; movement fixture kiểm tap/hold/coyote/no-double/drop.
+[Evidence revision mới](PrototypeEvidence/V6_2_7/validation.json) và [audit docs](PrototypeEvidence/V6_2_7/document-audit.json). V6.2.4/V6.2.5/V6.2.6 pass tests/route nhưng user từ chối hình địa hình; không là visual acceptance. Các thông số, hình và lỗi riêng mock nằm trong [Roadmap §10](../../docs/90-archive/production-history.md#prototype-visual-review), không chen vào production docs 1–4. Acceptance driver `--verify-route --evidence-path /tmp/huyenlo-route` đi fresh Q1–Q6 bằng Rigidbody2D, auto exits và keyboard menu adapter; không dùng debug preset hoặc set quest/EXP/HP/position để skip. TimeScale4 chỉ cho automation; đây không manual playtest. Real Input System tests kiểm NPC/shop/inventory/debug và air cast; movement fixture kiểm tap/hold/coyote/no-double/drop.
 
 Evidence [V6.2.0 và migration cũ](PrototypeEvidence/VS1_EndToEnd/validation.json) giữ nguyên byte và đường dẫn lịch sử. Scripts/audit cũ thuộc checkpoint trước, không chạy lên revision mới để ghi đè. Folder Assets/_Prototype vẫn giữ meta/GUID qua relocation cả project. Font [DejaVu Sans](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/DejaVuSans.ttf) có [license](Assets/_Prototype/VS1_EndToEnd/Resources/Fonts/LICENSE.txt).
 

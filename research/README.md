@@ -144,7 +144,7 @@ EOF
 
 ## Evidence notes
 
-Ba báo cáo NSO ở [notes/](notes/) chỉ là reference/historical recommendations; luật Huyền Lộ thuộc [GDD](../docs/design/1_HUYEN_LO_GDD.md). Các claim CPU/recipe line-count và recommendation chưa duyệt không phải evidence runtime.
+Ba báo cáo NSO ở [notes/](notes/) chỉ là reference/historical recommendations; luật Huyền Lộ thuộc [GDD](../docs/01-design/game-design.md). Các claim CPU/recipe line-count và recommendation chưa duyệt không phải evidence runtime.
 
 - [Research gaps](notes/NSO_RESEARCH_GAPS_BEFORE_HUYEN_LO_LOCK.md)
 - [Modernization](notes/NSO_TO_HUYEN_LO_MODERNIZATION_RESEARCH.md)

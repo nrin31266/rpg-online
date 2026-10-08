@@ -1,6 +1,6 @@
 # Huyền Lộ — bản chạy thử tối giản
 
-Đây là disposable prototype, sẽ thiết kế lại production từ đầu. Luật đọc [GDD](../../docs/design/1_HUYEN_LO_GDD.md), contract đọc [Technical](../../docs/design/2_HUYEN_LO_TECHNICAL.md), phạm vi đọc [Roadmap](../../docs/design/5_HUYEN_LO_IMPLEMENTATION_ROADMAP.md#vs-1).
+Đây là disposable prototype, sẽ thiết kế lại production từ đầu. Luật đọc [GDD](../../docs/01-design/game-design.md), contract đọc [Technical](../../docs/02-technical/architecture.md), phạm vi đọc [Roadmap](../../docs/04-production/roadmap.md#vs-1).
 
 ## Chạy
 
@@ -27,7 +27,7 @@ Một phiên RAM mới bắt đầu Q1; không save JSON, không resume, F8 mở
 | Esc | Modal/chat → pending/buffer → focus → no-op; mỗi press xử một tầng |
 | Click | Focus, NPC/loot hoặc menu; cùng command/validation với bàn phím |
 
-Luật giữ phím/arrival/buffer/focus ở [GDD §3](../../docs/design/1_HUYEN_LO_GDD.md#pending-cast). UI nhận/trả quest, nhập phái/nghỉ thành công đóng hội thoại; shop/kho giữ mở. Nhập phái phải tự tháo Mộc Kiếm, có Phong Du và Diệp Lam riêng; nhánh Cung chưa playable.
+Luật giữ phím/arrival/buffer/focus ở [GDD §3](../../docs/01-design/combat-and-character.md#pending-cast). UI nhận/trả quest, nhập phái/nghỉ thành công đóng hội thoại; shop/kho giữ mở. Nhập phái phải tự tháo Mộc Kiếm, có Phong Du và Diệp Lam riêng; nhánh Cung chưa playable.
 
 ## Phạm vi
 
