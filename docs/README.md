@@ -86,7 +86,7 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Potion gameplay/resource rule (WHAT) | [Items](01-design/items-and-economy.md#consumables-death) |
 | Potion realtime application ordering (HOW) | [Runtime](02-technical/gameplay-runtime.md#potion-ordering) |
 | Potion durability/crash/reconnect (HOW) | [Online](02-technical/online-and-persistence.md#potion-durability) |
-| Perspective/26-frame interpretation/socket/accounting | [Art](03-art/art-and-visual-production.md) |
+| Perspective/26 logical-frame mapping/socket/accounting | [Art](03-art/art-and-visual-production.md) |
 | Early Kiếm/Cung và production readiness | [Roadmap](04-production/roadmap.md), [protocol](04-production/playtest-and-balance.md#early-two-class-probe) |
 | Old tables/prototype history | [Design history](90-archive/design-history.md), [Art history](90-archive/art-history.md), [Production history](90-archive/production-history.md) |
 
@@ -129,10 +129,28 @@ Index chỉ dẫn nơi quyết định; không giữ options hoặc gameplay val
 | QUEST-03 | PLAYTEST | Fresh route, narrative/usability và duration có đạt? | [Quest](01-design/quests-and-narrative.md), [evidence](04-production/playtest-and-balance.md) | G-L/C/T |
 | POT-01 | LOCKED realtime / OPEN durability | Accepted Potion survive crash/outage thế nào? | [Online](02-technical/online-and-persistence.md#potion-durability) | G-D/G-T bắt buộc |
 | TECH-01 / SAVE-01 | SPIKE | Auth/lease/checkpoint/reconnect/recovery có nhất quán? | [Online](02-technical/online-and-persistence.md) | G-D |
-| A01 / A02 / A17 | OPEN | Raster/frame meaning, technique và real accounting? | [Art](03-art/art-and-visual-production.md#art-open-decisions) | Early probes/P15 |
+| A01 / A02 / A17 | OPEN | Raster mapping trong26 logical frames, technique và real accounting? | [Art](03-art/art-and-visual-production.md#art-open-decisions) | Early probes/P15 |
 | A03 | BASELINE | Stat-only visual binding? | [Items](01-design/items-and-economy.md#a03) | Gear/UI integration |
 | A04 / A08 / A09 / A12 / A16 | OPEN visual details | Motif/corpse/kit/camera/Boss pose? | [Art](03-art/art-and-visual-production.md#art-open-decisions) | Pha R/P01–P15 |
 | A05 / A06 / A14 | OPEN/TUNABLE details | Ranged timing, role và air policy? | [Combat](01-design/combat-and-character.md#a05) | Pha R/G-C |
 | A07 / A10 | OPEN details | Dummy/content/LoS/Return authoring? | [World](01-design/world-and-content.md#a07) | PHY-01/G-C |
 | A11 | OPEN presentation | Cosmetic anticipation/schema? | [Runtime](02-technical/gameplay-runtime.md#a11) | G-N |
 | A13 / A15 | OPEN details | Select preview và terminal/persistence ordering? | [Online](02-technical/online-and-persistence.md#a13) | G-D/P12 |
+
+
+<a id="consolidation-20261009"></a>
+
+## Gameplay/system consolidation — 2026-10-09
+
+Direction cập nhật tại owner: [Inventory 60/stack/item policy](01-design/items-and-economy.md#inventory-contract), [physical quest collection](01-design/quests-and-narrative.md#quest-collection), [fixed Jump/two facing](01-design/combat-and-character.md#movement-direction), [Q6/NPC](01-design/quests-and-narrative.md#npc-service-review), [Shop UI](02-technical/gameplay-runtime.md#shared-item-ui) và [Art facing](03-art/art-and-visual-production.md#player-facing). Rule không copy vào index.
+
+Review: [Q1–Q12 completeness/counts/identity credit](01-design/quests-and-narrative.md#quest-gameplay-review), [Q2 draft](01-design/quests-and-narrative.md#q2-journey), [code audit/matrix](02-technical/architecture.md#source-audit-20261009), [transaction flows](02-technical/gameplay-runtime.md#item-transaction-flows), [entitlement trade-off/recovery](02-technical/online-and-persistence.md#personal-quest-recovery), [vertical slices](04-production/roadmap.md#consolidation-slices) và [acceptance chưa chạy](04-production/playtest-and-balance.md#consolidation-acceptance).
+
+Counts và standard MobIdentity credit đã được duyệt trong recovery hiện tại. Exact Q2 item/name, Q6 MP tutorial reschedule, schema, TTL và 26/raster mapping vẫn chưa duyệt; không dùng plan hay audit observations của prototype làm implementation authority hoặc gate pass. Stable IDs, mob death và controls giữ; thay counts/services/target propagation theo direction đã xác nhận ở owner.
+
+
+## History recovery / canonical correction — 2026-10-09
+
+Tra [Decision Trace và Git evidence](01-design/combat-and-character.md#combat-decision-trace), [primary/propagation và OPEN probes](01-design/combat-and-character.md#target-propagation), [six-skill completeness](01-design/combat-and-character.md#combat-completeness), [six-skill visual contract](03-art/art-and-visual-production.md#six-skill-visual), [quest identity semantics](01-design/quests-and-narrative.md#mob-identity-credit), [NPC/service matrix](01-design/quests-and-narrative.md#npc-service-review), [vendor catalogs](01-design/items-and-economy.md#vendor-catalogs) và [placements](01-design/world-and-content.md#quest-farm-placement). Không dùng label APPROVED trong commit/doc để suy approval của người dùng.
+
+Đường implementation: [C0 combat micro-slice](04-production/roadmap.md#combat-micro-slice), [15 combat cases + quest regression chưa chạy](04-production/playtest-and-balance.md#recovery-combat-acceptance), [nine slices](04-production/roadmap.md#consolidation-slices) và [một task đầu](04-production/roadmap.md#first-coding-slice). Numeric proximity/vertical/behind-player/LoS là OPEN/PROBE tại Combat, không luật khóa hoặc runtime PASS.

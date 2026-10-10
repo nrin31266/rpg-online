@@ -20,16 +20,16 @@ Luật ngoài domain thuộc owner trong [documentation map](../README.md); evid
 
 ## Tầm nhìn và phạm vi
 
-**Giới thiệu ngắn:** RPG hành động 2D online ngang trên PC / Unity. Tân Lữ khám phá linh mạch, chọn Kiếm / Cung, tự phân bốn thuộc tính, gom quái đánh lan, nâng gear, săn Linh Biến / Boss và tỷ thí.
+**Giới thiệu ngắn:** RPG 2D online ngang, target-based trên PC / Unity. Tân Lữ khám phá linh mạch, chọn Kiếm / Cung, tự phân bốn thuộc tính, gom quái đánh lan, nâng gear, săn Linh Biến / Boss và tỷ thí.
 
 **STRONG DIRECTION hình ảnh:** cổ phong võ hiệp/huyền huyễn Á Đông, lấy cảm hứng cảnh quan/văn hóa Việt Nam và tiên hiệp nhẹ, không khóa triều đại cụ thể hay thuần làng quê. Camera gameplay pure 2D orthographic side-view LOCKED; kiến trúc/motif và sprite-facing thuộc [Art owner](../03-art/art-and-visual-production.md#visual-perspective), không rewrite map/lore/quest.
 
 | Trụ cột | Người chơi cảm nhận | Dấu hiệu đạt |
 | --- | --- | --- |
-| Farm có nhịp | Gom quái rồi cleave / pierce / spread / explosion | Lv 5 single; Lv 10 học tiến cảnh max 3; Lv 17 đại chiêu |
+| Farm có nhịp | Chọn primary rồi đánh lan gần mục tiêu / Spread / explosion theo Combat owner | Lv 5 single; Lv 10 học tiến cảnh max 3; Lv 17 đại chiêu |
 | Build tự do | Đổi phân phối điểm để thử cách chơi | All-in không bị khóa progression; Tẩy Mạch sửa build |
 | Progression hữu hình | Gear mới đổi cả stat và hình | Weapon / Armor / Pants đổi sprite |
-| Hai class khác nhau | Kiếm áp sát; Cung giữ khoảng cách | Range, hit shape và control khác rõ |
+| Hai class khác nhau | Kiếm áp sát; Cung giữ khoảng cách | Range, propagation và control khác rõ |
 | Online có ý nghĩa | Co-op farm / Boss, chat, challenge | Client kết nối tham gia gameplay thật |
 | Scope hoàn chỉnh | Ít nội dung nhưng nối thành hành trình | Lv 1 → 20, ba chương, chính tuyến và vòng chơi sau truyện |
 

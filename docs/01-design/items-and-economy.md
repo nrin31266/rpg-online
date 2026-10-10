@@ -116,7 +116,7 @@ Tinh Hoa luôn tính từ cấp đích sau commit, không copy giá trị cộng
 | Tinh Thạch | 8%, 1 | 100%, 1 | Guaranteed 5–8 |
 | Gear exclusive | Common 4 / Uncommon 1 / Rare 0,1 / None 94,9% | Uncommon 30 / Rare 6 / Epic 0,5 / None 63,5% | Rare 40 / Epic 8 / None 52%, tối đa 1 |
 | Hồi Sinh Phù | — | — | 30%, 1 |
-| Thỏi Vàng | — | — | Guaranteed 3–5, stack 99, sell 250 / thỏi |
+| Thỏi Vàng | — | — | Guaranteed 3–5, stack theo [Inventory contract](#inventory-contract), sell 250 / thỏi |
 
 Boss Thỏi chỉ thành currency khi nhặt + bán NPC, không auto-credit / không shop buy. Boss không dùng normal level-penalty. Counts uniform inclusive; channels independent, gear exclusive. Q12 Gold turn-in riêng một lần / character, không thêm pile. Linh gear band theo base mob level ở source table; cùng một mob dùng một Linh reward profile.
 
@@ -158,7 +158,7 @@ Eligible-FFA cố ý cho người đến sau nhặt đồ level-hợp lệ, khô
 | Xích Thạch Linh Lv 16 | II / 6 slots | III | Xích: Khoáng Xích Nham (9); Huyền: Mảnh Cổ Ấn (12) | Normal hoặc Linh |
 | Cổ Môn Vệ Binh Lv 20 | III / 6 slots | III | Huyền: Mảnh Cổ Ấn (12) | Normal hoặc Linh |
 | World Boss Lv 20 | III / 6 slots | III | Thỏi Vàng theo channel table | Boss |
-| Q3 / Q4 / Q6 / Q7 / Q11 | Quest exceptions trong catalog | Tutorial supplies theo quest | Evidence virtual riêng, không farm material | Guaranteed, không loot roll |
+| Q3 / Q4 / Q6 / Q7 / Q8 / Q10 / Q11 | Quest exceptions trong catalog | Tutorial supplies theo quest | Collection quest-bound riêng theo Quest owner, không nhập chung farm material | Guaranteed, không loot roll |
 
 Quest evidence không dùng Trade Material đã farm; tooltip material “Vật liệu giao dịch — có thể bán”. Tinh Thạch không có tier riêng. Source Nấm / Sói Lv 4 loại Weapon ở **mọi map**, không dùng MapId để thay slot pool.
 
@@ -169,11 +169,11 @@ Quest evidence không dùng Trade Material đã farm; tooltip material “Vật 
 
 Quest credit/predicates theo [Quest owner](quests-and-narrative.md#quests-story), độc lập EXP / Gold>0. Normal contributor pickup 5% theo cùng eligibility. Journey normal 5 / Linh 100 cho regular recipient ≥ 20%, nhân own level factor / floor; Boss 500 / deathID cho qualifying 10%; quest 150 / chapter 300 một lần, PvPwin 200 / matchID. Không claim points bằng pickup.
 
-Bag 30 / storage 40; stack 99, gear 1. Pickup stackable ưu tiên fill compatible stack có sẵn, overflow sang stack mới; transaction không fit toàn bộ thì không consume ground item. Bag đầy nhưng stack còn chỗ vẫn nhặt được. Ground Normal / Linh Biến 60 s / Boss 90 s, chỉ physical items; unequip cần ô trống, không bán equipped.
+Inventory ban đầu **60 slots — LOCKED**, Storage giữ 40. Không expansion/VIP/mua ô/nâng túi P0. [Inventory contract](#inventory-contract) sở hữu stack và item classification. Pickup phải fit toàn amount sau merge; thất bại giữ nguyên ground/entitlement. Bag 60/60 vẫn nhận được item vào compatible stack còn trong technical bound. Ground thường/Linh 60 s, Boss 90 s giữ nguyên; personal quest representation có TTL hữu hạn riêng còn TUNABLE. Unequip cần capacity, không bán equipped.
 
-Turn-in tính X ô trống thực cần sau merge stack: thiếu thì báo “Cần X ô trống trong hành trang”, giữ READY_TO_TURN_IN; không consume evidence / trao một phần reward / set Completed. Vàng / EXP / story / Journey không cần slot; retry không nhận lặp.
+Turn-in mô phỏng consume đúng collection items rồi merge reward, tính X ô còn thiếu trên net inventory. Thiếu thì báo “Cần X ô trống trong hành trang”, giữ READY_TO_TURN_IN; không consume vật phẩm / trao một phần reward / set Completed. Vàng / EXP / story / Journey không cần slot; retry không nhận lặp.
 
-Yên Thảo bán Food / Potion / phù; Bách Luyện bán Common I / II, Tinh Thạch **800 Vàng**, upgrade / sell; Yên Thảo bán Tẩy Mạch. Q9 không gear-exclusive, skip không mất nâng slot. Một tiền tệ Vàng. Bag Sort / protection gear P1; validation inventory P0.
+Yên Thảo bán Food/HP/MP Potion; Bách Luyện bán Common I/II, Tinh Thạch **800 Vàng**, General Sell/Enhance/Transfer và Q4 sample; Mộc An sở hữu Utility Shop Hồi Sinh Phù/Tẩy Mạch Phù cùng Storage40/Rest. Giá/effect hiện hành giữ nguyên. Q9 không gear-exclusive, skip không mất nâng slot. Một tiền tệ Vàng. Bag Sort / protection gear P1; validation inventory P0.
 
 > **Đọc sâu:** [Playtest & Balance — kinh tế và enhance](../04-production/playtest-and-balance.md#economy-analysis)
 
@@ -234,6 +234,51 @@ Food icon cho biết active/absent, remaining duration, cảnh báo gần hết 
 
 Mọi loại Bình Sinh Lực dùng chung **hồi chiêu HP 8 s**; mọi loại Bình Linh Lực dùng chung **hồi chiêu MP 8 s**. Hai nhóm **tách nhau**: dùng HP không khóa MP và ngược lại. Không có hồi chiêu riêng từng bậc bình.
 
-Tẩy Mạch Phù: 1.200 Vàng tại Yên Thảo, stock vô hạn. Gameplay reset giữ class/level/gear/quest/learned skills theo Combat owner.
+Tẩy Mạch Phù: 1.200 Vàng tại Mộc An, stock vô hạn. Gameplay reset giữ class/level/gear/quest/learned skills theo Combat owner.
 
 Food không hồi HP/MP khi actor đã chết. Mất phiên xóa Food runtime; resume phiên còn sống giữ state theo Online owner.
+
+<a id="inventory-contract"></a>
+
+## Inventory: capacity, stack và item classification
+
+**LOCKED:** 60 ô ban đầu, kể cả vật phẩm thu thập nhiệm vụ; không reserve quest slots. **STRONG DIRECTION:** cùng identity và stack-compatible dùng chung ô, không low gameplay cap 20/99/999. Không gọi stack vô hạn. Storage vẫn 40 ô, dùng cùng stack rules; không thay capacity Storage hoặc mở Trade P0.
+
+**Technical bound — BASELINE kỹ thuật đề nghị, cần parity test trước wire/DB schema:** quantity của một stack là integer `1..2_147_483_647` (int32 signed dương); request quantity cũng trong miền này, không float/âm/0. Tính tổng/merge và `unitPrice × quantity` bằng checked int64; reject overflow/currency out-of-bound trước mutation. Chọn wire/DB type cụ thể ở G-D, không tạo SQL schema bằng quyết định này. Gold bound riêng phải được kiểm ở G-B/G-D, không suy Gold là int32 từ prototype. Tại giới hạn kỹ thuật, phần dư có thể sang stack tương thích mới nếu đủ ô; không fit toàn amount thì reject toàn lệnh. Không silently clamp, wrap hoặc mất phần dư. UI formatter rút gọn có tooltip số chính xác; không áp cap vì text bị dài.
+
+Compatibility key gồm template identity, character/QuestId/objective binding và mọi state có nghĩa gameplay (rarity/options/enhancement nếu applicable). Khác binding không merge. Unique equipment luôn là instance riêng, quantity 1; không thêm durability nếu chưa có. Stack identity còn sống ổn định; khi merge, receipt ánh xạ entitlement/source tới stack đích + delta quantity, không hứa giữ tất cả incoming instance IDs như nhiều physical instances cùng ô.
+
+| Classification | Chiếm ô? | Stack | Sell | Trade | Manual Drop | Death loss | Persistence | Server owner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Stackable consumable — Food/Potion/phù | Có | Compatible, technical bound | Theo sellValue/policy | P0 không có Trade | Không thêm manual-drop feature P0 | Theo recovery hiện hành; không thêm loss | Quantity/location/binding | Inventory mutation; Use handler riêng |
+| Stackable material/Tinh Thạch/Thỏi | Có | Compatible, technical bound | Catalog hiện hành | P0 không có Trade | Chưa có handler production; không tự mở | Không thêm loss | Stack + quantity | Inventory; Sell/Storage riêng |
+| Quest-bound collection stack | Có, ô thường | Cùng quest/objective/identity mới merge | Cấm, reason nhiệm vụ | Cấm kể cả khi Trade được thêm | Cấm | Không mất | Item/binding + entitlement claim receipt | Inventory + Quest validation |
+| Normal item referenced by quest — Nấm Sương Q4 | Có | Compatible theo binding của sample; không merge nhầm bản thường trước sell | **Có** ở đúng Bách Luyện/step; gỡ temporary restriction sau action theo quest | P0 không có Trade | Tutorial restriction tới bước hợp lệ; không feature drop mới | Không mất quyền tutorial | Item và receipt `ItemSold` | Sell handler; quest chỉ observe commit |
+| Unique equipment instance | Có khi bag; equipped nằm ngoài bag | Không; enhancement/rarity/options riêng | Chỉ unequipped và policy cho phép; Mộc/bound cấm | P0 không có Trade | Bound cấm; không tự thêm normal-drop | Không đổi item-loss rule | Instance/location/slot/state | Equipment + Inventory |
+| Bound manual/power item | Có tới khi học | Receipt grant tối đa một/quyền học; giữ quantity 1 mỗi bound learning instance, không phải cap consumable 99 | Cấm | Cấm | Cấm | Không mất | Instance/grant/learn receipt | Learn handler consume + learned SkillId atomic |
+| Non-world UI-only feedback | Không | Không inventory quantity | Không | Không | Không | Không applicable | UI selection không bền; objective action receipts nếu cần | UI chỉ đọc; **không dùng nhóm này thay collection item** |
+| Currency — Vàng | Không | Numeric balance bound riêng | Không item để bán | Không thêm Trade | Không ground coin item | Theo contract hiện hành | Balance + transaction receipt | Shop/reward mutation; Spring commit |
+
+Personal quest ground drop là **delivery/ownership**, không một ItemKind hay một boolean `questItem` dùng cho tất cả. Tách item policy/binding khỏi entitlement/representation; Q4 sample được bán không mâu thuẫn với collection quest-bound cấm bán. **BASELINE implementation đề nghị:** quest-bound collection nằm trong bag, không gửi Storage P0 để tránh ambiguity về "đang mang"; supply gear/storage theo policy riêng. Pending entitlement không chiếm ô cho tới claim, nhưng cũng không được tính là đã có item. Normal quest-referenced nghĩa item có khả năng giao dịch theo domain; không khôi phục hệ Trade đã DROP P0.
+
+<a id="service-terminology"></a>
+
+## Enhancement, Chuyển giao và Tẩy Mạch
+
+Enhancement tăng cấp theo cost/RNG/trần hiện hành. **Chuyển giao (Enhancement Transfer)** tiêu source, giữ target instance/template/phẩm chất và chuyển cấp cùng bậc/đúng một bậc tiếp theo theo contract đã chốt; Bách Luyện sở hữu. **Tẩy Mạch** trả điểm thuộc tính, không đổi phái/ClassChosenLevel; Mộc An giữ ownership và giá 1200 theo chỉ đạo recovery, cùng Hồi Sinh Phù1000/Storage40/Rest; Yên Thảo giữ Food/HP/MP. Utility P0 chỉ hai phù đã có; nhóm bùa tương lai chỉ thêm nếu có requirement/catalog được duyệt, không seasonal/Crafting hoặc mở rộng túi. **Hoán Chuyển — PROPOSAL bị khuyến nghị bỏ như concept mới:** chưa thấy input/output/use-case khác Transfer; dùng tên Chuyển giao hiện hành, không thêm handler/item/cost mới.
+
+
+<a id="vendor-catalogs"></a>
+
+## Vendor catalogs và Sell policy — ownership đã duyệt, engineering policy BASELINE
+
+Một Shop UI Buy/Sell đọc catalog và capabilities của NPC, không mỗi NPC một layout. Root menu chọn Shop/Storage/Rest/Enhance/Transfer theo [NPC owner](quests-and-narrative.md#npc-service-review); các dịch vụ đó không thành Shop tabs. ItemDefinition giữ giá/effect/explicit sellValue hiện hành; catalog là refs, không copy stats.
+
+| NPC | Buy catalog P0 | Sell capability BASELINE | Other services |
+| --- | --- | --- | --- |
+| Yên Thảo | Ba Food + HP I/II/III + MP I/II/III; không Hồi Sinh/Tẩy Mạch | Chính các consumables Food/HP/MP sellable theo hiện hành; bag khác vẫn hiện nhưng disabled reason “Bán tại Bách Luyện” | Q5/Talk và tư vấn hồi phục thông thường; không thêm paid heal mới |
+| Bách Luyện | Common I/II theo class/equip gates + Tinh Thạch800; III/Mộc/manual không shop buy | **General Sell** mọi unequipped bag item sellable theo policy, cả materials/drop-only/consumables; quest-bound cấm. Q4 exact sample/step riêng | Enhance/Transfer/Q3/Q4/Q7; không Hoán Chuyển duplicate |
+| Mộc An | **Hồi Sinh Phù1000 + Tẩy Mạch Phù1200**; stock vô hạn/effect/cooldown giữ hiện hành | Chỉ hai utility sellable theo explicit sellValue/current quarter-price rule; mọi item khác disabled reason ở Sell | Storage40/Rest full; dùng Tẩy Mạch vẫn inventory Use handler theo Combat, không hai reset services |
+| Lâm Bá/hai mentors/Hạo Vũ | Không item vendor mới; manuals chỉ quest grants | Không General Sell | Theo NPC owner |
+
+Sell subsets ở Yên/Mộc là engineering recommendation để giữ nghề và reuse Buy/Sell tabs; không nerf giá hay đổi item policy. Bách vẫn bán được toàn bộ đồ hợp lệ, không buộc người chơi quay từng vendor. Catalog revisions/vendor capabilities server-owned; wrong vendor/template/step/quantity fail trước mutation. Hồi Sinh/Tẩy Mạch chỉ có một canonical Buy owner Mộc; Boss vẫn có thể drop Hồi Sinh như channel cũ. Chuyển catalog không regrant/migrate giá hoặc tạo utility item mới.

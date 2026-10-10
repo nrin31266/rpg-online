@@ -64,9 +64,9 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 - **Vai trò:** Khu vực an toàn tuyệt đối, không có quái vật. Nơi tập trung toàn bộ dịch vụ cốt lõi, tiếp nhận nhiệm vụ và là điểm trở về sau các chuyến thám hiểm.
 - **Phân khu chức năng không gian (Spatial Layout):**
   + *Khu trung tâm công cộng:* Nơi già làng Lâm Bá đứng bên gốc đa cổ thụ và bảng chỉ dẫn, đón tiếp người chơi mới (Q1/Q2), dẫn dắt cốt truyện chính và phong ấn Huyền Môn (Q8, Q10–Q12).
-  + *Khu Dược thảo (phía Đông):* Nhà thuốc mộc mạc của Yên Thảo, bày các sọt thảo mộc phơi khô, phục vụ mua bán bình Máu/Linh lực, thức ăn, bùa Hồi Sinh và dịch vụ Tẩy Mạch Phù.
+  + *Khu Dược thảo (phía Đông):* Nhà thuốc mộc mạc của Yên Thảo, bày các sọt thảo mộc phơi khô, phục vụ Food/bình Máu/Linh lực và lời khuyên phục hồi thông thường; utility thuộc khu Mộc An.
   + *Khu Lò rèn (phía Tây tựa vách đá):* Xưởng rèn rực lửa than của Bách Luyện với đe thép và bễ thổi, phụ trách rèn trang bị, cường hóa, chuyển giao và nhiệm vụ Mộc Kiếm (Q3/Q4/Q7).
-  + *Khu Kho lương & Nhà nghỉ (phía Bắc):* Gian nhà gỗ yên tĩnh của Mộc An, cung cấp dịch vụ cất giữ đồ đạc (`Storage`) và nghỉ ngơi hồi phục toàn bộ sinh lực/linh lực.
+  + *Khu Kho lương & Nhà nghỉ (phía Bắc):* Gian nhà gỗ yên tĩnh của Mộc An, cung cấp dịch vụ cất giữ đồ đạc (`Storage`) và nghỉ ngơi hồi phục toàn bộ sinh lực/linh lực cùng Utility Shop Hồi Sinh Phù/Tẩy Mạch theo Items owner.
   + *Các lối thông map:* Nhánh Tây nối sang Học Viện (`EdgeExit`); Nhánh Đông nối sang Đồng Sương (`EdgeExit`); Nhánh Nam dẫn xuống Lôi Đài của Hạo Vũ (`SpecialGate`).
 - **Triết lý Onboarding Q1:** Người chơi không đứng một chỗ bấm hội thoại menu mà phải thực sự di chuyển bộ qua từng khu vực chức năng, nhận diện vị trí các NPC để hình thành bản đồ nhận thức không gian (mental map) vững chắc.
 
@@ -75,8 +75,8 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 #### Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
 - **Vai trò:** Khu vực bán an toàn dành riêng cho tập luyện kỹ năng cơ bản, thử nghiệm di chuyển và nghi thức chọn phái (Q2, Q3, Q6).
 - **Phân khu 3 khu vực cốt lõi:**
-  + *Tuyến vượt chướng ngại vật Q2 (`HV_ObstacleCourse`):* Bắt đầu từ cửa vào (`HV_Entrance`), người chơi phải nhảy qua gờ đá cao (`HV_JumpLedge`), tiếp cận sàn gỗ mỏng trên cao rồi bấm `↓` để rơi xuyên sàn (`DropThrough`) đáp xuống thềm dưới (`HV_DropLanding`), sau đó men theo đường vòng quay lại lối ra làng. Tuyến này kiểm tra trực quan toàn bộ năng lực di chuyển cơ bản (Move, Jump, DropThrough) trước khi cho phép cầm vũ khí.
-  + *Sân tập Bù Nhìn (`HV_DummyYard`):* Bãi đất bằng phẳng bố trí các cọc Bù Nhìn rơm độc lập theo [Q3 owner](quests-and-narrative.md#quests-story). Việc đặt nhiều cọc ngăn chặn tình trạng người chơi chen lấn tranh giành mục tiêu khi làm Q3 và Q6.
+  + *Tuyến Q2 (`HV_ObstacleCourse`): * checklist bắt buộc Jump→Drop cũ SUPERSEDED. Giữ stable `HV_Entrance`, `HV_JumpLedge`, `HV_DropLanding` như anchor để review mini journey có mục đích tại [Quest owner](quests-and-narrative.md#q2-journey). Route dùng bậc solid và jump cố định, return rõ; one-way kết cấu là optional route, không bắt Q2 DropThrough. Exact destination/item/traversal count vẫn PROPOSAL, draft có typed requirements ở Quest owner; cần duyệt exact content và blockout trước production authoring.
+  + *Sân tập Bù Nhìn (`HV_DummyYard`):* Bãi đất bằng phẳng bố trí các cọc Bù Nhìn rơm độc lập theo [Q3 owner](quests-and-narrative.md#quests-story). **Năm placements đã duyệt: 3 sân chính + 2 khu phụ/ven tuyến đi**, cùng một Bù Nhìn/pool/lifecycle. Số placements giảm contention, không bảo đảm mọi N người có credit; không bắt Q3 chờ hồi sinh hoặc hạ bốn slot khác nhau.
   + *Khu vực Nhập Phái (`HV_ClassHall` / Điện Nhập Phái):* Khu vực riêng biệt cho hai phái với functional zoning rõ ràng; vị trí tả/hữu/Tây là đề xuất blockout tham khảo (tọa độ chính xác OPEN). Mentor Phong Du (Kiếm) và Mentor Diệp Lam (Cung) được bố trí bình đẳng, dễ thấy như nhau, khẳng định không đặt Kiếm Sĩ làm lựa chọn mặc định trước Cung Thủ.
 
 <a id="3-lôi-đài--đấu-trường-1v1-pvp"></a>
@@ -121,7 +121,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 - **Phân bố 2 nhánh chiến lược:**
   + *Nhánh hẻm núi ngoại vi (Canyon Branch):* Tuyến đèo đá đỏ nhiều bậc cao độ dẫn từ Bạch Vân vào, nơi các toán Đoạt Mạch Đạo Tặc Lv 13 rải rác đào trộm cổ vật (cụm `XN1–XN3` cho Q10, cụm `XN7`).
   + *Nhánh khe nứt khoáng mạch ngầm (Deep Rift Branch):* Tuyến đường ăn sâu vào lòng núi, nơi bố trí **3 trụ phong ấn cổ xưa** (`XN4_SealA`, `XN5_SealB`, `XN6_SealC`) do Xích Thạch Linh Lv 16 canh gác (cụm `XN4–XN6` cho Q11, cùng `XN8`, `XN9`).
-- **Điểm kết nối tối thượng:** Cuối nhánh sâu là đại môn Huyền Môn (`XN_HuyenMon_Outer`) tựa vào vách núi — một `SpecialGate` phong tỏa lối vào cấm địa, chỉ mở ra khi hoàn thành nghi thức thu thập đủ 3 Mảnh Cổ Ấn trong Q11.
+- **Điểm kết nối tối thượng:** Cuối nhánh sâu là đại môn Huyền Môn (`XN_HuyenMon_Outer`) tựa vào vách núi — một `SpecialGate` phong tỏa lối vào cấm địa, activation kiểm đủ Mảnh Ấn1/2/3 Q11 sau ba bước trụ; chỉ Q11 Completed mới mở map. Không dùng trade material Mảnh Cổ Ấn hoặc kill tổng10 tự mở cổng.
 
 <a id="8-huyền-tích-lv-1720--phế-tích-cấm-địa--world-boss-huyền-nham-cự-thú"></a>
 
@@ -129,7 +129,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 - **Ý đồ không gian & Topology:** Phế tích đá cổ đại khép kín với các bậc thang lớn và cấu trúc phòng sảnh phân cấp. Chi tiết mỹ thuật (rêu phong, hoa văn ấn mờ, ánh sáng tím) do [Art](../03-art/art-and-visual-production.md) sở hữu; design owner định nghĩa functional topology, encounter zones và ranh giới Boss.
 - **Phân khu chức năng nghiêm ngặt:**
   + *Tiền môn và hành lang ngoài (Outer Gate & Corridors):* Các thềm đá bậc dẫn vào phế tích, do Xích Thạch Linh Lv 16 trấn giữ lối vào (cụm `HT1`, `HT6`).
-  + *Trung sảnh và hai cánh tả/hữu (Great Hall & Wings):* Dãy hành lang đá với các bậc thang cao kết nối các phòng phụ, nơi Cổ Môn Vệ Binh Lv 20 đứng gác (cụm `HT2–HT5` cho Q12, cùng `HT7`, `HT8`).
+  + *Trung sảnh và hai cánh tả/hữu (Great Hall & Wings):* Dãy hành lang đá với các bậc thang cao kết nối các phòng phụ, nơi Cổ Môn Vệ Binh Lv 20 đứng gác (cụm `HT2–HT5`, cùng `HT7`, `HT8`). Mọi Cổ Môn Vệ Binh đúng identity đều được xét Q12 theo [Quest owner](quests-and-narrative.md#mob-identity-credit); groups là placement/route, không whitelist.
   + *Khu vực cấm điện trung tâm — BossCombatArea:* Đại sàn đấu phẳng, sạch chướng ngại vật; **tách biệt tuyệt đối khỏi quái thường (normal-spawn exclusion)**. Đây là đấu trường dành riêng cho World Boss Huyền Nham Cự Thú trong Q12, đảm bảo telegraph đòn đánh của Boss luôn rõ ràng, không bị quái thường quấy nhiễu hay gây nhiễu loạn mục tiêu.
 
 ---
@@ -171,7 +171,7 @@ Dưới đây là kế hoạch phân bổ bãi quái (pockets) cho 5 bản đồ
 
 | Map farm | Ý đồ bãi và phân bố không gian | Số cụm dự kiến (Pockets) | Số quái hoạt động (Active Mob Budget) | Quy mô mỗi cụm (Group Size) | Phân bố tầng / nhánh | Stable authored IDs / Quest anchors cần bảo toàn | Điểm an toàn & Ranh giới cách ly |
 | --- | --- | ---: | ---: | ---: | --- | --- | --- |
-| **Đồng Sương** (Lv 1–5) | Onboarding, đồi thấp, nương bậc và bìa rừng. Nhiều bãi nhỏ, không gian mở, tránh áp lực dồn dập. | 8–10 cụm | 14–20 quái | 1–2 quái / cụm | Tuyến dưới/ven suối: Nấm Linh (Lv 2). Đồi bậc giữa và thềm đông: Sói Sương (Lv 4). | `DS1` (Nấm Lv2), `DS2` (Q4 Nấm Linh), `DS3–DS6` (Q5 Da Sói) | Dải vào an toàn 6–8 u từ Vân Khê; các bãi Sói cách biệt đường về làng. |
+| **Đồng Sương** (Lv 1–5) | Onboarding, đồi thấp, nương bậc và bìa rừng. Nhiều bãi nhỏ, không gian mở, tránh áp lực dồn dập. | 8–10 cụm | 14–20 quái | 1–2 quái / cụm | Tuyến dưới/ven suối: Nấm Linh (Lv 2). Đồi bậc giữa và thềm đông: Sói Sương (Lv 4). | `DS1` (Nấm Lv2), `DS2` (Q4 Nấm Linh), `DS3–DS6` (Q5 Sói Sương) | Dải vào an toàn 6–8 u từ Vân Khê; các bãi Sói cách biệt đường về làng. |
 | **Trúc Ảnh** (Lv 5–10) | Rừng trúc rậm rạp, cầu gỗ, thềm đá cao thấp, kiểm tra di chuyển bậc và đánh quái theo nhóm. | 9–11 cụm | 20–28 quái | 2–3 quái / cụm | Tuyến dưới ven suối: Sói Sương (Lv 4). Bãi trúc trung tâm & quanh ấn: Sói Trúc Ảnh (Lv 8). Tuyến cầu trên cao & vách đá: Ong Giáp (Lv 10). | `TA1–TA3` (Sói Sương), `TA4` (với `TA4.slot1` giữ cho Q8 Linh Biến), `TA5` (Ong Giáp), `TA6` (Sói Trúc Ảnh) | Vùng an toàn 6–8 u tại cửa Đồng Sương và cầu nối sang Bạch Vân. |
 | **Bạch Vân** (Lv 8–13) | Vách đá dựng đứng, thác nước, thềm đá bậc liên tục, mỏm cụt và đường vòng. Cung phát huy tầm xa, Kiếm gom góc hẹp. | 8–10 cụm | 20–28 quái | 2–3 quái / cụm | Thềm trên cao quanh thác: Ong Giáp (Lv 10). Các terrace đá bậc giữa, hốc hang và lối đèo: Đoạt Mạch Đạo Tặc (Lv 13). | `BV1`, `BV2` (Ong Giáp Lv 10), `BV3–BV5` (farm/progression Đoạt Mạch Đạo Tặc Lv 13) | Thềm nghỉ an toàn 6–8 u đầu đèo và trước cửa sang Xích Nham. |
 | **Xích Nham** (Lv 12–17) | Mỏ khoáng cằn cỗi, đất đá đỏ, khe nứt sâu và ba khu vực trấn ấn. Quái trâu, áp lực chiến đấu tăng cao. | 9–11 cụm | 24–32 quái | 2–4 quái / cụm | Vành đai ngoại vi và lối vào: Đạo Tặc (Lv 13). Hốc nứt mạch sâu và 3 khu trấn ấn: Xích Thạch Linh (Lv 16). | `XN1–XN3` (Q10 Đạo Tặc Lv 13), `XN4–XN6` (Q11 Xích Thạch Linh Lv 16 tại 3 phong ấn) | Vùng an toàn 8 u cửa ngõ vào và hành lang dẫn đến cổng Huyền Môn. |
@@ -184,7 +184,7 @@ Các ID cụm mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) là các mã địn
 | --- | --- | --- | ---: | ---: | --- |
 | **Đồng Sương** | `DS1` | Nấm Linh | 2 | 1 | Stable seed: Nấm khởi đầu ven đường |
 | | `DS2` | Nấm Linh | 2 | 1 | Quest anchor: Q4 Nấm Sương tutorial |
-| | `DS3`–`DS6` | Sói Sương | 4 | 2 mỗi cụm (8) | Quest anchors: Q5 Da Sói (4 cụm đồi cỏ bậc giữa) |
+| | `DS3`–`DS6` | Sói Sương | 4 | 2 mỗi cụm (8) | Quest anchors: Q5 Sói Sương (4 cụm đồi cỏ bậc giữa) |
 | | `DS7`, `DS8` | Nấm Linh | 2 | 2 mỗi cụm (4) | Bổ sung: Dải nương thấp và bờ suối phía nam |
 | | `DS9`, `DS10` | Sói Sương | 4 | 2 mỗi cụm (4) | Bổ sung: Gờ đồi phía đông và lối rẽ lên Trúc Ảnh |
 | **Trúc Ảnh** | `TA1`–`TA3` | Sói Sương | 4 | 2 mỗi cụm (6) | Stable seeds: Bìa rừng trúc giáp ranh Đồng Sương |
@@ -194,7 +194,7 @@ Các ID cụm mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) là các mã địn
 | | `TA7`, `TA8` | Sói Trúc Ảnh | 8 | 2 mỗi cụm (4) | Bổ sung: Tuyến rừng trúc trũng và khe đá phụ |
 | | `TA9`, `TA10` | Ong Giáp | 10 | 2–3 mỗi cụm (5) | Bổ sung: Mỏm đá cao nhìn ra vực và giàn ván bắc qua đèo |
 | **Bạch Vân** | `BV1`, `BV2` | Ong Giáp | 10 | 2 mỗi cụm (4) | Stable seeds: Vùng trời thềm thác nước phía tây |
-| | `BV3`–`BV5` | Đoạt Mạch Đạo Tặc | 13 | 3 mỗi cụm (9) | Stable seeds: Ba thềm đá bậc giữa đường đèo (farm/progression, không phải Q10 anchor) |
+| | `BV3`–`BV5` | Đoạt Mạch Đạo Tặc | 13 | 3 mỗi cụm (9) | Stable seeds: Ba thềm đá bậc giữa đường đèo (farm/progression; standard Q10 MobIdentity credit hợp lệ dù narrative landmarks ở Xích Nham) |
 | | `BV6` | Ong Giáp | 10 | 2 | Bổ sung: Thềm đá gần đỉnh thác đổ |
 | | `BV7`, `BV8` | Đoạt Mạch Đạo Tặc | 13 | 2–3 mỗi cụm (5) | Bổ sung: Hốc đá cụt phía bắc và đường vòng chân vách |
 | **Xích Nham** | `XN1`–`XN3` | Đoạt Mạch Đạo Tặc | 13 | 2/3/2 (7) | Quest anchors: Q10 Vật Chứng (khu mỏ ngoại vi) |
@@ -325,31 +325,30 @@ Boss eligibility / corpse / EXP / Gold / pile / Journey theo **các mục liên 
 Tách chọn/thực thi cho phép chọn S2 trước rồi Execute theo ý định rõ, một intent mỗi lần bấm; không bắt chọn lại S2 mỗi đòn. Bỏ letter keys khỏi movement để thử Execute/Interact/dùng đồ/menu RPG; **phím chính xác vẫn OPEN**. AUTO tìm cục bộ theo kỹ năng/khả năng tới đích, click ghim đích, Tab đổi cục bộ theo thứ tự ổn định; vùng tìm/giữ/thực thi tách nhau. Chết hủy lệnh chờ nhưng giữ focus hợp lệ để xem trận cùng farm và HP thay đổi; focus đời cũ không tự gắn quái respawn.
 
 **Phân tích mật độ — Tăng số pocket thay vì gom blob:**
-- *Gameplay & Combat flow:* Tăng số bãi nhỏ độc lập (1–3 quái/cụm) trên các tuyến/thềm địa hình thay vì gom 8–10 quái thành một khối dồn cục (`blob`). Gom blob sẽ phá vỡ cơ chế xếp hàng tiếp cận (`crowd staging`), khiến quái chồng lấn khó đọc, đồng thời tạo ra lượng sát thương dồn tức thời quá lớn khiến người chơi không thể phản ứng. Bố trí nhiều cụm nhỏ giúp duy trì nhịp độ ra đòn nhanh của S1/S2 và tạo điều kiện cho Kiếm tận dụng sát thương quét 3 mục tiêu hoặc Cung tận dụng tầm xa/Spread để xử lý nhiều mục tiêu.
+- *Gameplay & Combat flow:* Tăng số bãi nhỏ độc lập (1–3 quái/cụm) trên các tuyến/thềm địa hình thay vì gom 8–10 quái thành một khối dồn cục (`blob`). Gom blob sẽ phá vỡ cơ chế xếp hàng tiếp cận (`crowd staging`), khiến quái chồng lấn khó đọc, đồng thời tạo ra lượng sát thương dồn tức thời quá lớn khiến người chơi không thể phản ứng. Bố trí nhiều cụm nhỏ giúp duy trì nhịp độ ra đòn nhanh của S1/S2 và tạo điều kiện cho Kiếm tận dụng propagation gần primary tối đa3 mục tiêu hoặc Cung tận dụng tầm xa/Spread để xử lý nhiều mục tiêu.
 - *Online co-farm & Contention:* Trong môi trường trực tuyến N-người chơi, nhiều cụm độc lập (ví dụ Đồng Sương 8–10 cụm, Trúc Ảnh 9–11 cụm, Bạch Vân 8–10 cụm, Xích Nham 9–11 cụm, Huyền Tích 8–10 cụm) cho phép các nhóm người chơi chia nhau các khu vực farm mà không bị nghẽn (bottleneck). Đồng thời giảm nguy cơ quái bị hạ gục quá nhanh trước khi người chơi kịp đạt ngưỡng đóng góp 20% máu để nhận tín chỉ nhiệm vụ.
 - *Thị giác camera tiêu chuẩn:* Bố trí theo tầng (dưới 1–2 quái, giữa 1–3 quái, trên 1–2 quái, nhánh phụ 1–2 quái) giúp một khung hình camera có thể bao quát 5–8+ quái cùng lúc, tạo cảm giác thế giới hoang sơ, nguy hiểm và đông đúc, nhưng aggro vẫn được giữ độc lập nhờ ranh giới `HomeRegion` và `WalkRegion` riêng biệt.
-- *Tải CPU / Physics / Network:* Phân tán quái theo các `SpawnGroup` nhỏ độc lập giúp AI server dễ dàng đưa các cụm không có người chơi vào trạng thái ngủ (dormant). Do địa hình hoàn toàn trực giao, không có dốc (`no slope`) và không có leo trèo (`no climb/ladder`), quái chỉ tuần tra trên mặt phẳng ngang của vùng đi lại được chỉ định, triệt tiêu hoàn toàn chi phí tìm đường nhiều tầng (multi-floor pathfinding).
+- *Tải CPU / Physics / Network:* Phân tán quái theo các `SpawnGroup` nhỏ độc lập giúp AI server dễ dàng đưa các cụm không có người chơi vào trạng thái ngủ (dormant). Do địa hình hoàn toàn trực giao, không có dốc (`no slope`) và không có leo trèo (`no climb/ladder`), quái chỉ tuần tra trên mặt phẳng ngang của vùng đi lại được chỉ định, tránh requirement tìm đường nhiều tầng; chi phí AI/physics/network vẫn phải benchmark, không suy bằng0.
 - *Boss Exclusion Rule:* Tại Huyền Tích, việc loại trừ tuyệt đối quái thường khỏi `BossCombatArea` bảo vệ tính toàn vẹn của cuộc chiến với Boss Huyền Nham Cự Thú, ngăn chặn các trường hợp quái thường quấy rối telegraph hoặc bị lợi dụng để farm hồi phục/tích nộ ngoài ý muốn.
 - *Dữ liệu lịch sử vs Kế hoạch hiện hành:* Mốc 28 cụm / 66 slots và khoảng cách tâm 18–20 u là seed lịch sử để đối chiếu prototype; kế hoạch authoring hiện hành đưa ra các khoảng ngân sách mục tiêu (14–20 ở Đồng Sương, 20–28 ở Trúc Ảnh/Bạch Vân, 24–32 ở Xích Nham, 20–26 ở Huyền Tích). Các mã authored ID mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) mở rộng số cụm mà không làm xáo trộn các Quest Anchor IDs gốc (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `TA4.slot1`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`) cũng như các stable authored seed IDs (`TA5`, `BV1–BV5`, v.v.).
 
 **Phân tích thiết kế địa hình trực giao (Orthogonal Terrain Rationale):**
-- *Tính toán hình học chiến đấu tất định:* Việc khóa địa hình tự nhiên thành khối đặc dày (`Solid Mass`), chỉ gồm mặt phẳng ngang và mặt đứng trực giao (loại bỏ hoàn toàn dốc nghiêng `slope/ramp/triangle`) là yêu cầu cốt lõi để đảm bảo sự chuẩn xác của hệ thống chiến đấu 2D authoritative. Mọi hình dạng kiểm tra sát thương (Melee single 1,7 u, Arc 120°, Line 5,5 u rộng 0,6 u, Logical single/Spread 6,5 u, Explosion bán kính 2 u) đều tính toán theo trục tọa độ trực giao. Dốc nghiêng sẽ làm lệch góc xoay hitbox, dẫn đến việc đòn đánh bị trượt hoặc xuyên thấu kỳ dị giữa Client và Dedicated Server. Mặt phẳng ngang đảm bảo việc kiểm tra chồng lấp dọc (`vertical overlap`) và va chạm hitbox–hurtbox tại `HitMoment` luôn mang tính tất định (deterministic).
-- *Bảo vệ tính toàn vẹn của AI quái vật:* Quái vật mặt đất (Sói, Nấm, Đạo Tặc, Thạch Linh, Cổ Vệ) không có logic leo trèo phức tạp. Nếu map có thang dây hay cơ chế leo (`ladder/climb`), người chơi chỉ cần đu trên thang hoặc đứng trên vách hẹp bắn tỉa quái bên dưới mà quái không thể phản ứng, biến toàn bộ bãi quái thành bia tập bắn vô dụng. Việc triệt tiêu thang leo và thay bằng các khối bậc nhảy trực giao (`stepped blocks`) bảo đảm mọi cao độ đều được quy về các phép kiểm tra tiếp cận (`reachability evaluation`) rõ ràng.
+- *Gameplay positions và terrain:* mặt trực giao giúp grounded/drop/WalkRegion/LoS queries dễ author và kiểm. Player damage theo [primary/propagation contract](combat-and-character.md#target-propagation), không Arc/Line VFX collider. Terrain không tự chứng minh deterministic networking; cùng definitions/clock/authority và probes mới chứng minh kết quả. Mob melee/Boss telegraph vẫn có vùng vị trí để né.
+- *Bảo vệ tính toàn vẹn của AI quái vật:* Quái vật mặt đất (Sói, Nấm, Đạo Tặc, Thạch Linh, Cổ Vệ) không có logic leo trèo phức tạp. Nếu map có thang dây hay cơ chế leo (`ladder/climb`), người chơi chỉ cần đu trên thang hoặc đứng trên vách hẹp bắn tỉa quái bên dưới mà quái không thể phản ứng, biến toàn bộ bãi quái thành bia tập bắn vô dụng. Việc triệt tiêu thang leo và thay bằng các khối bậc nhảy trực giao (`stepped blocks`) giúp author các phép kiểm tra tiếp cận (`reachability evaluation`) rõ ràng; geometry thật vẫn phải kiểm để loại perch.
 - *Quy tắc sàn One-way khắt khe:* Đất đá tự nhiên không bao giờ là one-way platform để tránh cảm giác phi lý (đất đá không thể nhảy xuyên từ dưới lên). Sàn one-way chỉ dành cho kết cấu mỏng nhân tạo có trụ/dầm/dây treo (ván gỗ, giàn catwalk, ban công, sàn treo). Người chơi bấm `↓` (`DropThrough`) chỉ xuyên qua một tầng sàn, không xâu chuỗi nhiều sàn khi giữ nút.
 - *Vùng nước nông (Shallow Water):* Lòng suối cạn có đáy đất thật, người chơi lội qua bị giảm tốc nhẹ khi chân chạm nước, nhưng khi đi trên cầu gỗ hoặc nhảy trên không thì giữ nguyên tốc độ. Không bổ sung cơ chế bơi lội hay đuối nước để tránh phình to phạm vi animation, trạng thái và vật lý.
 
 **Kiting hợp lệ vs Lỗi góc chết (Legitimate Kiting vs Safe Perch Exploit):**
 - *Bản sắc class của Cung thủ:* Cung thủ sở hữu tầm đánh xa 6,5 u và độ cơ động cao. Việc liên tục di chuyển lùi bước, vừa chạy vừa bắn và nhảy qua lại giữa các thềm đá trên cùng một tuyến đường đi lại được (`reachable path`) để tránh né đòn đánh cận chiến của quái là kỹ năng thả diều hoàn toàn hợp lệ và là lợi thế tự nhiên của phái đánh xa (`class advantage`).
-- *Xử lý lỗi góc chết bằng cơ chế Return đơn giản:* Nếu người chơi nhảy lên một mỏm đá cụt hoặc thềm cao mà quái vật không có đường tiếp cận hợp lệ (unreachable), hoặc người chơi chạy vượt quá giới hạn truy đuổi (`LeashRegion`), quái vật sẽ kích hoạt trạng thái `Return` rút về vị trí xuất phát (`HomeRegion`), đích reset tại home là full HP (cách hồi trong Return còn OPEN), kết thúc giao tranh. Cách xử lý này giải quyết triệt để vấn đề người chơi lợi dụng lỗi địa hình để farm quái an toàn mà không cần phải gượng ép bổ sung đòn đánh xa vô lý cho quái cận chiến (như cho Sói bắn đạn) hay teleport gian lận.
+- *Xử lý lỗi góc chết bằng cơ chế Return đơn giản:* Nếu người chơi nhảy lên một mỏm đá cụt hoặc thềm cao mà quái vật không có đường tiếp cận hợp lệ (unreachable), hoặc người chơi chạy vượt quá giới hạn truy đuổi (`LeashRegion`), quái vật sẽ kích hoạt trạng thái `Return` rút về vị trí xuất phát (`HomeRegion`), đích reset tại home là full HP (cách hồi trong Return còn OPEN), kết thúc giao tranh. Đây là hướng kiểm lỗi địa hình để hạn chế farm quái an toàn; exact Return targetability/regen/grace còn cần probe mà không cần phải gượng ép bổ sung đòn đánh xa vô lý cho quái cận chiến (như cho Sói bắn đạn) hay teleport gian lận.
 
 <a id="a07"></a>
 
 ## A07 — quyết định liên quan
 
-**A07 Dummy** — HP 60/25 s: rẻ nhưng chờ; pool thêm/respawn nhanh: ít chờ; HP lớn/scaling: test dài hơn nhưng phức tạp hoặc hại Q3 · Một prefab/yard, tối thiểu 3 Dummy cùng lúc theo Q3; số thêm và respawn 3–5 s chỉ đề xuất, không DPS Meter/scaling P0 · P07; đổi HP/timer hoặc số thêm phải theo design owner
+**A07 Dummy** — HP60/respawn25s giữ BASELINE/TUNABLE; **5 placements3+2** đã duyệt, cùng identity/pool. DEF/EVA và contention cần probe, không đổi timer sang3–5s để chữa tutorial hoặc thêm adaptive HP/DPS Meter.
 
-**A07** — ART-01 / QUEST-03 / SCOPE-01 · BASELINE HP60/25 s Q3; OPEN DEF/EVA, số điểm đứng thêm ngoài tối thiểu3 và timer nhanh. Q3/Q6 solo CURRENT; contention thử ở gate mạng.
-
+**A07** — ART-01/QUEST-03/SCOPE-01: placements không còn OPEN về số; exact tọa độ/clearance là authoring PROBE, timer tuning chỉ sau evidence. Respawn life mới vẫn tính standard kill theo Quest owner.
 
 <a id="a10"></a>
 
@@ -361,3 +360,20 @@ Tách chọn/thực thi cho phép chọn S2 trước rồi Execute theo ý đị
 
 
 Các hướng Đông/Tây/Bắc/Nam trong ý đồ blockout là nhãn quy hoạch/nhánh, không chỉ định nghiêng camera hoặc thêm depth traversal. Projection luôn theo [pure side-view Art lock](../03-art/art-and-visual-production.md#visual-perspective).
+
+<a id="quest-farm-placement"></a>
+
+## Placement/route và quest credit là hai trách nhiệm
+
+Candidate manifests ở trên giữ stable groups/slots và budgets, **không phải quest eligibility whitelist**. Các nhãn “quest anchor” ở DS2/DS3–6/TA4/TA6/XN1–6/HT4–5 là bãi/đường dẫn gợi ý, không giới hạn standard kills; Quest owner kiểm MobIdentity. `sourceMap/sourceAnchor` của entitlement là nơi event thực xảy ra, kể cả Q10 ở Bạch Vân. SpawnGroup phục vụ placement/AI/home/leash/respawn và navigation ưu tiên, không ngăn propagation/quest credit qua group khác.
+
+| Tutorial placement | Authoring contract | Kiểm cần làm |
+| --- | --- | --- |
+| Ba Bù Nhìn sân chính | Một loại training actor, ba điểm trên mặt sân HV_DummyYard | Nằm ngoài NPC/exit/path; đủ gap body/HP/impact và route nhặt nếu applicable |
+| Hai Bù Nhìn khu phụ | Cùng loại, hai điểm ven tuyến Học Viện hợp lý, tìm được từ yard | Waypoint nhìn được, fixed Jump tới được cho Q3/Q6, không khóa class/cửa chưa mở |
+
+Học Viện an toàn với player: Bù Nhìn không attack/reward, không tạo combat hazard; safe checkpoint vẫn theo Online. Tuyến Q3 đi qua yard rồi mở thêm khu phụ giúp solo có≥4 targets ban đầu, không yêu cầu chờ timer. Contention nhiều người vẫn đo wait/credit; không chỉ suy5 placements là fairness proof.
+
+Candidate farm inventory cho các routes đủ làm probe: Đồng6 Nấm/12 Sói; Trúc8 Sói Trúc và6 Sói Sương; Bạch14 Đoạt Mạch; Xích9 Đoạt Mạch/16 Thạch; Huyền4 Thạch/16 Guards. Đây là phép cộng candidate rows, không population đã chạy. Counts quest theo owner; requiredCount có thể vượt một pocket hoặc một lần clear và hoàn qua revisit/respawn/bãi khác. Không tăng slots/HP/drop tự động để vừa bảng counts. Waypoints kể chuyện dẫn tới seals/Boss nhưng tracker không nói “chỉ kills tại bãi này”.
+
+**Q8 availability vs eligibility:** TA4.slot1 là shared guaranteed encounter path; đúng Sói Trúc Ảnh + Linh Biến ở bãi khác vẫn có thể credit active Linh step theo Quest owner. Unrelated identity/variant không lấy hoặc hủy quyền Q8. Sau qualifying death commit thì remove requester dù kill không ở reserved slot; reservation còn phục vụ requesters khác, không despawn actor đang sống. Economic guard vẫn một budget/receipt cho force/retry; kill random Linh khác dùng regular life budget cũ, không thêm quest reward hoặc reroll.

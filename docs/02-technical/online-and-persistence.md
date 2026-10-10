@@ -77,7 +77,7 @@ Quest supply bindings/selectedInstanceId/mentor route cần đủ dữ liệu đ
 
 Checkpoint không giữ tọa độ farm/combat chính xác, Arena, Food tick, CD, pending cast, status, projectile, threat/contribution hoặc AI/Boss HP. `isDead` derive HP=0. Restore clamp HP/MP khi Max stat đổi, không tự heal. PostgreSQL là authority của state đã commit; RAM Game Server là authority realtime trong phiên.
 
-**Schema tối thiểu:** `accounts(id, username UNIQUE, password_hash, enabled)`; `characters(id, account_id FK, name, level, exp, class_id, class_chosen_level nullable, gold, journey, reset_used, revision, lease_generation, ...)`; `character_attributes(character_id PK/FK, str, vit, int, agi, unspent)`; `item_instances(id PK, character_id FK, location/slot, template_id, rarity, enhancement, quantity, binding)`; `character_skills(character_id, profile_id PK pair)`; `quest_progress(character_id, quest_id PK pair, state, active_group, counters/ordinals, entitlement_state)`; `character_unlocks(character_id, flag_id PK pair)`; `recovery_checkpoints(character_id PK/FK, map_id, hp, mp, safe_x nullable, safe_y nullable, checkpoint_seq, session_generation, updated_at)`; `mutation_receipts(command_id PK, result, created_at)`; `world_loot(item_instance_id PK, death_id, map_id, payload, ownership_snapshot, deadlines, claimed_by nullable)`; `game_tickets`/`character_leases`; `pvp_escrows(invite_id PK, two_character_ids, stake_each, match_id UNIQUE nullable, phase, server_instance_id, active_at, outcome, settled_at)` với unique settlement receipt theo MatchId.
+**Schema design candidate — PROPOSAL/OPEN, DOC-ONLY:** chưa có backend/SQL implementation trong repo; tên bảng dưới là đề nghị, không schema đã khóa. G-D quyết encoding/constraints/migration sau integration spike. `accounts(id, username UNIQUE, password_hash, enabled)`; `characters(id, account_id FK, name, level, exp, class_id, class_chosen_level nullable, gold, journey, reset_used, revision, lease_generation, ...)`; `character_attributes(character_id PK/FK, str, vit, int, agi, unspent)`; `item_instances(id PK, character_id FK, location/slot, template_id, rarity, enhancement, quantity, binding)`; `character_skills(character_id, profile_id PK pair)`; `quest_progress(character_id, quest_id PK pair, state, active_group, counters/ordinals, entitlement_state)`; `character_unlocks(character_id, flag_id PK pair)`; `recovery_checkpoints(character_id PK/FK, map_id, hp, mp, safe_x nullable, safe_y nullable, checkpoint_seq, session_generation, updated_at)`; `mutation_receipts(command_id PK, result, created_at)`; `world_loot(item_instance_id PK, death_id, map_id, payload, ownership_snapshot, deadlines, claimed_by nullable)`; `game_tickets`/`character_leases`; `pvp_escrows(invite_id PK, two_character_ids, stake_each, match_id UNIQUE nullable, phase, server_instance_id, active_at, outcome, settled_at)` với unique settlement receipt theo MatchId.
 
 Quest counters có thể là versioned JSONB data. Không save bằng file hoặc lưu static Item/Mob/SkillDefinitions trùng ScriptableObject.
 
@@ -89,9 +89,9 @@ Trong Arena, lưu consume + receipt/quota cần recovery, không dùng HP/MP tro
 
 **Ranh giới transaction:** Game Server tính gameplay result một lần từ definitions và snapshots: deathID, contribution, quest-qualified credit, rolls, enhancement RNG, inventory preview. Spring không chạy lại combat/drop formula. Internal service kiểm credential/lease/generation/commandId/expected revisions/IDs/capacity/ownership, commit deltas và canonical result. Kiểm receipt **trước revision mới**; duplicate command trả receipt đã commit, command mới phải đúng lease/revision.
 
-Một death với N recipients và shared pile commit rewards/quest credit/loot/death receipt chung hoặc rollback toàn bộ. Khóa character rows theo stable ID. Trong terminal-pending, mob không nhận hit mới, không respawn, chưa publish reward; finalize sau ACK. Claim ground→inventory cùng claim receipt trong một transaction, hai claims chỉ một thắng. Turn-in preflight capacity rồi commit reward/Completed/unlock/cleanup chung.
+Một death với N recipients và shared pile commit rewards/quest credit/loot/death receipt chung hoặc rollback toàn bộ. Khóa character rows theo stable ID. Trong terminal-pending, mob không nhận hit mới, không respawn, chưa publish reward; finalize sau ACK. Claim ground→inventory cùng claim receipt trong một transaction, hai claims chỉ một thắng. Turn-in simulate consume required bound items rồi merge rewards để kiểm net capacity; commit consume/reward/Completed/unlock/entitlement cleanup chung, không partial consume.
 
-Enhance fail vẫn commit cost/receipt; transfer tiêu source/cost và sửa target chung. Action chọn phái Q6 commit class/`ClassChosenLevel`/mentor binding/grant/active group chung. Turn-in là action riêng sau khi đủ objective, được kiểm tại cùng mentor và có receipt riêng.
+Enhance fail vẫn commit cost/receipt; transfer tiêu source/cost và sửa target chung. Action chọn phái Q6 kiểm cả hai discovery talk receipts rồi commit class/`ClassChosenLevel`/mentor binding/grant/active group chung. Turn-in là action riêng sau khi đủ objective, được kiểm tại cùng mentor và có receipt riêng.
 
 **Retry và lỗi backend:** durable reward, claim, quest turn-in, gear và escrow chỉ publish success sau ACK. Potion là ngoại lệ realtime đã duyệt; admission/consume/effect do server timeline quyết định theo contract bên dưới. ACK chỉ xác nhận durability, không áp lại heal hoặc rollback một combat tick đã xảy ra. Logout chờ các command/checkpoint/escrow còn pending rồi release lease.
 
@@ -155,3 +155,49 @@ Resume phiên còn sống dùng đúng RAM state và pending IDs, không nạp l
 **A15 Death terminal-pending** — Chờ ACK mới Death: nhất quán nhưng trễ; terminal state → Death ngay: đọc tốt nhưng cần event/state riêng · Diễn theo server terminal, success/reward sau ACK; deathUtc/deadline không tự đổi · Technical + P06/P12; không local đoán chết
 
 **A15** — TECH-01 / SAVE-01 / ART-01 · BASELINE terminal-pending không reward/respawn trước commit; OPEN event presentation trước ACK và deathUtc t0 contract chi tiết.
+
+<a id="personal-quest-recovery"></a>
+
+## Personal quest entitlement/recovery — TARGET recommendation, schema OPEN
+
+**Forensics:** VS-1 chỉ RAM `Receipts`, `pendingGrants`, `Loot.Tutorial` và `Tick` re-offer sau 60 s; chưa serializer/save/Spring/PostgreSQL/RPC. `WorldRevision` chỉ map rebuild, chưa Inventory revision. Không có existing production tables để migrate. Character durable state phải giữ quyền nhận/claim, network visibility không là ACL.
+
+| Viable design | Cost/DB | Exploit/recovery | UX | Kết luận |
+| --- | --- | --- | --- | --- |
+| **A Persisted entitlement + recreated ground** | Bounded record/quyền trong quest progress payload hoặc relation tương đương; writes ở source/death, claim, completion; không write mỗi visual tick/TTL | Claim+bag atomic; epoch/ordinal/receipt chống replay; one-writer lease/fencing chống reconnect race. TTL chỉ retire visual, reload quyền chưa claim | Về sourceMap, dọn bag rồi tự nhặt; tracker/ground cue phải rõ | **Recommendation BASELINE architecture**; giữ gameplay confirmed, encoding/schema/TTL OPEN |
+| B Recoverable pending grant + durable ground record | Pending grant + ground row TTL; có thể reuse world_loot storage candidate, thêm re-offer/retirement writes | Claim+bag atomic; pending payload sống qua TTL; hai records phải đồng bộ grant/ground/claim và generations, personal row không regular FFA | “Lấy lại” tại source marker hiện ground rồi tự nhặt; thêm thao tác so A nhưng không direct-to-bag/NPC mới | **Viable alternative**, state/DB/recovery-command cost cao hơn A |
+
+A đề nghị logical record `(characterId, QuestId, questEpoch, objective/source, qualifyingOrdinal, immutable entitlementId, item payload/binding/qty, sourceMap/sourceAnchor, Pending|Claimed|Consumed|Cancelled, receiptRefs)`. Tuple không phải locked wire/SQL schema. Ưu tiên versioned quest-progress payload nếu G-D chứng minh bounded queries/atomic mutation đủ dùng; chưa bắt buộc table/microservice riêng. Q11 ba identities; Q8/Q10 compatible quantities merge nhưng claim receipts độc lập.
+
+**Ordering:** persist eligibility/ordinal/entitlement đúng active group trong source/death transaction trước expose ground; rollback không có grant giả. Payload immutable, không reroll. Pickup add Inventory + Claimed + receipt/revisions cùng transaction; uncertain ACK query receipt, không cấp lại. Stack merge ghi mapping/delta vào receipt, split không duplicate incoming ID. Turn-in consume + reward + Completed + Consumed/cleanup atomic. Spring validate credentials/lease/ownership/revisions/constraints rồi commit authoritative result từ Game Server; không Java realtime combat/quest engine.
+
+**Bounds:** chỉ quantity/ordinal objective cần; kills sau cap không thêm quyền. Ground TTL hữu hạn, exact TUNABLE; 60 s có thể làm PROBE vì regular pipeline dùng 60 s, chưa lock. Mỗi right có một active representation trên current writer/session; epoch/generation loại pickup cũ. Cosmetic TTL/offset/phase không bắt buộc durable row mỗi lần re-offer nếu restore/fencing chứng minh an toàn. Pending không hết quyền vì TTL/rời map; cleanup sau consume/completion/cancel commit, receipt retention chống replay chốt tại G-D. Không ground vĩnh viễn hoặc pending vô hạn do kill spam.
+
+**Recovery UX — PROPOSAL:** owner sống và về **sourceMap** thì re-offer tại nguồn cũ nếu standable/reachable; điểm invalid do content/death location dùng authored anchor gần source trong cùng map. Tracker ghi món chưa nhặt/vùng lấy lại. Không teleport vào bag, không random current location/làng, không NPC service mới. Interact source/marker hoặc vào recovery zone có thể hiện ground; exact trigger/anchor/glyph là PROBE. Server author/physics validate reachability/ground/bounds, offset tách regular/personal piles; client không chọn trusted position. Người khác không thấy/claim; nhiều món cùng owner có separation và deterministic selection, không hidden trong solid/ngoài map/click-blocked.
+
+| Lifecycle/failure | Kết quả cần giữ |
+| --- | --- |
+| Full bag/revision conflict | Không add/claim/collection credit; Pending giữ. Conflict lookup receipt/reload rồi request mới, không đổi payload dưới ID cũ |
+| TTL/map change | Retire representation, giữ right; về sourceMap re-offer, không reroll/kill lại |
+| Death/revive | Quest-bound không loss; Pending giữ, dead không pickup; shadow presentation không sở hữu item delivery |
+| Resume≤grace | Giữ session/ground nếu chưa TTL; không actor/representation thứ hai |
+| New session/server restart | Load committed aggregate; Claimed chỉ ở bag, Pending generation mới tại sourceMap. Old lease/RPC reject; death chưa commit không infer grant từ client |
+| Duplicate/concurrent pickup | Cùng command trả receipt; commands khác claim cùng right serialize, một thành công; whole mutation cùng revisions/ownership constraints |
+| Quest Completed | Consume+cleanup atomic; không re-offer/grant bước tương lai, old callback reject epoch/state |
+| Abandon | Chưa P0; nếu thêm cần cancel epoch+items+rights atomic, không reaccept để farm grant/vendor vô hạn |
+| Backend outage/unknown commit | Pause durable mutation theo policy; receipt query/retry, không success UI trước ACK, không fallback RAM unlock/progress |
+
+Acceptance G-D cần crash trước/sau source/death/claim/turn-in commit, mất ACK, hai writers, old generation, TTL/resume/death/map/content-anchor change, 60/60 có/không compatible stack, N eligible/outsider, Completed/abandon-future replay. RAM chỉ kiểm transitions, không chứng minh durability. POT-01 và A15/death clock/cap release vẫn OPEN riêng; chưa giải Potion crash window hoặc đổi mob respawn ordering bằng recommendation này.
+
+
+<a id="identity-death-receipts"></a>
+
+## MobIdentity credit/source provenance — TARGET engineering contract
+
+Game Server death result pin `deathId/mobIdentityRef/variant/life/MapId` và từng recipient's active QuestId/objectiveGroup trước reward/step transition. Standard kill eligibility theo [Quest owner](../01-design/quests-and-narrative.md#mob-identity-credit), không SpawnGroup whitelist hoặc quest-map gate; special marker/variant/Boss giữ typed predicate. Spring không query mobs hoặc chạy damage; validate trusted server payload/lease/definition revision/constraints rồi commit result.
+
+Group/slot/sourceMap/death position giữ **provenance và recovery**, không authority thứ hai cho credit. Entitlement Q4/Q8/Q10/Q11 lưu nơi death thực xảy ra; Q10 Bạch Vân recovery phải ở sourceMap Bạch Vân, không hard-code Xích Nham. Marker fallback authored gần nguồn trong cùng map. Standard objective count dedup theo deathId/character/quest epoch/active objective; respawn life mới ở slot cũ được credit. Ordinal riêng mỗi recipient clamp tới requirement; đúng milestone mới tạo right immutable. Q4 final milestone tạo đúng một áo/một sample, duplicate death/ACK không tạo thêm; không roll lại supply ở DS2 nếu nhận kill ở bãi khác.
+
+Q11 atomic progress snapshot không credit bước kế trước landmark; mảnh identity/binding theo A/B/C dù kill ở cùng bãi. Item possession vẫn từ committed bag; activation không consume, turn-in consume+reward/unlock/cleanup chung. Q8 variant credit ở bãi khác remove reservation request sau commit, requesters khác giữ quyền; không reroll force economic budget. Q12 specific Boss eligibility/life/10%/corpse/reset giữ nguyên.
+
+Definition revision **cần đổi trong implementation sau**, không migration SQL trong lượt docs. Fixtures cũ counts/group whitelist/virtual collection không tự đủ reward: reset dev hoặc approved import mapping preserving committed receipts/rights, không hồi tố pre-step kills hoặc nhân ordinary rewards. Không có production saves để migrate hôm nay; exact encoding/unique constraints vẫn G-D. Tests: wrong identity cùng rig, same identity khác group/map-of-quest, player/mob khácMap, repeated slot newlife, future step, lostACK/fullbag/TTL/restart, N recipients atomic rollback.
