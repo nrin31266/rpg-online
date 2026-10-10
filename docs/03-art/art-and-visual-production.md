@@ -18,9 +18,9 @@ Luật ngoài domain thuộc owner trong [documentation map](../README.md); evid
 
 **Hướng UX đề xuất — PROPOSAL:** hợp nhất các view RPG trong một giao diện chung mở bằng một action menu; cấu trúc giao diện/phím I/C/Q còn OPEN. Inventory, Equipment, Attributes, Derived Stats/Thông số, Skills và Quest vẫn đủ chức năng. Menu action, Navigate/Confirm/Back tách khỏi gameplay, không cần key riêng cho từng view.
 
-**View inventory/NPC:** NPC hiện hội thoại ngắn và marker `!` khi Available, `?` khi Ready; chọn chức năng rồi mở submenu riêng (mua, bán, gửi/lấy rương), không trải mọi item/action trên một menu NPC. Hành trang 60 ô dùng lưới icon + stack count, một bảng chi tiết cho ô đang chọn; Enter/Interact mở thao tác của đúng instance. Trang bị nằm ở view Nhân vật với hình người và sáu slot quanh hình, tách khỏi bag grid.
+**View inventory/NPC:** NPC hiện hội thoại ngắn và marker `!` khi Available, `?` khi Ready; chọn chức năng rồi mở submenu riêng (mua, bán, gửi/lấy rương), không trải mọi item/action trên một menu NPC. Hành trang 60 ô dùng lưới icon + stack count, một bảng chi tiết cho ô đang chọn; Confirm mở thao tác của đúng instance. Trang bị nằm ở view Nhân vật với hình người và sáu slot quanh hình, tách khỏi bag grid.
 
-Navigate/Tab navigation, mouse click, Confirm/Interact và Esc/back dùng cùng commands; không bắt click. Chi tiết bố cục ở [Art — map/UI blockout](#icons-ui).
+Navigate/Tab navigation, mouse click, Confirm và Esc/back dùng cùng commands; không bắt click. Chi tiết bố cục ở [Art — map/UI blockout](#icons-ui).
 
 HUD: HP / MP / EXP / level, skill CD, Food / Potion, quest, Boss timer. Trong PvP hiện cược/pot, đồng hồ 120 s và số lần dùng HP/MP Potion còn lại (ban đầu 3/3). Bảng skill hiện ba active tích lũy, selected/locked/CD/MP riêng và hai nội tại/class: icon, tooltip, level/điều kiện khóa, auto-open Lv 5/Lv 13; không thêm hotkey nội tại. Bag-full rõ; tooltip enhance trước / sau. MapExit arrow + tên vùng đích, NPC marker cơ bản P0; SpecialGate có cue riêng.
 
@@ -141,7 +141,7 @@ NPC facing **authored độc lập** front-ish/3/4 Left/3/4 Right/side theo comp
 
 ### Back / Hand — STRONG DIRECTION, cơ chế OPEN/PROBE
 
-Chỉ Sword/Bow, Mộc Kiếm dùng Sword track. **PROPOSAL tối thiểu:** hai anchor Back và Hand/Grip; Tip/Muzzle/nock hiện có derive từ pose track khi cần, chưa khóa rig/socket phức tạp. Ngoài action ưu tiên Back; action bắt đầu chuyển Hand đúng phase, không chờ draw clip để ExecuteSelected. Hold ngắn sau recovery rồi cất là cosmetic timer, không đọc MP/CD để rút/cất, không nút/skill mới và không đổi CombatFocus/PendingCast. Khi chạy/nhảy/rơi: Back nếu đã cất, Hand nếu action/hold còn hiệu lực; gear trống không hiện cây giả.
+Chỉ Sword/Bow, Mộc Kiếm dùng Sword track. **PROPOSAL tối thiểu:** hai anchor Back và Hand/Grip; Tip/Muzzle/nock hiện có derive từ pose track khi cần, chưa khóa rig/socket phức tạp. Ngoài action ưu tiên Back; action bắt đầu chuyển Hand đúng phase, không chờ draw clip để PrimaryAction (combat branch). Hold ngắn sau recovery rồi cất là cosmetic timer, không đọc MP/CD để rút/cất, không nút/skill mới và không đổi CombatFocus/PendingCast. Khi chạy/nhảy/rơi: Back nếu đã cất, Hand nếu action/hold còn hiệu lực; gear trống không hiện cây giả.
 
 Một cây equip có **một representation nhìn thấy tại mỗi phase**: đổi Back ↔ Hand và render order cùng lúc, không hai bản sao/ghost weapon. Probe ưu tiên carry silhouette gộp bao/chuôi với Sword, ẩn representation đó khi Hand hiện. Bao kiếm rỗng riêng có thể đẹp hơn nhưng thêm prop, sorting và tối đa một hình/visual Sword; optional, chưa cộng mặc định. Back có thể reuse canonical bằng offset/góc nếu đọc tốt, nếu không thêm đúng hình carry cần sửa.
 
@@ -567,7 +567,7 @@ Tăng số bãi/cụm độc lập (`pockets`), giữ dải vào an toàn (safe 
 - **Cách ly hành vi:** Mỗi cụm là một `SpawnGroup` độc lập với `HomeRegion` và `WalkRegion` riêng; các cụm nằm cạnh nhau trên màn hình nhưng không chain aggro (không kích hoạt dây chuyền khi đánh một cụm).
 - **Authoring source:** [World candidate manifest](../01-design/world-and-content.md) sở hữu ranges, stable IDs và quest anchors.
 - **Boss Exclusion Rule:** Khu vực giao chiến Boss (`BossCombatArea`) tại trung tâm Huyền Tích cấm tuyệt đối việc sinh hoặc tuần tra của quái thường, tạo sàn đấu tập trung, sạch sẽ cho trận đánh đỉnh cao.
-- **Dữ liệu lịch sử:** Bảng 28 cụm / 66 slots cũ là **LEGACY seed** để giữ các mốc neo nhiệm vụ (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `TA4.slot1`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`) cùng các stable seed IDs (`TA5`, `BV1–BV5`, v.v.) và trace prototype; tổng số quái và số cụm cuối cùng còn **OPEN / TUNABLE**.
+- **Dữ liệu lịch sử:** Bảng 28 cụm / 66 slots cũ là **LEGACY seed** để giữ các mốc neo nhiệm vụ (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`) cùng các stable seed IDs (`TA5`, `BV1–BV5`, v.v.) và trace prototype; tổng số quái và số cụm cuối cùng còn **OPEN / TUNABLE**.
 
 <a id="12-terrain-readability-và-tile-variants"></a>
 
@@ -709,7 +709,7 @@ Không phải mọi mob đi mọi tầng công trình: author phạm vi và th�
 
 **Tạ Minh — LEGACY/SUPERSEDED:** roster cũ có 8 NPC, 16 idle và optional+6 →22; giữ số này để đối chiếu lịch sử. Không sản xuất NPC thứ tám hoặc NPC thay thế. Motif bàn/ấn cũ có thể chuyển thành prop của khu Lâm Bá/Huyền Môn; class cue thuộc hai mentor, Tẩy Mạch thuộc Mộc An. Stable internal IDs hiện có chỉ migrate references theo Technical; không mass-rename identifier vì display roster thay đổi.
 
-Q1 phải dẫn player qua khu dược → lò rèn → kho/nghỉ và đọc lối ra/về, không chỉ click ba người cạnh nhau. Q2 theo [mini journey proposal](../01-design/quests-and-narrative.md#q2-journey), destination/return rõ, không ép Drop; Q3 nhận Mộc Kiếm tại Bách Luyện, tới Dummy Yard rồi trả Bách Luyện. Q6 từ Lâm Bá tới Học Viện, player nói chuyện cả hai mentor, tự tháo Mộc Kiếm, chọn một mentor rồi nhận/learn/equip/cast/dùng MP Potion và trả đúng mentor đó. Hai khu mentor và yard phải nhìn ra route, không dàn Kiếm như default trước Cung. Q10–Q12/trấn ấn dẫn về Lâm Bá theo owner; không thêm NPC trung gian.
+Q1 phải dẫn player qua khu dược → lò rèn → kho/nghỉ và đọc lối ra/về, không chỉ click ba người cạnh nhau. Q2 theo [mini journey proposal](../01-design/quests-and-narrative.md#q2-journey), destination/return rõ, không ép Drop; Q3 nhận Mộc Kiếm tại Bách Luyện, tới Dummy Yard rồi trả Bách Luyện. Q6 từ Lâm Bá tới Học Viện, player nói chuyện cả hai mentor, tự tháo Mộc Kiếm, chọn một mentor rồi nhận/learn/equip/cast/dùng MP Potion và trả đúng mentor đó. Hai khu mentor và yard phải nhìn ra route, không dàn Kiếm như default trước Cung. Q10/Q12 về Lâm Bá; Q11 Lâm Bá→Bách Luyện restoration theo direction, endpoint OPEN; không thêm NPC mới.
 
 Hội thoại nhận 1–3 câu, phản hồi ngắn ở bước giữa và một câu trả; tracker nêu **việc → khu vực/đường đi → NPC tiếp theo**. Text có giọng riêng vừa đủ, giữ fantasy Việt nhưng không lặp “ngươi/bổn tọa/linh căn” mọi câu. Player không thấy QuestId/counter nội bộ hay reward dạng debug. Marker/quest/service menu đọc committed state; UI không tự hoàn quest vì đã phát thoại. Exact NPC coordinates và số props chốt sau blockout, không bịa pixel tọa độ.
 
@@ -763,9 +763,9 @@ Hội thoại nhận 1–3 câu, phản hồi ngắn ở bước giữa và mộ
 | Active profiles | 6=Kiếm/Cung×Lv 5/10/17 | Hai motif class với độ mở/rune khác theo milestone; Lv 5/10/17 là ba SkillIds/slot riêng, reuse motif icon nếu vẫn phân biệt được |
 | Passives | 4 | Kiếm Tâm/Kiếm Thế/Ưng Nhãn/Xạ Tâm cần cue khiên/gần/mắt/xa; derive hai motif class, không thêm tree/rank |
 | Status HUD | 4 loại presentation: Burn/Freeze/Slow/Food | Ba glyph status mới; Food dùng lại icon Food đang active. Freeze/Slow không chung một hình ice-block |
-| Physical quest collection | Dấu Trọc Khí, Vật Chứng, Mảnh 1/2/3: candidate 5 ItemDefinition bindings; Q2 placed item thêm 1 chỉ nếu proposal duyệt | Icon Inventory/ground thật, reuse sigil/ấn/glyph+ordinal/binding label; exact IDs/mapping PROPOSAL, không virtual feedback thay item |
+| Physical quest collection | Dấu Trọc Khí, Vật Chứng, quest material Q11 tên/ID OPEN, restored fragments1/2/3: candidate6 ItemDefinition bindings; Q2 placed item thêm1 chỉ nếu duyệt | Icon Inventory/ground thật, reuse sigil/ấn/glyph+ordinal/binding label; exact IDs/mapping PROPOSAL, không virtual feedback thay item |
 
-**SUY RA có điều kiện:** base catalog trước collection có 49 physical bindings; Gold 1/active 6/passive 4/status 4 cho 64 base bindings, Food status reuse. Physical collection candidate 5 definitions→54 physical/69 base bindings; Q2 item nếu duyệt thêm 1→55/70. Exact ItemIds/icon mapping/schema còn PROPOSAL, không khóa tổng bitmap mới. Tái dùng motif với label/ordinal/binding overlay có thể giảm ảnh vẽ; không dùng 49/64/63 cũ như full current catalog. Rarity/+n không nhân bitmap. Revive/Linh/Boss badges chỉ thêm khi sample cần và ghi delta.
+**SUY RA có điều kiện:** base catalog trước collection có 49 physical bindings; Gold 1/active 6/passive 4/status 4 cho 64 base bindings, Food status reuse. Physical collection candidate6 definitions→55 physical/70 base bindings; Q2 nếu duyệt thêm1→56/71. Exact ItemIds/icon mapping/schema còn PROPOSAL, không khóa tổng bitmap mới. Tái dùng motif với label/ordinal/binding overlay có thể giảm ảnh vẽ; không dùng 49/64/63 cũ như full current catalog. Rarity/+n không nhân bitmap. Revive/Linh/Boss badges chỉ thêm khi sample cần và ghi delta.
 
 Nguồn icon dự kiến32 × 32 transparent, hiển thị scale nguyên và tooltip lớn khi cần, **OPEN** theo HUD/reference resolution. Không lấy PPU world để quyết pixel UI. Inventory 60/Storage 40 dùng cùng slot primitive; stack count/+level/rarity/locked/quest-bound hiển thị text/glyph, không bake vào từng PNG. Icon màu band không được giống rarity border đến mức nhầm band III=Epic.
 
@@ -781,7 +781,7 @@ Nguồn icon dự kiến32 × 32 transparent, hiển thị scale nguyên và too
 | 2 Button | Confirm/use/cancel | Normal/hover/pressed/disabled; tint/border/offset, không bốn ảnh bắt buộc |
 | 3 Item slot | Bag/storage/shop | Empty/filled/selected/unavailable/pending; icon +overlays |
 | 4 Equipment slot | Character/equip picker | Reuse3 +slot glyph; empty/filled/off-class/level-lock |
-| 5 Skill slot | HUD/panel | Thể hiện rõ: Slot 1/2/3 được chọn (`SelectedSkillSlot`), hồi chiêu (`Cooldown`), chưa học (`ManualMissing`), và phân biệt rõ với thao tác thực thi (`ExecuteSelected`) |
+| 5 Skill slot | HUD/panel | Thể hiện rõ: Slot 1/2/3 được chọn (`SelectedSkillSlot`), hồi chiêu (`Cooldown`), chưa học (`ManualMissing`), và phân biệt rõ với thao tác thực thi (`PrimaryAction` (combat branch)) |
 | 6 Tabs | Bag categories/NPC menus | Normal/hover/selected/disabled; button derivative |
 | 7 Tooltip | Item/skill/reason | Panel1 +title/stat rows/cost/rarity/lock; compare layout reused |
 | 8 List row | Quest/Journey/character/opponents | Normal/hover/selected/disabled; text/icon/progress |
@@ -815,13 +815,13 @@ Nguồn icon dự kiến32 × 32 transparent, hiển thị scale nguyên và too
 | Inventory/Storage/Shop/Sell | Grid/list, capacity60/40, stack count/ownership, price/stock state | Cùng kit; Storage không item background riêng |
 | Class choice/manual use/attributes reset | Hai mentor/choice cues ngang hàng, reason/preview/confirm | Hai motif class/kit; học sách từ bag, Tẩy Mạch tại Mộc An |
 | Dialogue/Rest/Death | Text/action NPC, confirm nghỉ/death choices khác PvP | Panel/buttons; icon Hồi Sinh, không bảy portraits bắt buộc |
-| HUD/world UI/chat/map exits | Bars, quest tracker, food/bình, focus marker/mini HP + screen name/level/current-max HP, reward tooltip, bubble hai dòng, signpost, Boss timer/banner | Kit/typography/marker glyphs; edge arrow + destination name/NPC marker P0; không HP bars Party hoặc quest navigation xuyên map P0 |
+| HUD/world UI/chat/map exits | Small current-map counts panel theo World; bars, quest tracker, food/bình, focus marker/mini HP + screen name/level/current-max HP, reward tooltip, bubble hai dòng, signpost, Boss timer/banner | Kit/typography/marker glyphs; edge arrow + destination name/NPC marker P0; không HP bars Party hoặc quest navigation xuyên map P0 |
 
-Ba skill entry/class hiện **selected, đã học/chưa học, locked, CD và MP** riêng. Tân Lữ slot 1 Mộc Kiếm, 2/3 khóa. `1/2/3` chỉ đổi selection: highlight mới, không pose ra đòn/approach/cost/CD. HUD có cue/glyph `ExecuteSelected` riêng và tên kỹ năng sẽ dùng; không giả S1 luôn là Attack. Chọn S2 rồi Execute nhiều lần phải đọc rõ. Select khi pending/buffer/action đã chạy không đổi SkillId intent cũ; accepted presentation lấy snapshot, không slot highlight mới.
+Ba skill entry/class hiện **selected, đã học/chưa học, locked, CD và MP** riêng. Tân Lữ slot 1 Mộc Kiếm, 2/3 khóa. `1/2/3` chỉ đổi selection: highlight mới, không pose ra đòn/approach/cost/CD. HUD có cue/glyph `PrimaryAction` (combat branch) riêng và tên kỹ năng sẽ dùng; không giả S1 luôn là Attack. Chọn S2 rồi Execute nhiều lần phải đọc rõ. Select khi pending/buffer/action đã chạy không đổi SkillId intent cũ; accepted presentation lấy snapshot, không slot highlight mới.
 
 Input/cancel/revalidate theo [Combat & Character](../01-design/combat-and-character.md#pending-cast); Art hiện “Đang tiếp cận” hoặc lý do blocked/quá xa/chưa sẵn, không giả cast đã nhận trước validation/commit.
 
-**Điều hướng/input/readability:** ←/→ Move, ↑ Jump, ↓ DropThrough và 1/2/3 Select đã khóa theo design owner. Execute/Interact/QuickHP/QuickMP/Food/menu dùng semantic actions và glyph từ binding đang thử. E Execute, F Interact,4/5 Potion,R Food,I menu chỉ là **PROPOSAL / TUNABLE DEFAULT**, không khóa phím; C/Q chưa được gán mechanic mới. EdgeExit thường dùng mũi tên vùng thoát + tên đích, không arch dịch chuyển hay Interact prompt.
+**Điều hướng/input/readability:** ←/→ Move, ↑ Jump, ↓ DropThrough và 1/2/3 Select đã khóa theo design owner. PrimaryAction/QuickHP/QuickMP/Food/menu dùng semantic actions và glyph binding đang thử. E PrimaryAction,4/5 Potion,R Food,I menu chỉ là **PROPOSAL / TUNABLE DEFAULT**, không khóa phím; C/Q chưa được gán mechanic mới. EdgeExit thường dùng mũi tên vùng thoát + tên đích, không arch dịch chuyển hay Interact prompt.
 
 Huyền Môn/Arena có SpecialGate cue khác; marker NPC đủ thấy nơi nhận/trả, quest arrow xuyên map vẫn P1. Không bake key vào thoại/quest/ảnh; lời “nhảy/xuyên sàn/dùng Bình Linh lực” đi với glyph action hiện tại.
 
@@ -830,7 +830,7 @@ Huyền Môn/Arena có SpecialGate cue khác; marker NPC đủ thấy nơi nhậ
 **UI usability gate P11:** dùng kit panel/button/slot/tooltip/list hiện có để review ở tốc độ thường: tìm món/equip/bán sample không nhầm, nhận/trả quest và next action dễ hiểu, dismiss modal không lọt attack, pending approach có thể hủy rõ, locked skill/exit có reason; thử cả lỗi full bag/đầy HP/sai NPC. Log do dự/misclick/số bước/giờ sửa và nhận xét người chơi; không khóa ngưỡng thời gian hoặc gọi text-only automation là UX PASS.
 
 **Movement/mob feel presentation:** probe jump tap/hold có cùngapex khi cùng physics setup; landing/coyote/buffer/drop với rig và camera thật, pose không lái gravity; soft separation/reposition phải đọc vị trí Sói, không telegraph lệch do visual steering. Không tự thêm animation set, knockback, ring slots hoặc pose budget; exact movement/AI thuộc design owner/Technical/PHY-01.
-World marker+mini HP và tên/level/current-max HP/bar trên màn hình cùng bind focus life/generation/MapId; không portrait/element/rarity/generic buff panel. Player chết vẫn thấy/cập nhật HP target hợp lệ khi người khác đánh; target đổi đời/xóa hoặc rời retention thì dọn đúng HUD cũ. Loot highlight/Interact glyph độc lập, nhặt ngay không đổi CombatFocus. EXPLICIT xa/khác tầng/blocked vẫn có marker trong vùng giữ, Execute hiện reject reason và không tự swap target.
+World marker+mini HP và tên/level/current-max HP/bar trên màn hình cùng bind focus life/generation/MapId; không portrait/element/rarity/generic buff panel. Player chết vẫn thấy/cập nhật HP target hợp lệ khi người khác đánh; target đổi đời/xóa hoặc rời retention thì dọn đúng HUD cũ. Một ActiveFocus: item selected có marker/tam giác nhỏ và PrimaryAction glyph pickup, không active enemy marker đồng thời; click item thay combat selection và cancel pending theo Runtime. Pickup fail không cast fallback cùng press. EXPLICIT xa/khác tầng/blocked vẫn có marker trong vùng giữ, Execute hiện reject reason và không tự swap target.
 
 UI đang xử lý là thông tin core online: chặn thao tác lặp cần thiết, giữ dữ liệu đã commit và báo chờ. Timeout/network error khác RNG enhance fail. Preview có thể xem trước hình gear, HUD/world chỉ cập nhật canonical result đúng revision. Enhance success hoặc fail đã tiêu cost chỉ diễn sau ACK; không dùng animation giả làm người chơi tưởng request đã xong.
 
@@ -849,7 +849,7 @@ Bảng flow dưới là **phương án presentation để thử A11**, không to
 | Bước | Local player | Game Server / remote |
 | --- | --- | --- |
 | SelectSkillSlot1/2/3 | Chỉ đổi highlight kỹ năng, không chuẩn bị/cast/approach/cost/CD | Selection không là lệnh damage; action đang chạy giữ SkillId snapshot |
-| Bấm ExecuteSelected | Có thể thử pose/âm chuẩn bị cosmetic khi intent đủ điều kiện; ghi request đang chờ, không giả accepted cast | Intent chụp requested SkillId/target life/MapId; client không gửi trusted targets/damage |
+| Bấm PrimaryAction (combat branch) | Có thể thử pose/âm chuẩn bị cosmetic khi intent đủ điều kiện; ghi request đang chờ, không giả accepted cast | Intent chụp requested SkillId/target life/MapId; client không gửi trusted targets/damage |
 | Validate/start | Giữ UI resource/cooldown canonical, có pending cue nhẹ khi cần; không hiện target impact/HP trừ giả | Server kiểm alive/MapId/class/learned/profile/MP/CD/action lock, chụp source/action origin/weapon visual và startClock, commit cost realtime |
 | Accept/reject | Ghép request với actionId, căn phase theo server clock; reject trả pose phù hợp và reason, clear cosmetic anticipation | Remote bắt đầu từ phase còn hiệu lực, không chạy lại windup từ đầu ở packet trễ |
 | Release/projectile | Local slash/cast accent có thể anticipate cosmetic; khuyến nghị chờ authoritative spawn để tạo projectile chính trong slice | Authority schedule logical hit; visual event có action/hitIndex/life/origin/aim/travel phase để render |
@@ -1086,7 +1086,7 @@ Anchor S0 giữ để link cũ tới đúng owner; estimate side-only/full-outfi
 | Full structural assets | Danh mục cần review: forge station, broken/quest seals, Huyền Môn, Boss landmark | Ba seal anchors dùng một motif, back/front slice; waterfall ở nhóm riêng | Chốt mỗi landmark sau blockout; không tự áp một asset độc nhất mỗi map |
 | Background/decoration | 3 environment families; hub reuse | Palette/crop/clusters, props dùng lại nhiều roots | Số silhouette/prop phải từ blockout+camera; chưa derive được tổng nên không đoán |
 | Animated environment | Thác12 ô; nếu dùng: flow4, ripple 3–4; puddle2 static, leaf 1–2, puff 1, flame 4 | Flame Burn dùng chung khi phù hợp; puff/dust dùng lại | Không cộng flame/texture hai lần vào tổng; cần manifest shared refs |
-| Items/icons | Base 49 physical trước collection; candidate +5 collection (+Q2: 1 nếu duyệt), không final catalog count | Food status reuse, rarity/+n overlay; không dùng 63 outcomes cũ làm current asset budget; collection icons reuse sigil | Motif mới/clean crop/tier accent phải ghi riêng; không 64 tranh hoàn toàn mới |
+| Items/icons | Base 49 physical trước collection; candidate +6 collection (+Q2: 1 nếu duyệt), không final catalog count | Food status reuse, rarity/+n overlay; không dùng 63 outcomes cũ làm current asset budget; collection icons reuse sigil | Motif mới/clean crop/tier accent phải ghi riêng; không 64 tranh hoàn toàn mới |
 | Common UI | 21 primitives/chức năng các mục liên quan | Panel/button/slot compose; nhiều states tint/mask/text | Layout/bindings/font/focus/pending/error; screen-specific art chỉ phần thật cần |
 | Map content placement | 8 roots/5 farm maps; số pocket/slot mới OPEN/TUNABLE | 28 pockets/66 slots là LEGACY seed, ID nguồn quest vẫn giữ | Re-author nhánh/nhiều tầng/cụm độc lập, colliders/exit/safe strips/Boss exclusion; reuse art vẫn tốn công editor/QA |
 
@@ -1126,3 +1126,17 @@ Accepted Potion result của Game Server cập nhật HP/MP/HUD và heal/MP VFX 
 Một motif nhỏ tái dùng: nét nối/đường mạch và dấu ấn đứt/gắn lại, không một asset family lớn. Vân Khê/Đồng Sương chỉ crop nhỏ trên bia/gear/props; Trúc Ảnh rõ ở BrokenSeal/aura; Xích Nham dấu đục/mạch bị phá trên ba seal; Huyền Tích lớn hơn ở cổng/cột/Boss landmark, vẫn cùng ancient kit/sigil. Skill/VFX có cùng cue nét nhưng khác shape/nhịp theo action, không thêm entity/pet/CC. Intensity/size/palette cụ thể là PROBE, không thay lore/biome/skill counts.
 
 Học nguyên lý readability từ RPG side-view cổ điển/NSO: top rim, vertical wall shading, supported layered roofs, biome edge material, bamboo/props sparse, silhouette và hiệu ứng gọn. **Không copy** sprite/tile/palette/UI frame/architecture layout/animation pose từ reference. Dựng bố cục Huyền Lộ theo geography/collider và motif riêng; provenance/sample QA trước production rộng.
+
+<a id="primary-focus-visual"></a>
+
+## ActiveFocus / Map Info / Inventory visual sync — CURRENT DIRECTION
+
+[Runtime](../02-technical/gameplay-runtime.md#active-focus) sở hữu input/transitions, Art chỉ presentation. Một marker actionable cho Enemy/PvP/GroundItem/NPC/Landmark; combat miniHP/HUD chỉ combat branch, noncombat đổi cue theo type. Explicit GroundItem marker nhỏ nhìn được giữa piles; không icon tương tác song song active enemy. Quest/service marker !/? là trạng thái khả dụng, không actionable focus thứ hai. Hover/candidate cue nếu cần phải yếu và khác selected (**OPEN exact styling**).
+
+NPC PrimaryAction mở contextual root, quest option preselected khi hợp lệ; Talk là option. Opening press không Confirm; modal header/breadcrumb/pending/reason đọc kết quả server. BrokenSeal/ChiselMarks/SealScar/trụ Xích cũ tiếp tục environmental lore, không mặc định checkbox; Q11 restored placements reuse Ancient motif trên nhiều maps chưa chọn, không author toàn bộ ba seals ở Xích theo graph cũ.
+
+Map Info panel nhỏ tên map + ordinary total/Linh subset/NPC/Boss hiện hành theo [World](../01-design/world-and-content.md#map-population-info). Exact layout/text/colors OPEN; pending/reconnect/mapchange cue tránh stale truth. Không coordinates/pockets/ping/arrow Linh; ordinary total không cộng Linh hai lần. Reuse text/panel kit, chưa tạo assets hoặc bitmap budget mới.
+
+Inventory60/60, quantity picker và total Buy/Sell; Split quantity+empty-slot, Sort/Merge explicit, Discard confirmation nêu permanent destroy/no-ground. Stable-ID selection/survivor mapping theo Runtime. Quest item subtle background/overlay, unsellable/undiscardable disabled reason; palette OPEN, nền trắng không permission. Equipment details gọn ReqLv/Class với unmet đỏ nhẹ, stats dễ đọc/modest colors; comparison compact optional, không mặc định delta kép mọi stat.
+
+Giữ BodyBase/HairHead/Armor/LowerBody/Weapon, Q3 Quần/Q4 Áo visible, Boots/Ring/Necklace stat/icon; LeftRight/Idle3/4/RunJumpFallSide/AttackSide, Back/Hand, **26 logical LOCKED**. Không đổi one-main-action/VFX, SwordS2 embedded Lân hoặc qi slash alternative, BowS2 one release/ABC-ABA-AAA. Updated icon accounting là conditional bindings6, không6 bitmap mới và material Q11 exact vẫn OPEN.

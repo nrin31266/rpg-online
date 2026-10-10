@@ -1,6 +1,6 @@
 # Huyền Lộ — Documentation Map
 
-Entry point duy nhất cho documentation hiện hành, tổ chức theo semantic owner. Trạng thái triển khai hiện hành xem tại [Roadmap](04-production/roadmap.md). VS-1 là prototype/reference; kết quả của prototype không tự chứng minh current acceptance.
+Entry point cho **11 canonical docs** (kể cả index), tổ chức theo semantic owner; architecture và runtime dùng chung file với section ownership rõ. Trạng thái triển khai hiện hành xem tại [Roadmap](04-production/roadmap.md). Prototype VS-1 đã được xóa khỏi checkout; [lịch sử và source đã commit](90-archive/production-history.md#prototype-source-retired) vẫn tra được qua Git. Kết quả cũ không tự chứng minh current acceptance.
 
 ## Documentation map
 
@@ -14,7 +14,6 @@ docs/
 │   ├── quests-and-narrative.md
 │   └── items-and-economy.md
 ├── 02-technical/
-│   ├── architecture.md
 │   ├── gameplay-runtime.md
 │   └── online-and-persistence.md
 ├── 03-art/
@@ -31,12 +30,11 @@ docs/
 | Document | Document owns |
 | --- | --- |
 | [Game Design](01-design/game-design.md) | Identity, pillars, loop, scope, mục tiêu trải nghiệm, chương và ý nghĩa completion |
-| [Combat & Character](01-design/combat-and-character.md) | Stats/class/skill/input/focus/pending/damage/status và combat modifiers |
+| [Combat & Character](01-design/combat-and-character.md) | Stats/class/skill/combat focus branch/pending/damage/status và combat modifiers |
 | [World & Content](01-design/world-and-content.md) | Map/gate/topology/terrain, mob/AI gameplay, density/spawn, Linh Biến/Boss |
 | [Quests & Narrative](01-design/quests-and-narrative.md) | Lore/NPC/dialogue, canonical objectives và quest credit/gameplay recovery |
 | [Items & Economy](01-design/items-and-economy.md) | Gear/Food/Potion, inventory/shop/loot, Gold/Journey và PvP stake economy |
-| [Architecture](02-technical/architecture.md) | Authority, dependencies, boundaries và shared rules Local → Dedicated |
-| [Gameplay Runtime](02-technical/gameplay-runtime.md) | Triển khai clock/input/combat/quest/physics/map/UI/presentation |
+| [Gameplay Runtime](02-technical/gameplay-runtime.md) | Architecture/authority/Local → Dedicated; PrimaryAction/ActiveFocus/input/UI; clock/combat/quest/physics/map/presentation implementation |
 | [Online & Persistence](02-technical/online-and-persistence.md) | Auth/lease/reconnect/checkpoint, transactions/receipts, durability/outage/escrow |
 | [Art & Visual Production](03-art/art-and-visual-production.md) | Perspective/rig/pose/socket, visual language, map Bible/UI, workflow/accounting |
 | [Roadmap](04-production/roadmap.md) | CURRENT/TARGET/DEFERRED, phase/gate, phụ thuộc, lịch quản lý và readiness |
@@ -55,7 +53,7 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Vai trò | Đường đọc |
 | --- | --- |
 | Gameplay developer | README → design domain → Gameplay Runtime → Playtest khi cần evidence |
-| Backend/network | README → Architecture → Online & Persistence → design owner liên quan |
+| Backend/network | README → Runtime architecture/boundaries → Online & Persistence → design owner liên quan |
 | Level designer | README → World & Content → Quests & Narrative → Art |
 | Artist | README → Art & Visual Production → relevant design constraints |
 | QA | README → Roadmap → Playtest & Balance → design/technical owner của ca kiểm |
@@ -73,13 +71,21 @@ Evidence trái design phải thành finding để owner quyết định, không 
 
 | Cần tra | Owner |
 | --- | --- |
-| Skill/MP/CD, target, input/pending | [Combat](01-design/combat-and-character.md) |
+| Architecture/authority/Local → Dedicated | [Runtime architecture](02-technical/gameplay-runtime.md#runtime), [discipline](02-technical/gameplay-runtime.md#architecture-discipline) |
+| Code responsibilities / reuse / failure boundaries | [Runtime matrix](02-technical/gameplay-runtime.md#responsibility-matrix) |
+| PrimaryAction / universal ActiveFocus / NPC menu | [Runtime](02-technical/gameplay-runtime.md#active-focus) |
+| Quest RNG / physical collection | [Quest](01-design/quests-and-narrative.md#quest-collection) |
+| Q11 restoration / level and endpoint OPEN | [Quest](01-design/quests-and-narrative.md#q11-restoration) |
+| One regular physical outcome | [Items](01-design/items-and-economy.md#regular-loot-outcome) |
+| Inventory Split/Sort-Merge/Discard policy | [Items](01-design/items-and-economy.md#inventory-ux-policy) |
+| Map Info population / replication | [World](01-design/world-and-content.md#map-population-info), [Runtime](02-technical/gameplay-runtime.md#map-info-runtime) |
+| Skill/MP/CD, combat target/range/pending | [Combat](01-design/combat-and-character.md) |
 | Density/Hybrid/Linh/Boss (WHAT) | [World](01-design/world-and-content.md) |
 | Return gameplay policy (WHAT) | [World](01-design/world-and-content.md#melee-crowd) |
 | Return runtime/state machine (HOW) | [Runtime](02-technical/gameplay-runtime.md#mob-capabilities-vùng-hoạt-động-và-crowd) |
-| Q8 gameplay guarantee/reservation policy (WHAT) | [World](01-design/world-and-content.md#q8-bounded-path) |
+| Q8 natural hunt/spawn availability (WHAT) | [World](01-design/world-and-content.md#q8-bounded-path) |
 | Q8 quest credit (WHAT) | [Quests](01-design/quests-and-narrative.md#q8-credit-review) |
-| Q8 runtime scheduling/lifecycle (HOW) | [Runtime](02-technical/gameplay-runtime.md#death-loot-spawn-và-action-timeline) |
+| Natural Linh runtime lifecycle (HOW) | [Runtime](02-technical/gameplay-runtime.md#death-loot-spawn-và-action-timeline) |
 | Q8 entitlement/reconnect/durable receipt (HOW) | [Online](02-technical/online-and-persistence.md#lưu-dữ-liệu--spring-boot--postgresql) |
 | Objectives/NPC/evidence/credit | [Quests](01-design/quests-and-narrative.md) |
 | Food/loot/gear/Gold (WHAT) | [Items](01-design/items-and-economy.md) |
@@ -99,6 +105,10 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Commit / rollback | Ghi thành công toàn transaction / hoàn tác transaction thất bại |
 | Idempotent | Retry cùng ID không tạo effect/reward/consume lần nữa |
 | Generation | Phiên/đời dùng để loại callback hoặc write cũ |
+| PrimaryAction | Một player-facing action dispatch theo ActiveFocus thành concrete server command |
+| ActiveFocus | Một object/type actionable; combat branch có CombatFocus machinery, không double selected marker |
+| Quest RNG outcome | Success/failure immutable theo eligible death/recipient/objective/epoch; recovery không reroll |
+| Restoration flag | Action history đã commit sau consume đúng fragment, không possession counter |
 | CombatFocus | Target quan sát/ý định combat; không tự là một cast |
 | Execution range | Tầm có thể thực thi skill tại validation/resolve |
 | Retention range | Vùng còn giữ focus; khác tầm thực thi |
@@ -110,7 +120,7 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Hitbox / hurtbox | Hình truy vấn đòn / vùng có thể nhận đòn |
 | Action lock | Cửa đang chạy action, khác cooldown và độ dài VFX |
 | Receipt / ACK | Kết quả durable để retry / xác nhận đã nhận hoặc commit theo contract |
-| Entitlement | Quyền nhận/force theo event hợp lệ, giữ qua retry |
+| Entitlement | Quyền nhận item theo event/grant hợp lệ, giữ qua retry; không quest force-spawn |
 | Fresh-run | Hành trình từ trạng thái đầu hợp lệ, không dùng preset bỏ bước |
 
 <a id="open-decision-index"></a>
@@ -121,11 +131,11 @@ Index chỉ dẫn nơi quyết định; không giữ options hoặc gameplay val
 
 | ID | Status | Question | Owner | Resolve at |
 | --- | --- | --- | --- | --- |
-| INPUT-01 | OPEN/TUNABLE feel | Physical keys, shell, envelopes và approach/buffer feel? | [Combat](01-design/combat-and-character.md) | Pha R, G-L/G-N |
+| INPUT-01 | OPEN/TUNABLE feel | Physical keys, shell, envelopes và approach/buffer feel? | [Combat](01-design/combat-and-character.md), [Runtime](02-technical/gameplay-runtime.md#active-focus) | Pha R, G-L/G-N |
 | CMB-01 / BAL-01 | TUNABLE | Cadence, class growth/build và gear-lag có hợp lý? | [Combat](01-design/combat-and-character.md) | Early probes, G-C/F |
 | BAL-02 / GEAR-01 / LOOT-01 | TUNABLE | Food sustain, gear power và economic sinks? | [Items](01-design/items-and-economy.md) | Playtest/G-C/F |
 | MOBAI-01 / SCOPE-01 | OPEN/TUNABLE | Hybrid, Return và final population authoring? | [World](01-design/world-and-content.md) | PHY-01/G-C/F |
-| Q8-01 | LOCKED guarantee / OPEN mechanism | Bounds, fairness/credit và force entitlement recovery? | [World policy](01-design/world-and-content.md#q8-bounded-path), [credit](01-design/quests-and-narrative.md#q8-credit-review) | G-C/G-D, contention probe |
+| Q8-01 | CURRENT natural / TUNABLE pacing | Rare identity availability, shared cap và contribution contention? | [World](01-design/world-and-content.md#q8-bounded-path), [Quest](01-design/quests-and-narrative.md#q8-credit-review) | G-C/QUEST-03 |
 | QUEST-03 | PLAYTEST | Fresh route, narrative/usability và duration có đạt? | [Quest](01-design/quests-and-narrative.md), [evidence](04-production/playtest-and-balance.md) | G-L/C/T |
 | POT-01 | LOCKED realtime / OPEN durability | Accepted Potion survive crash/outage thế nào? | [Online](02-technical/online-and-persistence.md#potion-durability) | G-D/G-T bắt buộc |
 | TECH-01 / SAVE-01 | SPIKE | Auth/lease/checkpoint/reconnect/recovery có nhất quán? | [Online](02-technical/online-and-persistence.md) | G-D |
@@ -136,21 +146,15 @@ Index chỉ dẫn nơi quyết định; không giữ options hoặc gameplay val
 | A07 / A10 | OPEN details | Dummy/content/LoS/Return authoring? | [World](01-design/world-and-content.md#a07) | PHY-01/G-C |
 | A11 | OPEN presentation | Cosmetic anticipation/schema? | [Runtime](02-technical/gameplay-runtime.md#a11) | G-N |
 | A13 / A15 | OPEN details | Select preview và terminal/persistence ordering? | [Online](02-technical/online-and-persistence.md#a13) | G-D/P12 |
+| FOCUS-02 | OPEN | Auto non-combat sticky/priority và dead new acquisition? | [Runtime](02-technical/gameplay-runtime.md#active-focus) | C0/G-L/N |
+| QUEST-RNG | TUNABLE / OPEN | Collection quantities/rates và natural-hunt pacing? | [Quest](01-design/quests-and-narrative.md#quest-collection), [Q8 probe](04-production/playtest-and-balance.md#q8-01--natural-hunt--contribution--population-chưa-chạy) | QUEST-03/G-C/T |
+| Q11 | CURRENT direction / NEEDS USER LOCK | Start/gate, material/consume, level, maps/positions/order, endpoint/final gate action? | [Quest](01-design/quests-and-narrative.md#q11-restoration) | G-B/content review trước authoring |
+| LOOT-02 | TUNABLE / OPEN | One-outcome weights/income và Linh Gold rounding? | [Items](01-design/items-and-economy.md#regular-loot-outcome), [EV](04-production/playtest-and-balance.md#loot-model-transition) | G-C/F |
+| INV-UX | CURRENT planned / OPEN scope | Ordinary canDiscard và Split/Sort/Discard shipment P0/P1? | [Items](01-design/items-and-economy.md#inventory-ux-policy), [Roadmap](04-production/roadmap.md#map-info-work-package) | Slice1/3/4; scope review |
+| MAP-INFO | CURRENT direction / ENGINEERING recommendation / OPEN visual | Count encoding/lifecycle/replication và labels/layout? | [World](01-design/world-and-content.md#map-population-info), [Runtime](02-technical/gameplay-runtime.md#map-info-runtime), [Art](03-art/art-and-visual-production.md#activefocus--map-info--inventory-visual-sync--current-direction) | Slice5/8/G-N |
+| RNG-DURABILITY | OPEN engineering spike | Schema/retention/TTL, pre-handoff crash và staged batch delivery? | [Online](02-technical/online-and-persistence.md#identity-death-receipts) | G-D |
+| Q2 / Q6 | PROPOSAL chưa áp dụng | Exact journey content và MP tutorial reschedule? | [Q2](01-design/quests-and-narrative.md#q2-journey), [Q6](01-design/quests-and-narrative.md#q6-mp-tutorial--recovery-hiện-hành-và-proposal-dời-thời-điểm) | Content approval/G-L |
 
+## History
 
-<a id="consolidation-20261009"></a>
-
-## Gameplay/system consolidation — 2026-10-09
-
-Direction cập nhật tại owner: [Inventory 60/stack/item policy](01-design/items-and-economy.md#inventory-contract), [physical quest collection](01-design/quests-and-narrative.md#quest-collection), [fixed Jump/two facing](01-design/combat-and-character.md#movement-direction), [Q6/NPC](01-design/quests-and-narrative.md#npc-service-review), [Shop UI](02-technical/gameplay-runtime.md#shared-item-ui) và [Art facing](03-art/art-and-visual-production.md#player-facing). Rule không copy vào index.
-
-Review: [Q1–Q12 completeness/counts/identity credit](01-design/quests-and-narrative.md#quest-gameplay-review), [Q2 draft](01-design/quests-and-narrative.md#q2-journey), [code audit/matrix](02-technical/architecture.md#source-audit-20261009), [transaction flows](02-technical/gameplay-runtime.md#item-transaction-flows), [entitlement trade-off/recovery](02-technical/online-and-persistence.md#personal-quest-recovery), [vertical slices](04-production/roadmap.md#consolidation-slices) và [acceptance chưa chạy](04-production/playtest-and-balance.md#consolidation-acceptance).
-
-Counts và standard MobIdentity credit đã được duyệt trong recovery hiện tại. Exact Q2 item/name, Q6 MP tutorial reschedule, schema, TTL và 26/raster mapping vẫn chưa duyệt; không dùng plan hay audit observations của prototype làm implementation authority hoặc gate pass. Stable IDs, mob death và controls giữ; thay counts/services/target propagation theo direction đã xác nhận ở owner.
-
-
-## History recovery / canonical correction — 2026-10-09
-
-Tra [Decision Trace và Git evidence](01-design/combat-and-character.md#combat-decision-trace), [primary/propagation và OPEN probes](01-design/combat-and-character.md#target-propagation), [six-skill completeness](01-design/combat-and-character.md#combat-completeness), [six-skill visual contract](03-art/art-and-visual-production.md#six-skill-visual), [quest identity semantics](01-design/quests-and-narrative.md#mob-identity-credit), [NPC/service matrix](01-design/quests-and-narrative.md#npc-service-review), [vendor catalogs](01-design/items-and-economy.md#vendor-catalogs) và [placements](01-design/world-and-content.md#quest-farm-placement). Không dùng label APPROVED trong commit/doc để suy approval của người dùng.
-
-Đường implementation: [C0 combat micro-slice](04-production/roadmap.md#combat-micro-slice), [15 combat cases + quest regression chưa chạy](04-production/playtest-and-balance.md#recovery-combat-acceptance), [nine slices](04-production/roadmap.md#consolidation-slices) và [một task đầu](04-production/roadmap.md#first-coding-slice). Numeric proximity/vertical/behind-player/LoS là OPEN/PROBE tại Combat, không luật khóa hoặc runtime PASS.
+[Combat decision trace](90-archive/design-history.md#combat-decision-trace), [source audit 2026-10-09](90-archive/production-history.md#source-audit-20261009) và [prototype history](90-archive/production-history.md#prototype-runtime-history) chỉ dùng truy vết. CURRENT/gate status xem [Roadmap](04-production/roadmap.md#target-current-deferred); chưa có runtime evidence mới từ lượt docs.

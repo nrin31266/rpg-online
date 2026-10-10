@@ -6,6 +6,8 @@
 
 Nguồn hiện hành: [documentation map](../README.md). Các con số, claim và đường triển khai bên dưới mô tả revision lịch sử.
 
+> **SUPERSEDED bởi phase 2026-10-10:** two-button Execute/Interact, Q8 force/reservation, Q8/Q10 ordinal evidence, Q11 old quotas/mob fragments/three Xích seals và multi-independent regular non-boss loot trong trace cũ không còn authority. Đọc [PrimaryAction](../02-technical/gameplay-runtime.md#active-focus), [Quest RNG/Q11](../01-design/quests-and-narrative.md#quest-collection), [natural Linh](../01-design/world-and-content.md#linh-bien), [loot](../01-design/items-and-economy.md#regular-loot-outcome). Bảng/số lịch sử giữ nguyên để truy vết.
+
 <a id="art-rationale"></a>
 
 ## Phụ lục A. Rationale và ghi chú thiết kế
@@ -133,4 +135,4 @@ Các khối dưới được MOVE đầy đủ trong cùng file; phần chính g
 
 ## Export path của probe cũ
 
-**HISTORICAL export path:** `ArtSource/Probes/Sword01/` → `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` từng là đề xuất. Giữ để tra lịch sử, không chỉ định sửa VS-1 đang đóng băng để chạy probe revision mới; migration này không tạo/chạy sandbox hoặc asset.
+**HISTORICAL export path:** `ArtSource/Probes/Sword01/` → `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` từng là đề xuất. Giữ để tra lịch sử, VS-1 đã được xóa khỏi checkout; đường dẫn này không dùng để chạy probe revision mới; migration này không tạo/chạy sandbox hoặc asset.

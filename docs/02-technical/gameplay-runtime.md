@@ -4,11 +4,131 @@ Các số BASELINE/TUNABLE chưa phải nghiệm thu runtime.
 
 ## Document owns
 
-Cách triển khai clock/input/combat/quest/physics/map/UI/presentation; không sở hữu balance values.
+Authority/dependency và Local → Dedicated; cách triển khai clock/input/combat/quest/physics/map/UI/presentation. Combat/quest/items/world owners giữ gameplay và balance; Online giữ durability/recovery.
 
 ## Document does not own
 
 Luật ngoài domain thuộc owner trong [documentation map](../README.md); evidence thuộc [Playtest & Balance](../04-production/playtest-and-balance.md), thứ tự triển khai thuộc [Roadmap](../04-production/roadmap.md).
+
+## Tra cứu trong tài liệu
+
+[Architecture](#runtime) · [Local → Dedicated](#architecture-discipline) · [Responsibility matrix](#responsibility-matrix) · [Maps/physics](#maps) · [Combat data](#combat-data) · [ActiveFocus/input](#active-focus) · [Map Info](#map-info-runtime) · [Presentation](#presentation-data) · [UI](#ui-notes) · [Command flows](#item-transaction-flows).
+
+## Architecture và ranh giới hệ thống
+
+<a id="runtime"></a>
+
+<a id="1-kiến-trúc-runtime"></a>
+
+## Kiến trúc runtime
+
+P0 chạy **một Unity Dedicated Game Server** headless, **một Spring Boot backend**, **một PostgreSQL** và N Unity 2D Clients. Hai Client là mức nghiệm thu tối thiểu, không phải `MaxPlayers = 2`. Không có player-host, Party service, shard, cloud orchestration hoặc engine combat trong Java.
+
+| Thành phần | Sở hữu | Không sở hữu |
+| --- | --- | --- |
+| Unity Client | Input, camera, UI, animation, VFX, audio, interpolation; gọi login/character list/ticket qua backend và gửi intent gameplay tới Game Server | Damage, HP mục tiêu, EXP/Vàng, loot, quest/enhance/Boss/PvP result; không gửi character state đáng tin cậy |
+| Unity Dedicated Game Server | Physics2D, movement/map validation, skill timeline, combat/status, HP/MP trong phiên, mob/Boss/PvP, contribution/threat, roll và phân phối kết quả gameplay; kiểm intent theo character binding | Account/password, SQL, bản lưu tiến trình dài hạn |
+| Spring Boot | Admin tạo account, login, character list, session/ticket, character aggregate; giao dịch bền vững và idempotency cho progression/inventory/quest/loot/Gold/Journey | Physics/combat tick, AI, chọn mục tiêu hoặc roll lại kết quả gameplay |
+| PostgreSQL | Account/password hash, tiến trình nhân vật, recovery checkpoint, PvP escrow/settlement receipts và ground loot còn hiệu lực | Static ScriptableObject definitions, projectile/AI/threat hoặc combat state chính xác trong phiên |
+
+**Luồng kết nối:** Client ↔ Spring Boot để login, chọn nhân vật, lấy game ticket; Client ↔ Game Server qua NGO + Unity Transport cho realtime; Game Server ↔ Spring Boot qua internal HTTP API có service credential; Spring Boot ↔ PostgreSQL. Client không gọi backend để cộng thưởng hoặc hoàn thành quest. Backend không nằm trên đường mỗi frame/hit; kết quả làm thay đổi tiến trình bền vững chỉ được báo thành công sau khi commit (xác nhận thay đổi chính thức).
+
+**Một nguồn luật:** Skill/Mob/Item/Quest/Map definitions là ScriptableObject với stable IDs, đóng gói cùng revision vào Game Server build. Client nhận phần cần hiển thị. Spring giữ định danh, definition revision và constraint dữ liệu/giao dịch tối thiểu; không chép damage/drop/enhance thành engine thứ hai trong Java. Riêng escrow/payout/fee/refund PvP do Spring tính theo owner design tương ứng và các mục liên quan bên dưới.
+
+Game Server tính gameplay result từ definition; backend chỉ nhận lệnh từ service credential, kiểm session/IDs, expected character revision, idempotency key và cấu trúc giao dịch rồi commit atomic (toàn bộ cùng thành công hoặc cùng thất bại). Definition revision lệch thì từ chối join/mutation cho tới khi đồng bộ. PostgreSQL migrations giữ schema; JSON chỉ cho config/fixture/import-export dev, không là save authority.
+
+Physics 50 Hz, network 20 Hz và render 60 FPS là BASELINE/TUNABLE, cần profiler trước khi hứa throughput. RPC kiểm sender/binding rồi gọi domain function; không custom transport adapter, DI/service bus hoặc distributed messaging. Session admission theo config, độc lập với gameplay; collections theo characterId/playerId hỗ trợ N người. PvP MatchId có đúng hai participant vì mode 1v1. Dedicated build dùng cùng gameplay assembly/definitions với Client; assembly/build target tách presentation, server bỏ camera/UI/audio và chạy headless.
+
+**Unity/tooling:** pin Editor/ProjectVersion/manifest/lock khi dựng production base và kiểm package ở integration gate. Input System cho Client; NGO + Unity Transport là lựa chọn TARGET realtime, chưa có trong prototype. Multiplayer Play Mode (MPPM), Multiplayer Tools/Network Simulator và Unity Test Framework phục vụ dev/QA; ObjectPool chỉ quản lý presentation; Cinemachine 3 cho camera Client.
+
+Local Session ở các mục liên quan phục vụ slice đầu, Dedicated phục vụ gate mạng/final online acceptance. MPPM giúp lặp với nhiều Client, không thay standalone acceptance. Tránh DOTS/ECS, Addressables, Relay, prediction/rollback và cloud/service framework nếu slice chưa chứng minh cần.
+
+<a id="architecture-discipline"></a>
+
+<a id="11-kỷ-luật-kiến-trúc-và-local--dedicated"></a>
+
+## Kỷ luật kiến trúc và Local → Dedicated
+
+**Ranh giới production base đã được chấp nhận; prototype classes/folders không là implementation authority.** Input/UI tạo intent; authority của phiên kiểm binding/state rồi gọi rules/resolver; resolver trả result/state change; presentation đọc trạng thái để vẽ. Chỉ một session giữ quyền thay đổi gameplay trong một lần chạy. UI/PlayerScript không tự sửa HP quái, inventory, quest hoặc EXP.
+
+```text
+Input / UI → Intent → Authority của phiên → Rules / Resolver
+                                            ↓
+                                   Result / State → Presentation
+Local: intent gọi session trong process.
+Dedicated: intent qua RPC đã kiểm sender/character/session.
+```
+
+Giữ ít abstraction: một điểm nhận intent, một clock gameplay, definitions có revision và một điểm commit progression/receipt. Đây là trách nhiệm cần tách, không buộc tên class/interface hay service framework. Local/Dedicated dùng cùng gameplay assembly cho combat/stat/quest/reward. Reuse code prototype phải review/test theo contract mới; không mang nguyên assembly cũ vào production. Authority chạy physics adapter;
+
+MonoBehaviour có thể tích hợp physics, nhưng UI/animation không sở hữu luật. Resolver nhận state/definition/clock và trả kết quả dễ kiểm, không cần Text/Button/Animator/RPC/SQL để tính damage.
+
+| Ranh giới | Local slice / fixture dev | Dedicated + backend TARGET |
+| --- | --- | --- |
+| Nhận intent | Gọi session trong process, bind actor fixture rõ | RPC kiểm sender/character/session rồi gọi cùng domain path; collections N-player |
+| Simulation | Local Session tick physics/AI/timeline và sửa state | Dedicated tick headless; Client đọc state/interpolation, không chạy authority thứ hai |
+| Definition/result | Stable IDs/revision, stat/quest/loot resolver, action/life IDs | Giữ cùng ý nghĩa; protocol serialization là adapter, không bản công thức riêng |
+| Commit progression | Adapter RAM có receipt/revision; inject pending/reject/retry để thử luồng; mất khi đóng phiên | Spring/PostgreSQL theo các mục liên quan; chỉ ACK bền vững mới báo persistent success |
+| Admission/recovery | Profile dev/reset rõ, chưa chứng minh login/save/reconnect | Login/Select/ticket/lease/checkpoint/escrow và outage theo các mục liên quan |
+
+UI/modal/selection triển khai tại [UI](#ui-notes) và [shared item controllers](#shared-item-ui); NPC/class admission theo [Quest owner](../01-design/quests-and-narrative.md#npc-service-review).
+
+**ID ổn định:** Skill/Item/Quest/Map/group/slot IDs thuộc definition, không đổi theo thứ tự Inspector/list hoặc display name. Runtime instanceID/actionID/generation phân biệt một đời instance và một action; không dùng GameObject instance hoặc sprite frame làm business identity. Callback từ đời cũ bị từ chối. Client sequence/correlation không thay authoritative result identity.
+
+**Một clock gameplay:** hit/spawn, CD/action lock, status/tick, AI và due-slot dùng cùng timebase. Animator/UI không có timer quyết gameplay riêng; parts của actor đọc cùng state/phase. Deadline bền vững UTC theo các mục liên quan được quy đổi rõ với thời gian phiên; backend giữ timestamp giao dịch/reconciler riêng. AnimationEvent chỉ phát feedback cosmetic: bỏ frame/event không sinh, mất hoặc lặp damage. VFX collision/socket/render bounds không là hitbox authoritative. Hitstop/crit shake/material audio DEFERRED, không dừng clock gameplay.
+
+**Đổi sang Dedicated:** thay adapter nhận intent, physics host/replication, admission/commit; giữ rules và ý nghĩa result. G-N kiểm ít nhất hai Client trước nhân content/art; fixture RAM không chứng minh durability (dữ liệu còn sau lỗi/crash). G-D dùng service credential/PostgreSQL thật và kiểm transaction/recovery trước nhận persistence done. Message fields ở [presentation proposal](#presentation-data) cần spike, không buộc custom bus từ local.
+
+Task của coding agent phải nêu canonical section/revision, CURRENT/TARGET, input/result và gate liên quan. Thay số gameplay/timer/Boots/26-frame hoặc quyết định OPEN phải ghi giả định/evidence ở Playtest & Balance và đồng bộ owner. Không tự thêm movement lock/state/feature để làm art/count/test pass. Chọn phép kiểm có ý nghĩa cho luật/retry/life/physics; sửa visual nhẹ không cần test chỉ phản chiếu implementation.
+
+
+<a id="responsibility-matrix"></a>
+
+## Responsibility matrix — TARGET boundaries
+
+Owner là nơi đặt code/trách nhiệm. Dedicated Server giữ realtime gameplay authority; Spring/PostgreSQL giữ durable commit theo contract hiện hành. Local dùng cùng domain path với RAM adapter. Không bắt mỗi row thành service/interface; Reused by không cho bypass validation/transaction.
+
+| System / Component | Responsibility | Owner | Authority | Persistent state | Reads | Writes | Reused by | Must not depend on | Failure boundary | Idempotency requirement |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Client Inventory UI | Bag actions/pending | Client controller | Display/intent | Không | Bag snapshot/policy reasons | Selection/commands | Equipment picker | SQL/trusted mutations | Stale entry/reject | Correlate command; không double activate |
+| Client ItemGrid | Cells/navigation/scroll | Client widget | Display | Không | Entry viewmodel | Local focus | Bag/Buy/Sell/Storage/picker | NPC/quest rules | Missing entry/layout | Stable entry selection |
+| Client ItemDetails | Stats/quantity/requirements/reason | Widget/formatter | Display | Không | Selected entry/allowed actions | Local view | Item contexts | Damage/drop/price authority | Stale snapshot | Latest revision |
+| Client Shop UI | Tabs/catalog/quantity/request | Client controller | Intent | Không | Catalog/bag/results | Buy/Sell intent | NPC service | Inventory write/trusted Gold | Timeout pending | Một command, retry cùng ID |
+| Client NPC UI | Talk/quest/service/breadcrumb | Client controller | Display/intent | Không | NPC/quest/class result | Interaction intent | Quest/Shop/Storage | Grant từ thoại | Wrong NPC/range | Không UI credit/replay grant |
+| Client Ground visual | Owner-filtered icon/pick cue | Client presenter | Display | Không | Rep ID/gen/map/owner | Cosmetic/pick intent | Regular/personal visual | ACL/claim logic | Late/stale/wrong map | Dedup/retire representation |
+| Client Quest tracker | Action/possession feedback | Client presenter | Display | Không | Committed progress/bag/rights | Pin/local cue | NPC/HUD | Completion từ text | Pending vs committed | Latest revision; không event credit |
+| Client Character presentation | Pose/parts/carry/shadow | Client presenter | Visual | Không | Facing/action/life/gear | VisualRoot | Preview/world | Physics damage/Inventory | Stale action/death | Shared clock/life reset |
+| Client Movement input | Axis/press/semantic input | Input adapter | Intent | Không | Bindings/UI capture | Input sequence | Local/Dedicated receiver | Hold height/trusted position | Modal/stale press | Một accepted press/jump |
+| Server Player Inventory | Plan add/remove/merge/capacity | Domain planner/session | Gameplay | Stack/location/quantity | Definitions/bag/revision | Inventory delta | Buy/Sell/Pickup/TurnIn/Storage | UI/RPC/SQL details | Capacity/overflow/stale | Atomic plan/commit receipt |
+| Server Item ownership | Location/binding policy | Validator/data | Gameplay | Binding/location | Instance/session/quest policy | Validation result | Item handlers | Client visibility | Wrong owner/quest | Reject không mutation |
+| Server Equipment | Equip/unequip/stat projection | Handler/evaluator | Gameplay | Slots/instance state | Bag/class/level | Equip/bag delta | Character/quest | Art pose/DB formulas | Full bag/off-class/policy | Atomic swap/command receipt |
+| Server Loot eligibility | Recipient/window predicates | Domain validator | Gameplay | Eligibility snapshot | Ledger/level-at-death/source | Eligibility result | Regular/personal handlers | Visibility/last-hit shortcut | Wrong identity/special predicate/life | Snapshot một lần/death |
+| Server Ground loot | Valid ground/lifetime/representation | Runtime manager/data | Gameplay | Regular pile/deadline; personal right riêng | Map/surface/entitlement | Generation/position/retire | Pickup/visual | Trusted client raycast | TTL/unreachable/stale gen | Một active personal rep/right |
+| Server Personal quest entitlement | Bounded right/payload | Quest handler | Gameplay; durable via Spring | Pending/Claimed/Consumed/epoch/receipt | Active group/source outcome/eligibility | Entitlement delta | Death/placed/recovery | Regular owner budget/UI | Death rollback/restart | Unique death/recipient/objective/epoch hoặc staged grant; cả failure dedup |
+| Server Pickup validation | Alive/map/range/ACL/capacity | Pickup handler | Gameplay | Claim receipt | Ground/right/bag/revision | Add+claim delta | Regular/personal pickup | Client claimed state | Race/full bag/stale rep | Add+claim atomic |
+| Server Quest progress | History và derive possession | Evaluator/session | Gameplay | Per-Quest state/RNG outcomes/tutorial ordinal/receipts/placed flags | Definitions/bag/committed events | Progress/Ready cache | NPC/tracker/turn-in | UI counter/double collection authority | Wrong group/missing items | Event ID/source epoch |
+| Server Shop transaction | Catalog/price/quantity/Gold plan | Buy/Sell handlers | Gameplay | Gold/bag/receipts | Catalog/NPC/bag | Purchase/sale delta | Shop commands | Client price/quest grant engine | Overflow/vendor/timeout | Immutable command payload |
+| Server NPC interaction result | Resolve context/admission/NPC | Handler/data table | Gameplay | Q6 Talk/class/mentor receipts | NPC/quest/class | Talk/choice/result delta | Quest/service entry | Animation/ambient grant | Range/off-class | Talk gate/class receipt |
+| Server Combat/mob credit | HpLost/active ledger/death snapshot | Combat resolver/session | Realtime | Death reward/progress receipts | Mob identity/variant/life/contribution/active quest | Immutable death result | EXP/loot/entitlement | Spring damage engine/VFX | Terminal pending/stale life | Death ID/recipient dedup |
+| Spring Durable profile | Committed character aggregate | Backend application | Durable | Profile/bag/quest/class/checkpoint | Auth/DB/definitions | Validated durable delta | Join/commands | Physics/targets/RNG reroll | Revision/lease/credentials | Receipt trước revision |
+| Spring Transaction/revision | Atomic shared-result commit | Backend transaction | Durable | Receipts/revisions/claims | Immutable plan/current rows | Related rows một lần | Buy/Sell/claim/turn-in/death N | Trusted client result | Rollback/unknown commit | Unique ID/payload; stable lock order |
+| Spring Recovery/lease | Restore/one writer/fencing | Backend admission | Durable admission | Lease/generation/receipt/checkpoint | Lease/committed state | Ticket/lease/reconcile | Rejoin/restart/escrow | Client RAM save | Duplicate session/outage | One-time ticket/reject old writer |
+| PostgreSQL | ACID constraints/storage | DB/schema owner | Durable storage | Committed records | Backend transactions | Rows/indexes/constraints | Persistence | Unity tick/UI | Startup/migration failure | Unique IDs/transaction constraints |
+
+**Reuse:** inventory planner, item-policy validators, commit seam, UI widgets/formatter và valid-ground resolver. **Separate:** Buy/Sell/Equip/Storage/Pickup/TurnIn handlers vì admission và atomic deltas khác; regular pile/personal right khác ownership/expiry/recovery dù dùng chung visual. Collection evaluator đọc Inventory; action receipts giữ history, không event bus cho item counters. NPC chỉ cần data table/contextual handler. Spring dùng transaction/receipt boundary chung, không service cho mỗi item noun. Shared views nhận explicit viewmodel, tránh giant screen chứa business rules.
+
+
+<a id="primary-action-responsibilities"></a>
+
+## Responsibilities sau PrimaryAction / RNG / population migration
+
+| Boundary | Responsibility | Không suy authority từ presentation |
+| --- | --- | --- |
+| Client | Sample input; một ActiveFocus/resolver/marker; PrimaryAction → concrete intent; NPC context/Map Info/HUD render | Không credit quest từ mở menu, không trusted target validity/RNG/counts/price |
+| Game Server | Validate ExecuteSkill/PickupItem/OpenNpcContext/NpcAction/LandmarkInteract; eligibility, death RNG outcomes, one regular non-boss result, staged grant/placement plan; world population/revisions | Không một opaque network PrimaryAction; client selection không đủ rights |
+| Durable backend | Trusted server results + lease/fencing/revisions/constraints; atomic receipts/Inventory/outcomes/entitlements/placed flags/unlock, recovery | Không reroll RNG, không realtime combat hoặc map count từ client |
+
+Runtime owns [universal ActiveFocus](#active-focus); Combat owns combat branch/range/timeline. Q11 completion policy/material consume/level/maps còn OPEN tại Quest owner, không architecture lock bằng default schema. Inventory planners reuse cho Buy/Sell/Split/Merge/Discard/claim, handlers riêng admission; map population observer gắn lifecycle SpawnManager, snapshot/delta qua session/map replication, không subsystem persistence đếm renderer. [Online](online-and-persistence.md#identity-death-receipts) giữ durability boundary.
 
 **Map Chat:** Enter mở input / gửi, tối đa 80 ký tự; rate 1 message / 2 s mỗi playerId do Game Server kiểm; bubble trên đầu tối đa hai dòng, 4 s rồi fade 0,5 s, cùng MapId. P0 không history lớn. System banner do Game Server phát cho Boss T−60, spawn / death và chapter completion; P1 có thể thêm history nhỏ.
 
@@ -20,7 +140,7 @@ Luật ngoài domain thuộc owner trong [documentation map](../README.md); evid
 
 ## Scene và map trong Unity
 
-Code/tọa độ/lỗi của prototype nằm tại [Roadmap — lịch sử](../90-archive/production-history.md#prototype-technical-history), không là contract production. Local production slice dự kiến vào World với profile dev và ba roots theo [VS-1](../04-production/roadmap.md#vs-1); session vẫn kiểm MapId/transition. Login không bắt buộc cho combat probe đầu; luồng online TARGET là Boot/Main Menu → Login → CharacterSelect → overlay kết nối → WorldOnline tại recovery map/SafeAnchor.
+Code/tọa độ/lỗi của prototype nằm tại [Roadmap — lịch sử](../90-archive/production-history.md#prototype-technical-history), không là contract production. Local production slice dự kiến vào World với profile dev và ba roots theo [phạm vi local slice](../04-production/roadmap.md#vs-1); session vẫn kiểm MapId/transition. Login không bắt buộc cho combat probe đầu; luồng online TARGET là Boot/Main Menu → Login → CharacterSelect → overlay kết nối → WorldOnline tại recovery map/SafeAnchor.
 
 Một world scene có **8 logical map roots**: Village, Academy, Arena và năm farm maps. Root origins tính từ bounds thật và separation margin; ~200 u chỉ là mốc spike, không fixed spacing/width. Kiểm colliders/bounds không overlap khi đổi dimensions. Mỗi farm/combat map có một SafeAnchor cố định; Vân Khê/Học Viện dùng SafeAnchor fallback nếu checkpoint coordinate không hợp lệ. Arena dùng spawn theo MatchId, không là recovery map.
 
@@ -62,7 +182,7 @@ Slowdown/depth TUNABLE; flow/ripple cosmetic, không swim/drown/fluid subsystem.
 
 **Camera:** Cinemachine chỉ follow character owner, chết vẫn nhìn death anchor theo vị trí authority; pop/fall VisualRoot không kéo camera. Transition đổi confiner theo root và snap/cancel damping qua offset; invalidation cache khi shape/lens đổi, không follow player từ xa.
 
-**Authoring gate và phân bổ bãi quái hiện hành:** Thử nghiệm trước trên một farm room đại diện trước khi nhân rộng toàn map; bảo toàn tuyệt đối các Quest Anchor IDs (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `TA4.slot1`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`), giữ ổn định các stable authored seed IDs (`TA5`, `BV1–BV5`, v.v.), SafeAnchor, dải vào an toàn 6–8 u từ cửa map, tuyến rút lui về làng và đường tiếp cận bãi rơi đồ (loot).
+**Authoring gate và phân bổ bãi quái hiện hành:** Thử nghiệm trước trên một farm room đại diện trước khi nhân rộng toàn map; bảo toàn tuyệt đối các Quest Anchor IDs (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`), giữ ổn định các stable authored seed IDs (`TA5`, `BV1–BV5`, v.v.), SafeAnchor, dải vào an toàn 6–8 u từ cửa map, tuyến rút lui về làng và đường tiếp cận bãi rơi đồ (loot).
 
 Mật độ bãi quái phải được author lại theo [Kế hoạch mật độ World & Content](../01-design/world-and-content.md#world-farm):
 - **Nguyên tắc phân bổ:** Tăng số lượng bãi/cụm độc lập (`SpawnGroup`) trải trên các thềm đá, tầng cao/thấp và các tuyến nhánh; tuyệt đối không dồn thành một blob lớn 8–10 quái. Khung hình camera tiêu chuẩn có thể hiển thị 5–8+ quái thuộc 2–3 tầng khác nhau, nhưng mỗi cụm giữ AI/aggro độc lập, không báo động dây chuyền sang cụm bên cạnh.
@@ -76,7 +196,7 @@ MapDefinition giữ `requiredLevel`, `unlockFlag` và required quest IDs; author
 
 **MapTransition và Cơ chế chống lặp (Anti-Pingpong):**
 - `EdgeExit` giữ `targetMap`, `targetExit` và `spawnAnchor` đã author. Game Server kiểm tra thẩm quyền: nhân vật còn sống, đúng `MapId`/generation, chuyển động vào vùng exit là do người chơi chủ động điều khiển (`manual movement`), đích đến đã mở khóa (`requiredLevel`, `unlockFlag`, `quest Completed`); tuyệt đối không nhận tọa độ hay đích đến tùy ý từ Client.
-- `SpecialGate` có logic kích hoạt xác thực riêng theo design owner (Huyền Môn Q11 cần tương tác kiểm đủ 3 Mảnh Ấn; Lôi Đài cần chấp nhận thách đấu), không dùng generic Interact cho mọi lối đi.
+- `SpecialGate` có logic kích hoạt xác thực riêng theo design owner (Huyền Môn kiểm committed restoration flags và access theo Q11 owner; exact final interaction OPEN; Lôi Đài cần chấp nhận thách đấu), không dùng generic Interact cho mọi lối đi.
 - **Cơ chế chống giật chuyển cảnh liên tục (Anti-Pingpong Transition):** Tọa độ xuất hiện (`spawnAnchor`) ở bản đồ đích luôn được đặt cách mép collider trigger chuyển cảnh tối thiểu 2,5–3 u về phía trong lòng map (`safe inner offset`), nằm hoàn toàn ngoài phạm vi trigger trả về. Hệ thống duy trì cờ `isTransitioning` và chỉ kích hoạt chuyển cảnh tiếp theo sau khi người chơi đã rời khỏi vùng an toàn hoặc qua thời gian ân hạn (`re-arm upon exit`).
 - **Xử lý lỗi và đồng bộ:** Một pending transition cho mỗi actor, loại bỏ trùng lặp (dedup trigger/request). Nếu bị từ chối (Locked), hệ thống gửi thông báo lý do một lần; người chơi phải bước ra ngoài vùng exit rồi bước vào lại mới có thể thử lại. Commit checkpoint đích vào cơ sở dữ liệu trước khi gửi snapshot cho Client; nếu commit thất bại thì giữ nguyên vị trí ở bản đồ cũ, không gửi snapshot giả. Quá trình chuyển map dọn dẹp sạch sẽ target, threat, action pending và visuals của map cũ.
 
@@ -94,10 +214,10 @@ MapDefinition giữ `requiredLevel`, `unlockFlag` và required quest IDs; author
 | HitResult | Authoritative actionId, targetId/life generation, hitIndex, evade/crit/damage/remainingHP | Client chỉ trình diễn result; exact wire fields/time ở proposal bên dưới |
 | MobDefinition | mobIdentityId/fixedLevel/baseRigId/paletteRef; stats curve, capability/profile, movement/range/timeline/hit shape/projectile presentation, loot/sourceProfileRef, linhBienEligible | Bảy fixed-level identities trên sáu rigs; palette reuse không cần AI/animation riêng; curve chỉ evaluate fixedLevel |
 | LinhBienModifier | Stat/reward modifiers, visual preset, variant tag | Áp trên base runtime đúng một lần; không duplicate base identities/rigs |
-| SpawnGroup / SpawnSlot | mapId/groupId/slotId, mobIdentityRef/cached level/spawnPosition; HomeRegion/HomeSpan/WalkRegion/SurfaceId/AggroRange/LeashRegion; deadline/generation/variantState/Q8 waiting set | Vùng đã author quyết đường đi/aggro; cache level phải bằng fixedLevel; respawn không đổi identity |
+| SpawnGroup / SpawnSlot | mapId/groupId/slotId, mobIdentityRef/cached level/spawnPosition; HomeRegion/HomeSpan/WalkRegion/SurfaceId/AggroRange/LeashRegion; deadline/generation/natural variantState/cap occupancy | Vùng đã author quyết đường đi/aggro; cache level phải bằng fixedLevel; respawn không đổi identity |
 | ItemDefinition / Instance | templateID/instanceID/GearSlot/rarity/enhancement/count, stat lists; optional buyPrice/explicit sellValue, item policy/stack key/binding refs | Không suy stat từ UI position hoặc fake buyPrice cho drop-only; tutorial-bound tách bản vendor |
-| QuestDefinition | prerequisiteQuestIds/requiredLevel; ordered typed objectiveGroups/MobIdentityRefs/special actor-or-variant predicates/markerIds/counts/guaranteedEvidenceOrdinals; giver/turn-in requirements/rewards/unlockFlags | Nội dung theo [Quests & Narrative](../01-design/quests-and-narrative.md#quests-story), không bảng quest thứ hai |
-| QuestProgress per QuestId | state/activeObjectiveGroup/action counters/qualifyingKillOrdinal/personal entitlement receipts; activation/claimed/staged flags và selected mentor/ring khi cần | State riêng từng character/QuestId; backend commit theo revision/receipt các mục liên quan |
+| QuestDefinition | prerequisiteQuestIds/requiredLevel; ordered typed objectiveGroups/MobIdentityRefs/special actor-or-variant predicates/markerIds/counts/collectionRngPolicyRefs/stagedGrantRefs/restorationTargetRefs (exact Q11 fields OPEN); giver/turn-in requirements/rewards/unlockFlags | Nội dung theo [Quests & Narrative](../01-design/quests-and-narrative.md#quests-story), không bảng quest thứ hai |
+| QuestProgress per QuestId | state/activeObjectiveGroup/typed action counters/Q4 optional tutorialOrdinal/RNG outcome receipts/personal entitlements; restoration/claimed/staged flags và selected mentor/ring khi cần | State riêng từng character/QuestId; backend commit theo revision/receipt các mục liên quan |
 
 Production data phải author đủ **12 QuestDefinitions Q1–Q12 và toàn tuyến thật** ngay từ đầu; G-L chỉ thực thi slice Q1–Q6, không cho phép cắt definitions/quest runtime thành bản sáu nhiệm vụ. Bảng mô tả nhu cầu domain/state, **chưa khóa wire schema**. `actionID` trong request cũ chỉ là shorthand correlation; authority mới tạo/bind actionId sau validation. Client sequence/correlation khác ID của action/result/life. Local dùng commit adapter RAM; backend transaction/ACK dưới đây mô tả TARGET, không gọi RAM ACK là durable.
 
@@ -113,9 +233,7 @@ Pickup/equip/sell/use/enhance thất bại không phát event; dùng bình khi �
 
 Keydown/click hoặc UI tự báo thành công không cấp credit; không cần event bus lớn.
 
-**NPC và quest:** giver/turn-in/service/MapId/anchor lấy từ definitions theo [NPC owner](../01-design/quests-and-narrative.md#npc-roster). Q3/Q4/Q7 thuộc Bách Luyện; Q1/Q2, mở Q6 và chính tuyến Q10–Q12 thuộc Lâm Bá. Yên Thảo bán Food/HP/MP, Mộc An giữ Storage40/Rest/Utility Shop Hồi Sinh Phù/Tẩy Mạch, Hạo Vũ giữ PvP. Q6 ghi talk cả hai mentor trước admission, chọn phái và sau đó turn-in tại mentor đã chọn ở Học Viện; contextual Talk vẫn mở cho mentor không chọn. Server resolve mentor hợp lệ từ class + quest state (Phong Du/Diệp Lam), không tin turnInNpcId tùy ý từ Client.
-
-Class/`ClassChosenLevel`/mentor binding/grant và active group commit cùng action chọn phái; replay không đổi mentor. Tạ Minh là LEGACY reference, không còn current route. Giữ stable internal IDs khi đổi display/ownership; NPC đặt vào khu chức năng, tọa độ còn OPEN, không thêm NPC thay thế.
+**NPC resolution:** definitions lấy [NPC/service owner](../01-design/quests-and-narrative.md#npc-service-review); server resolve mentor từ class + quest state, không tin turnInNpcId từ Client. Class/`ClassChosenLevel`/mentor/grant/active group commit cùng admission; replay không đổi mentor. Stable internal IDs giữ qua đổi display/ownership.
 
 TurnInRequest kiểm connection/character binding, ReadyToTurnIn, NPC đã resolve, sameMap/range/claimedFlag. Một transaction gồm consume đúng collection items/binding, reward, Completed, story/unlock/summary eligibility và cleanup entitlement. Capacity preflight xét net bag sau consume + compatible merge rewards và số X slots thực cần; thiếu thì giữ Ready, trả reason+X, không thưởng một phần hoặc cleanup/unlock sớm. Retry trả receipt cũ. Đủ objective chỉ chuyển Ready, không teleport/auto-turn-in. Q12 chỉ Main Story/Chapter III Complete, vòng chơi vẫn tiếp tục.
 
@@ -131,9 +249,11 @@ SelectedSlot chỉ là UX, không cấp quyền cast hoặc tạo DB subsystem. 
 
 **Collection items và credit:** item requirement derive từ committed bag theo [Quest owner](../01-design/quests-and-narrative.md#quest-collection), không collection counter thứ hai. Pending entitlement không credit possession; pickup phải qua server validation/commit. Kiểm QuestId/InProgress/active objectiveGroup/typed MobIdentity-or-special predicate/quyền còn thiếu; threshold/recipient predicates theo owner design tương ứng. Khi gây ActualHpLost, ghi activeQuestId/objectiveGroup/targetGeneration vào quest-qualified ledger; damage trước accept hoặc sai step không hồi tố. Whole-life ledger vẫn phục vụ reward/threat.
 
-Death chụp quest eligibility trước tăng step; action counters/qualifying ordinal/personal entitlements/death receipt commit cùng character mutation. Dùng guaranteed ordinal của chính recipient, không world kill count/RNG, và clamp count. Level penalty không chặn quest/supply. Q11 activation từ ngoài Huyền Môn kiểm ba mảnh đúng binding trong bag, commit flag idempotent; cleanup chỉ sau turn-in thành công. N players có progress riêng; Talk/Equip/Use/Enhance/Region/PvP không tự share và không phụ thuộc last hit.
+Death chụp active groups trước transition. Kill counters (Q3/Q4/Q5/Q12), Q4 tutorial ordinal, collection RNG outcome success/failure và bounded personal entitlements là typed paths, không generic guaranteed ordinal. Server roll một lần theo death/recipient/objective/epoch, persist immutable outcome cùng receipt/revision; level penalty không chặn quest. Serial cap tính bag+outstanding rights theo [Quest owner](../01-design/quests-and-narrative.md#quest-collection). N players riêng; Talk/Equip/Use/Enhance/Region/PvP không share/last-hit.
 
-**Thêm item vào inventory:** điền compatible stacks trước, overflow tạo stack tới capacity. Commit toàn amount hoặc giữ nguyên ground/pending. Compatibility gồm template/binding/instance flags; tutorial/manual-bound không merge với unbound. Bag Sort P1 không là điều kiện để auto-stack P0 chạy.
+Q11 material Collect RNG → Lâm → Bách/gate/restored grant → three placements theo [direction/OPEN owner](../01-design/quests-and-narrative.md#q11-restoration). Grant receipt pin ba fragment identities/bindings và quyền Pending chưa nhận khi full bag; encoding/grant delivery exact cần spike, không tự direct-add giả pickup. Placement validator đúng target/fragment/quest epoch/map/range/active policy, consume corresponding fragment + durable flag + receipt atomic. Gate evaluate committed flags và approved completion policy, không bag possession sau consume; không tự choose endpoint/ordered sequence/level bằng runtime defaults.
+
+**Thêm item vào inventory:** điền compatible stacks trước, overflow tạo stack tới capacity. Commit toàn amount hoặc giữ nguyên ground/pending. Compatibility gồm template/binding/instance flags; tutorial/manual-bound không merge với unbound. Sort-Merge/Split/Discard là explicit commands theo Items policy và roadmap priority; auto-stack không phụ thuộc Sort UI.
 
 **Tính chỉ số trang bị:** ItemDefinition giữ `GearSlot`, `rarityPrimaryStatIds`, `enhanceStatRules`, `fixedSlotBonusDefinition`, `equipLevel` theo [Items & Economy](../01-design/items-and-economy.md#gear-economy). Data khai báo HP family Armor/Pants/Boots và MP family Weapon/Ring/Necklace, không suy từ bên trái/phải UI. HP/MP mới chịu rarity/enhance theo primary lists design owner; ACC/EVA, Crit/tốc chạy cố định, flat gains và Tinh Hoa dùng đúng thứ tự design owner.
 
@@ -153,25 +273,21 @@ Retry trả target/result cũ dù source đã mất; hai commands tranh source c
 
 Không chia lại phần bị loại; TopDamage chọn whole-life ledger, không fallback né level suppression. Commit immutable roll/recipients/receipts trước publish; retry cùng deathID không reroll.
 
-**Shared loot:** một roll/death theo catalog/rates design owner, exclusive gear buckets ở data. LootRecord giữ itemInstanceId/deathId/MapId/deathUtc/ownerId, contributorSnapshot gồm playerId/levelAtDeath và deadlines. Một OwnershipPhase(deadlines,now), pickup predicates theo mode. TopDamage eligibility100/0 quyết regular set trước roll, không RNG level gate/fallback. Fixed mob identity/level chọn band/slot pool, MapId chỉ chọn material theo design owner.
+**Shared loot:** Normal/Linh một optional regular outcome/death từ weighted category pool theo Items owner; Boss giữ independent channels/exclusive gear. LootRecord giữ itemInstanceId/deathId/MapId/deathUtc/ownerId, contributorSnapshot gồm playerId/levelAtDeath và deadlines. Một OwnershipPhase(deadlines,now), pickup predicates theo mode. TopDamage eligibility100/0 quyết regular set trước roll, không RNG level gate/fallback. Fixed mob identity/level chọn band/slot pool, MapId chỉ chọn material theo design owner.
 
 Contributor trong death ledger dùng level đã chụp cho pickup; người tới sau dùng current level. Recheck sameMap/alive/distance/capacity/window; không mất quyền vì chính kill làm level-up. Capacity fail giữ ground.
 
 Claim/death transaction shapes và durability thuộc [Online & Persistence](online-and-persistence.md#persistence). Runtime tạo immutable death/claim payload và chỉ finalize durable rewards sau adapter success.
 
-**Spawn arbitration:** một server-owned record/MapId giữ random activeSlotId/generation và Q8 reservation/waiting characterId set riêng, sửa trên simulation thread. Due slots serialize theo slotId; spawn đọc identity/fixedLevel/position/group, evaluate curve rồi Linh modifier đúng một lần. Random variant roll/cap theo World owner, cộng ngoại lệ reservation Q8 cố định; Lv1–7 không roll. Initial population cùng path; Return/root wake/reconnect không respawn/reroll.
+**Spawn arbitration:** server-owned cap occupancy/MapId giữ slotId/life/generation; due slots serialize stable slotId trên simulation writer. Spawn đọc identity/fixedLevel/position/group, curve rồi natural Linh modifier đúng một lần theo [World](../01-design/world-and-content.md#linh-bien), Lv1–7 không roll. Initial population cùng path; Return/root wake/reconnect không reroll life còn tồn tại. Không waiting set, Q8 reservation/force promotion hoặc quest retry machinery.
 
-Death đặt slot deadline25s BASELINE/TUNABLE; terminal-pending chưa finalize không respawn. Mốc capture deathUtc/release cap/reservation/due ordering còn [A15/TECH-01](../04-production/playtest-and-balance.md#pending-ordering-probes), không suy lethal đã cho phép release trước ACK.
-
-**Q8 reservation:** server giữ random occupancy và một Q8 reservation chung tách biệt, theo [World policy](../01-design/world-and-content.md#q8-bounded-path). Key request là character/QuestId/active step, waiting set/age stable và bind target generation. Due arbitration ưu tiên reservation tại TA4.slot1; unrelated Linh không chặn admission. Không promote/reset actor đang combat.
-
-Persist force entitlement/economic receipt qua adapter online để retries không reroll budget; snapshot credit riêng từng requester, không nhân reward theo waiting count. Rebuild request từ progress/entitlement sau restart, không phục hồi actor life cũ. Các bounds/schema cụ thể phải qua Q8-01.
+Death slot deadline25s BASELINE/TUNABLE; terminal-pending chưa finalize không respawn/release admission sớm. Exact deathUtc/cap release/due ordering còn [A15/TECH-01](../04-production/playtest-and-balance.md#pending-ordering-probes). Living Map Info count giảm tại server terminal state khác cap admission timing; không dùng count0 để cấp random Linh slot trước finalize. Hai views lấy cùng lifecycle record.
 
 Boss stat/scheduler/shape đọc [World & Content](../01-design/world-and-content.md#world-farm). Một action tại một thời điểm; ba vùng đá không double-hit, geometry/né/nhịp cần PlayMode. Q12 không spawn Boss; credit và loot/turn-in receipts tách nhau.
 
 **Canonical combat:** [Combat owner](../01-design/combat-and-character.md#target-propagation) tách acquisition/propagation/presentation. Primary identity của action là immutable; player damage kiểm eligibility/range theo profile, không hình chém. Proximity Kiếm quanh primary tại resolve; Spread start batch và Hàn valid-primary explosion là policies khác nhau. Mob melee/Boss ground geometry giữ đúng owner, không đổi theo correction player.
 
-**ActionTimeline:** authority kiểm requested SkillId/class/learned/level/weapon/MP/per-skill CD/common action lock/primary eligibility/range. Accepted start tạo actionId/life/startClock, snapshot SkillId/profile/source stats/passive/origin/facing rồi commit MP/CD đúng một lần. RunningAction không đọc mutable selectedSlot. Một timeline cho basic Tân Lữ và các ExecuteSelected; sau class không zero-MP Normal Attack hoặc RepeatOnHold.
+**ActionTimeline:** authority kiểm requested SkillId/class/learned/level/weapon/MP/per-skill CD/common action lock/primary eligibility/range. Accepted start tạo actionId/life/startClock, snapshot SkillId/profile/source stats/passive/origin/facing rồi commit MP/CD đúng một lần. RunningAction không đọc mutable selectedSlot. Một timeline cho basic Tân Lữ và combat intents từ PrimaryAction; sau class không zero-MP Normal Attack hoặc RepeatOnHold.
 
 Nhịp S1/S2/S3 và MP mới là TUNABLE design owner, S2 có thể farm tần suất cao; không hard-code S1 là attack mặc định. Buffer/readiness theo [Combat & Character pending](../01-design/combat-and-character.md#pending-cast). Logical ranged resolve theo clock, không gameplay projectile. Spread ABC/ABA/AAA chụp start, ba hit cùng resolve moment từ profile/stable hitIndex; invalid index mất hit, không reacquire. Kiếm query secondary tại HitMoment một lần theo primary-first policy, freeze resolve set/indices trước apply;
 
@@ -215,19 +331,36 @@ Physics masks tách body collision/hurtbox/solid/one-way. Player eligibility/pro
 
 <a id="input-contract"></a>
 
-Input adapter phát semantic actions `Move`, `Jump`, `DropThrough`, `SelectSkillSlot1`, `SelectSkillSlot2`, `SelectSkillSlot3`, `ExecuteSelected`, `CycleTarget(direction)`, `QuickHP`, `QuickMP`, `Food`, `Interact`, `Navigate`, `Confirm`, `Back`. Move ←/→, Jump ↑, DropThrough ↓ và select1/2/3 theo [Combat & Character](../01-design/combat-and-character.md#ux-art). Execute/Interact/Potion/Food/menu physical keys **OPEN**; candidate E/F/4–5/R/I chỉ PROPOSAL/TUNABLE DEFAULT cho usability. Không alias gameplay A/D/Space/S cũ hoặc tự gán C/Q.
+<a id="active-focus"></a>
 
-Select hợp lệ chỉ đổi UX selectedSlot/SkillId, không cast/approach/MP/CD. Locked slot không đổi selection/action. `ExecuteSelected` mỗi physical press tạo tối đa một execution intent; release không hủy one-shot PendingCast, giữ không RepeatOnHold. Authority kiểm requested SkillId từ capability/definition, không tin selectedSlot hoặc secondary list Client. Chọn S2 rồi Execute nhiều lần là luồng bình thường, không special attack pipeline cho S1.
+### PrimaryAction / ActiveFocus — USER-APPROVED direction
 
-`CombatFocus` giữ mode NONE/AUTO/EXPLICIT và target ID/life/generation/MapId. Tách `search envelope` (vùng tìm), `retention range` (vùng giữ) và `execution range` (tầm thực thi). Lifecycle eligibility khác reachability để cast. NONE+Execute xét skill đã chọn: ưu tiên target local đánh được ngay, rồi target reachable bằng bounded horizontal approach. AUTO sticky, không bị target gần hơn chiếm.
+Player có **một actionable ActiveFocus**: Enemy/PvP/GroundItem/NPC/Landmark/None. Enemy/PvP dùng CombatFocus NONE/AUTO/EXPLICIT + search/retention/execution/life machinery bên dưới. Non-combat focus thay combat selection; không marker enemy active cùng selected item. Candidate cache/internal combat memory không active authority thứ hai.
 
-Click tạo EXPLICIT, không đánh; xa/khác tầng/blocked vẫn giữ trong retention, Execute reject không swap. CycleTarget dùng local combat set; hướng ưu tiên cùng SpawnGroup → cùng WalkRegion/SurfaceId → nhóm lân cận nhìn thấy/cục bộ → local candidate khác. Order ổn định theo authored group/surface/IDs, không sort lại mỗi frame theo nearest; radius/order/vertical bounds **TUNABLE**.
+| Event/state | Resolver/dispatch |
+| --- | --- |
+| Valid combat focus | Sticky; item/NPC/landmark không tự cướp. Không re-sort nearest mỗi frame |
+| Explicit click object | Choice thắng AUTO; bind ID/life/generation/MapId, click không action. Chuyển non-combat cancel PendingCast/BufferedIntent/approach trước bind; RunningAction đã accepted giữ snapshot riêng |
+| Enemy invalid/dead (actor sống; dead observer policy OPEN ở dưới) | Invalidate rồi chọn combat candidate phù hợp ngay; không có thì eligible nearby GroundItem → NPC soft-focus trong support context → contextual landmark → None. Không auto cast/pickup; priority geometry/order exact TUNABLE |
+| GroundItem active | Marker nhỏ; PrimaryAction snapshot **đúng item instance/generation** → PickupItem duy nhất; nearest thay không đổi payload, không ExecuteSkill |
+| Item expired/claimed/no rights/out of range/despawn/wrong generation | Invalidate rồi resolver cho selection tiếp; press đã admit item không phát fallback cast/pickup khác trong cùng press |
+| Capacity fail | Giữ valid item và reason thiếu ô; 60/60 compatible stack có thể success. Không coi bag-full là lost rights |
+| Pickup success | Commit rồi clear claimed focus, resolver chọn candidate tiếp theo; một press không pickup chuỗi. Combat-first khi cần resolve; auto next-item policy/order TUNABLE, không stealing valid explicit focus |
+| Tab/Shift+Tab world | Chỉ local combat set; đang item/NPC/landmark có thể chuyển combat nếu có candidate. Không cycle loot/NPC; không candidate giữ valid focus, không action |
+| NPC PrimaryAction | OpenNpcContext → root menu quest/service/Talk; ưu tiên selected eligible quest action, **không NpcTalked/quest/grant/turn-in** chỉ vì mở menu |
+| Landmark PrimaryAction | Một typed interaction đúng target/range/quest/state; scenery không tự thành mandatory objective |
+| None + press | Resolve một candidate rồi chụp đúng một typed intent; None không target trả NoTarget. Nếu candidate invalid trong validation thì reason, không reroute press |
+| Death/map/session | Death giữ valid combat observer/HUD nhưng khóa actions và cancel pending; auto acquire mới khi dead **OPEN**, recommendation giữ observer tới target invalid rồi None. Map transition/session loss clear stale focus/generation; same-session resume revalidate |
 
-Đổi/clear focus hủy pending/buffer trước khi bind target mới. Rời execution range/nhảy không clear focus còn trong retention. Target chết/despawn/new generation/life/WrongMap hoặc vượt retention thì clear; Esc/explicit replacement theo context, không tự cast/reacquire cho tới Execute mới. Interaction candidate riêng, `Interact` nhặt/dùng ngay không mutate CombatFocus.
+Client input adapter resolve rồi gửi concrete `ExecuteSkill(SkillId,target life)`, `PickupItem(itemId,generation)`, `OpenNpcContext(npcId)`, `NpcAction(actionId,npcId,...)`, `LandmarkInteract(targetId,...)`. Server validate từng command theo domain; không network `PrimaryAction()` mơ hồ. 1/2/3 select-only, không cost/CD/approach. PrimaryAction chưa chọn phím cứng; E là test default TUNABLE, không cần permanent F Interact.
 
-**Player death và target HUD:** hủy PendingCast/BufferedIntent/approach, chặn combat input và cancel unresolved action theo timeline, **không clear CombatFocus chỉ vì player chết**. Retention/target-life validation không phụ thuộc owner alive; dead actor còn trong MapId vẫn nhận target state snapshots, marker/name/level/current-maxHP/bar cập nhật khi người khác đánh.
+Modal/chat capture press; press mở UI bị consume, không Confirm option cùng frame hoặc leak world cast. Talk chỉ option trong context và successful Talk mới phát NpcTalked. UI close/open/map/reset dọn pending/capture; key held không tạo press mới. NPC context phải revalidate NPC/range/state khi action commit; full bag/disabled quest/service reason đọc result hiện hành.
 
-Target invalid mới clear theo các điều kiện trên; same SpawnSlot respawn có life/generation mới, không inherit focus cũ. Resume trong phiên còn sống giữ focus nếu vẫn hợp lệ; mất phiên không persist focus trong checkpoint. Corpse camera/loot/quest eligibility vẫn theo design owner, không từ HUD.
+Valid explicit item không bị auto enemy steal; valid combat không bị auto loot steal. **OPEN** exact sticky/priority của auto non-combat focus khi có combat candidate mới; recommendation chỉ resolve lại khi invalid/explicit input để tránh flicker, trade-off Tab/click thêm khi enemy mới đến. Không mặc định rule đó thành gameplay lock.
+
+Input adapter phát semantic actions `Move`, `Jump`, `DropThrough`, `SelectSkillSlot1`, `SelectSkillSlot2`, `SelectSkillSlot3`, `PrimaryAction`, `CycleTarget(direction)`, `QuickHP`, `QuickMP`, `Food`, `Navigate`, `Confirm`, `Back`. Move ←/→, Jump ↑, DropThrough ↓ và select1/2/3 theo [Combat & Character](../01-design/combat-and-character.md#ux-art). PrimaryAction/Potion/Food/menu physical keys **OPEN**; candidate E/4–5/R/I chỉ PROPOSAL/TUNABLE DEFAULT cho usability. Không alias gameplay A/D/Space/S cũ hoặc tự gán C/Q.
+
+[CombatFocus/select/pending gameplay](../01-design/combat-and-character.md#focus-input) thuộc Combat; Runtime giữ dữ liệu triển khai: `CombatFocus(mode,targetId,life,generation,MapId)`, tách search/retention/execution. Không copy thứ tự acquisition/Tab/death observer ở đây. Universal non-combat resolver vẫn tại [ActiveFocus](#active-focus).
 
 `PendingCast` giữ requested SkillId/target ID/life/generation/MapId/intentId/expiry/start/progress position/heldMovementMaskAtPress; chưa chụp source stats/action hoặc commit cost. `BufferedIntent` chỉ một execution intent mới nhất, có readiness/expiry theo authority clock. `RunningAction` đã accepted có snapshot riêng. Select đổi UX nhưng không mutate/cancel ba state này; **Execute mới** mới thay PendingCast/BufferedIntent, không sửa action đang chạy.
 
@@ -247,9 +380,17 @@ Approach budget tính đoạn còn thiếu ngoài execution range của từng p
 
 Gravity/momentum tiếp tục; air cast Tân Lữ/S1 cần probe, quyền S2/S3 trên không còn OPEN.
 
-**Ranh giới UI:** keyboard/mouse dùng cùng action list/validator/command. Modal giữ selected action ID; renderer vẽ focus/lý do disabled rồi dispatch, không sửa progression. NPC mới mở ưu tiên quest action; consume input mở UI, không Confirm lần hai cùng frame. Khi list đổi, giữ selected ID nếu còn hợp lệ, nếu không thì clamp index; không gọi callback món/session cũ. Mở/đóng UI/transition/reset dọn pending gameplay và input capture; giữ phím không sinh Execute mới.
+**Ranh giới UI:** keyboard/mouse dùng cùng action list/validator/command. Modal giữ selected action ID; renderer vẽ focus/lý do disabled rồi dispatch, không sửa progression. NPC mới mở ưu tiên quest action; consume input mở UI, không Confirm lần hai cùng frame. Khi list đổi, giữ selected ID nếu còn hợp lệ, nếu selected stack merge away thì map tới survivor ID; nếu mất thì clear/chọn lại có cue, không index-clamp sang món khác; không gọi callback món/session cũ. Mở/đóng UI/transition/reset dọn pending gameplay và input capture; giữ phím không sinh Execute mới.
 
 Enter là Confirm trong modal, Chat ở world. Tab/Shift+Tab điều hướng view trong UI, CycleTarget ngoài UI/chat, không dispatch cả hai. Bag filter theo GearSlot từ inventory hiện có; Equipment/Attributes/Derived Stats là views riêng cùng evaluator. Preview/world đọc cùng Art pose/socket contract. NPC text hiển thị kết quả command đã commit.
+
+<a id="map-info-runtime"></a>
+
+### Map Info replication — ENGINEERING RECOMMENDATION
+
+World population owner định nghĩa [counts](../01-design/world-and-content.md#map-population-info). Server emit current MapId + map/session generation + population revision + ordinary/Linh/NPC/Boss counts/alive state. Admission/reconnect gửi snapshot; spawn/new life/terminal death/despawn/NPC presence update revision/delta. Duplicate/stale revision ignore; gap/out-of-order request snapshot, không decrement hai lần hoặc underflow. Map change clear old panel, late old-map packet không overwrite; disconnect/loading hiện pending/unknown thay vì stale counts truth.
+
+Client không count renderer/interest set; dormant mobs vẫn trong authoritative living total, due slots chưa sinh chưa tính. Natural cap admission timing và living count khác nghĩa theo spawn contract; schema/transport exact ở G-D. Panel không đưa entity IDs/positions/pockets để UI làm Linh ping; existing combat snapshots/visibility policy giữ. Integration phụ thuộc SpawnManager/population observer và map/session replication, không chỉ Art HUD widget.
 
 <a id="movement-feel"></a>
 
@@ -280,23 +421,15 @@ Network 20 Hz ≈ 50 ms/snapshot, physics 50 Hz = 20 ms/tick, render 60 FPS ≈ 
 
 ## Hợp đồng tích hợp art và animation
 
-[Art](../03-art/art-and-visual-production.md#art-integration) sở hữu pose/frame mapping, module/catalog, sockets, sorting và import workflow. Technical giữ yêu cầu runtime, không có catalog hoặc sorting table thứ hai. `26 frames` là USER-LOCK; A01/A02 còn OPEN về raster/profile mapping, không tự đổi thành 33 frames. Rig baseline 64×64 px/PPU32/Bottom-Center/Point filter và state indices phải đối chiếu Art gate. `12 modules` cũ chỉ ba band×bốn loại, thiếu Mộc/fallback: LEGACY workload reference, không tổng asset hiện hành.
+[Art import/pose/socket owner](../03-art/art-and-visual-production.md#art-integration), [facing/carry](../03-art/art-and-visual-production.md#player-facing) và [player shadow](../03-art/art-and-visual-production.md#player-shadow-death) giữ visual constraints và classification. Runtime không có frame/module/sorting catalog thứ hai; adapter nhận pose/profile/socket refs từ manifest.
 
-Một shared state/frame controller điều khiển modular parts; parts không chạy Animator clock riêng. Pose/phase/flip của front/back weapon và sockets đồng bộ. Physics root/hurtbox tách VisualRoot: thay gear/flip/scale không tự đổi collider. Collider baseline khoảng 0,60–0,65u×1,45u TUNABLE, không lấy toàn canvas. Attack origins author theo timeline, không sprite bounds. Không Climb state/animation. Module names/schema phải theo Art hiện hành, không giữ Pants/Lower hoặc Hair aliases thành hai slot.
+Một shared state/phase controller/actor dẫn mọi modular part. Physics root/hurtbox tách VisualRoot: swap/flip/scale/carry không đổi collider. Collider baseline khoảng 0,60–0,65u×1,45u **TUNABLE**, không lấy toàn canvas; attack origin là authority data, không socket hoặc sprite bounds. Atomic representation/order switch tránh double-render equipped weapon; cosmetic carry timer không delay Execute/MP/CD. Action-facing snapshot dùng xuyên release.
 
-**Player presentation — facing direction đã xác nhận, mapping PROBE:** two logical Left/Right, Idle 3/4 nhẹ theo current facing, Run/Jump/Fall/action side-oriented và carry Back/Hand đọc cùng pose controller, tách movement/action facing theo [Art](../03-art/art-and-visual-production.md#player-facing); default Right deterministic khi không saved-facing requirement, không field DB mới; action facing immutable. Đổi representation/order atomically để một equipped weapon không hiện hai lần. Carry timer chỉ cosmetic, không MP/CD hoặc delay Execute. Player dead state/terminal clock cùng identity/generation/MapId dẫn pop/fall visual-only → shared shadow; hide các outfit modules, giữ authority root/death anchor và HUD focus. Duplicate/stale không replay, late join bắt phase hiện tại; revive/map/life mới reset offset/visibility/timer. Không thêm physics knockback hay gameplay death states; schema/event cụ thể còn ở spike [presentation data](#presentation-data). Mob/Linh/Boss lifecycle giữ nguyên.
+Terminal state/clock cùng actor identity/life/generation/MapId dẫn presenter vào phase hiện hành, không thêm gameplay death states hoặc physics knockback. Duplicate/stale không replay, late join bắt đúng phase; revive/map/life mới reset offset/visibility/timers và hide/show parts đúng state. Camera/death anchor/HUD bind authority root, không visual pop/fall offset. Schema/event vẫn [PROPOSAL](#presentation-data).
 
-**Tích hợp map:** environment families Forest/Mountain/Ancient và hub props reuse theo Art. Tile/cell size derive asset pixels/PPU, không suy từ 64px rig. Background/decor/foreground không collider. Natural ground là solid mass; one-way chỉ mặt mỏng nhân tạo có support hợp lệ theo các mục liên quan. Validate movement/jump/drop với nhiều actor trước decorate. Foreground phải giữ telegraph/loot/nameplate/chat đọc được; không thêm lighting/streaming subsystem P0.
+**Feedback và pool:** renderer nhận authority event. AnimationEvent/FX không gây damage/stun hoặc pause simulation. Pool reuse reset tint/timer/parent/owner/action/life; release hủy listeners/timers. Callback kiểm IDs/generation, không GameObject reference làm lifetime identity. Pooled projectile chỉ presentation; packet trễ bắt phase còn hiệu lực, không replay gameplay. Shared actor clock và SortingGroup đọc order từ Art.
 
-Stable MapId/NPC/region/slot/exit/gate/SafeAnchor và Boss exclusion được kiểm trên authored layout; seed manifest cũ không buộc current totals. Camera local follow/confiner/impulse đúng bounds và transition ACK. Kiểm hai hướng/cao độ/tint, wolf palette khác aura Linh. Ground mob route không trở thành route jump/drop chỉ vì asset có bậc. Nước chỉ shallow feet-contact visual, không swim/underwater physics.
-
-**Feedback và pool:** renderer nhận Game Server event. AnimationEvent/FX không gây damage/stun hoặc pause simulation. Pool dùng chung configuration cho projectile/telegraph/status/hit/damage/NÉ/heal/upgrade/death/slash. Reuse reset tint/timer/owner/action/life, release hủy listeners/timers. Callback kiểm IDs/generation, không GameObject reference làm lifetime identity; pooled projectile chỉ presentation. Client bắt đúng phase còn hiệu lực, không replay gameplay khi packet trễ.
-
-Hit animation không tự stun; Freeze Normal/Linh đọc rõ bằng overlay băng, Boss/PvP Slow bằng sắc lam/hạt lạnh nhẹ, Bỏng bằng tia lửa gọn. Overlay không đổi hitbox/collider. Corpse presentation phục vụ snapshot/camera/quest; player shadow/death anchor không pickup hoặc cast, vẫn quan sát focus hợp lệ theo [Art player death](../03-art/art-and-visual-production.md#player-shadow-death). Một SortingGroup và shared frame clock giữ nhiều actor/part không tách pose; layer order chi tiết từ Art.
-
-Asset gate hiện hành nhập default/outfit I và Mộc/Kiếm vào **standalone disposable rig/art sandbox riêng**, ngoài VS-1 đã frozen. Fixture nhỏ kiểm mix-band/Tân Lữ/S1; thêm profile Kiếm khi cần kiểm reuse. Minimal Cung S1/S2/range/focus/kite/socket được probe trong Pha R; full production Cung vẫn theo G-C sau gates.
-
-Chưa nhân ba families khi A01/A02/A17 hoặc grip/pivot/phase chưa kiểm. [Roadmap](../04-production/roadmap.md#production-release) sở hữu thứ tự; [legacy art gate](../90-archive/production-history.md#legacy-art-gate) giữ trace.
+Tích hợp layout/physics/camera theo [Maps](#maps), không lặp environment/terrain catalog tại đây. Import probe theo [Art First Probe](../03-art/art-and-visual-production.md#first-art-probe); [Roadmap production-release](../04-production/roadmap.md#production-release) giữ sandbox/family sequencing và gate. Legacy workload không là manifest hiện hành.
 
 
 <a id="ui-notes"></a>
@@ -319,11 +452,11 @@ Quest HUD dùng canonical state, không client tự chuyển Available/Ready. Qu
 | Inventory/shop | Capacity/stack rules từ design owner, server transaction trước refresh |
 | Upgrade/transfer | Preview cùng evaluator; source tiêu/target trước–sau/cost/Tinh Hoa/khóa–mở rõ; failure vẫn lưu cost |
 | Skill panel | Ba active slot tích lũy/CD riêng, manual requirements, hai passive/class và mốc Lv5/13; passive hiện final stats, không skill points/ranks hoặc mới chọn là cast |
-| Quest/chapter | State/nextLevel/resolved turnInNpcId server-owned; Ready vẫn chơi tiếp; Q6 mentor đúng class, Q10–Q12 Lâm Bá, Q12 Main Story Complete |
+| Quest/chapter | State/nextLevel/resolved turnInNpcId server-owned; Ready vẫn chơi tiếp; Q6 mentor đúng class; Q10/Q12 Lâm Bá, Q11 Lâm→Bách và endpoint OPEN, Q12 Main Story Complete |
 | WorldUI | HitResult/status/evidence theo recipient; combat focus marker + current/max HP/text/bar đồng bộ; owner chết vẫn thấy damage của người khác trên target còn hợp lệ; loot windows/quest cues/chat/Boss name riêng per-character |
 | Death/PvP | Death choices khác PvPDefeated; stake/escrow pending/confirmed/phí/refund/quota, không xác nhận mutation khi chưa ACK |
 
-Bag Sort/protection gear/quest arrows/history là P1, không điều kiện để P0 hoạt động. Tooltip làm tròn cho đọc nhưng evaluator giữ fractional enhancement. Không đưa RPC/saveAPI/microservice vào player flow.
+Split/Sort-Merge/Discard delivery priority theo [Roadmap scope OPEN](../04-production/roadmap.md#map-info-work-package); gear protection mở rộng/quest arrows/history giữ P1. Tooltip làm tròn cho đọc nhưng evaluator giữ fractional enhancement. Không đưa RPC/saveAPI/microservice vào player flow.
 
 <a id="dev-mode"></a>
 
@@ -337,7 +470,7 @@ Dev Mode là tooling P0 cho người phát triển/tester trong development buil
 | --- | --- |
 | Progression/class | SetLevel/EXP/attributes; Set/ClearClass với `ClassChosenLevel` hợp lệ; learn/unlearn skill; inspect derived stats/points/CD. Thay state invalidate pending action và derive lại evaluator, không cộng stat lần nữa hoặc đoán cấp chọn phái |
 | Quest/inventory | SetQuestState/active step/prerequisite; give/remove item/Gold/manual; inspect/reset entitlement/counter/receipt test có chủ đích. Giữ stable IDs/bindings và phân biệt fixtures đã grant với reward chơi thật |
-| World/combat | Teleport tới authored marker/SafeAnchor; spawn/reset group/life; force Linh chỉ cho probe; reset encounter/Boss/status; inspect target/focus/action/generation/clock/threat/contribution/loot deadlines. Không dùng force để thay production reservation hoặc autoroll |
+| World/combat | Teleport tới authored marker/SafeAnchor; spawn/reset group/life; force Linh chỉ cho probe; reset encounter/Boss/status; inspect target/focus/action/generation/clock/threat/contribution/loot deadlines. Dev Force không là production quest spawn hoặc acceptance fresh-run |
 | Test lifecycle | ResetFreshCharacter/test profile, reload/checkpoint/reconnect probes và log before–after. Reset chỉ dữ liệu test đã chọn, không wipe database/character thật; clear hoặc đổi generation để callbacks cũ không tác động life mới |
 
 Mỗi dev override có label, command log và cách quay về production defaults. Preset Lv20/fullgear/Boss yếu hữu ích cho feature probes; **không chứng minh pacing hoặc fresh journey Q1–Q12**. Nghiệm thu cần fresh character **cho từng phái Kiếm và Cung**, không skip, EXP multiplier1/current defaults, chơi đủ các bước và optional Q9 branch. Sau reset không để item/quest entitlement, receipt, focus, action hoặc profile stats cũ rò vào run mới.
@@ -378,12 +511,12 @@ Handlers là trách nhiệm đề nghị, chưa phải classes có sẵn. Author
 | A Buy | NPC catalog→details/quantity→request; kiểm alive/NPC/range/map/catalog revision/template/class/level/quantity/currency; checked price×quantity và simulate merge/capacity | Debit Gold + add bag + revisions + qualifying progress nếu có + receipt; publish result/snapshot sau ACK | Thiếu ô/Vàng/off-class không debit; timeout giữ pending/immutable plan; retry không mua hai lần. Catalog thay phải reconcile rồi request mới |
 | B Sell | Grid **toàn bag**→instance/quantity; kiểm ownership/location/count/vendor/policy; quest-bound fail reason; Q4 sample chỉ đúng bound instance/step/Bách | Remove quantity + credit Gold + ItemSold receipt/progress + revisions cùng commit | Equipped/bound/stale fail; double-click cùng intent dedup; concurrent Use/Sell serialize writer/revision, chỉ một thắng |
 | C Regular pickup | Snapshot windows/owner/contributor/level-at-death theo Items; alive/map/range/original deadline/unclaimed; simulate toàn payload | Ground claim + bag add + receipt/revisions; retire visibility sau ACK | Giữ 8/20/60 và 12/30/90. Hai người claim một pile chỉ một thắng; capacity fail giữ ground tới deadline gốc; regular expiry không recovery entitlement |
-| D Personal quest | Lethal→snapshot active-group ledger/threshold→bounded ordinal/right từng character; expose ground sau death finalize ACK. Pickup kiểm right/epoch/generation/lease/map/range/alive/quantity/capacity | **Death:** kill progress + ordinal + entitlements + regular rewards/pile + death receipt atomic. **Pickup riêng:** add bag + Claim chuyển trạng thái + revisions/receipt atomic; re-evaluate possession/publish sau ACK | Không mark Claimed trước add commit; wrong-owner RPC reject dù client thấy/ẩn; stale generation reject. Already claimed trả receipt/reconcile; kill trước accept không hồi tố |
+| D Personal quest | Lethal→snapshot active-group ledger/threshold→one RNG outcome/recipient/objective hoặc Q4 tutorial ordinal→bounded right; expose ground sau death finalize ACK. Pickup kiểm right/epoch/generation/lease/map/range/alive/quantity/capacity | **Death:** typed kill progress/Q4 ordinal + RNG success/failure + entitlements + optional regular outcome/rewards + death receipt atomic. **Pickup riêng:** add bag + Claim chuyển trạng thái + revisions/receipt atomic; re-evaluate possession/publish sau ACK | Không mark Claimed trước add commit; wrong-owner RPC reject dù client thấy/ẩn; stale generation reject. Already claimed trả receipt/reconcile; kill trước accept không hồi tố |
 | E Full bag | Preflight compatible merge; reason thiếu X ô; player tự dọn bag | Không add/claim/collection credit; Pending right giữ bền, representation có TTL hữu hạn | TTL retire ground, không xóa quyền; re-offer ground theo recovery owner, không reserve/auto-add/vĩnh viễn |
 | F Reconnect | Resume grace giữ session; phiên mới load bag/progress/receipts/rights, validate sourceMap/anchor; lookup uncertain command trước re-offer | Claimed item đã ở bag không respawn; Pending chỉ một generation mới tại sourceMap | Reconnect không regrant; lease/generation cũ không mutate. Restart không suy RAM/client visual thành committed grant |
-| G Turn-in | Active/Ready cache, đúng resolved NPC/map/range/alive; revalidate action history và bound items/count; simulate consume rồi merge reward trên net bag | Consume + reward/Gold/EXP + Completed + unlock/chapter/Journey + entitlement cleanup + receipt/revisions một commit | Reject giữ toàn inputs/Ready, không partial consume/reward/unlock. Timeout không báo Completed/cleanup; lost ACK lookup receipt, chỉ thưởng một lần |
+| G Turn-in | Active/Ready cache, đúng resolved NPC/map/range/alive; revalidate action history và bound items/count; simulate consume rồi merge reward trên net bag | Consume remaining required inputs (Q11 fragments đã placed không consume lại) + reward/Gold/EXP + Completed theo approved endpoint + unlock/chapter/Journey + entitlement cleanup + receipt/revisions một commit | Reject giữ toàn inputs/Ready, không partial consume/reward/unlock. Timeout không báo Completed/cleanup; lost ACK lookup receipt, chỉ thưởng một lần |
 
-**Migration:** chưa production DB/code để migrate trong lượt docs. Version QuestDefinitions chuyển Q8/Q10/Q11 virtual collection sang item references/bindings. Không suy fixture “counter đủ” thành item đã pickup: reset hoặc approved mapping một lần sang Pending recoverable rights theo source/ordinal; không credit lại regular kills/rewards. Action history khác collection possession; schema ở Online vẫn OPEN.
+**Migration:** chưa production DB/code để migrate trong lượt docs. Version QuestDefinitions thay old quotas/ordinals bằng mob Collect RNG và Q11 staged restoration targets; không chỉ đổi virtual counter sang item. Không suy fixture “counter đủ” thành item đã pickup: reset hoặc approved mapping một lần sang Pending recoverable rights theo source outcome/receipt (Q4 ordinal riêng); không credit lại regular kills/rewards. Action history khác collection possession; schema ở Online vẫn OPEN.
 
 <a id="shared-item-ui"></a>
 
@@ -396,9 +529,13 @@ Reuse layout/navigation, slot/icon/quantity/rarity/binding glyph, stable-ID sele
 **NPC context:** receiver validate definition/map/range/alive và quest/service predicates. Q6 discovery receipt chỉ từ Talk đúng mentor/Q6 group; class admission kiểm đã nói cả hai, weapon slot trống và prerequisites. Việc unequip là action riêng có capacity check; class/grant/mentor commit cùng admission. Contextual reply đọc committed class/quest/learned skills. Marker/thoại không tự credit; unselected mentor vẫn Talk, off-class manual absent/disabled reason. Không relationship meter/cinematic/auto-face.
 
 
+<a id="combat-boundary-review"></a>
+
 <a id="combat-runtime-boundaries"></a>
 
 ## Combat foundation nhỏ và presentation profiles — TARGET, chưa classes hiện có
+
+Kiếm S2/S3 dùng chung primary-centered query/order helpers với profiles/caps/powers khác; Cung S2 batch giữ executor riêng khi cần, không ép cùng executor. MobIdentity refs trong typed QuestDefinitions tại G-B trước author Q3–Q12; C0 chặn real combat credit/full VFX theo [Roadmap](../04-production/roadmap.md#combat-micro-slice).
 
 Một authority receiver/clock và vài pure policies đủ P0; đây là các responsibilities có thể chung assembly, không yêu cầu chín services/interfaces. Focus/acquisition không quyết damage; eligibility dùng cùng helpers ở start/arrival/resolve, version profile ghi rõ phase. Secondary selection chỉ query server state, không nhận trusted list từ Client.
 
@@ -415,4 +552,6 @@ Một authority receiver/clock và vài pure policies đủ P0; đây là các r
 
 Presentation profile fields **PROPOSAL**: pose profileRef, mainVfxRef, defaultWeaponVfx policy Allow/Replace, Grip/Tip/Muzzle binding, release/retire visual duration, impactRef/status references và local/remote LOD. Gameplay timeline/target set từ server; visual durations không tăng lock. Một main VFX/action gồm ba arrow trails cho Spread là một composite execution, không ba draw actions. Keys dùng actionId/visualIndex và targetId/generation/hitIndex; pool checkout/release reset socket parent/tint/time/IDs/listeners. Reconnect/late join dựng phase/status hiện tại, không replay damage hoặc old impact. Sorting theo Art; không gameplay colliders trên skill VFX.
 
-**Typed quest definitions tại G-B:** Kill(MobIdentityRef,requiredCount), VariantKill(MobIdentityRef,variantPredicate), BossCredit(BossId/life/area), Talk/Visit/Interact(marker/NPC), ItemRequirement(binding/count), SuccessfulAction(type) là discriminated data đề nghị. Một validator/evaluator theo objective kind đủ, không generic workflow engine. Source provenance gồm deathId/mobIdentity/variant/sourceMap/position/group/slot/active group/ordinal; group/slot để audit/recovery, không standard credit whitelist. Death snapshot ghi active group trước update; chỉ những objective active ở snapshot nhận credit, không auto-credit group vừa mở. Q11 landmark trước kill, pickup trước next-step, gate possession trước activation, Completed trước map unlock theo owner.
+**Typed quest definitions tại G-B:** Kill(MobIdentityRef,requiredCount), VariantKill(MobIdentityRef,variantPredicate), BossCredit(BossId/life/area), Talk/Visit/Interact(marker/NPC), ItemRequirement(binding/count), SuccessfulAction(type) là discriminated data đề nghị. Một validator/evaluator theo objective kind đủ, không generic workflow engine. Source provenance phân biệt mob deathId/identity/variant/sourceMap/position/group/slot/active group/RNG outcome và NPC staged grantId/npcId; Q4 tutorialOrdinal optional, không required generic field; group/slot để audit/recovery, không standard credit whitelist. Death snapshot ghi active group trước update; chỉ những objective active ở snapshot nhận credit, không auto-credit group vừa mở. CollectRng(MobIdentityRef,policyRef), StagedGrant(grantRef), RestorationPlacement(targetRef,fragmentBinding,flagRef) nối Q11 direction: material→NPC gate/grant→placement committed flags; maps/order/level/endpoint OPEN theo Quest owner. Q11 không landmark-before-kill hoặc gate-possession graph cũ.
+
+Inventory UI actions/policy theo [Items](../01-design/items-and-economy.md#inventory-ux-policy), controller/selection theo [shared item UI](#shared-item-ui), visual details theo [Art](../03-art/art-and-visual-production.md#icons-ui).

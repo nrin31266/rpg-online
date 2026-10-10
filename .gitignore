@@ -18,22 +18,7 @@ research/notes/*
 *.sln
 *.slnx
 
-# Disposable Unity projects, separate from the future production project
-/prototypes/**/Library/
-/prototypes/**/Temp/
-/prototypes/**/Obj/
-/prototypes/**/Logs/
-/prototypes/**/UserSettings/
-/prototypes/**/Builds/
-/prototypes/**/MemoryCaptures/
-/prototypes/**/.vs/
-
-# Disposable test/capture output: media and logs stay local only
-/prototypes/**/Assets/InitTestScene*
-/prototypes/**/PrototypeEvidence/**/*.xml
-/prototypes/**/PrototypeEvidence/**/*.log
-/prototypes/**/PrototypeEvidence/**/*.mp4
-/prototypes/**/PrototypeEvidence/**/*.png
+# Production test/capture output
 /game/Validation/
 /game/PrototypeEvidence/
 

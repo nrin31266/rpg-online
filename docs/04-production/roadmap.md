@@ -22,7 +22,7 @@ Luật ngoài domain thuộc owner trong [documentation map](../README.md); evid
 
 World và các danh sách nhận thưởng, nhặt đồ, threat phải an toàn với N người; hai client là mức kiểm tối thiểu, không phải trần người chơi hoặc tuyên bố capacity.
 
-**CURRENT** là đồng bộ tài liệu sau khi thu bài học từ VS-1. Đường triển khai tiếp theo là **thu bài học bản mẫu → đồng bộ docs → probe cảm giác điều khiển/UI/art/rig → review production base → dựng local production slice → Dedicated với ít nhất hai client sớm → mở rộng production**. Local-first giúp kiểm luật và tương tác sớm; TARGET vẫn là game online. CURRENT biểu thị việc đang ưu tiên, không tự có nghĩa đã code hoặc đã pass.
+**CURRENT** là đồng bộ tài liệu sau khi thu bài học từ VS-1. Prototype cũ đã được xóa khỏi checkout; [trace và source đã commit](../90-archive/production-history.md#prototype-source-retired) chỉ dùng để tra lịch sử. Đường triển khai tiếp theo là **thu bài học bản mẫu → đồng bộ docs → probe cảm giác điều khiển/UI/art/rig → review production base → dựng local production slice → Dedicated với ít nhất hai client sớm → mở rộng production**. Local-first giúp kiểm luật và tương tác sớm; TARGET vẫn là game online. CURRENT biểu thị việc đang ưu tiên, không tự có nghĩa đã code hoặc đã pass.
 
 Bản mẫu cũ đã có các lượt test và video theo revision riêng. Trạng thái G-L PARTIAL trong hồ sơ cũ không chứng minh G-L production theo thiết kế mới. Chưa có bằng chứng runtime mới cho controls, cadence, mật độ, địa hình hay NPC/quest đã sửa.
 
@@ -30,8 +30,8 @@ Bản mẫu cũ đã có các lượt test và video theo revision riêng. Trạ
 
 | Nhóm | Trạng thái hiện hành | Điều kiện quay lại / mở rộng |
 | --- | --- | --- |
-| Tân Lữ → Kiếm, movement, chọn skill và ExecuteSelected | CURRENT docs và kế hoạch probe; chưa triển khai revision mới | Review production base, rồi kiểm G-L theo controls mới ở tốc độ thường |
-| Vân Khê, Học Viện, Đồng Sương; NPC/Nấm/Sói/Dummy/UI | CURRENT phạm vi blockout và local slice; layout VS-1 cũ chỉ là reference | Kiểm tuyến Q1–Q6, năm Dummy3+2/bốn Q3 kills, địa hình mới, mật độ và khu chức năng NPC |
+| Tân Lữ → Kiếm, movement, chọn skill và PrimaryAction (combat branch) | CURRENT docs và kế hoạch probe; chưa triển khai revision mới | Review production base, rồi kiểm G-L theo controls mới ở tốc độ thường |
+| Vân Khê, Học Viện, Đồng Sương; NPC/Nấm/Sói/Dummy/UI | CURRENT phạm vi blockout và local slice; layout VS-1 cũ chỉ là reference lịch sử trong Git | Kiểm tuyến Q1–Q6, năm Dummy3+2/bốn Q3 kills, địa hình mới, mật độ và khu chức năng NPC |
 | Kiếm Lv 10/13/17, Q7–Q12 và các map sau Đồng Sương | DEFERRED khỏi slice đầu, vẫn P0 | G-N và G-D; fixture hẹp chỉ kiểm kỹ thuật, không thay hành trình thật |
 | Cung playable, skill/gear/projectile/pose/balance | DEFERRED IMPLEMENTATION, vẫn P0 | Minimal Cung và so Kiếm/Cung ở Pha R; production Cung sau G-N, trước nhân toàn bộ family; giải OPEN liên quan |
 | Dedicated với ≥2 client | Gate sớm sau G-B và G-L revision mới; chưa bắt đầu | G-N trước mở production content/art rộng, trên production base |
@@ -45,28 +45,19 @@ Bản mẫu cũ đã có các lượt test và video theo revision riêng. Trạ
 
 <a id="2-lát-cắt-local-đầu-tiên-và-reference-vs-1"></a>
 
-## Lát cắt local đầu tiên và reference VS-1
+## Lát cắt local đầu tiên và lịch sử VS-1
 
 **BASELINE phạm vi G-L:** Q1–Q6, Tân Lữ → Kiếm, ba map **Vân Khê / Học Viện / Đồng Sương**. Hướng triển khai vẫn Kiếm trước → local trước → gate mạng sớm. Trúc Ảnh mở trong quest state sau Q6 nhưng nằm ngoài build slice đầu; MapExit phải báo giới hạn bản thử. G-L không thêm Q7/enhance để thay mục tiêu đang kiểm. Phạm vi có thể được review sau blockout nếu bằng chứng cho thấy cần đổi; khi đó cập nhật mục này, G-L và kế hoạch kiểm liên quan.
 
 **Phạm vi slice không phải phạm vi định nghĩa quest.** Production phải có đầy đủ 12 `QuestDefinition` cho Q1–Q12, điều kiện, bước hành động, thưởng, NPC nhận/trả và mở khóa theo [Quests & Narrative](../01-design/quests-and-narrative.md#quests-story). G-B review cách biểu diễn cả tuyến; G-L chỉ chạy đoạn Q1–Q6. Những quest sau phải nằm trong tuyến production thật ở G-C/G-T, không được thay bằng vài con số tracker hoặc preset debug.
 
-VS-1 hiện có là reference của luật/layout/input cũ, không phải production architecture hay art acceptance. Không mang nguyên các bờ dốc, đất one-way hoặc phím alias cũ vào slice revision mới. Probe art/rig mới dùng một sandbox standalone disposable theo [Art](../03-art/art-and-visual-production.md#first-art-probe). Sandbox art chỉ kiểm hình ảnh/pipeline, không thay production base hoặc route G-L.
+VS-1 đã được xóa khỏi checkout; luật/layout/input cũ chỉ còn là reference lịch sử trong Git, không phải production architecture hay art acceptance. Không mang nguyên các bờ dốc, đất one-way hoặc phím alias cũ vào slice revision mới. Probe art/rig mới dùng một sandbox standalone disposable theo [Art](../03-art/art-and-visual-production.md#first-art-probe). Sandbox art chỉ kiểm hình ảnh/pipeline, không thay production base hoặc route G-L.
 
 G-L chạy onboarding Tân Lữ → Kiếm theo [canonical quest route](../01-design/quests-and-narrative.md#quests-story). Minimal Cung probe Pha R dùng fixture riêng, không thay fresh-run Kiếm hoặc full-route Cung ở G-C/G-T.
 
 Q6 discovery nói chuyện cả Phong Du và Diệp Lam trong cả slice Kiếm và route Cung; mentor đã chọn giữ admission/turn-in, mentor kia vẫn có contextual Talk. Không khôi phục Tạ Minh làm bước trung gian.
 
-| Cần có trong slice revision mới | Bằng chứng cần giữ cho G-L |
-| --- | --- |
-| Local Session authoritative; intent/result/UI tách biệt | Một input đi qua resolver một lần; UI/VFX không tự sửa HP/túi/quest; log clock/life/action IDs |
-| Movement/jump/drop-through, ba map và camera | Trái/phải di chuyển, lên nhảy, xuống drop-through; mặt solid trực giao đúng collider. EdgeExit/MapId/gate/refused-transition không ping-pong; kiểm coyote/buffer/fixed-height (tap/hold cùng apex trong cùng setup) ở tốc độ thường |
-| Chọn skill và thực thi riêng | 1/2/3 chỉ chọn slot. Chỉ ExecuteSelected tạo intent; giữ phím không lặp. Đổi slot không sửa lệnh pending/buffer/action đã chụp; kiểm hủy/thay thế và revalidate khi tới nơi |
-| Focus và combat Tân Lữ → Kiếm | AUTO/EXPLICIT, tìm/giữ/thực thi có vùng riêng; primary/propagation eligibility/clock đúng; C0 trước real death credit. Chết hủy lệnh combat nhưng giữ focus hợp lệ và HUD HP, kể cả cập nhật HP người chơi khác |
-| Quái và mật độ mới | Cụm melee có Approach/Contact–Staging/Attack/Recovery–Reposition; peer đã chiếm chỗ không bị coi là terrain bị chặn. Quái giữ HomeRegion/WalkRegion/SurfaceId; Return và kiting theo luật chung |
-| EXP/điểm/class, item/equip/loot/sell, Food/Potion/death | Đúng luật cho phần đã có; reject/full bag/đầy HP không tiêu sai item. Dùng điểm chọn phái thực tế để giữ HP liên tục; không dùng fixture reset thay lưu bền |
-| Q1–Q6, NPC và UI | Route thật, late/retry/grant/full-bag; inventory/equipment preview, shop, Skills/Quest/HUD dùng được bằng bàn phím và chuột; automation không chứng minh UX đã pass |
-| Mẫu art nhỏ đã nhập Unity | Default + outfit I, Mộc/Kiếm I và một visual khác qua fixture; Dummy/Nấm/Sói, impact/Death, solid/one-way đúng loại, font có dấu; đo grip/pivot/phase/độ đọc và giờ sửa |
+G-L acceptance chi tiết dùng [gate protocol](playtest-and-balance.md#technical-gates) và [QA cases](playtest-and-balance.md#qa); [Runtime discipline](../02-technical/gameplay-runtime.md#architecture-discipline) giữ implementation boundaries, không bảng requirement thứ hai tại Roadmap.
 
 **Chưa bắt buộc cho G-L:** login/backend/DB, network/reconnect, full production Cung, PvP, Boss và các map sau Đồng Sương. Local dùng profile/fixture và RAM; phải báo dữ liệu có thể mất khi reset/đóng phiên. JSON chỉ phục vụ config/fixture/import-export dev. Thành công trong RAM chưa chứng minh crash atomicity hay persistence.
 
@@ -83,7 +74,7 @@ Gate chỉ pass khi có bằng chứng đúng revision. [Playtest & Balance](pla
 | Phase / gate | Điều kiện vào và công việc | Điều kiện ra / cho phép tiếp theo |
 | --- | --- | --- |
 | Pha R — thu bài học và probe | Thu findings VS-1, đồng bộ docs; minimal Kiếm/Cung controls/UI/art/rig trong sandbox disposable riêng | Có contract hiện hành, danh sách giả định cần đo và mẫu nhỏ đọc được; không biến mock thành production base |
-| Pha B / **G-B: production base review** | Review input/intent/pending/clock/IDs/definitions/physics/commit/presentation; review typed ObjectiveGroup/QuestDefinition toàn bộ Q1–Q12 (MobIdentity, special predicates, ordinals, physical bindings, NPC/rewards/unlocks) và class/NPC dependencies rồi dựng base nhỏ; review C0 acquisition/propagation/presentation trước actual quest credit | Ownership/dependency rõ; kiểm core theo revision mới; room production sơ bộ; quyết phần reuse/rewrite. Không dựng framework chỉ vì đối xứng |
+| Pha B / **G-B: production base review** | Review input/intent/pending/clock/IDs/definitions/physics/commit/presentation; review typed ObjectiveGroup/QuestDefinition toàn bộ Q1–Q12 (MobIdentity, special predicates, RNG/staged grants/restoration OPEN, physical bindings, NPC/rewards/unlocks) và class/NPC dependencies rồi dựng base nhỏ; review C0 PrimaryAction/ActiveFocus/acquisition/propagation/presentation trước actual quest credit | Ownership/dependency rõ; kiểm core theo revision mới; room production sơ bộ; quyết phần reuse/rewrite. Không dựng framework chỉ vì đối xứng |
 | Pha L / **G-L: local slice revision mới** | G-B và C0 pass cho combat/real kill flow; ghép Q1–Q6/Kiếm từ base, blockout ba map và kit đủ đọc | Route fresh Q1–Q6 cùng log/video, review feel/UX ở tốc độ thường; các phép kiểm áp dụng trong bảng dưới đạt. Art/QA/rework có số đo; mở G-N |
 | Pha N / **G-N: Dedicated + ≥2 client sớm** | G-B/G-L mới pass; rules/resolver/timeline chạy headless; adapter RAM ghi rõ fixture dev | Hai client độc lập kiểm movement/MapId/kill/quest/shared claim, stale life/replay/late result, dead-focus và HP người chơi khác; N-safe recipients/claim/threat. Đo correction/latency/headless; mở rộng có chọn lọc |
 | Pha D / **G-D: backend/persistence thật** | G-N pass; thay fixtures bằng Spring/PostgreSQL, giữ một writer và domain result chung | Login → Select → one-time ticket → join; lease/duplicate, checkpoint/SafeAnchor/HP0; N recipients, claim/quest commit idempotent; crash/outage/retry trước/sau ACK. ClassChosenLevel và class transaction bền vững |
@@ -105,8 +96,8 @@ G-N dùng phạm vi local đã kiểm lại và diễn ra trước khi làm rộ
 
 | Tuần mục tiêu | Đầu ra để review | Điều kiện / xử lý nếu chưa đạt |
 | --- | --- | --- |
-| 1 | Thu findings bản mẫu, sync docs; minimal Kiếm/Cung controls/UI/art/rig và review base nhỏ | Ghi assumptions, OPEN và công sửa/% dùng được thật; VS-1 giữ vai trò reference |
-| 2 | Core production base/local room → G-B; definitions Q1–Q12, input/clock/IDs/physics/AI/kit | Review select-only/ExecuteSelected, class/NPC dependencies, terrain/mật độ mới; chưa nhân toàn bộ family |
+| 1 | Thu findings bản mẫu, sync docs; minimal Kiếm/Cung controls/UI/art/rig và review base nhỏ | Ghi assumptions, OPEN và công sửa/% dùng được thật; VS-1 chỉ là reference lịch sử trong Git |
+| 2 | Core production base/local room → G-B; definitions Q1–Q12, input/clock/IDs/physics/AI/kit | Review select-only/PrimaryAction (combat branch), class/NPC dependencies, terrain/mật độ mới; chưa nhân toàn bộ family |
 | 3 | Ghép Q1–Q6 Nấm→Sói/Kiếm, blockout ba map, art/UI nhỏ → G-L revision mới | Fresh route, review tốc độ thường và logic retry/death; thiếu UX/art thì gate còn PARTIAL |
 | 4 | Dedicated + ≥2 client trên slice → G-N | Checkpoint mạng trước production rộng; nếu boundary/headless/recipients sai, sửa trước mở rộng |
 | 5 | Spring/PostgreSQL/auth/ticket/lease/commit/recovery → G-D mục tiêu; tích hợp production Cung sau minimal probe Pha R và nếu G-N pass | Chưa pass DB thật chưa nhận persistence done; Cung vẫn DEFERRED P0 nếu chưa triển khai |
@@ -129,15 +120,9 @@ Hạng mục độc lập trong G-C/F/P có thể làm song song sau gate phụ 
 
 <a id="5-art-cho-người-chưa-thạo-vẽ-và-kỷ-luật-giao-việc"></a>
 
-## Art cho người chưa thạo vẽ và kỷ luật giao việc
+## Giao việc cho art probe
 
-Dùng quy trình nhỏ ở [Art & Visual Production](../03-art/art-and-visual-production.md#art-tool-workflow): chọn mẫu, sửa palette/outline/pivot/grip bằng editor pixel, nhập Unity rồi đo. Probe chạy trong sandbox standalone disposable riêng; VS-1 giữ vai trò reference.
-
-**TOOL CANDIDATE:** có thể thử PixelLab bằng Free/free trial rồi đánh giá tool/workflow. Contract visual/import và architecture không phụ thuộc PixelLab. Giới hạn dịch vụ cần kiểm lại từ [FAQ chính thức](https://www.pixellab.ai/docs/faq) tại thời điểm dùng; không giả tool animation/outfit đều miễn phí hoặc hứa số credits. Nếu tính năng cần thiết không có trong Free, ghi “chưa kiểm được với Free”, dùng placeholder kiểm pipeline và đo chi phí trước quyết định mua.
-
-Đếm cả output thất bại. `% dùng trực tiếp = output pass không sửa / toàn bộ output tạo`; `% dùng sau sửa = output pass sau sửa / toàn bộ output tạo` là hai nhóm riêng. `% dùng được tổng = tổng hai nhóm pass / toàn bộ output tạo`, không đếm một output hai lần. Chưa tạo mẫu ghi **CHƯA ĐO**. Ghi giờ sửa/import/QA, lỗi pose/alignment và cỡ mẫu cho từng loại. Gate cần mẫu rig/weapon/outfit chạy đúng timing trong room thật, không chỉ một PNG đẹp.
-
-Kỷ luật cho mọi người và coding agent nằm ở [Architecture](../02-technical/architecture.md#architecture-discipline): gameplay tách UI, ID ổn định, một clock authority/session; AnimationEvent chỉ presentation; Local và Dedicated dùng cùng rules. Task ghi rõ TARGET/CURRENT, section canonical, input/result, gate cần kiểm và OPEN dependency. Không tự đổi range/timer/26-frame/slot để làm task pass. Giá trị BASELINE/TUNABLE phải có setup và bằng chứng khi đề xuất chỉnh; quyết định tại semantic owner, index ở docs/README.md.
+Pha R/P15 dùng [Art workflow và phép đo output/giờ](../03-art/art-and-visual-production.md#art-tool-workflow); task tuân [Runtime discipline](../02-technical/gameplay-runtime.md#architecture-discipline). Chỉ mở production theo gate bên dưới.
 
 <a id="production-release"></a>
 
@@ -154,7 +139,7 @@ Cắt P1/P2 và polish trước: giảm cosmetic variations/shake/sound/phần t
 
 ## Implementation readiness — vertical slices sau consolidation 2026-10-09
 
-**PLAN/PROPOSAL; chưa code hoặc pass gate.** [Source audit](../02-technical/architecture.md#source-audit-20261009) ghi actual classes/files; [matrix](../02-technical/architecture.md#responsibility-matrix) ghi trách nhiệm đề nghị. VS-1 là frozen reference, không sửa để đồng bộ contract mới. Production `game/`/`backend/` chưa tồn tại. Module mới dưới đây là đề xuất boundary, chưa phải filename/class có sẵn; G-B quyết layout nhỏ nhất. Không port nguyên `SliceSession`/`SliceHud`.
+**PLAN/PROPOSAL; chưa code hoặc pass gate.** [Source audit](../90-archive/production-history.md#source-audit-20261009) ghi actual classes/files tại snapshot 2026-10-09; [matrix](../02-technical/gameplay-runtime.md#responsibility-matrix) ghi trách nhiệm đề nghị. Source VS-1 đã bị xóa khỏi checkout; tra commit lưu trữ khi cần đối chiếu, dựng production theo contract mới. Production `game/`/`backend/` chưa tồn tại. Module mới dưới đây là đề xuất boundary, chưa phải filename/class có sẵn; G-B quyết layout nhỏ nhất. Không port nguyên `SliceSession`/`SliceHud`.
 
 **Thứ tự đề nghị:** Inventory → fixed Jump; C0 combat contract sau base/movement và trước real combat death credit; shared UI → Shop → regular ground → personal entitlement → collection objectives → Q2/mentor → presentation integration. Fixed Jump đi trước Q2 để blockout không dựa hold apex. Minimal Kiếm/Cung art probe vẫn làm sớm ở **Pha R**; Slice 9 chỉ tích hợp vào production. Review schema/data cho đủ 12 QuestDefinitions tại G-B; Q2 content cần duyệt riêng, tuyến Q8+ nghiệm thu ở G-C. Fixture local của Slice 6–7 phục vụ Q2/Q4; durability chỉ hoàn thành sau G-N/G-D. Dedicated receiver/replication và Spring commit adapter là các PR nhỏ tại gate tương ứng, không gộp vào PR Inventory.
 
@@ -164,14 +149,14 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 
 ### C0 — Combat contract gate / micro-slice trước real quest credit và full VFX
 
-- **Why now:** VS-1 vẫn Arc/Line và caster-order, thiếu status runtime; sửa docs không chứng minh primary-proximity chạy đúng. C0 cô lập tác động targeting trước ghép loot/collection hoặc sản xuất art rộng.
+- **Why now:** source VS-1 tại snapshot lịch sử dùng Arc/Line và caster-order, thiếu status runtime; sửa docs không chứng minh primary-proximity chạy đúng. C0 cô lập tác động targeting trước ghép loot/collection hoặc sản xuất art rộng.
 - **Dependencies:** Pha R minimal hai phái/S2 A-B và G-B boundaries/typed QuestDefinitions; Slice2 cần cho pending/arrival/vertical physics thật. Slice1/3/4 có thể đi độc lập bằng command fixtures; C0 không buộc Inventory PR đầu tích hợp combat.
 - **Actual reference:** `Domain/CombatController.cs` InRange/TryStart/Resolve/Spread/Hit/Tick, `SliceRules.Skills`, target life/facing; old fixtures chỉ reference, chưa production implementation.
-- **New contracts:** acquisition/focus/pending; primary validator; SinglePrimary/PrimaryProximity/SnapshotSpread/PrimaryExplosion; immutable action snapshot/result; unique status cache; presentation đọc ordered actual results. Đủ sáu SkillIds bằng data fixture đúng unlock, không cấp skill thật sai level.
+- **New contracts:** PrimaryAction/one ActiveFocus/modal→concrete typed intent; combat acquisition/focus/pending; primary validator; SinglePrimary/PrimaryProximity/SnapshotSpread/PrimaryExplosion; immutable action snapshot/result; unique status cache; presentation đọc ordered actual results. Đủ sáu SkillIds bằng data fixture đúng unlock, không cấp skill thật sai level.
 - **Minimal implementation:** room disposable/production harness nhỏ, một caster/primary + configurable secondary/solid/one-way/life; C1/C2, vertical và LoS A/B explicit profiles. Minimal SwordS2/BowS2 pose/impact probe, không full assets hoặc quest route.
-- **Migration:** không sửa frozen VS-1; ghi revision cũ/mới và expected differences, giữ power/MP/CD/range primary/caps/timing/cancel. New stats hoặc kỹ năng không thuộc slice.
+- **Migration:** dựng/test trên production base mới, đối chiếu VS-1 qua Git khi cần; ghi revision cũ/mới và expected differences, giữ power/MP/CD/range primary/caps/timing/cancel. New stats hoặc kỹ năng không thuộc slice.
 - **Server:** pin source/primary/start clock/MP-CD; validate tại start/HitMoment; Kiếm query primary-near set trước apply; Spread immutable indices, Hàn valid center; results/lives/status/damage không VFX collision, không SpawnGroup gate.
-- **Client:** select-only/Execute/pending reasons/focus; actor/weapon riêng, một main/action, actual landed impacts/status; late/replay/life mới không effect cũ. Auto-face chỉ accepted start là baseline probe, không focus-only.
+- **Client:** select-only/PrimaryAction/pending reasons/one ActiveFocus; actor/weapon riêng, một main/action, actual landed impacts/status; late/replay/life mới không effect cũ. Auto-face chỉ accepted start là baseline probe, không focus-only.
 - **Persistence:** không DB mới hoặc claim durable; RAM ledger/death fixtures kiểm one terminal event/recipient, actual transactions phải Slice5–7/G-D. Không save từng hit.
 - **Dev Mode:** target positions/lives/MapId/identity/group/variant/Evade seed; death trước resolve, movement/focus/slot/replay, ≥2 caster/>5 recipients; log profile/start/resolve/indices/cache/action/result IDs.
 - **Unit tests:** six-policy target sets/caps/power indices, ties/boundaries/invalid primary-secondary/status fail cache; source snapshot; wrong life/map/identity special predicates; no refill/double primary.
@@ -186,14 +171,14 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Why now:** capacity/identity/quantity là nền cho mọi Buy/Pickup/TurnIn; cần chứng minh invariants trước UI/content.
 - **Dependencies:** Pha R và G-B boundary review; chưa cần combat, quest hoặc DB chạy thật.
 - **Actual reference:** `Domain/SliceRules.cs` (`Inventory`, `ItemDef`, `Item`, `Catalog`); `SliceSession.NewItem/Grant/Store/Equip/Unequip`; EditMode `DomainTests.FullBagRejectDoesNotConsumeGroundAndStackMergeStillFits`, `PendingGrantKeepsInstanceAndReceiptAfterCapacityRetry`, `StorageTransferIsAtomicAndDoesNotCopyInstances`. Full paths ở audit; không sửa frozen files.
-- **New contracts:** capacity 60/Storage 40, stack key/item policy, unique instance IDs, checked quantity, expected character/inventory revision, immutable command payload và receipt; versioned definitions không copy gear stats cũ.
-- **Minimal implementation:** Add/Remove/Merge/Capacity planner trên state copy, một commit function, RAM receipt/revision adapter và room/harness thấy Add/Merge/Reject/Replay; chưa Shop/Quest logic.
+- **New contracts:** capacity 60/Storage 40, stack key/explicit canDiscard/protection policy, unique instance IDs, checked quantity, expected character/inventory revision, immutable command payload và receipt; versioned definitions không copy gear stats cũ.
+- **Minimal implementation:** Add/Remove/Merge/Split/Discard/Capacity planner trên state copy, một commit function, RAM receipt/revision adapter và room/harness thấy Add/Merge/Reject/Replay; chưa Shop/Quest logic.
 - **Migration:** reset fixture 30/99 hoặc import bằng mapping được review; split tại technical bound tạo IDs mới, không dùng một ID cho nhiều stacks.
 - **Server:** validate ownership, positive quantity, checked arithmetic và whole-payload capacity trước mutation; local receiver và dedicated adapter sau G-N dùng cùng path.
 - **Client:** inspect panel cho occupancy/quantity/pending/reject, đủ demo; chưa full UI kit/art production.
 - **Persistence:** RAM fixture ghi rõ mất khi đóng; chuẩn bị result/revision seam cho G-D, không gọi JSON/RAM là authority bền vững. Gold/cost kiểm tại Shop khi cần.
 - **Dev Mode:** FillBag60Distinct, GiveCompatible, NearNumericBound, InjectCommitFailure/Replay trong test profile; không release commands.
-- **Unit tests:** reject món distinct thứ 61; merge khi 60/60; sai binding; 0/âm/overflow; split ở numeric bound; capacity reject không mất quantity; unique gear không merge; duplicate incoming ID reject.
+- **Unit tests:** reject món distinct thứ 61; merge khi 60/60; sai binding; 0/âm/overflow; user split k/empty slot/new stackID/no source receipt clone; manual merge/sort selection survivor; protected discard reject; capacity reject không mất quantity; unique gear không merge; duplicate incoming ID reject.
 - **Integration tests:** receipt lookup trước revision check; cùng ID khác payload reject; failure giữ toàn state; Store/Take nối fixture phải giữ identity/quantity.
 - **Multiplayer tests:** hai actor states độc lập và competing mutations serialize trong fixture; ghi chưa G-N PASS. Tại G-N chạy wrong sender/two writers/stale revision thật.
 - **Manual acceptance:** 60/60 vẫn thêm được compatible item; món khác báo thiếu ô; UI hiển thị quantity chính xác, không cần kill/grant để demo.
@@ -228,7 +213,7 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Minimal implementation:** Bag và một Storage/picker fixture dùng chung widgets; 60 slots scroll/page responsive, chưa khóa pixel/columns.
 - **Migration:** không port giant IMGUI Refresh hoặc fixed 6 columns×30; bỏ legacy callbacks trong code mới sau session reset.
 - **Server:** snapshots/reasons dựa canonical state; client prevalidation không trusted; UI callback không mutation trực tiếp.
-- **Client:** keyboard/mouse chung command router; selection giữ theo ID hoặc clamp khi entry mất; pending/empty/unsellable details, modal consume opening input.
+- **Client:** keyboard/mouse chung command router; selection stableID; merged source map tới survivor, deleted entry clear có cue; quantity Split/Sort-Merge/Discardconfirm+disabled reasons; pending/empty/unsellable details, modal consume opening input.
 - **Persistence:** selection/viewport/breadcrumb không DB; chỉ đọc committed snapshot.
 - **Dev Mode:** tên tiếng Việt dài, full/empty bag, gear bound/mixed equipment, slow/fail result fixtures.
 - **Unit tests:** quantity/rarity/+n/binding formatters; entry bị xóa không gửi stale command.
@@ -259,14 +244,14 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 
 ### Slice 5 — Regular ground loot foundation
 
-- **Why now:** chứng minh shared pile/claim trước personal rights, giữ nguyên loot budget.
+- **Why now:** chứng minh shared pile/claim trước personal rights, đo model0..1 regular outcome, Gold/EXPbudget riêng.
 - **Dependencies:** Slice1/receiver/valid-ground physics và Slice3 selection widgets; **C0 pass trước actual combat death→loot/quest credit**. Synthetic committed-death fixture có thể kiểm planner sớm, không pass combat.
 - **Actual reference:** `Loot.Eligible` trong `SliceRules.cs`, `SliceSession.Die/Drop/LootCandidate/PickUp`, `SliceHost.Interact/LateUpdate` lootViews; `DomainTests.LootImmediateIndependentAndNextCandidate`, `LevelAtDeathSnapshotSurvivesLevelUpAndGapRejects`.
-- **New contracts:** death/life IDs, immutable owner/contribution/level snapshot, original deadlines, pile payload, valid-ground resolver, claim command/revision.
+- **New contracts:** death/life IDs, immutable owner/contribution/level snapshot, original deadlines, weighted one-result payload Normal/Linh (weightsTUNABLE), valid-ground resolver, claim command/revision.
 - **Minimal implementation:** một normal mob death→pile→pickup demo; chưa toàn Boss content.
 - **Migration:** không port owner=1/Tutorial flag thành ACL; chuyển single-player fixture thành N recipients, reset expired pile không reroll.
 - **Server:** valid snap/offset/bounds; giữ Normal/Linh 8/20/60, Boss 12/30/90 và top-damage/level/no-fallback; validate alive/range/map/ACL/deadline/whole capacity.
-- **Client:** icon/prompt/selection và retirement sau claim commit; loot selection tách CombatFocus.
+- **Client:** icon/prompt/selection và retirement sau claim commit; loot ActiveFocus thay combat selection; exact item/gen Pickup only, no samepress fallback.
 - **Persistence:** G-D atomic death N rewards+pile+receipt và claim+bag+receipt; restore UTC deadline. A15 timestamp/cap release cần spike trước durable acceptance.
 - **Dev Mode:** drop trên ledge/trong solid/Ong ở cao, windows owned/contributor/FFA, expired pile và delayed death ACK.
 - **Unit tests:** threshold/window edges/level snapshot, capacity/ownership/generation, không fixed array 2 người.
@@ -281,14 +266,14 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Why now:** local placed/mob fixtures mở Q2/Q4 và collection; không cần full Q8 trước.
 - **Dependencies:** Slice 1+5; per-Quest state/schema review G-B. Sau local, chạy Dedicated G-N rồi Spring G-D.
 - **Actual reference:** `SliceSession.Grant/pendingGrants/TutorialSupply/PickUp/Tick`, `Loot.Tutorial`; `DomainTests.PendingGrantKeepsInstanceAndReceiptAfterCapacityRetry`, `TutorialSupplyOnlyExistsAtRelevantActiveStep`; chưa backend durable.
-- **New contracts:** bounded entitlement/epoch/ordinal/sourceMap/item payload/binding/claim receipt; representation generation và TTL tách quyền nhận.
+- **New contracts:** bounded entitlement/epoch/source outcome success+failure/sourceMap/item payload/binding/staged grant/claim receipt; representation generation và TTL tách quyền nhận.
 - **Minimal implementation:** một placed source và một mob collection fixture theo [phương án A](../02-technical/online-and-persistence.md#personal-quest-recovery); owner tới ground tự nhặt.
 - **Migration:** version exact ItemIds/binding mapping; virtual fixture không tự thành picked up. Reset hoặc approved mapping một lần sang Pending, không reroll reward cũ.
-- **Server:** đúng active objective group + MobIdentity/special predicate + threshold mới tạo quyền một lần mỗi recipient; SpawnGroup/sourceMap là provenance/recovery, không standard kill whitelist; expose sau death commit. Pickup owner/lease/generation/map/range/alive/capacity; add+claim atomic; re-offer Pending tại valid sourceMap anchor.
+- **Server:** đúng active objective group + MobIdentity/special predicate + threshold → one RNG outcome/eligible death/recipient/objective; success mới tạo quyền bounded, failure cũng persist; SpawnGroup/sourceMap là provenance/recovery, không standard kill whitelist; expose sau death commit. Pickup owner/lease/generation/map/range/alive/capacity; add+claim atomic; re-offer Pending tại valid sourceMap anchor.
 - **Client:** owner-only visual và pickup intent; tracker pending/full-bag reason, không client grant/security bằng hide.
-- **Persistence:** local fault fixture rồi PR adapter G-D riêng: transaction source/death→entitlement và transaction claim→bag. Versioned progress payload/relation còn OPEN, spike chốt atomicity/queries/lease.
+- **Persistence:** local fault fixture rồi PR adapter G-D riêng: transaction source/death→RNG outcome+entitlement và transaction claim→bag. Versioned progress payload/relation còn OPEN, spike chốt atomicity/queries/lease.
 - **Dev Mode:** FillBag60, ExpireRepresentation, InspectEntitlement, duplicate/old-generation/ACK loss; DropTransport/Restart chỉ khi test infrastructure có thật.
-- **Unit tests:** bounds/ordinals/wrong step/owner/binding, double claim/capacity reject; TTL không xóa quyền; completed không respawn item.
+- **Unit tests:** bag+pending bounds/RNG fail-success dedup/Q4 tutorialordinal/wrong step/owner/binding, double claim/capacity reject; TTL không xóa quyền; completed không respawn item.
 - **Integration tests:** full bag→TTL→dọn→re-offer→pickup; death/map/new session; crash trước/sau source/claim commit với DB ở G-D, không dùng RAM để chứng minh.
 - **Multiplayer tests:** N eligible có rights độc lập; outsider không read/claim; threshold 20% giới hạn tối đa 5 recipients/normal life; một claim/owner, stale lease/rejoin.
 - **Manual acceptance:** lấy lại ở sourceMap rõ, không giết lại/NPC mới; regular/personal icons riêng và clickable/keyboard reachable, không auto-add vào bag.
@@ -298,17 +283,17 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 ### Slice 7 — Inventory-derived objectives và atomic turn-in
 
 - **Why now:** nối collection possession vào quest, dùng fixture trước Q2; actual Q8/Q10/Q11 ở G-C.
-- **Dependencies:** Slice1+6, C0 cho real MobKilled và typed full QuestDefinition review G-B (đủ counts/ordinal/bindings/special predicates, Q9 parallel).
+- **Dependencies:** Slice1+6, C0 cho real MobKilled và typed full QuestDefinition review G-B (đủ stable counts/RNG/staged bindings/restoration OPEN/special predicates, Q9 parallel).
 - **Actual reference:** `SliceSession.Objective/Stage/Kills/ObservePosition/TurnIn/Grant/Die`; `DomainTests.QuestStagedGrantRetryAndTurnInCapacityAreAtomic`; source chưa Q7–Q12/per-Quest definitions.
-- **New contracts:** per-Quest state/groups, ItemRequirement(binding/identity/quantity/consumeAtTurnIn); action receipts/ordinal riêng, không collectionCounter authority thứ hai.
+- **New contracts:** per-Quest state/groups, ItemRequirement(binding/identity/quantity/consumeAction); action receipts/Q4 tutorial ordinal/RNG outcomes/placed flags riêng, không collectionCounter authority thứ hai.
 - **Minimal implementation:** một objective→bag→net-capacity turn-in demo; full 12 definition validation không có nghĩa một mega-PR chạy tất cả content.
-- **Migration:** virtual fixtures reset hoặc approved Pending mapping; giữ QuestIds/counts/thresholds/rewards; Q9 parallel state không bị một currentQuestId ghi đè.
-- **Server:** evaluate committed bag; death snapshot pin active group trước progress, không future-step credit; kill+collection group active tới khi đủ cả hai; Q11 ba bindings và activation không consume sớm; Q4 ItemSold history khác possession; Ready revalidate/resolve đúng NPC.
+- **Migration:** virtual fixtures reset hoặc approved Pending mapping; giữ QuestIds, counts Q3/Q4/Q5/Q12, thresholds và rewards; thay Q8/Q10 normal quota và Q11 flow cũ; Q9 parallel state không bị một currentQuestId ghi đè.
+- **Server:** evaluate committed bag; death snapshot pin active group trước progress, không future-step credit; single-axis Kill hoặc CollectRNG cùng nguồn; Q8 Collect→Linh; Q10 Collect; Q11 material→Lâm→Bách/gate/grant→ba placements trên nhiều maps (OPEN), consume từng fragment+placed flag atomic; Q4 ItemSold history khác possession; Ready revalidate/resolve đúng NPC.
 - **Client:** tracker phân biệt pending/ground/owned/action count; TurnIn pending/missing-item/capacity reasons; internal IDs chỉ debug.
 - **Persistence:** consume+reward+Completed+unlocks+entitlement cleanup+receipt atomic; local reject fixture rồi DB fault thật G-D, matched definition revisions.
 - **Dev Mode:** SetQuestGroup, GrantBoundItem, RemoveItem, FillNetCapacity, FailTurnIn, InspectReceipt; reset epoch invalidates stale claims.
-- **Unit tests:** entitlement không là possession; wrong quest/mảnh; kills đủ nhưng chưa item không hoàn; Q4 sold vẫn hoàn; không duplicate collection authority.
-- **Integration tests:** full bag consume tạo một slot rồi reward fit; reward cần hai slots reject toàn consume; lost ACK hoàn/thưởng một lần; Q11 activation không consume/unlock sai thời điểm.
+- **Unit tests:** entitlement không là possession; wrong quest/mảnh; rights đủ nhưng chưa item không hoàn; Q4 sold vẫn hoàn; không duplicate collection authority.
+- **Integration tests:** full bag consume tạo một slot rồi reward fit; reward cần hai slots reject toàn consume; lost ACK hoàn/thưởng một lần; Q11 placement consume+flag durable; gate đọc flags/approved endpoint, không possession ba mảnh; staged grant không duplicate.
 - **Multiplayer tests:** cofarm vẫn riêng quest state; Pickup/TurnIn serialize revisions; Talk không share; G-D transaction faults thật.
 - **Manual acceptance:** item thấy trong bag, không Sell/mất khi chết; turn-in thiếu item có reason, Q4 sample vẫn Sell đúng policy.
 - **DoD:** fixture end-to-end và full definition validation, Q2 draft gated pending approval; Q8+ nghiệm thu G-C/G-T.
@@ -323,7 +308,7 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Minimal implementation:** Q2 route và Q6 admission nối riêng vào fresh journey, không rewrite mọi NPC cùng lúc.
 - **Migration:** giữ anchor/QuestIds; bỏ mandatory Drop không rename MapId. Migrate Tạ Minh references theo current roster; G-L Sword-only không là final Cung product.
 - **Server:** Q2 một placed entitlement, pickup thật/atomic consume, không credit từ Jump/Drop presses. Q6 both-talk→manual unequip→class/grant/mentor commit; không trust selected mentor ID/off-class manual.
-- **Client:** tracker mục đích/đường về; service/context rõ, unselected mentor vẫn Talk và biết class sau Q6; không auto-face/relation meter.
+- **Client:** tracker mục đích/đường về; PrimaryAction NPC mởrootcontext, Talkoption explicit/noopeningcredit/modalconsume; service/context rõ, unselected mentor vẫn Talk và biết class sau Q6; không auto-face/relation meter.
 - **Persistence:** discovery/class/mentor/learn receipts durable G-D; ambient readonly; Q2 epoch/claim/turn-in dùng flow chung.
 - **Dev Mode:** FreshQ2/full bag placed item, Q6 one/both talked, Sword/Bow selected/unselected, late class/reserved MP; preset không thay fresh G-L video.
 - **Unit tests:** chọn class trước both-talk fail, duplicate Talk không thêm resource; Q2 presses không credit; wrong-NPC/replay reject; context selectors.
@@ -356,4 +341,14 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 
 ## Một coding slice nên làm đầu tiên
 
-**Chọn Slice 1: production Inventory domain nhỏ + RAM command/receipt seam, 60 slots và compatible stack.** Đây không chỉ đổi 30→60 trong prototype. Nó mở net capacity/quantity/ownership/revision cho Shop/Pickup/TurnIn và test full bag độc lập, chưa cần chốt Q2 name/schema/26-raster mapping. G-B boundary review cùng Pha R prerequisites đi trước; deliverable đầu là harness chạy Add/Merge/Reject/Replay với logs/invariants và label RAM fixture. Fixed Jump tiếp theo trước Q2 authoring; C0 sau movement/base review và trước Slice5–7 actual kills hoặc full VFX. Không để Inventory slice thành chốt ngầm combat bounds. Không sửa VS-1 reference, không gộp UI/DB/quests/network trong PR đầu.
+**Chọn Slice 1: production Inventory domain nhỏ + RAM command/receipt seam, 60 slots và compatible stack.** Đây không chỉ đổi 30→60 trong prototype. Nó mở net capacity/quantity/ownership/revision cho Shop/Pickup/TurnIn và test full bag độc lập, chưa cần chốt Q2 name/schema/26-raster mapping. G-B boundary review cùng Pha R prerequisites đi trước; deliverable đầu là harness chạy Add/Merge/Reject/Replay với logs/invariants và label RAM fixture. Fixed Jump tiếp theo trước Q2 authoring; C0 sau movement/base review và trước Slice5–7 actual kills hoặc full VFX. Không để Inventory slice thành chốt ngầm combat bounds. Đối chiếu VS-1 qua lịch sử Git khi cần; không gộp UI/DB/quests/network trong PR đầu.
+
+<a id="map-info-work-package"></a>
+
+## Map Info work package / revised UX scope — PLAN, chưa code
+
+Gắn **Slice5 + Slice8** và PhaC/world integration, không slice/network framework mới: Slice5 có server population observer gắn SpawnManager/newlife/terminaldeath/despawn/natural cap; session-map snapshot+revision/delta/reconcile nối G-N; Slice8/HUD reuse small panel/unknown/loading state. Dependencies: C0 input/focus cho hunting UX, world lifecycle/due ordering, map/session generation replication; widget có thể fixture sớm nhưng fixture không pass authoritative count. G-D không persist client counts. DoD MI01/MI02 spawn/death/despawn/reconnect/mapchange/outoforder, no coordinates; original16fields/slice giữ.
+
+Split/Sort-Merge/Discard planners trong Slice1, player UX Slice3, quantities Slice4 là **CURRENT DIRECTION planned integration**, chưa implementation. Exact canDiscard ordinary defaults và P0/P1 shipment priority **OPEN scope confirmation**, không vague “SortP1” rồi bỏ acceptance. Engineering recommendation kiểm invariants sớm/UX cùng inventory slice để không retrofit receipts; trade-off tăng Slice3 scope, không cắt baseline60/40 hoặc deviate task đầu Inventory domain. MapInfo cũng cần population integration thật, không chỉ Art budget. Q11 exact graph chờ user lock các OPEN ở Quest; không production content author bằng placeholder.
+
+[Acceptance revision](playtest-and-balance.md#primary-action-acceptance) và [lootEV](playtest-and-balance.md#loot-model-transition) không runtime pass; drop weights/rates/quest pacing tune sau evidence. Natural Q8 không reservation task/retry queue, old source/test names trong Actualreference chỉ frozen archaeology.

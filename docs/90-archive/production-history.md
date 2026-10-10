@@ -6,6 +6,25 @@
 
 Nguồn hiện hành: [documentation map](../README.md). Các con số, claim và đường triển khai bên dưới mô tả revision lịch sử.
 
+> **SUPERSEDED bởi phase 2026-10-10:** two-button Execute/Interact, Q8 force/reservation, Q8/Q10 ordinal evidence, Q11 old quotas/mob fragments/three Xích seals và multi-independent regular non-boss loot trong trace cũ không còn authority. Đọc [PrimaryAction](../02-technical/gameplay-runtime.md#active-focus), [Quest RNG/Q11](../01-design/quests-and-narrative.md#quest-collection), [natural Linh](../01-design/world-and-content.md#linh-bien), [loot](../01-design/items-and-economy.md#regular-loot-outcome). Bảng/số lịch sử giữ nguyên để truy vết.
+
+<a id="prototype-source-retired"></a>
+
+## Prototype đã xóa khỏi checkout — 2026-10-10
+
+Theo yêu cầu chủ dự án, toàn bộ `prototypes/` đã được xóa, gồm Unity project, source, assets, tests, evidence và cache/output local. Các đoạn phía dưới là snapshot lịch sử tại ngày ghi trong từng mục; đường dẫn và mô tả “source hiện có” không phản ánh checkout sau lần xóa này.
+
+Source, README, CHANGELOG và evidence **đã được Git theo dõi tại commit** `e1bc810982a384cf8880b14efc36dc3cf13a7fea` vẫn tra được bằng các lệnh read-only từ repo root:
+
+```sh
+git ls-tree -r --name-only e1bc810982a384cf8880b14efc36dc3cf13a7fea -- prototypes/
+git show e1bc810982a384cf8880b14efc36dc3cf13a7fea:prototypes/VS1_EndToEnd/README.md
+git show e1bc810982a384cf8880b14efc36dc3cf13a7fea:prototypes/VS1_EndToEnd/CHANGELOG.md
+git show e1bc810982a384cf8880b14efc36dc3cf13a7fea:prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/Domain/SliceRules.cs
+```
+
+Thay đường dẫn cuối để xem file khác có trong kết quả `ls-tree`. Các mã mục CHANGELOG bên dưới giữ nguyên để tìm đúng đoạn lịch sử. Cache, build, media hoặc artifact local chưa được commit không được bảo toàn bởi Git. Hồ sơ cũ không chứng minh gate production hoặc luật hiện hành đã được triển khai.
+
 <a id="legacy-roadmap"></a>
 
 <a id="roadmap-history-appendix"></a>
@@ -160,7 +179,7 @@ Mock project ở `prototypes/VS1_EndToEnd/`, tương lai `game/` là Unity produ
 | Review §7/§8 | [Art setup](../03-art/art-and-visual-production.md#first-art-probe) | Mini style sample và provenance |
 | Review §9/§10/§15/§16 | [Art](../03-art/art-and-visual-production.md#working-spec-end), [Analysis](../04-production/playtest-and-balance.md#keyboard-prototype-review) | Version hiện hành, base trước mạng, numbering và history marker |
 | Review §12 | [GDD quest](../01-design/quests-and-narrative.md#quests-story), [Technical quest](../02-technical/gameplay-runtime.md#combat-data) | Active-step-only tutorial supply, không future entitlement |
-| User keyboard/debug/mock | [GDD UX](../01-design/combat-and-character.md#ux-art), [Technical input](../02-technical/gameplay-runtime.md#shared-combat-input), [prototype](../../prototypes/VS1_EndToEnd/README.md) | Menu keyboard/mouse cùng command, debug mốc/reset, project tách biệt |
+| User keyboard/debug/mock | [GDD UX](../01-design/combat-and-character.md#ux-art), [Technical input](../02-technical/gameplay-runtime.md#shared-combat-input), [prototype](#prototype-source-retired) | Menu keyboard/mouse cùng command, debug mốc/reset, project tách biệt |
 
 <a id="feedback-source-destination"></a>
 
@@ -175,7 +194,7 @@ Mock project ở `prototypes/VS1_EndToEnd/`, tương lai `game/` là Unity produ
 | F03 | Bỏ J/hold, tap thông minh | [GDD input](../01-design/combat-and-character.md#focus-input), [Technical input](../02-technical/gameplay-runtime.md#shared-combat-input) | One-shot pending/approach, no-repeat/no-cost/cancel/expiry/revalidate |
 | F04 | Jump/drop mapping/feel | [GDD UX](../01-design/combat-and-character.md#ux-art), [Technical movement](../02-technical/gameplay-runtime.md#movement-feel) | OR aliases; coyote/buffer/variable-height/acceleration chưa khóa số |
 | F05 | Melee pile/reposition | [GDD mob](../01-design/world-and-content.md#world-farm), [Technical AI](../02-technical/gameplay-runtime.md#combat-data) | Cluster đọc được, soft separation/recovery offsets; không lock ring slots |
-| F06 | Prototype không codebase | [Technical discipline](../02-technical/architecture.md#architecture-discipline), [Roadmap gates](../04-production/roadmap.md#phase-gates), [prototype README](../../prototypes/VS1_EndToEnd/README.md) | Tách folder giữ meta; evidence cũ không pass revision mới; G-B trước G-N |
+| F06 | Prototype không codebase | [Technical discipline](../02-technical/gameplay-runtime.md#architecture-discipline), [Roadmap gates](../04-production/roadmap.md#phase-gates), [prototype README](#prototype-source-retired) | Tách folder giữ meta; evidence cũ không pass revision mới; G-B trước G-N |
 | F07 | Q3 waiting | [GDD quest](../01-design/quests-and-narrative.md#quests-story), [Art Dummy](../03-art/art-and-visual-production.md#mob-visual) | ≥3 placements cùng pool; HP60/25s giữ, contention OPEN |
 | F08 | UI keys/usability/navigation | [Art UI](../03-art/art-and-visual-production.md#icons-ui), [GDD UX](../01-design/combat-and-character.md#ux-art) | I/C/Q default, edge arrow/name + NPC marker P0, manual UX review |
 | F09 | Class Normal reasoning stale | [Analysis feedback](../04-production/playtest-and-balance.md#prototype-feedback-review), [legacy timing](../04-production/playtest-and-balance.md#balance-baselines) | Giữ bảng số, gắn LEGACY/SUPERSEDED trực tiếp reasoning; không restore Normal |
@@ -248,7 +267,7 @@ Reader Testing độc lập theo skill doc-coauthoring kiểm scope/gates, autho
 
 ## Hồ sơ bản mẫu — không phải luật production
 
-**Snapshot lịch sử V6.2.7; G-L của bản mẫu cũ PARTIAL.** Layout, tọa độ mock, lịch sử V6.2.4–V6.2.7 và bằng chứng đã chuyển sang [CHANGELOG prototype](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-visual-review). Bản nháp V6.2.8 trong hồ sơ chưa được xác minh. Metadata docs 2026-10-06 không phải prototype version bump; không xác nhận bản nháp hoặc gate mới đã pass. Toàn bộ chi tiết được bảo toàn, gồm chỉnh sửa cảnh quan chưa commit có trước task này; tests cũ không là visual/feel acceptance.
+**Snapshot lịch sử V6.2.7; G-L của bản mẫu cũ PARTIAL.** Layout, tọa độ mock, lịch sử V6.2.4–V6.2.7 và bằng chứng đã chuyển sang [CHANGELOG prototype](#prototype-source-retired) (CHANGELOG, mục `prototype-visual-review`). Bản nháp V6.2.8 trong hồ sơ chưa được xác minh. Metadata docs 2026-10-06 không phải prototype version bump; không xác nhận bản nháp hoặc gate mới đã pass. Toàn bộ chi tiết được bảo toàn, gồm chỉnh sửa cảnh quan chưa commit có trước task này; tests cũ không là visual/feel acceptance.
 
 **Snapshot vận hành trước migration:** bản chạy thử cũ dùng một hành vi đã duyệt, không ProbeConfig/flag/metric harness; F8/debug chọn giai đoạn và reset đã được khôi phục, chỉ cho prototype local. Chỉ thị khi đó là dừng A/B, evidence work, hook/Git cleanup và Phase H. Đây là lịch sử, không mở hoặc đóng gate revision mới; budget release và TARGET vẫn theo tài liệu canonical hiện hành.
 
@@ -259,36 +278,67 @@ Reader Testing độc lập theo skill doc-coauthoring kiểm scope/gates, autho
 | V6.2.6 | User từ chối slab solid, bridge clearance và cách đọc tầng đất. |
 | V6.2.7 | Snapshot bản mẫu được ghi trong hồ sơ cũ; visual/feel chưa nghiệm thu, không production base. |
 
-**Trace INPUT-01/CMB-01/MOBAI-01 của revision cũ:** A/B lúc đó mặc định OFF, [báo cáo probe](../../prototypes/VS1_EndToEnd/CHANGELOG.md#phase-e--kết-quả-ab-và-giới-hạn). Cung gameplay vẫn DEFERRED thuộc TARGET P0; chỉ có ranged fixture. Không nối network/backend vào lớp throwaway. G-B nhận findings sau review, không lấy test pass để mở G-L.
+**Trace INPUT-01/CMB-01/MOBAI-01 của revision cũ:** A/B lúc đó mặc định OFF, [báo cáo probe](#prototype-source-retired) (CHANGELOG, mục `phase-e--kết-quả-ab-và-giới-hạn`). Cung gameplay vẫn DEFERRED thuộc TARGET P0; chỉ có ranged fixture. Không nối network/backend vào lớp throwaway. G-B nhận findings sau review, không lấy test pass để mở G-L.
 
-Các anchor dưới đây giữ routing lịch sử cho tài liệu read-only; nội dung thực ở CHANGELOG:
+Các anchor dưới đây giữ routing lịch sử; nội dung thực ở CHANGELOG tại [commit lưu trữ](#prototype-source-retired):
 
 <a id="prototype-technical-history"></a>
 
-[Technical — lịch sử probe](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-technical-history).
+[Technical — lịch sử probe](#prototype-source-retired) (CHANGELOG, mục `prototype-technical-history`).
 
 <a id="prototype-feedback-history"></a>
 
-[Analysis — lịch sử feedback](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-feedback-history).
+[Analysis — lịch sử feedback](#prototype-source-retired) (CHANGELOG, mục `prototype-feedback-history`).
 
 <a id="prototype-map-history"></a>
 
-[Art — layout mock](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-map-history).
+[Art — layout mock](#prototype-source-retired) (CHANGELOG, mục `prototype-map-history`).
 
 <a id="prototype-ui-history"></a>
 
-[Art — UI/rig mock](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-ui-history).
+[Art — UI/rig mock](#prototype-source-retired) (CHANGELOG, mục `prototype-ui-history`).
 
 <a id="prototype-water-history"></a>
 
-[GDD — lịch sử tuning nước](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-water-history).
+[GDD — lịch sử tuning nước](#prototype-source-retired) (CHANGELOG, mục `prototype-water-history`).
 
 <a id="prototype-tooling-history"></a>
 
-[Technical — tooling mock](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-tooling-history).
+[Technical — tooling mock](#prototype-source-retired) (CHANGELOG, mục `prototype-tooling-history`).
 
 <a id="prototype-runtime-history"></a>
 
-[Analysis — runtime và sequencing](../../prototypes/VS1_EndToEnd/CHANGELOG.md#prototype-runtime-history).
+[Analysis — runtime và sequencing](#prototype-source-retired) (CHANGELOG, mục `prototype-runtime-history`).
 
 **LEGACY / SUPERSEDED — feedback prototype 2026-10-05 về địa hình/focus/actor:** vũng Vân Khê chữ nhật dài hơn, có đường đất one-way phía trên để chọn đi khô/lội nước; cầu giữ đường đi solid và nâng mặt nước hình ảnh, không thêm collision dưới nước. Thân đất liền, mặt cỏ/đá lát nông khác nhau; bỏ bờ tam giác và bậc vụn ở quảng trường. Dùng lại rig hình học từ `50f05ed`, cache renderer thay vì dựng mỗi frame; NPC/Sói/Dummy đặt chân đúng support. Hướng dẫn phím world chỉ một panel. Tab/click search thử ±12 u ngang/±6 u dọc; retention ±20/±10, độc lập range/vertical cast nên nhảy không mất focus. Quái có thể crossing ngắn khi recovery, nhưng không bắt đầu windup khi peer quá sát; không slot/token/formation. Đây là mô tả disposable probe của revision cũ, chưa nghiệm thu feel hoặc G-L production. Đất one-way và các vùng số thử ±12/±6, ±20/±10 không phải luật hiện hành; VS-1 giữ nguyên trong migration. Chi tiết/tọa độ lịch sử không chuyển sang docs 1–4.
+
+
+> **Moved historical source audit:** snapshot 2026-10-09, không chứng minh source/runtime hiện hành; TARGET responsibilities ở [Runtime](../02-technical/gameplay-runtime.md#responsibility-matrix).
+
+<a id="source-audit-20261009"></a>
+
+## Source audit 2026-10-09 — baseline 229cc61, read-only
+
+Production `game/` và `backend/` chưa tồn tại. Source gameplay hiện có là VS-1 frozen reference; đã đọc cả 16 C# files, README, package manifest và ProjectVersion. Không sửa source/build/scene/assets. Prototype dùng Unity 6000.5.9f1, Input System 1.20.0/Test Framework 1.4.6; Multiplayer Center trong manifest chưa phải NGO/Transport gameplay implementation. Không suy production dependencies hoặc gates đã đạt từ prototype.
+
+Paths dưới thuộc `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/`. Class/method là **actual**; matrix ghi **proposed responsibilities**, chưa phải classes đã tạo.
+
+| Subsystem | Actual files/classes/methods | Observed behavior | Trạng thái so TARGET / reuse decision |
+| --- | --- | --- | --- |
+| Item definitions/instances | `SliceRules.cs`: `ItemDef`, `Catalog`, `Item` | 15 catalog entries; long Instance/int Count/string Binding/double Quality; `ItemDef.Stack=Gear/Manual?1:99`, chưa đủ enhancement/options | PROTOTYPE-ONLY/PARTIAL; tham khảo data, không copy cap 99 hoặc dùng string Binding thay toàn policy |
+| Inventory/Storage | `Inventory` trong `SliceRules.cs`: `Capacity=30`, `Merge/Fits/Add/Consume`; `Player.Storage Capacity40` | Bag List + equipment Dictionary; compatibility Id/Binding/Quality; copy/preflight; split vượt 99 reuse incoming Instance ID, chưa checked arithmetic/revision | PROTOTYPE-ONLY; cần planner/IDs/quantity validation/revision production |
+| Equipment/stat | `SliceSession.Equip/Unequip/Allocate/Learn/Store`; `Player.Stats` | Local gear swap, một class Sword, manual consume; thiếu current HP/MP bands/ClassChosenLevel/Transfer/Enhancement đầy đủ | PARTIAL prototype; tests mới theo current owner |
+| Shop | `SliceHud.cs` `ShopBuy/ShopSell`, `SliceSession.Buy/Sell` | Buy 1 item/lần; lists riêng; Sell chỉ value>0 và Bách, Q4 binding exception; chưa quantity/grid shop | PROTOTYPE-ONLY/PARTIAL; không port giant Refresh branching |
+| Inventory/UI/context | `SliceHud.DrawInventory/Description/NavigateGrid/ItemActions/Storage` | 6 columns×30 slots, detail/viewport nhỏ; tăng 60 đơn thuần sẽ tràn. Keyboard/mouse chung callbacks nhưng gọi RAM session trực tiếp | PROTOTYPE-ONLY; reuse grid/detail/selection, tách context controllers |
+| Quest definitions/progress/events | `SliceSession.cs` `Quest/Stage/Kills/Objective/AcceptQuest/TurnIn/ObservePosition/Die` | Hardcoded Q1–Q6, một current quest, arrays/ifs/event strings/direct updates; không typed QuestDefinitions hay Q9 concurrent | PROTOTYPE-ONLY; full 12 definitions/runtime NOT IMPLEMENTED |
+| Tutorial grant/ground/recovery | `SliceSession.Grant/TutorialSupply/PickUp/Tick`, `Loot.Eligible` trong `SliceRules.cs` | RAM pendingGrants/Receipts; Q4 áo/sample Tutorial flag, TTL 60 s re-offer DS2Home, owner=1; full bag không claim ground | PARTIAL; durable entitlement/RPC ACL/N recipients NOT IMPLEMENTED |
+| Regular loot/mob credit | `SliceSession.Landed/Die/Drop`; `Mob.QuestTag/QuestDamage/Generation` | Single-player 20% quest; random drops/death receipt RAM, owner=1; 20/60 windows thiếu contributor phase 8 s/N ledger/atomic durable pile; chưa ground snap | PROTOTYPE-ONLY/PARTIAL; admission/credit/snap/transactions cần production implementation |
+| NPC routing/Dev Mode | `SliceSession.Anchors/QuestNpc/Interact/ChooseSword`, `SliceHud.Npc/Dialogue/Marker`; `PrototypePresets.Create`, `SliceHost.ResetPrototype` | Q3 Phong/Q6 Tạ Minh cũ; Diệp Talk nhưng Bow disabled; chưa both-talk gate. F8 preset reset RAM/local pause, chưa durable dev roles | PROTOTYPE-ONLY; rebuild theo Quest owner; presets không thay fresh acceptance |
+| Movement/Jump/Drop | `SliceHost.cs` `Update/FixedUpdate/IsGrounded/BuildMap` | JumpSpeed 12/gravity 2; release clamp vy>4→4; jumpHeld; fall extra .35, coyote .10/buffer .12. Ignored pairs restore crossing/timeout .65; map clear chưa explicit restore trước destroy | PROTOTYPE-ONLY/PARTIAL; bỏ release branch, kiểm buffer/coyote và per-actor reset |
+| Terrain/SpawnGroups | `BlockoutLayout.Surface/Surfaces/MobSupport`, `SliceSession` mob constructor | Ba map; DS1–6 và PROBE DS7/8, strings group/lane/home/activity; natural RearEarth one-way trái current terrain | PROTOTYPE-ONLY; không port old geometry; sources/counts lấy World candidate, chưa eight production roots |
+| Facing/art/death | `CombatController.cs` `Facing=1/TryStart`; `GeometricRig.cs` `Pose`; `SliceHost.RenderPlayer` | Facing giữ qua Idle; torso gần static/weapon rotate; dead-gray full outfit, mob view inactive ngay; chưa 3/4 poses/shadow/current corpse presentation | PROTOTYPE-ONLY; reuse facing concept, presentation mới DOC-ONLY |
+| Player combat executors | `CombatController.InRange/Witness/TryStart/Resolve/Hit`, `Rules` skill profiles | Arc front cone, Line width0,6/caster-order; snapshot targets start; old Bow spread powers0,9/0,8/0,7 và Sword-only weapon admission; `Hit` chưa StatusController | Frozen reference, **không current implementation**. Primary/propagation C0 phải dựng/test riêng; không copy shape hoặc old powers |
+| Input/combat tests | `CombatController.Press/Release/Tick`, `DomainTests/InputBehaviorTests`, `InputPhysicsTests`, `ContinuousRouteTests`, `SliceRouteProbe` | 1/2/3 vừa select vừa execute; HurtPlayer clear focus; variable-jump test đòi hold apex>tap+.5; route releaseJumpAt/Q2.dropped/Tạ Minh | Historical tests, không current acceptance; cần select-only/dead-focus/fixed-jump/new-route tests |
+| Persistence/online | Không Java/SQL/backend handler/production RPC; `WorldRevision` chỉ map render | RAM HashSet receipts/pending Dictionary; chưa inventory revision, serializer, login/ticket/lease/DB save | **NOT IMPLEMENTED / DOC-ONLY**; RAM PASS không chứng minh G-N/G-D |
+
+**Recovery re-audit 2026-10-09:** source hiện tại không đổi so snapshot consolidation; đọc lại CombatController/SliceRules/SliceSession/SliceHost và đối chiếu hash toàn source. Không có production handler để refactor ngay. Coding task dựng base nhỏ sau G-B/Pha R, dùng paths trên làm reference và review trước port; [vertical slices](../04-production/roadmap.md#consolidation-slices) không invent existing filenames.

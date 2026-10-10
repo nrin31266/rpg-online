@@ -106,19 +106,26 @@ Nếu cấp đích không tăng, từ chối trước khi tiêu gì; cấp chuy�
 
 Tinh Hoa luôn tính từ cấp đích sau commit, không copy giá trị cộng từ nguồn. Không bán nguồn trong cùng giao dịch. Evidence chi phí tại [Playtest & Balance](../04-production/playtest-and-balance.md#economy-analysis).
 
-**Luồng đồ rơi:** Vàng/nguyên liệu/Bình/Tinh Thạch là các lượt roll độc lập; trang bị dùng **một roll loại trừ giữa các phẩm chất**. Một kill có thể cho Vàng + nguyên liệu + đá + đồ, nhưng không roll hai phẩm chất trang bị. Tỷ lệ/số lượng là TEST/TUNABLE; ngữ nghĩa dưới đây là baseline triển khai, LOOT-01 còn kiểm tuning/kinh tế.
+<a id="regular-loot-outcome"></a>
 
-| Channel | Normal | Linh Biến | Boss (một shared pile) |
+**Luồng đồ rơi — USER-APPROVED direction:** mỗi Normal/Linh non-boss death tạo **0..1 regular physical outcome** trong shared world, không nhiều independent regular channels. Gold/EXP riêng, không tính cap. Roll q có item hay None, nếu có chọn một category trong Material/Potion/Tinh Thạch/Gear rồi payload phù hợp source. Một stack quantity>1 vẫn là một outcome; unique gear quantity1. Không dùng fixed-order first-success khiến category cuối bị bias. q/weights/quantities/rarity exact **TUNABLE**, chưa lấy rates cũ làm production weights.
+
+| Channel | Normal | Linh Biến | Boss — giữ một shared pile |
 | --- | --- | --- | --- |
-| Gold / EXP | 100% budget theo mobL | Base × 3 | **0 direct Gold / 0 EXP** |
-| Trade Material | 30%, 1 | 100%, 1–2 | — |
-| Potion | 4%, 1; tier theo mobL | — | 50%, III 2–3; HP / MP 50–50 |
-| Tinh Thạch | 8%, 1 | 100%, 1 | Guaranteed 5–8 |
-| Gear exclusive | Common 4 / Uncommon 1 / Rare 0,1 / None 94,9% | Uncommon 30 / Rare 6 / Epic 0,5 / None 63,5% | Rare 40 / Epic 8 / None 52%, tối đa 1 |
-| Hồi Sinh Phù | — | — | 30%, 1 |
-| Thỏi Vàng | — | — | Guaranteed 3–5, stack theo [Inventory contract](#inventory-contract), sell 250 / thỏi |
+| Gold / EXP | Budget theo mobL, eligibility bên dưới | Base ×3; luôn có Gold budget cho eligible recipient, physical roll riêng | **0 direct Gold /0 EXP** |
+| Regular physical | q_N, chọn tối đa một Material/Potion/Stone/Gear hoặc None | q_L > q_N, quality/rarity profile tốt hơn; vẫn tối đa một outcome | Không áp non-boss cap |
+| Boss Potion | — | — |50%, III2–3; HP/MP50–50 |
+| Boss Stone | — | — |Guaranteed5–8 |
+| Boss Gear | — | — |Rare40/Epic8/None52%, tối đa1 |
+| Hồi Sinh Phù | — | — |30%,1 |
+| Thỏi Vàng | — | — |Guaranteed3–5, sell250/thỏi |
+| Personal quest RNG | Optional tối đa một món/eligible recipient/active mob-collection objective khi success | Độc lập regular outcome, không shared competition | Q12 credit giữ, không thêm quest loot channel |
 
-Boss Thỏi chỉ thành currency khi nhặt + bán NPC, không auto-credit / không shop buy. Boss không dùng normal level-penalty. Counts uniform inclusive; channels independent, gear exclusive. Q12 Gold turn-in riêng một lần / character, không thêm pile. Linh gear band theo base mob level ở source table; cùng một mob dùng một Linh reward profile.
+Linh Gold guarantee là **reward profile/budget**, không tự minimum1: công thức floor theo contribution/level vẫn có thể cho recipient lượng0. Nếu muốn minimum1 phải review budget riêng (**OPEN**), không đổi rounding. Linh Potion membership là pool direction, exact weight có thể0 hoặc >0 cần tune; không tự suy tier income đã được giữ.
+
+**Boss unchanged:** counts uniform inclusive, channels independent, gear exclusive. Thỏi thành currency sau pickup+Sell, không auto-credit/shop buy. Không normal level penalty; Q12 turn-in Gold riêng một lần, không pile thêm. Source/band/slot pool giữ bảng bên dưới.
+
+**SUPERSEDED economic reference:** Normal material30%×1/potion4%×1/stone8%×1/gear5.1%; Linh guaranteed material1–2 + stone1 + gear36.5% là model cũ, không active production probabilities. Before/After EV và income risks thuộc [Playtest](../04-production/playtest-and-balance.md#loot-model-transition). Không tự retune shop800/stone, enhance/transfer cost hoặc EXP để bù model mới.
 
 <a id="farm-rewards"></a>
 
@@ -133,7 +140,7 @@ BaseReward đã có variant multiplier. **Không normalize / redistribute** ph�
 
 Áp riêng từng recipient, snapshot trước level-up, đối xứng cả player quá cao lẫn quá thấp; không có tầng nửa thưởng hay gate RNG theo level. Lv 20 EXP luôn0, Gold/loot/Journey vẫn hợp lệ. Quest/supply/evidence xét riêng các mục liên quan, vẫn làm quest muộn. Reward eligibility hiển thị tooltip/reject feedback khi cần, không spam trên mọi nameplate; level/quest/Linh/Boss cues giữ vai trò riêng.
 
-**Physical loot Normal / Linh Biến:** roll một shared set / death, không personal sets. TopDamage là highest ActualHpLost trên entire life ledger, tie characterId; nếu TopDamage factor = 0 thì **không roll regular physical set**, không fallback người thứ hai. TopDamage đủ điều kiện thì roll profile bình thường nguyên quantity; không gate RNG theo level. TopDamage absent / dead không chuyển priority; owner window có thể không ai nhặt, deadline vẫn chạy. Quest tutorial supply tách khỏi regular set.
+**Physical loot Normal / Linh Biến:** roll tối đa một shared regular outcome / death, không personal sets. TopDamage là highest ActualHpLost trên entire life ledger, tie characterId; nếu TopDamage factor = 0 thì **không roll regular physical set**, không fallback người thứ hai. TopDamage đủ điều kiện thì roll profile bình thường nguyên quantity; không gate RNG theo level. TopDamage absent / dead không chuyển priority; owner window có thể không ai nhặt, deadline vẫn chạy. Quest tutorial supply tách khỏi regular set.
 
 | Từ deathUtc | Normal / Linh Biến 60 s | Boss 90 s |
 | --- | --- | --- |
@@ -158,7 +165,7 @@ Eligible-FFA cố ý cho người đến sau nhặt đồ level-hợp lệ, khô
 | Xích Thạch Linh Lv 16 | II / 6 slots | III | Xích: Khoáng Xích Nham (9); Huyền: Mảnh Cổ Ấn (12) | Normal hoặc Linh |
 | Cổ Môn Vệ Binh Lv 20 | III / 6 slots | III | Huyền: Mảnh Cổ Ấn (12) | Normal hoặc Linh |
 | World Boss Lv 20 | III / 6 slots | III | Thỏi Vàng theo channel table | Boss |
-| Q3 / Q4 / Q6 / Q7 / Q8 / Q10 / Q11 | Quest exceptions trong catalog | Tutorial supplies theo quest | Collection quest-bound riêng theo Quest owner, không nhập chung farm material | Guaranteed, không loot roll |
+| Quest source exceptions | Q3/Q4/Q6/Q7 và restored fragments Q11 là staged/tutorial supply | Theo Quest owner | Q8 Dấu/Q10 Vật Chứng/Q11 material là personal Collect RNG, khác farm material | Mob collection RNG; tutorial/NPC grant deterministic |
 
 Quest evidence không dùng Trade Material đã farm; tooltip material “Vật liệu giao dịch — có thể bán”. Tinh Thạch không có tier riêng. Source Nấm / Sói Lv 4 loại Weapon ở **mọi map**, không dùng MapId để thay slot pool.
 
@@ -173,7 +180,7 @@ Inventory ban đầu **60 slots — LOCKED**, Storage giữ 40. Không expansion
 
 Turn-in mô phỏng consume đúng collection items rồi merge reward, tính X ô còn thiếu trên net inventory. Thiếu thì báo “Cần X ô trống trong hành trang”, giữ READY_TO_TURN_IN; không consume vật phẩm / trao một phần reward / set Completed. Vàng / EXP / story / Journey không cần slot; retry không nhận lặp.
 
-Yên Thảo bán Food/HP/MP Potion; Bách Luyện bán Common I/II, Tinh Thạch **800 Vàng**, General Sell/Enhance/Transfer và Q4 sample; Mộc An sở hữu Utility Shop Hồi Sinh Phù/Tẩy Mạch Phù cùng Storage40/Rest. Giá/effect hiện hành giữ nguyên. Q9 không gear-exclusive, skip không mất nâng slot. Một tiền tệ Vàng. Bag Sort / protection gear P1; validation inventory P0.
+Yên Thảo bán Food/HP/MP Potion; Bách Luyện bán Common I/II, Tinh Thạch **800 Vàng**, General Sell/Enhance/Transfer và Q4 sample; Mộc An sở hữu Utility Shop Hồi Sinh Phù/Tẩy Mạch Phù cùng Storage40/Rest. Giá/effect hiện hành giữ nguyên. Q9 không gear-exclusive, skip không mất nâng slot. Một tiền tệ Vàng. Split/Sort-Merge/Discard có UX/policy trong [inventory contract](#inventory-ux-policy), priority theo Roadmap, chưa implementation; gear protection mở rộng vẫn P1.
 
 > **Đọc sâu:** [Playtest & Balance — kinh tế và enhance](../04-production/playtest-and-balance.md#economy-analysis)
 
@@ -212,15 +219,15 @@ Với cược 1.000 mỗi người: pot 2.000; thắng nhận 1.800, phí 200; h
 
 QuickHP và QuickMP chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Food dùng bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. QuickHP/QuickMP chỉ dùng bình, không chọn skill.
 
-Q6 hiển thị glyph QuickMP theo binding probe. Interact tác động ngay ứng viên NPC/loot riêng, không thay CombatFocus. [Approach không kích hoạt EdgeExit](combat-and-character.md#pending-cast).
+Q6 hiển thị glyph QuickMP theo binding probe. PrimaryAction dispatch theo ActiveFocus hiện tại, không active combat focus và loot selection song song; input/menu thuộc Runtime. [Approach không kích hoạt EdgeExit](combat-and-character.md#pending-cast).
 
 ## Food state và Potion feedback
 
 Food icon cho biết active/absent, remaining duration, cảnh báo gần hết và thông báo expiry. Thiếu MP nêu reason rõ và gợi chuẩn bị Food/bình phù hợp; không tự mua hay dùng Food. Warning threshold còn TUNABLE qua usability review. Hồi phục Potion đã accepted do Game Server phát ngay; reject đầy HP/MP/dead/quota/CD không tiêu item. Persistence chi tiết thuộc [Online & Persistence](../02-technical/online-and-persistence.md#potion-durability).
 
-## Ngoại lệ kinh tế reservation Q8
+## Natural Linh budget
 
-[World Q8 policy](world-and-content.md#q8-bounded-path) khóa một shared economic budget/receipt, không roll Linh mới mỗi credit retry. Regular random Linh vẫn dùng profile trong bảng trên. Forced Q8 retry không sinh thêm Rare/EXP/Gold/Journey budget, không nhân loot theo số requester. Entitlement/recovery cụ thể phải qua Q8-01/G-D; mọi thay đổi profile ngoài ngoại lệ này cần review design.
+Mỗi natural Linh life dùng một death budget theo profile; quest không force/retry roll hoặc tạo budget thêm. Quest RNG outcome/entitlement độc lập, recovery không reroll regular loot hay thêm Gold/EXP/Journey. World cap/lifecycle tại [World](world-and-content.md#linh-bien).
 
 <a id="a03"></a>
 
@@ -248,16 +255,16 @@ Food không hồi HP/MP khi actor đã chết. Mất phiên xóa Food runtime; r
 
 Compatibility key gồm template identity, character/QuestId/objective binding và mọi state có nghĩa gameplay (rarity/options/enhancement nếu applicable). Khác binding không merge. Unique equipment luôn là instance riêng, quantity 1; không thêm durability nếu chưa có. Stack identity còn sống ổn định; khi merge, receipt ánh xạ entitlement/source tới stack đích + delta quantity, không hứa giữ tất cả incoming instance IDs như nhiều physical instances cùng ô.
 
-| Classification | Chiếm ô? | Stack | Sell | Trade | Manual Drop | Death loss | Persistence | Server owner |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Stackable consumable — Food/Potion/phù | Có | Compatible, technical bound | Theo sellValue/policy | P0 không có Trade | Không thêm manual-drop feature P0 | Theo recovery hiện hành; không thêm loss | Quantity/location/binding | Inventory mutation; Use handler riêng |
-| Stackable material/Tinh Thạch/Thỏi | Có | Compatible, technical bound | Catalog hiện hành | P0 không có Trade | Chưa có handler production; không tự mở | Không thêm loss | Stack + quantity | Inventory; Sell/Storage riêng |
-| Quest-bound collection stack | Có, ô thường | Cùng quest/objective/identity mới merge | Cấm, reason nhiệm vụ | Cấm kể cả khi Trade được thêm | Cấm | Không mất | Item/binding + entitlement claim receipt | Inventory + Quest validation |
-| Normal item referenced by quest — Nấm Sương Q4 | Có | Compatible theo binding của sample; không merge nhầm bản thường trước sell | **Có** ở đúng Bách Luyện/step; gỡ temporary restriction sau action theo quest | P0 không có Trade | Tutorial restriction tới bước hợp lệ; không feature drop mới | Không mất quyền tutorial | Item và receipt `ItemSold` | Sell handler; quest chỉ observe commit |
-| Unique equipment instance | Có khi bag; equipped nằm ngoài bag | Không; enhancement/rarity/options riêng | Chỉ unequipped và policy cho phép; Mộc/bound cấm | P0 không có Trade | Bound cấm; không tự thêm normal-drop | Không đổi item-loss rule | Instance/location/slot/state | Equipment + Inventory |
-| Bound manual/power item | Có tới khi học | Receipt grant tối đa một/quyền học; giữ quantity 1 mỗi bound learning instance, không phải cap consumable 99 | Cấm | Cấm | Cấm | Không mất | Instance/grant/learn receipt | Learn handler consume + learned SkillId atomic |
-| Non-world UI-only feedback | Không | Không inventory quantity | Không | Không | Không | Không applicable | UI selection không bền; objective action receipts nếu cần | UI chỉ đọc; **không dùng nhóm này thay collection item** |
-| Currency — Vàng | Không | Numeric balance bound riêng | Không item để bán | Không thêm Trade | Không ground coin item | Theo contract hiện hành | Balance + transaction receipt | Shop/reward mutation; Spring commit |
+| Classification | Chiếm ô? | Stack | Sell | Trade | Discard | Manual Drop | Death loss | Persistence | Server owner |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Stackable consumable — Food/Potion/phù | Có | Compatible, technical bound | Theo sellValue/policy | P0 không có Trade | Theo explicit canDiscard, confirmation | Không thêm manual-drop feature P0 | Theo recovery hiện hành; không thêm loss | Quantity/location/binding | Inventory mutation; Use handler riêng |
+| Stackable material/Tinh Thạch/Thỏi | Có | Compatible, technical bound | Catalog hiện hành | P0 không có Trade | Theo explicit canDiscard, confirmation | Chưa có handler production; không tự mở | Không thêm loss | Stack + quantity | Inventory; Sell/Storage riêng |
+| Quest-bound collection stack | Có, ô thường | Cùng quest/objective/identity mới merge | Cấm, reason nhiệm vụ | Cấm kể cả khi Trade được thêm | Cấm — nhiệm vụ | Cấm | Không mất | Item/binding + entitlement claim receipt | Inventory + Quest validation |
+| Normal item referenced by quest — Nấm Sương Q4 | Có | Compatible theo binding của sample; không merge nhầm bản thường trước sell | **Có** ở đúng Bách Luyện/step; gỡ temporary restriction sau action theo quest | P0 không có Trade | Cấm trong tutorial restriction | Tutorial restriction tới bước hợp lệ; không feature drop mới | Không mất quyền tutorial | Item và receipt `ItemSold` | Sell handler; quest chỉ observe commit |
+| Unique equipment instance | Có khi bag; equipped nằm ngoài bag | Không; enhancement/rarity/options riêng | Chỉ unequipped và policy cho phép; Mộc/bound cấm | P0 không có Trade | Unequipped/unprotected mới theo canDiscard; Mộc/bound cấm | Bound cấm; không tự thêm normal-drop | Không đổi item-loss rule | Instance/location/slot/state | Equipment + Inventory |
+| Bound manual/power item | Có tới khi học | Receipt grant tối đa một/quyền học; giữ quantity 1 mỗi bound learning instance, không phải cap consumable 99 | Cấm | Cấm | Cấm | Cấm | Không mất | Instance/grant/learn receipt | Learn handler consume + learned SkillId atomic |
+| Non-world UI-only feedback | Không | Không inventory quantity | Không | Không | Không applicable | Không | Không applicable | UI selection không bền; objective action receipts nếu cần | UI chỉ đọc; **không dùng nhóm này thay collection item** |
+| Currency — Vàng | Không | Numeric balance bound riêng | Không item để bán | Không thêm Trade | Không item | Không ground coin item | Theo contract hiện hành | Balance + transaction receipt | Shop/reward mutation; Spring commit |
 
 Personal quest ground drop là **delivery/ownership**, không một ItemKind hay một boolean `questItem` dùng cho tất cả. Tách item policy/binding khỏi entitlement/representation; Q4 sample được bán không mâu thuẫn với collection quest-bound cấm bán. **BASELINE implementation đề nghị:** quest-bound collection nằm trong bag, không gửi Storage P0 để tránh ambiguity về "đang mang"; supply gear/storage theo policy riêng. Pending entitlement không chiếm ô cho tới claim, nhưng cũng không được tính là đã có item. Normal quest-referenced nghĩa item có khả năng giao dịch theo domain; không khôi phục hệ Trade đã DROP P0.
 
@@ -282,3 +289,17 @@ Một Shop UI Buy/Sell đọc catalog và capabilities của NPC, không mỗi N
 | Lâm Bá/hai mentors/Hạo Vũ | Không item vendor mới; manuals chỉ quest grants | Không General Sell | Theo NPC owner |
 
 Sell subsets ở Yên/Mộc là engineering recommendation để giữ nghề và reuse Buy/Sell tabs; không nerf giá hay đổi item policy. Bách vẫn bán được toàn bộ đồ hợp lệ, không buộc người chơi quay từng vendor. Catalog revisions/vendor capabilities server-owned; wrong vendor/template/step/quantity fail trước mutation. Hồi Sinh/Tẩy Mạch chỉ có một canonical Buy owner Mộc; Boss vẫn có thể drop Hồi Sinh như channel cũ. Chuyển catalog không regrant/migrate giá hoặc tạo utility item mới.
+
+<a id="inventory-ux-policy"></a>
+
+## Inventory operations — CURRENT DIRECTION, policy server-owned
+
+Buy/Sell chọn quantity dương, preview unit/total server price/value; server revalidate stock/catalog/rights/quantity/currency/capacity/revisions và checked arithmetic. Partial stack sale trừ đúng amount; mutation currency+quantity+receipt atomic, retry không bán/mua hai lần. Uncertain ACK query receipt trước command mới.
+
+Split chọn k trong1..Q−1, cần empty slot: source quantityQ−k, stack mới quantityk với **stack ID mới**, cùng template/binding/state. Không clone unique gear/manual hoặc source entitlement receipt. Receipt ghi quantity/location mapping; total quantity bảo toàn, overflow/capacity/conflict reject toàn lệnh. Merge lại chỉ compatibility key đầy đủ.
+
+Sort/Merge do user yêu cầu, không auto-sort mỗi pickup; merge compatible trước/while sort rồi stable deterministic ordering. Unique gear khác state không merge vì cùng icon. Selection bám stable ID; nếu selected source stack bị merge away, receipt/view mapping tới surviving stack, không clamp index sang món khác. Invalid selection clear có reason; pending UI callback cũ không dispatch.
+
+Discard là **permanent destruction**, chọn món/quantity và confirm, server kiểm canDiscard/protection/binding/equipped/revision rồi destroy+receipt atomic. Không GroundItem spawn. Quest/protected/Mộc/tutorial-bound/manual bị chặn với reason. White background không là permission. Manual Drop to world là concept khác, chưa mở P0. Exact canDiscard defaults cho ordinary catalog và priority P0/P1 **OPEN authoring/scope**; recommendation ordinary unprotected bag items enabled, trade-off permanent loss cần UX confirm; không tự mở protected.
+
+Inventory60/Storage40 giữ; 60/60 compatible merge vẫn nhận; capacity fail không đổi valid GroundItem focus, còn expired/claimed/rights/range/generation fail thì invalidation theo [Runtime](../02-technical/gameplay-runtime.md#active-focus). UI details thuộc Runtime, visual thuộc Art, scheduling thuộc Roadmap.

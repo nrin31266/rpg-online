@@ -6,6 +6,8 @@
 
 Nguồn hiện hành: [documentation map](../README.md). Các con số, claim và đường triển khai bên dưới mô tả revision lịch sử.
 
+> **SUPERSEDED bởi phase 2026-10-10:** two-button Execute/Interact, Q8 force/reservation, Q8/Q10 ordinal evidence, Q11 old quotas/mob fragments/three Xích seals và multi-independent regular non-boss loot trong trace cũ không còn authority. Đọc [PrimaryAction](../02-technical/gameplay-runtime.md#active-focus), [Quest RNG/Q11](../01-design/quests-and-narrative.md#quest-collection), [natural Linh](../01-design/world-and-content.md#linh-bien), [loot](../01-design/items-and-economy.md#regular-loot-outcome). Bảng/số lịch sử giữ nguyên để truy vết.
+
 ### Bảng dữ liệu gốc lịch sử (LEGACY seed manifest — 28 cụm / 66 điểm sinh quái)
 
 > [!NOTE]
@@ -301,3 +303,61 @@ Hồ sơ feedback và lỗi của mock được giữ tại [Roadmap](production
 
 
 **Legacy provenance compact:** NSO reference đã khai thác, không current authority. Trace từ `research/SRC NSOACE FIX/`: `Char.initMenu/finishTask` (NPC turn-in / bag checks), equip / use callbacks và `AbilityFromEquip` (onboarding / +4), `Mob.dead` (quest assist / loot input), Part / TileMap (modular / one-way). Availability instances là historical input; Boss hiện hành shared world. Không dùng reference chứng minh crash atomicity, rates hoặc balance. Lịch sử chi tiết nằm trong Git; pattern đã nhận là design Huyền Lộ.
+
+
+> **HISTORICAL / SUPERSEDED một phần:** Decision Trace 2026-10-09 bên dưới giữ nguyên evidence lúc recovery, không current input/quest authority. Q8/Q10 normal kill quotas, Q11 quota/mob fragments và two-button input đã bị thay tại [Quest](../01-design/quests-and-narrative.md#quest-gameplay-review) / [Runtime](../02-technical/gameplay-runtime.md#active-focus). Git không chứng minh approval.
+
+<a id="combat-decision-trace"></a>
+
+## Decision Trace — lập trước khi sửa Combat, 2026-10-09
+
+Git chứng minh nội dung và thời điểm ghi, không chứng minh user đã duyệt từng câu. `APPROVED` trong draft là phân loại do tài liệu ghi; không có transcript quyết định tương ứng trong Git. Chỉ đạo trực tiếp ở prompt recovery hiện tại là approval mới cho target-based propagation và quest/service corrections. Không reset về `229cc61`.
+
+| Decision | Historical evidence | Current canonical trước sửa | Conflict | Recommendation |
+| --- | --- | --- | --- | --- |
+| Kiếm Arc/Line | `2080dd8`, `docs/design/HUYEN_LO_GDD.md`, bảng kỹ năng Lv5/Lv17 đã có Arc120°/1,7 và Line5,5/rộng≈0,6; `ed73c73` chuyển đường dẫn | Combat, Bộ kỹ năng giữ hình học đó với stats mới | Có từ import đầu tiên; không tìm được bản thảo trước import hoặc approval riêng | Không gọi là Codex mới tự thêm trong migration. Chỉ đạo hiện tại thay damage geometry Kiếm bằng primary + proximity; giữ stats hiện hành, không phục hồi stats import |
+| Primary với geometry và falloff | `46006c4` / nhánh `63bbd22`, `docs/design/1_HUYEN_LO_GDD.md`, CombatFocus: Arc/Line chỉ cần victim, Line intersections gần→xa; `af7e23c` giữ câu này | Focus có thể không bị hit; primary chưa giữ vị trí power đầu | Target intent và geometry không có một primary bắt buộc thống nhất | Primary hợp lệ bắt buộc cho Kiếm; primary index0, secondary gần primary theo thứ tự ổn định là engineering recommendation, không recovered lock |
+| Từ khóa target-based | Pickaxe `target-based`: `af7e23c`, GDD CombatFocus, thêm “target-based authoritative combat + logical geometry validation”; `229cc61` chuyển sang owner mới | Combat/Runtime kiểm hitbox–hurtbox/front/Arc/Line | Tên target-based vẫn ghép shape gate cũ | Tách acquisition, propagation và presentation. Không VFX collider hoặc PlatformID/SpawnGroup damage gate |
+| AUTO/EXPLICIT/Pending | `00e9d9c`, GDD CombatFocus; `00d2369`, Technical input; `34829d5`, Analysis ghi approved input/cadence. `af7e23c` sửa select-only/Execute riêng | Select riêng, Execute one-shot; pending/buffer/dead focus | Rule hold-repeat/123-execute trong checkpoint đã superseded | Giữ current input/snapshot/lifecycle; không phục hồi hold-repeat vì nằm ở commit cũ |
+| Cung batch/Hàn/status | `46006c4`, GDD Ba hit Cung/timing/status; parent của `af7e23c` và `af7e23c` đều giữ ABC/ABA/AAA, invalid index drop, primary Evade vẫn nổ, cache fail | Cùng logical resolve, no retarget/status dedup | Không có căn cứ bỏ các invariants này khi sửa Kiếm | Giữ; làm rõ batch khác primary-gated AoE, mỗi index revalidate riêng |
+| Secondary proximity khác tầng | `46006c4`, `research/notes/NSO_WORLD_FARM_TARGETING_RESEARCH.md` §3B/§5; Modernization §5 đề xuất X3–3,5/Y2,2 u | Geometry quanh caster; research chưa là authority | Research phỏng NSO không chứng minh Huyền Lộ duyệt exact units | Current user xác nhận gần primary/cross-height nếu eligible; numeric bounds chỉ OPEN/PROBE. So profile hẹp và rộng, không đổi power để che phạm vi |
+| NSO source bounds | Local `research/SRC NSOACE FIX/src/main/java/com/nsoz/model/Char.java` khoảng6347 dùng X±100/Y±100; khoảng7656/7861 dùng X±100/Y±50. Client decompile path trong notes nằm ngoài repo, chưa xác minh trực tiếp | Rationale đã cảnh báo khác nhánh | Không có một ngưỡng dọc duy nhất có thể copy hoặc suy PPU=32 là conversion đã duyệt | Ghi branch-specific research. Không khóa 2,2 u như recovered rule; không port client target lists/auto-train/physics cũ |
+| LoS/facing/behind-player | Research Modernization §8 gọi B là LOCK CANDIDATE; `46006c4`/`af7e23c` ghi A/B prototype, không PlatformID gate | Front gate player melee; A/B OPEN | Không chứng minh wall hoặc behind-player secondary đã approved | Recommendation auto-face primary lúc start, không front-filter secondary; compare A/B với SolidWall only, one-way bỏ qua. Final policies phải có probe |
+| Ownership authority/visual | `46006c4` GDD timeline và Technical; `229cc61` migration | Dedicated realtime, Spring durable; visual-only ranged/result per target | Không có conflict cần rollback network | Giữ origin/source snapshot, resolve clock, cost/cancel, damage/status; main VFX/impact/status đọc result |
+| Quest counts/source | `229cc61` và staged consolidation giữ 3/1/5/4+Linh/6/3-3-4/6+Boss; whitelist còn trong Quest/Runtime/Playtest | Counts và source proposals chưa duyệt ở lượt trước | Prompt hiện tại duyệt counts mới và MobIdentity; staged canonical không còn đúng | Áp trực tiếp Q3=4,Q4=5,Q5=8,Q8=8+Linh,Q10=10,Q11=3/3/4,Q12=10+Boss; groups chỉ placement. Special actor/landmark explicit |
+| NPC utility | Staged Quest/Items ghi Yên giữ HồiSinh/TẩyMạch, Mộc Storage/Rest | Ownership cũ và recommendation cũ | Prompt hiện tại chuyển utility sang Mộc | Yên Food/HP/MP; Bách gear/stone/Sell/Enhance/Transfer; Mộc Storage/Rest/utility hiện có. Giá/effect không đổi |
+
+Không tìm được bằng chứng user approval riêng cho Arc120°, Line width0,6, X/Y proximity, behind-player hoặc SolidWall mode. Lịch sử chỉ đủ truy nguyên drift; quyết định mới không được gắn nhãn “đã khôi phục user lock” cho các số chưa xác nhận.
+
+
+
+### TTK và group clear — mô phỏng lịch sử 24 seeds, SUPERSEDED cho targeting/pacing
+
+**HISTORICAL ASSUMPTIONS, không executor requirement:** chưa rerun sau sửa primary-proximity/counts; không dùng TTK dưới để nghiệm thu revision mới. Phép tính stats/gear và cost/CD vẫn DERIVED từ values không đổi; thuận lợi ideal target-set không chứng minh distribution thực. Python 3 tạm trong `/tmp`, 24 hạt giống 0–23; bước đồng hồ 0,01 s. Sát thương làm tròn half-up; né/chí mạng/random theo design owner; một Bỏng/mục tiêu, refresh giữ nhịp tick. Mọi mục tiêu đứng trong hình đòn hợp lệ; Kiếm ở ≤1,2 u, Cung ≥4 u để có nội tại Lv 13. Chụp nguồn lúc cast; lên lịch hit +0,12/0,14/0,16/0,18 s, index mất hiệu lực không chuyển đích. Spread ABC/ABA/AAA theo số mục tiêu sống lúc bắt đầu; giới hạn Line/nổ theo owner tại revision cũ. Đủ bộ Common +0, Food đúng bậc;
+
+Bình MP chỉ khi thiếu chi phí, hồi chiêu 8 s. Chưa tính phản công, Bình HP, chết, đi đường, túi/UI/mạng hoặc hụt hình đòn; chưa mô phỏng Đóng Băng/Làm Chậm vì không có AI phản công. Không nhân hệ số 0,85 của mô hình cũ. “Luân phiên” giả định người chơi chọn rồi Execute theo ưu tiên S3→S2→S1 khi sẵn, **không phải auto-combat hay lặp khi giữ phím của game**. Hàng Lv 17 giả định đã hoàn Q11/học S3, không dùng tính độ khó Q11.
+
+| Lv / mob / số victim | Chỉ S2 Kiếm / Cung, s | Luân phiên Kiếm / Cung, s |
+| --- | --- | --- |
+| 5 / mob Lv 4 / 1 | Khóa | 1,4 / 1,37 (chỉ S1) |
+| 5 / mob Lv 4 / 3 | Khóa | 5,22 / 5,22 (chỉ S1) |
+| 5 / mob Lv 4 / 4 | Khóa | 7,09 / 7,09 (chỉ S1) |
+| 10 / mob Lv 10 / 1 | 7,42 / 5,26 | 3,8 / 3,24 |
+| 10 / mob Lv 10 / 3 | 7,94 / 17,11 | 6,66 / 10,46 |
+| 10 / mob Lv 10 / 4 | 14,92 / 22,81 | 9,32 / 14,12 |
+| 17 / mob Lv 16 / 1 | 7,24 / 5,26 | 3,16 / 2,7 |
+| 17 / mob Lv 16 / 3 | 7,83 / 16,96 | 5,4 / 7,86 |
+| 17 / mob Lv 16 / 4 | 14,39 / 22,58 | 6,69 / 10,41 |
+| 20 / mob Lv 20 / 1 | 9,74 / 7,25 | 4,43 / 3,86 |
+| 20 / mob Lv 20 / 3 | 10,27 / 22,92 | 6,78 / 11,22 |
+| 20 / mob Lv 20 / 4 | 19,45 / 30,38 | 8,98 / 14,33 |
+
+Các lượt ngắn trên không dùng Bình MP vì pool đầu còn đủ; **không suy khả năng đánh lâu dài từ số bình 0**. Kiếm S2 rõ lợi thế ở ba mục tiêu; bốn con vượt cap 3 cần lượt thêm. Cung AAA nhanh hơn Kiếm S2 trên một mục tiêu nhưng dọn cụm chậm hơn, bù bằng tầm/kite. Đánh đơn cuối game khi luân phiên thuận lợi có thể dưới mục tiêu 4–8 s; phải kiểm đồ chậm hơn mốc cấp, trước Q11, thời gian đổi bãi và người chơi thật trước chỉnh HP quái.
+
+**Boss sensitivity mới, chưa trận Boss:** 120 s bấm thuận lợi cùng mô hình, target DEF25/EVA60 và HP rất lớn để đo dòng sát thương; Common III+0 cân bằng. Kiếm284,16 DPS, Cung318,30 DPS, MP dùng8,0417/8,025 mỗi giây; 129/128 S1,129 S2,20 S3 trong cửa sổ (cast cuối có thể resolve ngoài120 s), Kiếm dùng1 Bình MP, Cung0 do pool đầu. Burn giữ, target không phản công. Tổng602,46 DPS; nhân tỷ lệ ra đòn hữu hiệu50/65/75% → Boss32.000 khoảng106/82/71 s.
+
+Đây là sensitivity tính từ hai dòng độc lập, **không mô phỏng vừa né vừa dùng tài nguyên**; food/pool đầu khiến nhu cầu bình dài hạn khác. Biên65–75% có thể nhanh hơn target90–150 s: ghi rủi ro BOSS-02/BAL-02, giữ BossHP/ATK và telegraph hiện hành tới playtest, không gọi đã đạt target.
+
+**PvP retune audit — arithmetic, chưa duel:** MaxHP Cung mới738 so Kiếm844,8 ở fixtureLv20; Bình III hồi442,8/506,88 HP. Ba lầnHP có trần tổng1.328,4/1.520,64 hồi (thực tế clamp/HP đầy/quota làm thấp hơn), Food III trung bình14,76/16,896 HP/s. Cadence mới tăng pressure nhưng gear/HP/Food/Potion thay cả sống sót lẫn hồi phục; bảng PvP TTK cũ không còn đủ. Hệ số0,20, quota3+3, CD8 s, Băng Hàn move-only, Bỏng immune, cược/payout và 120 s DRAW giữ nguyên.
+
+Cần duel cả chiều, VIT/INT/cực đoan/gear-lag và tần suất hòa trước retune hệ số hoặc economic stake.

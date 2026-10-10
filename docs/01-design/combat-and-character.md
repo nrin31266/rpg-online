@@ -133,15 +133,15 @@ Tầm đánh trong skill profiles là tầm thực, không cộng thêm nội t�
 
 | Thao tác / trạng thái | Luật chọn và giữ mục tiêu |
 | --- | --- |
-| NONE + `ExecuteSelected` | Xét kỹ năng đang chọn; ưu tiên mục tiêu cục bộ đánh được ngay, rồi mục tiêu tới được bằng tiếp cận ngang có giới hạn. Không quét toàn map hoặc chọn melee khác tầng không tới được. |
-| AUTO | Giữ mục tiêu đang hợp lệ; quái khác gần hơn không tự chiếm focus. Khi mục tiêu bị xóa, lần Execute mới mới được tìm lại. |
+| NONE + `PrimaryAction` (combat branch) | Xét kỹ năng đang chọn; ưu tiên mục tiêu cục bộ đánh được ngay, rồi mục tiêu tới được bằng tiếp cận ngang có giới hạn. Không quét toàn map hoặc chọn melee khác tầng không tới được. |
+| AUTO | Giữ mục tiêu đang hợp lệ; quái khác gần hơn không tự chiếm focus. Khi mục tiêu invalid, resolver chọn combat candidate hợp lệ ngay theo Runtime; không tự cast. |
 | Click quái | Ghim EXPLICIT đúng ID/đời quái đã chọn; click không đánh. Xa, khác tầng hoặc bị địa hình chắn vẫn giữ focus trong retention range; Execute có thể từ chối nhưng không đổi đích. |
 | Tab / Shift+Tab ngoài UI | Đổi EXPLICIT trong tập mục tiêu chiến đấu cục bộ (`local combat set`), không cycle toàn map. Ưu tiên cùng SpawnGroup → cùng mặt/vùng đi được → cụm lân cận có liên quan, nhìn thấy/cục bộ → ứng viên cục bộ khác. Thứ tự ổn định theo nhóm/mặt và ID, không sort lại theo nearest mỗi frame; chi tiết còn TUNABLE. |
 | RETAIN | Giữ đúng ID, life/generation (đời instance) và MapId; range reject không đổi target để cứu cast. Returning target có thể còn focus; Execute có thể từ chối `TargetReturning` nếu policy bản thử không cho đánh trong Return. Quyền đánh chính xác còn OPEN/TUNABLE. |
 | Player chết | **Không tự clear CombatFocus.** Hủy lệnh chờ, buffer và tiếp cận; khóa combat input. Nếu target còn sống, đúng đời/MapId và trong retention range, marker/HUD vẫn hiện current/max HP và cập nhật khi người khác đánh. |
 | Target chết/despawn/đổi đời, MapId không hợp lệ, vượt retention, Esc clear hoặc chọn đích khác | Xóa hoặc thay focus theo thao tác. Quái hồi sinh tại cùng SpawnSlot không kế thừa focus đời cũ. Rời/chuyển map làm MapId cũ không hợp lệ. |
 
-**LOCKED cấu trúc input:** `1 / 2 / 3` chỉ chọn S1/S2/S3 đã mở; không cast, không tiếp cận, không tiêu MP, không bắt đầu CD. Tân Lữ chọn basic Mộc Kiếm ở slot 1, slot 2/3 khóa. `ExecuteSelected` là action riêng; phím vật lý còn OPEN. Ví dụ `2 → Execute → Execute → Execute` là ba lần chủ động dùng S2. Giữ Execute không RepeatOnHold; mỗi lần bấm vật lý tạo tối đa một execution intent. Chọn slot đã khóa không đổi selection hay action đã nhận.
+**LOCKED cấu trúc input:** `1 / 2 / 3` chỉ chọn S1/S2/S3 đã mở; không cast, không tiếp cận, không tiêu MP, không bắt đầu CD. Tân Lữ chọn basic Mộc Kiếm ở slot 1, slot 2/3 khóa. `PrimaryAction` là semantic action theo ActiveFocus; phím vật lý OPEN. Combat execution dùng skill đã chọn. Ví dụ `2 → Execute → Execute → Execute` là ba lần chủ động dùng S2. Giữ Execute không RepeatOnHold; mỗi lần bấm vật lý tạo tối đa một execution intent. Chọn slot đã khóa không đổi selection hay action đã nhận.
 
 Chọn slot hợp lệ khác không sửa SkillId trong pending/buffer/action đang chạy; phải bấm Execute mới để thay intent chờ.
 
@@ -164,11 +164,15 @@ Hơi ngoài tầm và cùng đường ngang đi được: một lần Execute c�
 
 <a id="escape-priority"></a>
 
+Esc clear giữ None tới candidate event/press tiếp theo, không resolver chọn lại trong cùng Esc. Focus không persist trong checkpoint; resume cùng phiên revalidate identity/life/MapId/retention, mất phiên clear theo [Online](../02-technical/online-and-persistence.md#profile-authority).
+
 **Esc, mỗi lần chỉ xử lý một tầng:** đóng/lùi modal hoặc chat → nếu đang pending/buffer thì hủy → nếu có focus thì clear → nếu không có gì thì no-op. Không rơi tiếp xuống thao tác gameplay trong cùng lần bấm.
 
 Trọng lực và quán tính ngang tiếp tục khi Tân Lữ/S1 ra đòn trên không; quyền dùng S2/S3 trên không còn OPEN, phải thử trước khi chốt. Sát thương thường chỉ đổi HP và phản hồi bằng flash/chữ/impact, không tạo trạng thái Hurt, giật đòn, đẩy lùi hay ngắt action. Thứ tự ưu tiên là trạng thái kết thúc/tử vong → khống chế cứng đúng loại mục tiêu → action chưa giải quyết. P0 không cho nhảy/dash để hủy đoạn hồi động tác.
 
-Ứng viên nhặt đồ/tương tác tách khỏi CombatFocus: làm nổi món ở gần, đủ quyền và tầm; `Interact` nhặt/tương tác ngay, không cần bấm lần đầu để chọn rồi lần thứ hai mới dùng. Nhặt xong chuyển sang ứng viên gần tiếp theo; rời tầm thì xóa hoặc đổi ứng viên. Quyền nhận đồ tutorial riêng và quyền nhặt đồ chung vẫn theo các mục liên quan; phím combat không tự nhặt, dùng bình hay chạy tuyến.
+Player chỉ có **một ActiveFocus actionable**. Khi focus là Enemy/PvP, CombatFocus cung cấp machinery trên; non-combat selection thay combat selection và hủy pending/buffer/approach, không sửa RunningAction đã accepted. PrimaryAction chỉ dispatch một typed intent theo snapshot; item thất bại không cast fallback cùng press. Universal resolver/item/NPC/modal semantics do [Runtime](../02-technical/gameplay-runtime.md#active-focus) sở hữu; combat owner giữ range, PendingCast và target propagation.
+
+
 
 **Ba hit Cung:** snapshot A/B/C, A/B/A hoặc A/A/A tại start; resolve cả ba cùng clock +0,12 s, giữ power theo index. Invalid target làm mất index đó, không chuyển target/chia power. Mỗi logical hit có Evade/Crit roll, status tối đa một application/unique landed target/cast kể cả proc fail cache. Hàn primary hợp lệ tại resolve tạo tâm nổ ở primary position kể cả primary Evade; invalid primary không nổ; secondary roll riêng, primary không nhận explosion lần hai.
 
@@ -274,16 +278,16 @@ Luồng màn hình P0: Boot/Main Menu → Login tài khoản được cấp → 
 | ↑ — LOCKED | Jump | Nhảy theo movement state |
 | ↓ — LOCKED | DropThrough | Một lần xuyên one-way hợp lệ đang đứng |
 | 1 / 2 / 3 — LOCKED | SelectSkillSlot1 / 2 / 3 | Chỉ chọn kỹ năng; không action/MP/CD/approach |
-| Phím còn OPEN | ExecuteSelected | Thực thi kỹ năng đã chọn theo các mục liên quan |
+| Physical key OPEN; E là TUNABLE test default | PrimaryAction | Một press → một typed intent theo ActiveFocus; combat branch dùng selected skill |
 | Tab / Shift+Tab | CycleTarget | World đổi target cục bộ; trong modal thuộc UI navigation |
-| Phím còn OPEN | QuickHP / QuickMP / Food / Interact | Gọi validator dùng đồ/tương tác, độc lập CombatFocus |
+| Phím còn OPEN | QuickHP / QuickMP / Food | Gọi validator dùng consumables; không đổi selected skill |
 | Navigate / Confirm / Back | UI actions | Điều hướng, xác nhận và lùi/đóng theo context |
 | Enter / Esc | Chat / Back hoặc clear theo context | Chat theo các mục liên quan; Esc chỉ xử lý một tầng theo các mục liên quan |
 
-**PROPOSAL / TUNABLE DEFAULT để thử usability, không LOCK:** E→ExecuteSelected, F→Interact, 4/5→QuickHP/QuickMP, R→Food, I→RPG menu. C/Q và các letter khác chưa được gán mechanic mới. Không thêm full remapping P0. Nếu dùng bảng này trong probe, HUD/tutorial phải lấy glyph từ binding thực, không hard-code phím vào quest data.
+**PROPOSAL / TUNABLE DEFAULT để thử usability, không LOCK:** E→PrimaryAction, 4/5→QuickHP/QuickMP, R→Food, I→RPG menu. C/Q và các letter khác chưa được gán mechanic mới. Không thêm full remapping P0. Nếu dùng bảng này trong probe, HUD/tutorial phải lấy glyph từ binding thực, không hard-code phím vào quest data.
 
 
-**Menu bằng bàn phím:** Interact mở NPC với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: Navigate chọn ô/action, Tab/Shift+Tab đổi lựa chọn/view; Confirm hoặc Interact xác nhận; Esc đóng. Move/Jump/DropThrough/SelectSkillSlot/ExecuteSelected không lọt thành gameplay khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở modal là UI navigation; ở world dùng [CycleTarget](#focus-input). Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Đổi mục tiêu và vòng đời focus theo [các mục liên quan](#focus-input); menu không nhận world CycleTarget.
+**Menu bằng bàn phím:** PrimaryAction trên NPC mở root context với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: Navigate chọn ô/action, Tab/Shift+Tab đổi lựa chọn/view; Confirm xác nhận; Esc đóng. Move/Jump/DropThrough/SelectSkillSlot/PrimaryAction không lọt thành gameplay khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở modal là UI navigation; ở world dùng [CycleTarget](#focus-input). Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Đổi mục tiêu và vòng đời focus theo [các mục liên quan](#focus-input); menu không nhận world CycleTarget.
 
 **Gate cảm giác di chuyển:** thử khoảng cho nhảy ngay sau khi rời mép (coyote time), nhớ input nhảy ngay trước khi chạm đất (jump buffer), normal Jump độ cao cố định cho mỗi accepted press, không đổi apex bằng hold/release, tăng/giảm tốc trên đất và tốc rơi. Các số là PROTOTYPE, chưa khóa trước khi có collider/tỷ lệ/map/mẫu art. Không thêm double-jump/dash. Drop không hưởng coyote để nhảy bật ngược lên sàn; authority và client phải dùng cùng semantics. Xem contract/probe Technical.
 
@@ -293,7 +297,7 @@ Target HUD tối giản: marker + mini HP trong world; tên/level/current-max HP
 
 ## Combat rationale, delta và gates
 
-Luật progression/input hiện hành đọc [Combat & Character](#focus-input); NSO research chỉ evidence. Basic Tân Lữ trước class tránh hard cutoff làm Q5 Lv 5 kẹt. Ba active tích lũy giữ lựa chọn skill/MP/CD riêng, thay vì thêm class Normal miễn MP; interaction riêng giúp thao tác loot không đổi combat target. Logical ranged result bỏ flight damage/interception; player primary/propagation kiểm eligibility, còn mob melee/Boss telegraph giữ positional dodge. Movement/momentum không bị normal damage interrupt.
+Luật progression/input hiện hành đọc [Combat & Character](#focus-input); NSO research chỉ evidence. Basic Tân Lữ trước class tránh hard cutoff làm Q5 Lv 5 kẹt. Ba active tích lũy giữ lựa chọn skill/MP/CD riêng, thay vì thêm class Normal miễn MP; một PrimaryAction dispatch theo ActiveFocus; explicit loot selection thay combat selection, không auto steal. Logical ranged result bỏ flight damage/interception; player primary/propagation kiểm eligibility, còn mob melee/Boss telegraph giữ positional dodge. Movement/momentum không bị normal damage interrupt.
 
 | Review decision | Kết luận / trade-off | Gate còn phải đo |
 | --- | --- | --- |
@@ -334,7 +338,7 @@ Research claims về CPU/GPRS/T9 motive là HISTORICAL INFERENCE; “1000 mobs <
 
 ## A14 — quyết định liên quan
 
-**Weapon carry/facing:** Idle 3/4 Left/Right và Back↔Hand thuộc [Art probe](../03-art/art-and-visual-production.md#weapon-carry), không đổi CombatFocus/PendingCast, MP/CD, input hoặc action clock; rút/cất không trì hoãn ExecuteSelected.
+**Weapon carry/facing:** Idle 3/4 Left/Right và Back↔Hand thuộc [Art probe](../03-art/art-and-visual-production.md#weapon-carry), không đổi CombatFocus/PendingCast, MP/CD, input hoặc action clock; rút/cất không trì hoãn combat execution.
 
 **A14 Action khi nhảy/chạy** — Full pose attack trên không: ít setup nhưng chân lệch; upper action + lower locomotion: reuse tốt nhưng overlap khó; pose riêng: đẹp nhưng tăng cost · Không thêm movement lock để cứu art; thử hành vi được cho phép, thêm đúng pose/track thiếu · P01/P03/P09; khóa movement/jump là gameplay proposal
 
@@ -352,28 +356,6 @@ Player có **hai logical facing Left/Right**; dừng sau movement giữ hướng
 
 DropThrough giữ cho one-way kết cấu có topology cần (ví dụ cầu/sàn Trúc); không ép Q2 dùng. **Binding ↓ đã LOCKED từ canonical input**, S chỉ alias prototype cũ, không mở lại ↓ hoặc mới khóa S. Jump và Drop là actions riêng, solid vẫn no-op Drop.
 
-
-<a id="combat-decision-trace"></a>
-
-## Decision Trace — lập trước khi sửa Combat, 2026-10-09
-
-Git chứng minh nội dung và thời điểm ghi, không chứng minh user đã duyệt từng câu. `APPROVED` trong draft là phân loại do tài liệu ghi; không có transcript quyết định tương ứng trong Git. Chỉ đạo trực tiếp ở prompt recovery hiện tại là approval mới cho target-based propagation và quest/service corrections. Không reset về `229cc61`.
-
-| Decision | Historical evidence | Current canonical trước sửa | Conflict | Recommendation |
-| --- | --- | --- | --- | --- |
-| Kiếm Arc/Line | `2080dd8`, `docs/design/HUYEN_LO_GDD.md`, bảng kỹ năng Lv5/Lv17 đã có Arc120°/1,7 và Line5,5/rộng≈0,6; `ed73c73` chuyển đường dẫn | Combat, Bộ kỹ năng giữ hình học đó với stats mới | Có từ import đầu tiên; không tìm được bản thảo trước import hoặc approval riêng | Không gọi là Codex mới tự thêm trong migration. Chỉ đạo hiện tại thay damage geometry Kiếm bằng primary + proximity; giữ stats hiện hành, không phục hồi stats import |
-| Primary với geometry và falloff | `46006c4` / nhánh `63bbd22`, `docs/design/1_HUYEN_LO_GDD.md`, CombatFocus: Arc/Line chỉ cần victim, Line intersections gần→xa; `af7e23c` giữ câu này | Focus có thể không bị hit; primary chưa giữ vị trí power đầu | Target intent và geometry không có một primary bắt buộc thống nhất | Primary hợp lệ bắt buộc cho Kiếm; primary index0, secondary gần primary theo thứ tự ổn định là engineering recommendation, không recovered lock |
-| Từ khóa target-based | Pickaxe `target-based`: `af7e23c`, GDD CombatFocus, thêm “target-based authoritative combat + logical geometry validation”; `229cc61` chuyển sang owner mới | Combat/Runtime kiểm hitbox–hurtbox/front/Arc/Line | Tên target-based vẫn ghép shape gate cũ | Tách acquisition, propagation và presentation. Không VFX collider hoặc PlatformID/SpawnGroup damage gate |
-| AUTO/EXPLICIT/Pending | `00e9d9c`, GDD CombatFocus; `00d2369`, Technical input; `34829d5`, Analysis ghi approved input/cadence. `af7e23c` sửa select-only/Execute riêng | Select riêng, Execute one-shot; pending/buffer/dead focus | Rule hold-repeat/123-execute trong checkpoint đã superseded | Giữ current input/snapshot/lifecycle; không phục hồi hold-repeat vì nằm ở commit cũ |
-| Cung batch/Hàn/status | `46006c4`, GDD Ba hit Cung/timing/status; parent của `af7e23c` và `af7e23c` đều giữ ABC/ABA/AAA, invalid index drop, primary Evade vẫn nổ, cache fail | Cùng logical resolve, no retarget/status dedup | Không có căn cứ bỏ các invariants này khi sửa Kiếm | Giữ; làm rõ batch khác primary-gated AoE, mỗi index revalidate riêng |
-| Secondary proximity khác tầng | `46006c4`, `research/notes/NSO_WORLD_FARM_TARGETING_RESEARCH.md` §3B/§5; Modernization §5 đề xuất X3–3,5/Y2,2 u | Geometry quanh caster; research chưa là authority | Research phỏng NSO không chứng minh Huyền Lộ duyệt exact units | Current user xác nhận gần primary/cross-height nếu eligible; numeric bounds chỉ OPEN/PROBE. So profile hẹp và rộng, không đổi power để che phạm vi |
-| NSO source bounds | Local `research/SRC NSOACE FIX/src/main/java/com/nsoz/model/Char.java` khoảng6347 dùng X±100/Y±100; khoảng7656/7861 dùng X±100/Y±50. Client decompile path trong notes nằm ngoài repo, chưa xác minh trực tiếp | Rationale đã cảnh báo khác nhánh | Không có một ngưỡng dọc duy nhất có thể copy hoặc suy PPU=32 là conversion đã duyệt | Ghi branch-specific research. Không khóa 2,2 u như recovered rule; không port client target lists/auto-train/physics cũ |
-| LoS/facing/behind-player | Research Modernization §8 gọi B là LOCK CANDIDATE; `46006c4`/`af7e23c` ghi A/B prototype, không PlatformID gate | Front gate player melee; A/B OPEN | Không chứng minh wall hoặc behind-player secondary đã approved | Recommendation auto-face primary lúc start, không front-filter secondary; compare A/B với SolidWall only, one-way bỏ qua. Final policies phải có probe |
-| Ownership authority/visual | `46006c4` GDD timeline và Technical; `229cc61` migration | Dedicated realtime, Spring durable; visual-only ranged/result per target | Không có conflict cần rollback network | Giữ origin/source snapshot, resolve clock, cost/cancel, damage/status; main VFX/impact/status đọc result |
-| Quest counts/source | `229cc61` và staged consolidation giữ 3/1/5/4+Linh/6/3-3-4/6+Boss; whitelist còn trong Quest/Runtime/Playtest | Counts và source proposals chưa duyệt ở lượt trước | Prompt hiện tại duyệt counts mới và MobIdentity; staged canonical không còn đúng | Áp trực tiếp Q3=4,Q4=5,Q5=8,Q8=8+Linh,Q10=10,Q11=3/3/4,Q12=10+Boss; groups chỉ placement. Special actor/landmark explicit |
-| NPC utility | Staged Quest/Items ghi Yên giữ HồiSinh/TẩyMạch, Mộc Storage/Rest | Ownership cũ và recommendation cũ | Prompt hiện tại chuyển utility sang Mộc | Yên Food/HP/MP; Bách gear/stone/Sell/Enhance/Transfer; Mộc Storage/Rest/utility hiện có. Giá/effect không đổi |
-
-Không tìm được bằng chứng user approval riêng cho Arc120°, Line width0,6, X/Y proximity, behind-player hoặc SolidWall mode. Lịch sử chỉ đủ truy nguyên drift; quyết định mới không được gắn nhãn “đã khôi phục user lock” cho các số chưa xác nhận.
 
 <a id="combat-completeness"></a>
 

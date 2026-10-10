@@ -43,7 +43,7 @@ Mục tiêu tới Lv 20: 2,5–4 giờ gồm đi đường, nhiệm vụ, mua b�
 | --- | --- | --- | --- |
 | Player / combat | Novice, hai class, bốn attributes / Tẩy Mạch, 3 active tích lũy + 2 nội tại / class, nhập môn / tiến cảnh qua bí kíp, đánh lan / Bỏng / Băng Hàn | Buff đề xuất: Chiến Ý / Ưng Nhãn Cường Hóa (P1; chưa khóa phím); DPS Meter | Cosmetic polish |
 | World | Năm bãi, cụm quái, bảy loại quái / sáu rigs, Linh Biến modifier, Boss basic + ba pattern / Cuồng Mạch | Linh Giáp / Vỡ Thế | Hazard, Boss polish |
-| RPG | 18 dòng trang bị / 6 ô / 3 bậc, phẩm chất, I +4 / II +6 / III +8, shop / đồ rơi / túi / kho, Food / Death, chuyển giao cường hóa | Sắp túi; khóa đồ; Bùa Hồi Thành | Mua lại, mở rộng túi |
+| RPG | 18 dòng trang bị / 6 ô / 3 bậc, phẩm chất, I +4 / II +6 / III +8, shop / đồ rơi / túi / kho, Food / Death, chuyển giao cường hóa | Khóa đồ; Bùa Hồi Thành; inventory UX priority OPEN theo roadmap | Mua lại, mở rộng túi |
 | Story / UI | Q1–Q12 với Q9 nhánh optional; ba Stage Summary; Journey; controls / HUD | Quest arrow, chat history | Extra cosmetics |
 | Online / data | Unity Dedicated Game Server + Spring Boot + PostgreSQL; acceptance tối thiểu 2 concurrent players, MapId, co-farm không Party, chat / banner, shared loot ownership, lưu tiến trình an toàn | Observer hide / show; triển khai Internet công khai | Performance polish |
 
@@ -53,7 +53,7 @@ P1 chỉ triển khai sau core và quyết định scope; proposal ở cuối t�
 
 **Phạm vi game đích:** P0 là game đầy đủ, gồm cả Kiếm/Cung và online Dedicated + Spring/PostgreSQL. Thứ tự triển khai không đổi genre, scope hoặc final acceptance. CURRENT/DEFERRED, phạm vi bản thử và gate mạng sớm nằm ở [Roadmap](../04-production/roadmap.md#target-current-deferred).
 
-> **Thứ tự triển khai / ngân sách:** [Roadmap — VS-1 và mục tiêu quản lý](../04-production/roadmap.md#vs-1)
+> **Thứ tự triển khai / ngân sách:** [Roadmap — local slice và mục tiêu quản lý](../04-production/roadmap.md#vs-1)
 
 ---
 
@@ -63,7 +63,7 @@ P1 chỉ triển khai sau core và quyết định scope; proposal ở cuối t�
 | Chương | Dải cấp | Sắc thái và diễn tiến | Checkpoint tổng kết |
 | --- | --- | --- | --- |
 | I — Dấu Nứt Vân Khê | 1–7 | Nhập môn & sinh tồn: làng còn yên, điềm lạ thoáng qua; tự cầm kiếm, dùng thuốc, rèn món đầu tiên | Q7 completed và Lv ≥ 7 |
-| II — Theo Dấu Huyền Lộ | 8–17 | Dấn thân & khám phá: lần theo trọc khí; Lv 12 tu luyện ngoại vi Xích Nham, Lv 15 điều tra sâu, Lv 17 phục hồi Huyền Môn | Q11 completed và Lv ≥ 17 |
+| II — Theo Dấu Huyền Lộ | 8–17 | Dấn thân & khám phá: lần theo trọc khí; Lv 12 tu luyện ngoại vi Xích Nham, Lv 15 điều tra sâu, phục hồi Huyền Môn theo Q11 direction/gate OPEN | Q11 completed và Lv ≥ 17 |
 | III — Huyền Tích Thức Tỉnh | 18–20 khuyến nghị | Thanh tẩy & vấn đạo: phế tích trang nghiêm, Thủ Vệ bị cuồng hóa; phong ấn ổn định sau trận chiến | Q12 completed và Lv 20 |
 
 **Main Story Complete — HOÀN THÀNH CHÍNH TUYẾN:** Q12 khép lại chính tuyến / Chương III. Summary: **CHƯƠNG III HOÀN THÀNH / CHÍNH TUYẾN ĐÃ HOÀN THÀNH** — Lâm Bá: “Tai ương tạm lắng. Đường phía trước còn dài.” Tiếp tục farm Huyền Tích, săn đồ Rare / Epic, nâng đồ III lên +8, săn Linh Biến / Dư Ảnh, tỷ thí và thử build; P1 chỉ có khi được triển khai.
@@ -75,11 +75,7 @@ P1 chỉ triển khai sau core và quyết định scope; proposal ở cuối t�
 
 ## Online, PvP và giao tiếp
 
-Online multiplayer theo mô hình Client–Server. Player đăng nhập bằng tài khoản do admin cấp, chọn nhân vật rồi kết nối Unity Dedicated Game Server; không có Register cho player. Game Server quyết định combat, quái, Boss và kết quả trận PvP; Spring Boot/PostgreSQL lưu tiến trình, tạm giữ và quyết toán Vàng cược. Client không gửi level / Vàng / EXP / gear / thuộc tính như dữ liệu đáng tin. **P0 acceptance: tối thiểu 2 concurrent players** — hai Client kết nối Game Server; đây là mức nghiệm thu, không phải giới hạn world. P0 chạy local/LAN; triển khai Internet công khai ngoài phạm vi P0.
-
-MapId P0 kiểm combat / mob / map transition / loot / chat; khác map không tương tác, chỉ render khu hiện tại. Hide / show P1 không gate slice. Boss timer / banner global khi map rỗng; tên Cự Thú / Dư Ảnh theo character, không tạo entity khác.
-
-World support N players; không hard-code hai slot / Player 1–Player 2. Threat / contribution, MapId / chat, quest assist và loot eligibility dùng collection theo playerId. PvP **1v1** là mode riêng, không giới hạn multiplayer world. Co-op xét N recipients theo contribution / eligibility và level factor các mục liên quan; kill / evidence credit các mục liên quan, shared loot windows tách khỏi credit.
+Co-farm và Boss là shared world cho N players; PvP 1v1 là mode riêng. [Runtime architecture](../02-technical/gameplay-runtime.md#runtime) giữ authority/map/network boundaries, [Online](../02-technical/online-and-persistence.md#profile-authority) giữ login/session/recovery. [Items](items-and-economy.md#farm-rewards) và [Quest](quests-and-narrative.md#mob-identity-credit) giữ recipient/credit policies. Nghiệm thu LAN tối thiểu hai concurrent clients không là capacity cap; benchmark trước tuyên bố tải lớn hơn.
 
 **Không Party P0:** không create/invite/accept/leader/leave/kick, UI/HP bars/chat nhóm, EXP bonus, loot/quest sharing dành riêng nhóm hoặc raid. N người cùng farm chỉ cần tham gia đánh: contribution, threat, credit và quyền loot xét từng character; không membership container ở giữa. “Cụm quái” là bãi author, không tổ đội. Party chỉ xem xét sau P0, chưa có thiết kế cần code.
 
@@ -100,3 +96,9 @@ Các đề xuất dưới đây được giữ để không mất thiết kế �
 
 
 <a id="gdd-0"></a>
+
+## Hệ quả phase PrimaryAction / collection / restoration
+
+[PrimaryAction + ActiveFocus](../02-technical/gameplay-runtime.md#active-focus) gộp combat và interaction ở input; 1/2/3 vẫn select-only, server commands cụ thể giữ authority. Vòng farm có [natural shared Linh / Map Info](world-and-content.md#linh-bien), [một regular physical outcome](items-and-economy.md#regular-loot-outcome) và personal quest RNG riêng. [Q8/Q10](quests-and-narrative.md#quest-collection) không dual kill+collect; [Q11](quests-and-narrative.md#q11-restoration) chuyển material→NPC phục hồi→placements nhiều map, level/maps/order/endpoint còn OPEN.
+
+Chương II checkpoint Q11Completed+Lv17 giữ reference hiện có, khác gate Bách chưa chọn; không thêm level gate ẩn cho Huyền Tích. EXP curve/rewards/catch-up giữ nhưng route/pacing phải đo lại. Split/Sort-Merge/Discard có planned UX/engineering contract tại Items/Runtime và [roadmap scope](../04-production/roadmap.md#map-info-work-package); exact P0/P1 delivery còn OPEN, không coi đã implementation hoặc giữ Sort vague P1 làm authority ngược owner.

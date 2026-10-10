@@ -2,7 +2,7 @@
 
 Các số BASELINE/TUNABLE chưa phải nghiệm thu runtime.
 
-**CURRENT:** topology và candidate density đã có; tổng placement cuối vẫn TUNABLE. Linh ngẫu nhiên và reservation Q8 là hai quyền spawn phân biệt. [Q8 reservation](#q8-bounded-path) không được phụ thuộc cái chết của Linh ở nơi khác.
+**CURRENT:** topology/candidate density có, final placements TUNABLE. [Linh Biến](#linh-bien) là natural shared variant; không quest-specific spawn. [Q8 hunt](#q8-bounded-path) không có guaranteed waiting bound; [Map Info](#map-population-info) hỗ trợ nhận biết population.
 
 ## Document owns
 
@@ -41,7 +41,7 @@ Mỗi điểm sinh quái chọn một **mob identity có level cố định**, v
 | Map / gate | Ý đồ bãi và topology nội bộ — STRONG DIRECTION | Traversal tham khảo — TUNABLE |
 | --- | --- | --- |
 | Đồng Sương / onboarding | Đồi bậc thấp và tuyến dưới; cụm hai quái vẫn phù hợp, thêm các bãi độc lập thay vì một blob lớn | 25–35 s |
-| Trúc Ảnh / Q6 Completed + Lv 5 | Nhánh trên cầu/nhánh dưới trấn ấn và vòng về; giữ `TA4.slot1` cho Q8 | 35–55 s |
+| Trúc Ảnh / Q6 Completed + Lv 5 | Nhánh trên cầu/nhánh dưới trấn ấn và vòng về; TA4 là normal farm pocket | 35–55 s |
 | Bạch Vân / Q8 Completed + Lv 8 | Các terrace solid quanh thác, tuyến vòng và mỏm cụt; cụm trên/dưới cùng xuất hiện trên camera | 35–55 s |
 | Xích Nham / Q8 Completed + Lv 12 | Ngoại vi tách nhánh sâu, hốc/khe đá và ba khu trấn ấn; lối Huyền Môn ở nhánh phù hợp | 35–55 s |
 | Huyền Tích / Q11 Completed | Cấu trúc phế tích có tuyến cao/thấp và ngách, khoảng Boss tách normal spawn | 45–60 s |
@@ -100,7 +100,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 - **Ý đồ không gian & Topology:** Chênh lệch cao độ bắt đầu rõ rệt với rừng trúc dày đặc, vách đá phủ rêu và hệ thống cầu giàn ván bắc qua đèo. Đây là nơi kiểm tra khả năng phối hợp kỹ năng mới nhận sau khi nhập phái (Lv 5+).
 - **Phân bố 3 tuyến đường & Vòng lặp (Loops):**
   + *Tuyến cầu trên cao (Upper Bridge Route):* Kết cấu giàn ván mỏng (sàn one-way) vắt ngang giữa hai mỏm đá, nơi Ong Giáp Lv 10 bay lơ lửng, tạo áp lực tấn công tầm cao (cụm `TA5`, `TA9`, `TA10`).
-  + *Tuyến rừng trúc trung tâm (Mid Bamboo Forest):* Thềm đất ẩm ướt dưới tán trúc quanh trụ Trấn Ấn cổ bị nứt (`TA4_BrokenSeal`), nơi bầy Sói Trúc Ảnh Lv 8 hung hãn mai phục (cụm `TA4` với `slot 1` cố định cho Q8 Linh Biến, cụm `TA6`, `TA7`, `TA8`).
+  + *Tuyến rừng trúc trung tâm (Mid Bamboo Forest):* Thềm đất ẩm ướt dưới tán trúc quanh trụ Trấn Ấn cổ bị nứt (`TA4_BrokenSeal`), nơi bầy Sói Trúc Ảnh Lv 8 hung hãn mai phục (cụm `TA4` normal slots, cụm `TA6`, `TA7`, `TA8`).
   + *Tuyến ven suối trũng (Lower Stream Trail):* Ranh giới phía Tây còn sót lại các cụm Sói Sương Lv 4 (`TA1–TA3`).
 - **Vòng lặp cơ động:** Người chơi có thể đứng trên cầu gỗ bấm `↓` để nhảy xuyên sàn rơi xuống bãi trúc dưới chân, hoặc đi vòng qua bậc đá trực giao phía sau để leo ngược lên cầu, tạo nhịp cơ động tự nhiên khi thả diều quái.
 
@@ -120,8 +120,8 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 - **Ý đồ không gian & Topology:** Bản đồ có diện tích rộng, đặc trưng bởi hệ thống khe nứt địa chất và các thềm đá bậc cao độ; bố cục blockout tham khảo dùng khoảng **2 nhánh lớn hội tụ (Two Branches Merge, TUNABLE, không khóa tổng nhánh)**. Chi tiết chất liệu đá, ánh sáng sa thạch do [Art](../03-art/art-and-visual-production.md) sở hữu.
 - **Phân bố 2 nhánh chiến lược:**
   + *Nhánh hẻm núi ngoại vi (Canyon Branch):* Tuyến đèo đá đỏ nhiều bậc cao độ dẫn từ Bạch Vân vào, nơi các toán Đoạt Mạch Đạo Tặc Lv 13 rải rác đào trộm cổ vật (cụm `XN1–XN3` cho Q10, cụm `XN7`).
-  + *Nhánh khe nứt khoáng mạch ngầm (Deep Rift Branch):* Tuyến đường ăn sâu vào lòng núi, nơi bố trí **3 trụ phong ấn cổ xưa** (`XN4_SealA`, `XN5_SealB`, `XN6_SealC`) do Xích Thạch Linh Lv 16 canh gác (cụm `XN4–XN6` cho Q11, cùng `XN8`, `XN9`).
-- **Điểm kết nối tối thượng:** Cuối nhánh sâu là đại môn Huyền Môn (`XN_HuyenMon_Outer`) tựa vào vách núi — một `SpecialGate` phong tỏa lối vào cấm địa, activation kiểm đủ Mảnh Ấn1/2/3 Q11 sau ba bước trụ; chỉ Q11 Completed mới mở map. Không dùng trade material Mảnh Cổ Ấn hoặc kill tổng10 tự mở cổng.
+  + *Nhánh khe nứt khoáng mạch ngầm (Deep Rift Branch):* Tuyến đường ăn sâu vào lòng núi, nơi bố trí **3 trụ phong ấn cổ xưa** (`XN4_SealA`, `XN5_SealB`, `XN6_SealC`) do Xích Thạch Linh Lv 16 canh gác (cụm `XN4–XN6` farm material Q11, cùng `XN8`, `XN9`; trụ cũ giữ scenery, không mapping ba placements mới).
+- **Điểm kết nối tối thượng:** Cuối nhánh sâu là đại môn Huyền Môn (`XN_HuyenMon_Outer`) tựa vào vách núi — một `SpecialGate` phong tỏa lối vào cấm địa, restoration đọc ba flags placement đã commit theo [Q11 owner](quests-and-narrative.md#q11-restoration); access Q11 Completed giữ. Exact completion endpoint và gate interaction OPEN; không kiểm possession mảnh đã consume hoặc tự mở từ kill count/trade material.
 
 <a id="8-huyền-tích-lv-1720--phế-tích-cấm-địa--world-boss-huyền-nham-cự-thú"></a>
 
@@ -146,7 +146,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 6. **Vùng nước nông (Shallow Water):** Lòng nước nông có đáy đất thật, người chơi lội qua thì chân tiếp xúc mặt nước sẽ giảm nhẹ tốc độ chạy (hệ số TUNABLE); khi đi trên cầu gỗ hoặc nhảy trên không qua mặt nước thì không bị giảm tốc. Tuyệt đối không có cơ chế bơi lội, chết đuối hay vật lý thủy động lực học.
 7. **Cơ chế chuyển tiếp bản đồ:**
    - `EdgeExit`: Vùng mép bản đồ thông thường có mũi tên chỉ hướng và tên vùng đích; nhân vật đi chạm vào vùng này bằng di chuyển thủ công sẽ tự động chuyển map, không cần bấm phím tương tác và không dựng vòm cổng dịch chuyển. Điểm xuất hiện ở map đích luôn nằm phía trong mép, bên ngoài vùng trigger trả về để chống hiện tượng giật chuyển map liên tục (ping-pong transition).
-   - `SpecialGate`: Cổng đặc biệt đòi hỏi tương tác xác thực bằng phím (Huyền Môn Q11 cần đủ 3 Mảnh Ấn; Lôi Đài cần giao kèo thách đấu).
+   - `SpecialGate`: admission/state validation riêng (Huyền Môn đọc committed restoration flags và Q11Completed access; cần PrimaryAction cuối hay tự phản ứng OPEN; Lôi Đài cần giao kèo thách đấu).
    - `SafeAnchor`: Mỗi map có một tọa độ an toàn cố định. Khi mất kết nối hoặc máy chủ khởi động lại, người chơi sẽ xuất hiện tại SafeAnchor của map đó.
 
 ---
@@ -172,7 +172,7 @@ Dưới đây là kế hoạch phân bổ bãi quái (pockets) cho 5 bản đồ
 | Map farm | Ý đồ bãi và phân bố không gian | Số cụm dự kiến (Pockets) | Số quái hoạt động (Active Mob Budget) | Quy mô mỗi cụm (Group Size) | Phân bố tầng / nhánh | Stable authored IDs / Quest anchors cần bảo toàn | Điểm an toàn & Ranh giới cách ly |
 | --- | --- | ---: | ---: | ---: | --- | --- | --- |
 | **Đồng Sương** (Lv 1–5) | Onboarding, đồi thấp, nương bậc và bìa rừng. Nhiều bãi nhỏ, không gian mở, tránh áp lực dồn dập. | 8–10 cụm | 14–20 quái | 1–2 quái / cụm | Tuyến dưới/ven suối: Nấm Linh (Lv 2). Đồi bậc giữa và thềm đông: Sói Sương (Lv 4). | `DS1` (Nấm Lv2), `DS2` (Q4 Nấm Linh), `DS3–DS6` (Q5 Sói Sương) | Dải vào an toàn 6–8 u từ Vân Khê; các bãi Sói cách biệt đường về làng. |
-| **Trúc Ảnh** (Lv 5–10) | Rừng trúc rậm rạp, cầu gỗ, thềm đá cao thấp, kiểm tra di chuyển bậc và đánh quái theo nhóm. | 9–11 cụm | 20–28 quái | 2–3 quái / cụm | Tuyến dưới ven suối: Sói Sương (Lv 4). Bãi trúc trung tâm & quanh ấn: Sói Trúc Ảnh (Lv 8). Tuyến cầu trên cao & vách đá: Ong Giáp (Lv 10). | `TA1–TA3` (Sói Sương), `TA4` (với `TA4.slot1` giữ cho Q8 Linh Biến), `TA5` (Ong Giáp), `TA6` (Sói Trúc Ảnh) | Vùng an toàn 6–8 u tại cửa Đồng Sương và cầu nối sang Bạch Vân. |
+| **Trúc Ảnh** (Lv 5–10) | Rừng trúc rậm rạp, cầu gỗ, thềm đá cao thấp, kiểm tra di chuyển bậc và đánh quái theo nhóm. | 9–11 cụm | 20–28 quái | 2–3 quái / cụm | Tuyến dưới ven suối: Sói Sương (Lv 4). Bãi trúc trung tâm & quanh ấn: Sói Trúc Ảnh (Lv 8). Tuyến cầu trên cao & vách đá: Ong Giáp (Lv 10). | `TA1–TA3` (Sói Sương), `TA4` (normal slots), `TA5` (Ong Giáp), `TA6` (Sói Trúc Ảnh) | Vùng an toàn 6–8 u tại cửa Đồng Sương và cầu nối sang Bạch Vân. |
 | **Bạch Vân** (Lv 8–13) | Vách đá dựng đứng, thác nước, thềm đá bậc liên tục, mỏm cụt và đường vòng. Cung phát huy tầm xa, Kiếm gom góc hẹp. | 8–10 cụm | 20–28 quái | 2–3 quái / cụm | Thềm trên cao quanh thác: Ong Giáp (Lv 10). Các terrace đá bậc giữa, hốc hang và lối đèo: Đoạt Mạch Đạo Tặc (Lv 13). | `BV1`, `BV2` (Ong Giáp Lv 10), `BV3–BV5` (farm/progression Đoạt Mạch Đạo Tặc Lv 13) | Thềm nghỉ an toàn 6–8 u đầu đèo và trước cửa sang Xích Nham. |
 | **Xích Nham** (Lv 12–17) | Mỏ khoáng cằn cỗi, đất đá đỏ, khe nứt sâu và ba khu vực trấn ấn. Quái trâu, áp lực chiến đấu tăng cao. | 9–11 cụm | 24–32 quái | 2–4 quái / cụm | Vành đai ngoại vi và lối vào: Đạo Tặc (Lv 13). Hốc nứt mạch sâu và 3 khu trấn ấn: Xích Thạch Linh (Lv 16). | `XN1–XN3` (Q10 Đạo Tặc Lv 13), `XN4–XN6` (Q11 Xích Thạch Linh Lv 16 tại 3 phong ấn) | Vùng an toàn 8 u cửa ngõ vào và hành lang dẫn đến cổng Huyền Môn. |
 | **Huyền Tích** (Lv 17–20) | Phế tích cổ, đền thờ phong ấn, hành lang đá nguyên khối. Tách bạch hoàn toàn quái thường và khu vực Boss. | 8–10 cụm thường + 1 Boss | 20–26 quái thường + 1 Boss | 2–3 quái / cụm | Tiền môn / ngoài cổng: Xích Thạch Linh (Lv 16). Hành lang / nội điện: Cổ Môn Vệ Binh (Lv 20). Trung điện (BossCombatArea): Boss độc lập. | `HT1` (Thạch Linh), `HT2`, `HT3` (Vệ Binh), `HT4`, `HT5` (Q12 Cổ Môn Vệ Binh Lv 20), `HT_BossLandmark` (Q12 Boss) | **Boss Exclusion:** Tuyệt đối cấm quái thường trong BossCombatArea. Vùng vào Huyền Môn an toàn 8 u. |
@@ -188,7 +188,7 @@ Các ID cụm mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) là các mã địn
 | | `DS7`, `DS8` | Nấm Linh | 2 | 2 mỗi cụm (4) | Bổ sung: Dải nương thấp và bờ suối phía nam |
 | | `DS9`, `DS10` | Sói Sương | 4 | 2 mỗi cụm (4) | Bổ sung: Gờ đồi phía đông và lối rẽ lên Trúc Ảnh |
 | **Trúc Ảnh** | `TA1`–`TA3` | Sói Sương | 4 | 2 mỗi cụm (6) | Stable seeds: Bìa rừng trúc giáp ranh Đồng Sương |
-| | `TA4` | Sói Trúc Ảnh | 8 | 2 | Quest anchor: `TA4.slot1` cố định cho Q8 Linh Biến |
+| | `TA4` | Sói Trúc Ảnh | 8 | 2 | Normal farm slots; không quest authority |
 | | `TA5` | Ong Giáp | 10 | 3 | Stable seed: Nhịp cầu gỗ trên cao |
 | | `TA6` | Sói Trúc Ảnh | 8 | 2 | Quest anchor: Bãi trúc quanh trụ trấn ấn nứt |
 | | `TA7`, `TA8` | Sói Trúc Ảnh | 8 | 2 mỗi cụm (4) | Bổ sung: Tuyến rừng trúc trũng và khe đá phụ |
@@ -198,7 +198,7 @@ Các ID cụm mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) là các mã địn
 | | `BV6` | Ong Giáp | 10 | 2 | Bổ sung: Thềm đá gần đỉnh thác đổ |
 | | `BV7`, `BV8` | Đoạt Mạch Đạo Tặc | 13 | 2–3 mỗi cụm (5) | Bổ sung: Hốc đá cụt phía bắc và đường vòng chân vách |
 | **Xích Nham** | `XN1`–`XN3` | Đoạt Mạch Đạo Tặc | 13 | 2/3/2 (7) | Quest anchors: Q10 Vật Chứng (khu mỏ ngoại vi) |
-| | `XN4`–`XN6` | Xích Thạch Linh | 16 | 3/3/4 (10) | Quest anchors: Q11 Mảnh Ấn (ba cụm trấn ấn A/B/C) |
+| | `XN4`–`XN6` | Xích Thạch Linh | 16 | 10 total; candidate split giữ 3, 3, 4 chỉ mật độ | Farm material Q11/scenery; không quota hay ba restored-fragment sources |
 | | `XN7` | Đoạt Mạch Đạo Tặc | 13 | 2 | Bổ sung: Ngách đá hẹp phía tây |
 | | `XN8`, `XN9` | Xích Thạch Linh | 16 | 3 mỗi cụm (6) | Bổ sung: Thềm đá nứt mạch ngầm và lối bậc đá dẫn vào phế tích |
 | **Huyền Tích** | `HT1` | Xích Thạch Linh | 16 | 2 | Stable seed: Tiền môn phế tích |
@@ -272,7 +272,9 @@ Ranged / Hybrid: Acquire → Aim / Windup → resolveMoment → authority logica
 
 Báo động cụm chỉ wake, từng mob tự acquire / resolve. Return kết thúc encounter cũ, clear threat/contribution/status và hủy action chưa resolve; không giữ damage từ lượt kéo trước. Đích reset là HP đầy ở home; exact cách hồi/regen, grace và invulnerability khi về còn OPEN/TUNABLE, không coi “đầy ở home” là khóa hồi tức thì lúc bắt đầu Return. Linh Biến dùng cùng resolver, không nearest-only sau acquire.
 
-**Linh Biến P0 — modifier trên normal slot:** dynamic roll `LinhBienChance = 0.05` (**5% TEST / TUNABLE**) chỉ tại spawn / respawn của mob **Lv 8+**, cap `MaxRandomActiveLinhBienPerMapId = 1`. Lv 1–7 không roll, không tiêu RNG rồi upgrade level; initial population dùng cùng arbitration. Return / root hide / reconnect không reroll. Khi chết, slot dùng deadline 25 s như normal; lần spawn sau mới xét variant.
+<a id="linh-bien"></a>
+
+**Linh Biến P0 — natural shared-world modifier trên normal slot:** dynamic roll `LinhBienChance = 0.05` (**5% TEST / TUNABLE**) chỉ tại spawn / respawn của mob **Lv 8+**, cap `MaxRandomActiveLinhBienPerMapId = 1`. Lv 1–7 không roll, không tiêu RNG rồi upgrade level; initial population dùng cùng arbitration. Return / root hide / reconnect không reroll. Khi chết, slot dùng deadline 25 s như normal; lần spawn sau mới xét variant.
 
 | Modifier | BASELINE / TUNABLE |
 | --- | --- |
@@ -282,19 +284,17 @@ Báo động cụm chỉ wake, từng mob tự acquire / resolve. Return kết t
 
 <a id="q8-bounded-path"></a>
 
-**Q8 force encounter — LOCKED no-softlock:** giữ `TA4.slot1` và một encounter shared. Random Linh cap vẫn áp cho random spawning; khi có requester hợp lệ, dành **một reservation Q8 chung cho map**, độc lập Linh unrelated đang giữ random cap. Đây là ngoại lệ quest cố định, không cap tăng theo N. Existing Linh ở target slot thì bind đúng life; Linh khác sống nguyên lifecycle, không demote/despawn/reset giữa combat. Suppress random promotions mới trong thời gian reservation hoạt động.
+**Q8 natural hunt — USER-APPROVED direction:** không reserved slot, private/per-player spawn, waiting requester, quest force promotion hoặc retry encounter. TA4 vẫn hai normal slots trong seed; `TA4.slot1` nếu authoring dùng chỉ là normal identifier, không authority Q8. Mọi new life roll theo Linh policy trên; đang sống giữ life/variant, không demote/reset để làm quest. Dev Force chỉ test.
 
-Tại target slot, chỉ promote normal idle/fullHP ở spawn hoặc next valid lifecycle boundary. Nếu target đang combat thì tiếp tục life đó, không ép reset; requester có thể kết thúc encounter hoặc chờ Return/respawn theo luật. Không phải chờ ai đó tình cờ giết Linh ở nơi khác. Reservation được xử lý tại mỗi due boundary, priority trước random roll; bounded scheduler/retry không phụ thuộc RNG. Exact timeout/promotion budget cần Q8-01 probe; guarantee là đường chủ động tiến triển, không hứa tự complete cho người AFK.
+Q8 dạy tìm Sói Trúc Ảnh Linh Biến trên các farm pockets, không ping tọa độ. Credit ≥20% theo [Quest owner](quests-and-narrative.md#q8-credit-review), không gắn SpawnGroup. **OPEN availability/pacing:** cap1/map có thể bị species khác chiếm; shared population không bảo đảm đúng Sói hoặc tất cả người săn đủ contribution. Không hứa bounded no-starvation từ rate5% hoặc counts panel. Rate/density tune chỉ sau Q8-01, không thêm quest scheduler.
 
-N requesters đăng ký idempotently theo character + active step; waiting order ổn định và có tuổi, không để người mới liên tục vượt người chưa credit. Cùng life có thể share encounter. Death snapshot dùng quest predicates riêng; đủ credit bỏ request, thiếu giữ vị trí ưu tiên cho valid lifecycle retry. Rời map bỏ hiện diện nhưng giữ progress/entitlement; reconnect không tạo force quyền mới. Không private entity hoặc world slot theo từng player.
+<a id="map-population-info"></a>
 
-**Economic guard:** force/retry không được là nút reroll Rare. Reservation có force entitlement bền theo active quest step và economic receipt; một budget Linh cố định được roll/commit một lần cho shared reservation, không roll reward lại do thiếu quest credit, Return, disconnect hoặc replay. Retry phục vụ credit, không tạo budget EXP/Gold/regular loot/Journey Linh mới. Không nhân pile theo N.
+**Map Info — CURRENT DIRECTION:** panel nhỏ chỉ MapId hiện tại, counts server-owned: living ordinary mobs (bao gồm Linh), Linh subset, NPC hiện diện, Boss count/alive khi phù hợp. Không double-count Linh vào tổng, không cộng Boss vào ordinary count. **ENGINEERING RECOMMENDATION:** count living nonterminal entities đã admit kể cả dormant/outside camera; dead/corpse/terminal-pending không living, slot chờ respawn không count. Exact labels/visual OPEN, dùng định nghĩa chung cho snapshot và delta; không suy từ rendered objects hoặc số authored slots.
 
-Binding vào random Linh đang sống dùng death/reward hiện hành của life đó, không cộng thêm quest pile. Exact entitlement grouping/recovery là Q8-01/G-D gate, không claim queue RAM tự bảo đảm crash-safe.
+Không tọa độ/pocket/minimap ping/arrow Linh, không identity disclosure thêm vào panel khi chưa duyệt. Counts tổng Linh không đồng nghĩa Sói Linh tồn tại. Map admission xử lý due lifecycle hợp lệ trước population snapshot; wake không reroll life đã tồn tại. Snapshot/revision/map generation, late packet và reconnect thuộc [Runtime](../02-technical/gameplay-runtime.md#map-info-runtime). Boss banner hiện hành giữ, panel không thay global announcement.
 
-**Credit review:** bảng objectives giữ ngưỡng hiện tại tại [Quests & Narrative](quests-and-narrative.md#q8-credit-review). Tối đa năm người đạt ngưỡng trong một full-health life nên không hứa mọi N complete cùng death. Fair retries phải có probe đông người/outsider contention. Nếu còn starvation thì gate không pass; proposal credit participation riêng bên quest owner cần duyệt/đo trước thay threshold, không tự lấy 10%.
-
-
+<a id="world-boss"></a>
 
 **Một World Boss chung:** Lv 20 Huyền Nham Cự Thú, HP **32.000**, ATK **160**, DEF **25**, ACC **140**, EVA **60** — BASELINE. Ngay trong Huyền Tích, không scene / story instance / cổng arena / gate Lv 20 riêng. Q11 hoàn thành mở toàn map; người đi ngang thấy trận đánh. Landmark có khoảng trống đọc vùng báo trước đòn, BossCombatArea radius 15 u TEST; không đặt quái thường trong vùng đánh Boss.
 
@@ -330,7 +330,7 @@ Tách chọn/thực thi cho phép chọn S2 trước rồi Execute theo ý đị
 - *Thị giác camera tiêu chuẩn:* Bố trí theo tầng (dưới 1–2 quái, giữa 1–3 quái, trên 1–2 quái, nhánh phụ 1–2 quái) giúp một khung hình camera có thể bao quát 5–8+ quái cùng lúc, tạo cảm giác thế giới hoang sơ, nguy hiểm và đông đúc, nhưng aggro vẫn được giữ độc lập nhờ ranh giới `HomeRegion` và `WalkRegion` riêng biệt.
 - *Tải CPU / Physics / Network:* Phân tán quái theo các `SpawnGroup` nhỏ độc lập giúp AI server dễ dàng đưa các cụm không có người chơi vào trạng thái ngủ (dormant). Do địa hình hoàn toàn trực giao, không có dốc (`no slope`) và không có leo trèo (`no climb/ladder`), quái chỉ tuần tra trên mặt phẳng ngang của vùng đi lại được chỉ định, tránh requirement tìm đường nhiều tầng; chi phí AI/physics/network vẫn phải benchmark, không suy bằng0.
 - *Boss Exclusion Rule:* Tại Huyền Tích, việc loại trừ tuyệt đối quái thường khỏi `BossCombatArea` bảo vệ tính toàn vẹn của cuộc chiến với Boss Huyền Nham Cự Thú, ngăn chặn các trường hợp quái thường quấy rối telegraph hoặc bị lợi dụng để farm hồi phục/tích nộ ngoài ý muốn.
-- *Dữ liệu lịch sử vs Kế hoạch hiện hành:* Mốc 28 cụm / 66 slots và khoảng cách tâm 18–20 u là seed lịch sử để đối chiếu prototype; kế hoạch authoring hiện hành đưa ra các khoảng ngân sách mục tiêu (14–20 ở Đồng Sương, 20–28 ở Trúc Ảnh/Bạch Vân, 24–32 ở Xích Nham, 20–26 ở Huyền Tích). Các mã authored ID mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) mở rộng số cụm mà không làm xáo trộn các Quest Anchor IDs gốc (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `TA4.slot1`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`) cũng như các stable authored seed IDs (`TA5`, `BV1–BV5`, v.v.).
+- *Dữ liệu lịch sử vs Kế hoạch hiện hành:* Mốc 28 cụm / 66 slots và khoảng cách tâm 18–20 u là seed lịch sử để đối chiếu prototype; kế hoạch authoring hiện hành đưa ra các khoảng ngân sách mục tiêu (14–20 ở Đồng Sương, 20–28 ở Trúc Ảnh/Bạch Vân, 24–32 ở Xích Nham, 20–26 ở Huyền Tích). Các mã authored ID mới (`DS7+`, `TA7+`, `BV6+`, `XN7+`, `HT6+`) mở rộng số cụm mà không làm xáo trộn các Quest Anchor IDs gốc (`DS2`, `DS3–DS6`, `TA4`, `TA6`, `XN1–XN6`, `HT4–HT5`, `HT_BossLandmark`) cũng như các stable authored seed IDs (`TA5`, `BV1–BV5`, v.v.).
 
 **Phân tích thiết kế địa hình trực giao (Orthogonal Terrain Rationale):**
 - *Gameplay positions và terrain:* mặt trực giao giúp grounded/drop/WalkRegion/LoS queries dễ author và kiểm. Player damage theo [primary/propagation contract](combat-and-character.md#target-propagation), không Arc/Line VFX collider. Terrain không tự chứng minh deterministic networking; cùng definitions/clock/authority và probes mới chứng minh kết quả. Mob melee/Boss telegraph vẫn có vùng vị trí để né.
@@ -376,4 +376,8 @@ Học Viện an toàn với player: Bù Nhìn không attack/reward, không tạo
 
 Candidate farm inventory cho các routes đủ làm probe: Đồng6 Nấm/12 Sói; Trúc8 Sói Trúc và6 Sói Sương; Bạch14 Đoạt Mạch; Xích9 Đoạt Mạch/16 Thạch; Huyền4 Thạch/16 Guards. Đây là phép cộng candidate rows, không population đã chạy. Counts quest theo owner; requiredCount có thể vượt một pocket hoặc một lần clear và hoàn qua revisit/respawn/bãi khác. Không tăng slots/HP/drop tự động để vừa bảng counts. Waypoints kể chuyện dẫn tới seals/Boss nhưng tracker không nói “chỉ kills tại bãi này”.
 
-**Q8 availability vs eligibility:** TA4.slot1 là shared guaranteed encounter path; đúng Sói Trúc Ảnh + Linh Biến ở bãi khác vẫn có thể credit active Linh step theo Quest owner. Unrelated identity/variant không lấy hoặc hủy quyền Q8. Sau qualifying death commit thì remove requester dù kill không ở reserved slot; reservation còn phục vụ requesters khác, không despawn actor đang sống. Economic guard vẫn một budget/receipt cho force/retry; kill random Linh khác dùng regular life budget cũ, không thêm quest reward hoặc reroll.
+**Q8 availability vs eligibility:** natural population và per-character credit tách nhau; đúng identity+variant ở mọi bãi hợp lệ tính theo active stage. Xem [hunt review](quests-and-narrative.md#q8-credit-review); không force economic budget hoặc guaranteed encounter path.
+
+
+
+XN4/XN5/XN6 slot counts là candidate density hiện có, không Q11 quota hoặc nơi cấp ba restored fragments. Ba restoration targets trên nhiều map còn OPEN và phải accessible trước Huyền Tích unlock; không lấy trụ scenery cũ làm graph mới mặc định.
