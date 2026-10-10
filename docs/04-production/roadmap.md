@@ -28,6 +28,22 @@ Bản mẫu cũ đã có các lượt test và video theo revision riêng. Trạ
 
 **DEFERRED** là hạng mục vẫn thuộc TARGET nhưng chưa nằm trên đường phụ thuộc đầu tiên. Cung là P0. Giữ toàn bộ skill, projectile, gear, pose/VFX và các phép kiểm Kiếm/Cung. Slice sớm triển khai Kiếm trước; Cung vẫn được giới thiệu trong Q6 và có thể ghi “Chưa mở trong bản thử nghiệm” khi chưa playable. Nhãn giới hạn này không dùng trong sản phẩm cuối.
 
+<a id="docs-phase-readiness"></a>
+
+### Chốt phase docs — 2026-10-11
+
+**Canonical docs ready for vertical-slice implementation, with explicitly tracked tuning/technical gates.** Core architecture/system contracts đủ làm đầu vào triển khai các slices; Q2 content và Q6 non-blocking MP onboarding đã duyệt, SafeAnchor đồng bộ Online owner. Chốt phase chuẩn hóa docs không phải mọi design LOCKED hoặc G-B/G-L/G-N/G-D đã pass. Readiness là quyết định bắt đầu implementation theo gate, không bằng chứng runtime.
+
+| Loại việc còn lại | Trạng thái / ảnh hưởng | Việc tiếp theo và gate |
+| --- | --- | --- |
+| Content decision | Q11 package chưa chốt, chặn final authoring Q11/maps liên quan; Q2 không còn chờ content approval | Một lượt riêng duyệt [Q11 graph](../01-design/quests-and-narrative.md#q11-restoration), không dùng placeholder làm production content. Q2 blockout/definition validation ở G-B/G-L |
+| Gameplay profile probes | Combat eligibility/LoS/C1–C2/Return là OPEN có chủ đích, không chặn coding probe hoặc chứng minh balance frozen | Implement switchable profiles + logs trong C0/PHY-01; chơi rồi chọn tại owner, không chốt tiếp bằng suy đoán trên giấy |
+| Data tuning | One-outcome loot model đủ implement; rates/weights và quest pacing chưa production lock | Tạo `loot-v0-probe` có version theo [EV/probe owner](playtest-and-balance.md#loot-model-transition), đo income/bag/shop pressure và fresh route tại G-C/F/QUEST-03 |
+| Technical durability | Potion durable handoff, death pre-commit policy và A15 clock/cap ordering chưa nghiệm thu; chặn G-D/G-T | Spike process crash/unknown commit/lost ACK/two writers theo [Online candidates](../02-technical/online-and-persistence.md#potion-durability); test rồi chọn, không gọi RAM queue crash-safe |
+| Art production | Minimal Kiếm/Cung/map/mob/VFX còn probe; chưa raster/camera/effort freeze | Pha R/P01–P15 rồi G-N trước nhân catalog/families; [workflow](#art-workflow) giữ phạm vi nhỏ |
+
+Các OPEN khác tiếp tục tại [Open Decision Index](../README.md#open-decision-index), gồm inventory shipment/canDiscard và data/schema details. Không biến toàn backlog thành blocker của Slice 1 hoặc bỏ gate tương ứng để gọi TARGET done.
+
 | Nhóm | Trạng thái hiện hành | Điều kiện quay lại / mở rộng |
 | --- | --- | --- |
 | Tân Lữ → Kiếm, movement, chọn skill và PrimaryAction (combat branch) | CURRENT docs và kế hoạch probe; chưa triển khai revision mới | Review production base, rồi kiểm G-L theo controls mới ở tốc độ thường |
@@ -122,7 +138,15 @@ Hạng mục độc lập trong G-C/F/P có thể làm song song sau gate phụ 
 
 ## Giao việc cho art probe
 
-Pha R phải review [Master Pose modular probe](../03-art/art-and-visual-production.md#first-art-probe) và [P01/P02/P03 acceptance](playtest-and-balance.md#modular-character-acceptance) trước chốt raster budget; P15 đo công thực, không chỉ review một outfit. Pha R/P15 dùng [Art workflow và phép đo output/giờ](../03-art/art-and-visual-production.md#art-tool-workflow); task tuân [Runtime discipline](../02-technical/gameplay-runtime.md#architecture-discipline). Chỉ mở production theo gate bên dưới.
+Pha R phải review [Master Pose Schema / Visual Set probe](../03-art/art-and-visual-production.md#first-art-probe) và [P01/P02/P03 acceptance](playtest-and-balance.md#modular-character-acceptance) trước chốt raster budget; P15 đo công thực, không chỉ review một outfit. Pha R/P15 dùng [Art workflow và phép đo output/giờ](../03-art/art-and-visual-production.md#art-tool-workflow); task tuân [Runtime discipline](../02-technical/gameplay-runtime.md#architecture-discipline). Chỉ mở production theo gate bên dưới.
+
+**Map/mob/VFX micro-slices — PLAN, CHƯA CHẠY:** bổ sung vào Pha R/base/local/Dedicated hiện hành; không gate mới, không thay Slice 1 là coding slice đầu hoặc mở full content sớm. Mỗi mẫu đo authoring/integration/QA/rework, dùng [P05/P06/P08/P09/P04/P12](playtest-and-balance.md#map-mob-vfx-validation).
+
+| Mẫu trước khi nhân production | Đường làm và evidence | Lúc mở rộng |
+| --- | --- | --- |
+| Map authoring | Một farm room: Tile Palette/MapRoot → Ground + structural OneWay → background/decor → Spawn/NPC/Exit/regions/approved landmark markers cần thiết → Validate/refresh → Client/Local, rồi same-source Dedicated | Pha R thử workflow nhỏ; G-B review representation, G-L kiểm local route; G-N kiểm round-trip ≥2 client trước full families/content. Room không thay blockout ba map G-L. RuleTile/custom brush, batch tooling/advanced Editor UX chỉ đầu tư sau basic room path pass; không xây Map Editor lớn trước |
+| Mob visual | Nấm + Sói → minimal Mob Visual Definitions → ít body rasters → move/anticipation/hit/death/facing/impact clock → eligible Sói Linh overlay fixture → camera gameplay review | Pha R P05/P06 + P15; xử missing pose/feedback trước, qua G-N mới nhân roster sáu rigs/bảy identities ở G-C. Boss bespoke ở G-F/P14, không normal-raster cap |
+| VFX early combat | Sword S1/S2 và Bow S1/S2 → main cue/projectile khi cần/impact/status fixtures → pool reuse/life reset → target-based independence | Pha R minimal hai phái; C0/P04 giữ propagation/clock fixtures, S3 theo current gate/fixture. G-L chỉ route Kiếm; P12/G-N chứng minh Dedicated, full Bow/gear/VFX production sau gates phù hợp. Không kéo full catalog vào early probe |
 
 <a id="production-release"></a>
 
@@ -141,7 +165,7 @@ Cắt P1/P2 và polish trước: giảm cosmetic variations/shake/sound/phần t
 
 **PLAN/PROPOSAL; chưa code hoặc pass gate.** [Source audit](../90-archive/production-history.md#source-audit-20261009) ghi actual classes/files tại snapshot 2026-10-09; [matrix](../02-technical/gameplay-runtime.md#responsibility-matrix) ghi trách nhiệm đề nghị. Source VS-1 đã bị xóa khỏi checkout; tra commit lưu trữ khi cần đối chiếu, dựng production theo contract mới. Production `game/`/`backend/` chưa tồn tại. Module mới dưới đây là đề xuất boundary, chưa phải filename/class có sẵn; G-B quyết layout nhỏ nhất. Không port nguyên `SliceSession`/`SliceHud`.
 
-**Thứ tự đề nghị:** Inventory → fixed Jump; C0 combat contract sau base/movement và trước real combat death credit; shared UI → Shop → regular ground → personal entitlement → collection objectives → Q2/mentor → presentation integration. Fixed Jump đi trước Q2 để blockout không dựa hold apex. Minimal Kiếm/Cung art probe vẫn làm sớm ở **Pha R**; Slice 9 chỉ tích hợp vào production. Review schema/data cho đủ 12 QuestDefinitions tại G-B; Q2 content cần duyệt riêng, tuyến Q8+ nghiệm thu ở G-C. Fixture local của Slice 6–7 phục vụ Q2/Q4; durability chỉ hoàn thành sau G-N/G-D. Dedicated receiver/replication và Spring commit adapter là các PR nhỏ tại gate tương ứng, không gộp vào PR Inventory.
+**Thứ tự đề nghị:** Inventory → fixed Jump; C0 combat contract sau base/movement và trước real combat death credit; shared UI → Shop → regular ground → personal entitlement → collection objectives → Q2/mentor → presentation integration. Fixed Jump đi trước Q2 để blockout không dựa hold apex. Minimal Kiếm/Cung art probe vẫn làm sớm ở **Pha R**; Slice 9 chỉ tích hợp vào production. Review schema/data cho đủ 12 QuestDefinitions tại G-B; Q2 content đã duyệt, Q11 cần lượt chốt graph riêng trước final authoring, tuyến Q8+ nghiệm thu ở G-C. Fixture local của Slice 6–7 phục vụ Q2/Q4; durability chỉ hoàn thành sau G-N/G-D. Dedicated receiver/replication và Spring commit adapter là các PR nhỏ tại gate tương ứng, không gộp vào PR Inventory.
 
 Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo definition revision. Chưa có save production để migrate SQL; mục Migration nói cách xử lý fixture/import nếu được tạo. Không đổi lịch TARGET, không dùng preset thay fresh acceptance.
 
@@ -296,23 +320,23 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Integration tests:** full bag consume tạo một slot rồi reward fit; reward cần hai slots reject toàn consume; lost ACK hoàn/thưởng một lần; Q11 placement consume+flag durable; gate đọc flags/approved endpoint, không possession ba mảnh; staged grant không duplicate.
 - **Multiplayer tests:** cofarm vẫn riêng quest state; Pickup/TurnIn serialize revisions; Talk không share; G-D transaction faults thật.
 - **Manual acceptance:** item thấy trong bag, không Sell/mất khi chết; turn-in thiếu item có reason, Q4 sample vẫn Sell đúng policy.
-- **DoD:** fixture end-to-end và full definition validation, Q2 draft gated pending approval; Q8+ nghiệm thu G-C/G-T.
+- **DoD:** fixture end-to-end và full definition validation; Q2 content đã duyệt nhưng binding/geometry phải kiểm; Q11 graph chưa duyệt không author production bằng fixture; Q8+ nghiệm thu G-C/G-T.
 - **Rollback risk:** revision migration cao; rollback view không được xóa committed rights/history.
 
 ### Slice 8 — Q2 journey và Q6/NPC contextual route
 
 - **Why now:** gameplay/content dựa trên physics, UI và recovery đã kiểm; mỗi quest là PR nhỏ.
-- **Dependencies:** Slice 2+3+6+7; exact Q2 item/name/route cần duyệt trước production definition. Q6 both-talk direction đã xác nhận, không hỏi lại.
+- **Dependencies:** Slice 2+3+6+7; [Q2 item/source/route](../01-design/quests-and-narrative.md#q2-journey) đã duyệt, cần binding/blockout validation. Q6 both-talk và non-blocking MP onboarding đã duyệt, không hỏi lại.
 - **Actual reference:** `SliceSession.Anchors/QuestNpc/Interact/ChooseSword/ObservePosition`, `SliceHud.QuestIntro/QuestComplete/Dialogue/Npc/Marker`, `BlockoutLayout.Surfaces`, `PrototypePresets.Create`, `SliceRouteProbe.Route`, `ContinuousRouteTests`; Q3 Phong/Q6 Tạ Minh chỉ legacy reference.
-- **New contracts:** approved Q2 placed source/destination/return (Vải Bọc Chuôi là draft chưa duyệt); Q6 two NpcTalked receipts/resolved mentor và contextual data table. Q6 dời mandatory Used sang lúc thiếu MP tự nhiên vẫn PROPOSAL riêng, không tự đổi definition.
+- **New contracts:** Q2 Vải Bọc Chuôi (`item_q2_grip_wrap`) tại `HV_Q2_SupplyRack` → personal ground/pickup → Lâm Bá consume; Q6 two NpcTalked receipts/resolved mentor và contextual data table. MP tutorial Armed/Completed thuộc onboarding riêng, không Used objective blocking Q6; hint thiếu MP thật và accepted MP use theo owner.
 - **Minimal implementation:** Q2 route và Q6 admission nối riêng vào fresh journey, không rewrite mọi NPC cùng lúc.
-- **Migration:** giữ anchor/QuestIds; bỏ mandatory Drop không rename MapId. Migrate Tạ Minh references theo current roster; G-L Sword-only không là final Cung product.
-- **Server:** Q2 một placed entitlement, pickup thật/atomic consume, không credit từ Jump/Drop presses. Q6 both-talk→manual unequip→class/grant/mentor commit; không trust selected mentor ID/off-class manual.
+- **Migration:** giữ anchor/QuestIds; bỏ mandatory Drop không rename MapId. Q6 bỏ blocking UseMpPotion predicate, onboarding flags tách quest group; reset dev hoặc approved import mapping giữ actual consume receipts, không suy tutorial Complete chỉ từ Q6Completed. Migrate Tạ Minh references theo current roster; G-L Sword-only không là final Cung product.
+- **Server:** Q2 một placed entitlement, pickup thật/atomic consume, không credit từ Jump/Drop presses. Q6 both-talk→manual unequip→class/grant/mentor/Arm commit; S1 core progress và reserved supply một lần, turn-in không đợi MP use. Accepted MP use Complete onboarding, không trust selected mentor ID/off-class manual.
 - **Client:** tracker mục đích/đường về; PrimaryAction NPC mởrootcontext, Talkoption explicit/noopeningcredit/modalconsume; service/context rõ, unselected mentor vẫn Talk và biết class sau Q6; không auto-face/relation meter.
-- **Persistence:** discovery/class/mentor/learn receipts durable G-D; ambient readonly; Q2 epoch/claim/turn-in dùng flow chung.
+- **Persistence:** discovery/class/mentor/learn/Armed receipts durable G-D; Potion consume+onboarding Completed chung ordered command/receipt, pending reconciliation theo POT-01; ambient readonly. Q2 epoch/claim/turn-in dùng flow chung; flags sống qua Q6 completion/map/death/reload, không regrant.
 - **Dev Mode:** FreshQ2/full bag placed item, Q6 one/both talked, Sword/Bow selected/unselected, late class/reserved MP; preset không thay fresh G-L video.
 - **Unit tests:** chọn class trước both-talk fail, duplicate Talk không thêm resource; Q2 presses không credit; wrong-NPC/replay reject; context selectors.
-- **Integration tests:** fresh Q1–Q6 Sword bằng Rigidbody/menu commands; Q2 fall retry/TTL; Q6 learn/cast/actual MP use/unselected Talk; Cung fixture rồi full route G-C.
+- **Integration tests:** fresh Q1–Q6 Sword bằng Rigidbody/menu commands; Q2 fall/fullbag/TTL/return consume; Q6 learn/cast/turn-in khi onboarding chưa Complete, Food refill/full-MP reject, thiếu MP tự nhiên về sau→accepted consume/Complete/replay; unselected Talk. Cung fixture rồi full route G-C; DB crash/reload ở G-D.
 - **Multiplayer tests:** một placed source tạo rights độc lập; class choice không share, NPC response đúng từng class; reconnect discovery/claim.
 - **Manual acceptance:** journey có lý do, không precision platformer; 2–4 jumps là geometry proposal, Drop optional; hai mentor dễ tìm/ngang hàng, không off-class sale.
 - **DoD:** approved Q2 definition + fresh G-L logs/video và keyboard/mouse usability; full Cung route G-C/G-T.
@@ -323,25 +347,25 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Why now:** đưa art probe đã làm sớm vào production rig, rồi mới mở rộng families.
 - **Dependencies:** Pha R minimal KiếmS2 A/B và CungS2 ngang ưu tiên, Slice2 movement/shared rig + **C0 actual target/result contract trước full VFX**; G-N và A01/A02/A12 trước nhân families.
 - **Actual reference:** `CombatController.Facing/TryStart`, `SliceHost.FixedUpdate/RenderPlayer`, `GeometricRig.Pose`, `SliceHud.DrawEquipment`; dead-gray outfit/Idle torso+weapon rotation là gap prototype.
-- **New contracts:** Left/Right, Idle3/4, class upper poses/clock/keys/parts/sockets/carry; Right default/immutable action facing/life; SkillPresentationProfile main/impact/status/SuppressDefaultMainWeaponVfx/local-remote LOD theo Art, không per-skill system mới.
-- **Minimal implementation:** tích hợp Master Pose và default/Áo I/Quần I + fixture variants nhỏ đã qua [Art probe](../03-art/art-and-visual-production.md#first-art-probe); Kiếm/Cung cùng pose system, không full catalog.
-- **Migration:** Front Idle priority SUPERSEDED, giữ tám states/count 26; A01 timeline/raster OPEN, không dùng estimate Body/Armor lịch sử làm budget hoặc mass rename assets.
+- **New contracts:** Left/Right, Idle3/4, shared clock/timeline samples→PoseKeys→Visual Set lookup theo [Art terminology](../03-art/art-and-visual-production.md#character-art-terminology), sockets/carry; Right default/immutable action facing/life; SkillPresentationProfile main/impact/status/SuppressDefaultMainWeaponVfx/local-remote LOD theo Art, không per-skill system mới.
+- **Minimal implementation:** tích hợp Master Pose Schema với Head Visual Set/default Upper/Lower Sets, visual bindings của Áo Thanh Mộc/Quần Thanh Mộc và fixture variants nhỏ đã qua [Art probe](../03-art/art-and-visual-production.md#first-art-probe); Kiếm/Cung cùng pose system, không full catalog.
+- **Migration:** Front Idle priority SUPERSEDED, giữ tám states/26 Logical Timeline Samples; A01 sample→PoseKey/raster mapping OPEN, không dùng estimate Body/Armor lịch sử làm budget hoặc mass rename assets.
 - **Server:** expose authoritative action/facing/terminal phase theo presentation spike; không gameplay damage/AnimationEvent/facing DB mới.
 - **Client:** Idle giữ hướng, Run side hơn, Jump/Fall riêng 2+2, swing/draw upper thật; Back/Hand một representation, player pop/fall/shadow hide parts; NPC authored độc lập.
 - **Persistence:** dùng existing gear/class/terminal/checkpoint contracts; lost session Right baseline khi chưa saved-facing requirement.
 - **Dev Mode:** Left/Right stop, air/opposite action, swap/unequip/S2, duplicate death/late viewer/revive/life reset, fixture labels rõ.
 - **Unit tests:** phase/facing/carry dedup/life-reset/pose mapping invariants; không test chỉ mirror PNG implementation.
-- **Integration tests:** Unity import/pivot/socket/timing/pose-indexed part mix và visual revision; late/stale shadow đúng, Hit không restart clock; sprite không là damage collision.
+- **Integration tests:** Unity import/pivot/socket/timing/Visual Set/Pose Fragment mix và visual revision; late/stale shadow đúng, Hit không restart clock; sprite không là damage collision.
 - **Multiplayer tests:** remote clients, old-life action/late join/MapId/dead focus HP updates; PNG local không chứng minh network truth.
-- **Manual acceptance:** Idle 3/4/action side dễ đọc; hand grip/hip/armor/weapon align hai hướng, không chỉ xoay weapon; camera/font ở scale thật.
-- **DoD:** [modular acceptance](playtest-and-balance.md#modular-character-acceptance) và minimal Kiếm/Cung evidence, manifest, effort hours/% usable; A01 mapping/reuse trong26 logical frames được kiểm, không fake asset PASS; physics/mob death giữ.
+- **Manual acceptance:** Idle 3/4/action side dễ đọc; hand grip/hip/Upper/Lower/Weapon visuals align hai hướng, không chỉ xoay weapon; camera/font ở scale thật.
+- **DoD:** [modular acceptance](playtest-and-balance.md#modular-character-acceptance) và minimal Kiếm/Cung evidence, manifest, effort hours/% usable; A01 mapping/reuse trong 26 Logical Timeline Samples được kiểm, không fake asset PASS; physics/mob death giữ.
 - **Rollback risk:** presentation revision reset callbacks cũ, không rollback Inventory/class.
 
 <a id="first-coding-slice"></a>
 
 ## Một coding slice nên làm đầu tiên
 
-**Chọn Slice 1: production Inventory domain nhỏ + RAM command/receipt seam, 60 slots và compatible stack.** Đây không chỉ đổi 30→60 trong prototype. Nó mở net capacity/quantity/ownership/revision cho Shop/Pickup/TurnIn và test full bag độc lập, chưa cần chốt Q2 name/schema/26-raster mapping. G-B boundary review cùng Pha R prerequisites đi trước; deliverable đầu là harness chạy Add/Merge/Reject/Replay với logs/invariants và label RAM fixture. Fixed Jump tiếp theo trước Q2 authoring; C0 sau movement/base review và trước Slice5–7 actual kills hoặc full VFX. Không để Inventory slice thành chốt ngầm combat bounds. Đối chiếu VS-1 qua lịch sử Git khi cần; không gộp UI/DB/quests/network trong PR đầu.
+**Chọn Slice 1: production Inventory domain nhỏ + RAM command/receipt seam, 60 slots và compatible stack.** Đây không chỉ đổi 30→60 trong prototype. Nó mở net capacity/quantity/ownership/revision cho Shop/Pickup/TurnIn và test full bag độc lập, chưa cần chốt Q11 graph/schema/26-sample→PoseKey/raster mapping. G-B boundary review cùng Pha R prerequisites đi trước; deliverable đầu là harness chạy Add/Merge/Reject/Replay với logs/invariants và label RAM fixture. Fixed Jump tiếp theo trước Q2 authoring; C0 sau movement/base review và trước Slice5–7 actual kills hoặc full VFX. Không để Inventory slice thành chốt ngầm combat bounds. Đối chiếu VS-1 qua lịch sử Git khi cần; không gộp UI/DB/quests/network trong PR đầu.
 
 <a id="map-info-work-package"></a>
 

@@ -36,7 +36,7 @@ docs/
 | [Items & Economy](01-design/items-and-economy.md) | Gear/Food/Potion, inventory/shop/loot, Gold/Journey và PvP stake economy |
 | [Gameplay Runtime](02-technical/gameplay-runtime.md) | Architecture/authority/Local → Dedicated; PrimaryAction/ActiveFocus/input/UI; clock/combat/quest/physics/map/presentation implementation |
 | [Online & Persistence](02-technical/online-and-persistence.md) | Auth/lease/reconnect/checkpoint, transactions/receipts, durability/outage/escrow |
-| [Art & Visual Production](03-art/art-and-visual-production.md) | Master Pose/visual-part authoring/composition, perspective/rig/pose/socket, visual language, map Bible/UI, workflow/accounting |
+| [Art & Visual Production](03-art/art-and-visual-production.md) | Master Pose Schema/Pose Template Sheet, Visual Channels/Sets/Fragments/Slices, perspective/rig/pose/socket, visual language, map Bible/UI, workflow/accounting |
 | [Roadmap](04-production/roadmap.md) | CURRENT/TARGET/DEFERRED, phase/gate, phụ thuộc, lịch quản lý và readiness |
 | [Playtest & Balance](04-production/playtest-and-balance.md) | Evidence/fixtures/probes/KPI, harness requirements và fresh-run protocol |
 
@@ -47,6 +47,8 @@ Một current fact có một canonical owner. Design quyết định WHAT; Techn
 LOCKED là quyết định đã duyệt. STRONG DIRECTION là hướng rõ cần kiểm cách làm. BASELINE/TUNABLE là mốc để thử. OPEN là câu hỏi chưa chốt. PROPOSAL chưa phải luật. LEGACY/SUPERSEDED chỉ truy vết lịch sử; không dùng làm implementation requirement. P0/P1/P2 mô tả scope, không tự chứng minh hệ đã được triển khai.
 
 Evidence trái design phải thành finding để owner quyết định, không silently sửa luật. Reference/prototype/external review không tự thành authority.
+
+**Docs checkpoint 2026-10-11:** canonical docs ready for vertical-slice implementation, with explicitly tracked tuning/technical gates. Đây là chốt phase chuẩn hóa tài liệu; content/balance/durability/art production chưa freeze hoặc nghiệm thu. Phân loại backlog và gate tiếp theo thuộc [Roadmap](04-production/roadmap.md#docs-phase-readiness).
 
 ## Reading by role
 
@@ -92,7 +94,9 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Potion gameplay/resource rule (WHAT) | [Items](01-design/items-and-economy.md#consumables-death) |
 | Potion realtime application ordering (HOW) | [Runtime](02-technical/gameplay-runtime.md#potion-ordering) |
 | Potion durability/crash/reconnect (HOW) | [Online](02-technical/online-and-persistence.md#potion-durability) |
-| Master Pose / modular parts / 26 logical mapping / socket / accounting | [Art](03-art/art-and-visual-production.md#master-pose), [runtime integration](02-technical/gameplay-runtime.md#art-contract), [probe acceptance](04-production/playtest-and-balance.md#modular-character-acceptance) |
+| Master Pose Schema / Visual Sets / 26 timeline samples / socket / accounting | [Art schema](03-art/art-and-visual-production.md#master-pose), [terminology](03-art/art-and-visual-production.md#character-art-terminology), [runtime integration](02-technical/gameplay-runtime.md#art-contract), [probe acceptance](04-production/playtest-and-balance.md#modular-character-acceptance) |
+| Unity map authoring / Client–Dedicated source / validation | [Runtime pipeline](02-technical/gameplay-runtime.md#map-authoring-pipeline), [Art Editor workflow](03-art/art-and-visual-production.md#map-editor-workflow), [round-trip probes](04-production/playtest-and-balance.md#map-mob-vfx-validation) |
+| Mob Visual Definition / low-raster art / Asset Roles / Projectile Visual | [Runtime mob binding](02-technical/gameplay-runtime.md#mob-visual-definition), [mob Art](03-art/art-and-visual-production.md#mob-visual), [asset taxonomy](03-art/art-and-visual-production.md#asset-roles), [projectile boundary](02-technical/gameplay-runtime.md#projectile-visual) |
 | Early Kiếm/Cung và production readiness | [Roadmap](04-production/roadmap.md), [protocol](04-production/playtest-and-balance.md#early-two-class-probe) |
 | Old tables/prototype history | [Design history](90-archive/design-history.md), [Art history](90-archive/art-history.md), [Production history](90-archive/production-history.md) |
 
@@ -101,9 +105,11 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Thuật ngữ | Nghĩa dùng trong docs |
 | --- | --- |
 | Authority | Thành phần có quyền quyết định một loại state/result |
-| Master Pose Template / Schema | Reference authoring và contract dữ liệu pose/anchors dùng chung; không body render layer |
-| Pose-indexed visual set | Head/Hair, Upper/Armor, Lower/Pants hoặc Weapon được chọn/căn theo logical pose; default Upper/Lower dùng khi unequip |
-| Logical pose / raster | Mẫu trên timeline / ảnh pixel xuất; 26 logical poses LOCKED không đồng nghĩa 26 unique rasters mỗi item |
+| Master Pose Schema | Contract pose/anchors dữ liệu dùng chung, không sprite; [Art owner](03-art/art-and-visual-production.md#master-pose) |
+| Pose Template Sheet | Reference sheet artist dùng khi vẽ theo schema; không runtime body layer |
+| Equipment Slot / Visual Channel | Gameplay Weapon/Armor/Pants/Boots/Ring/Necklace / presentation Head/Upper/Lower/Weapon; hai loại khái niệm riêng |
+| Visual Set / Pose Fragment / Render Slice | Appearance trên channel / representation theo PoseKey / phần trước-sau tùy chọn; [glossary owner](03-art/art-and-visual-production.md#character-art-terminology) |
+| Logical Timeline Sample / PoseKey / raster | Mốc timeline / visual pose ID / ảnh pixel; 26 samples LOCKED không khóa số PoseKeys/raster |
 | UI icon / character visual | Hai asset roles riêng: biểu diễn item trong UI / fragments ghép actor trong world |
 | Snapshot | Bản chụp bất biến của data tại một thời điểm |
 | Commit / rollback | Ghi thành công toàn transaction / hoàn tác transaction thất bại |
@@ -143,7 +149,7 @@ Index chỉ dẫn nơi quyết định; không giữ options hoặc gameplay val
 | QUEST-03 | PLAYTEST | Fresh route, narrative/usability và duration có đạt? | [Quest](01-design/quests-and-narrative.md), [evidence](04-production/playtest-and-balance.md) | G-L/C/T |
 | POT-01 | LOCKED realtime / OPEN durability | Accepted Potion survive crash/outage thế nào? | [Online](02-technical/online-and-persistence.md#potion-durability) | G-D/G-T bắt buộc |
 | TECH-01 / SAVE-01 | SPIKE | Auth/lease/checkpoint/reconnect/recovery có nhất quán? | [Online](02-technical/online-and-persistence.md) | G-D |
-| A01 / A02 / A17 | OPEN | Raster mapping trong26 logical frames, technique và real accounting? | [Art](03-art/art-and-visual-production.md#art-open-decisions) | Early probes/P15 |
+| A01 / A02 / A17 | OPEN | Raster mapping trong 26 Logical Timeline Samples, technique và real accounting? | [Art](03-art/art-and-visual-production.md#art-open-decisions) | Early probes/P15 |
 | A03 | BASELINE | Stat-only visual binding? | [Items](01-design/items-and-economy.md#a03) | Gear/UI integration |
 | A04 / A08 / A09 / A12 / A16 | OPEN visual details | Motif/corpse/kit/camera/Boss pose? | [Art](03-art/art-and-visual-production.md#art-open-decisions) | Pha R/P01–P15 |
 | A05 / A06 / A14 | OPEN/TUNABLE details | Ranged timing, role và air policy? | [Combat](01-design/combat-and-character.md#a05) | Pha R/G-C |
@@ -157,7 +163,8 @@ Index chỉ dẫn nơi quyết định; không giữ options hoặc gameplay val
 | INV-UX | CURRENT planned / OPEN scope | Ordinary canDiscard và Split/Sort/Discard shipment P0/P1? | [Items](01-design/items-and-economy.md#inventory-ux-policy), [Roadmap](04-production/roadmap.md#map-info-work-package) | Slice1/3/4; scope review |
 | MAP-INFO | CURRENT direction / ENGINEERING recommendation / OPEN visual | Count encoding/lifecycle/replication và labels/layout? | [World](01-design/world-and-content.md#map-population-info), [Runtime](02-technical/gameplay-runtime.md#map-info-runtime), [Art](03-art/art-and-visual-production.md#activefocus--map-info--inventory-visual-sync--current-direction) | Slice5/8/G-N |
 | RNG-DURABILITY | OPEN engineering spike | Schema/retention/TTL, pre-handoff crash và staged batch delivery? | [Online](02-technical/online-and-persistence.md#identity-death-receipts) | G-D |
-| Q2 / Q6 | PROPOSAL chưa áp dụng | Exact journey content và MP tutorial reschedule? | [Q2](01-design/quests-and-narrative.md#q2-journey), [Q6](01-design/quests-and-narrative.md#q6-mp-tutorial--recovery-hiện-hành-và-proposal-dời-thời-điểm) | Content approval/G-L |
+
+**Đã duyệt 2026-10-11:** [Q2 Vải Bọc Chuôi journey](01-design/quests-and-narrative.md#q2-journey) là canonical content; [Q6 MP Potion onboarding](01-design/quests-and-narrative.md#mp-potion-onboarding) không chặn quest completion/map unlock. Geometry, implementation và runtime acceptance tiếp tục theo gates; hai mục này không còn chờ approval design.
 
 ## History
 

@@ -297,7 +297,7 @@ Target HUD tối giản: marker + mini HP trong world; tên/level/current-max HP
 
 ## Combat rationale, delta và gates
 
-Luật progression/input hiện hành đọc [Combat & Character](#focus-input); presentation theo [Art — Master Pose](../03-art/art-and-visual-production.md#master-pose), không đổi gameplay authority. Basic Tân Lữ trước class tránh hard cutoff làm Q5 Lv 5 kẹt. Ba active tích lũy giữ lựa chọn skill/MP/CD riêng, thay vì thêm class Normal miễn MP; một PrimaryAction dispatch theo ActiveFocus; explicit loot selection thay combat selection, không auto steal. Logical ranged result bỏ flight damage/interception; player primary/propagation kiểm eligibility, còn mob melee/Boss telegraph giữ positional dodge. Movement/momentum không bị normal damage interrupt.
+Luật progression/input hiện hành đọc [Combat & Character](#focus-input); presentation theo [Art — Master Pose Schema](../03-art/art-and-visual-production.md#master-pose), không đổi gameplay authority. Basic Tân Lữ trước class tránh hard cutoff làm Q5 Lv 5 kẹt. Ba active tích lũy giữ lựa chọn skill/MP/CD riêng, thay vì thêm class Normal miễn MP; một PrimaryAction dispatch theo ActiveFocus; explicit loot selection thay combat selection, không auto steal. Logical ranged result bỏ flight damage/interception; player primary/propagation kiểm eligibility, còn mob melee/Boss telegraph giữ positional dodge. Movement/momentum không bị normal damage interrupt.
 
 | Review decision | Kết luận / trade-off | Gate còn phải đo |
 | --- | --- | --- |
@@ -308,7 +308,7 @@ Luật progression/input hiện hành đọc [Combat & Character](#focus-input);
 | D14 | Hybrid count/identity OPEN; 3/1/0 chỉ ví dụ lịch sử, không preferred/final roster; giữ các mob identity/fixedlevel | PROTOTYPE + user content approval; không tiết kiệm pose count trước duyệt |
 | D15/D15R | Legit Cung kite là lợi thế; perch unreachable xử authoring+Return đơn giản, không anti-Bow AI; exact grace/Return/regen/invuln/targetability chưa chốt | Jump ngắn/perch/kite/2 players/reachable retarget; reset không reward/reroll/life mới |
 | D17/D18/D20 | LoS A/B PROTOTYPE; full geometry LoS DROP P0; respawn 25 s/rates giữ TUNABLE; 28/66 là LEGACY seed, mật độ mới re-author chưa totals | Room/playtest/benchmark workload thật; không CPU%/số dòng recipe proof |
-| D21/D23/D24 | Per-profile visuals; Auto/gamepad/hitstop/crit shake/material audio DEFER; Tab theo input đã duyệt; 26 logical frames giữ LOCKED, A01 mapping/A02 technique OPEN | Art imported rig/weapon/readability/hour/% usable; không 33 pose lock |
+| D21/D23/D24 | Per-profile visuals; Auto/gamepad/hitstop/crit shake/material audio DEFER; Tab theo input đã duyệt; 26 Logical Timeline Samples giữ LOCKED, A01 mapping/A02 technique OPEN | Art imported rig/weapon/readability/hour/% usable; không 33 pose lock |
 | D25–D27/D29/D30 | Giữ tính toàn vẹn backend; tổng hợp findings VS-1 rồi thử trong sandbox riêng; ba ô tích lũy/CD riêng, không fallback class miễn MP | Tổng hợp/thử → nền production → G-L mới → G-N/G-D; luân phiên CD độc lập đổi burst/tài nguyên |
 
 **ROLE AUDIT hiện hành:** power/MP, power/CD, occupancy, TTK đơn/cụm và rủi ro Cung AAA/S1 nằm tại [probe 2026-10-06](../04-production/playtest-and-balance.md#current-balance-probe). Bảng input1–3one-press/cadence1,0/1,5/1,7/7 cũ đã SUPERSEDED; không restore class Normal để lấp MP/CD. Independent cooldown và chọn/Execute thủ công giữ quyền luân phiên skill, không cho hold-repeat hoặc auto-combat.

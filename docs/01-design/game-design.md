@@ -28,7 +28,7 @@ Luật ngoài domain thuộc owner trong [documentation map](../README.md); evid
 | --- | --- | --- |
 | Farm có nhịp | Chọn primary rồi đánh lan gần mục tiêu / Spread / explosion theo Combat owner | Lv 5 single; Lv 10 học tiến cảnh max 3; Lv 17 đại chiêu |
 | Build tự do | Đổi phân phối điểm để thử cách chơi | All-in không bị khóa progression; Tẩy Mạch sửa build |
-| Progression hữu hình | Gear mới đổi cả stat và hình | Weapon / Armor / Pants đổi sprite |
+| Progression hữu hình | Gear mới đổi cả stat và hình | Weapon / Armor / Pants có visual binding đổi hình nhân vật theo [Art owner](../03-art/art-and-visual-production.md#character-visual-binding) |
 | Hai class khác nhau | Kiếm áp sát; Cung giữ khoảng cách | Range, propagation và control khác rõ |
 | Online có ý nghĩa | Co-op farm / Boss, chat, challenge | Client kết nối tham gia gameplay thật |
 | Scope hoàn chỉnh | Ít nội dung nhưng nối thành hành trình | Lv 1 → 20, ba chương, chính tuyến và vòng chơi sau truyện |

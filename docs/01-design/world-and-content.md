@@ -75,7 +75,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 #### Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
 - **Vai trò:** Khu vực bán an toàn dành riêng cho tập luyện kỹ năng cơ bản, thử nghiệm di chuyển và nghi thức chọn phái (Q2, Q3, Q6).
 - **Phân khu 3 khu vực cốt lõi:**
-  + *Tuyến Q2 (`HV_ObstacleCourse`): * checklist bắt buộc Jump→Drop cũ SUPERSEDED. Giữ stable `HV_Entrance`, `HV_JumpLedge`, `HV_DropLanding` như anchor để review mini journey có mục đích tại [Quest owner](quests-and-narrative.md#q2-journey). Route dùng bậc solid và jump cố định, return rõ; one-way kết cấu là optional route, không bắt Q2 DropThrough. Exact destination/item/traversal count vẫn PROPOSAL, draft có typed requirements ở Quest owner; cần duyệt exact content và blockout trước production authoring.
+  + *Tuyến Q2 (`HV_ObstacleCourse`):* checklist bắt buộc Jump→Drop cũ SUPERSEDED. Giữ stable `HV_Entrance`, `HV_JumpLedge`, `HV_DropLanding`; [Quest owner](quests-and-narrative.md#q2-journey) đã duyệt lấy Vải Bọc Chuôi tại `HV_Q2_SupplyRack`, tự nhặt rồi trả Lâm Bá. Route dùng bậc solid và jump cố định, return rõ; one-way kết cấu là optional route, không bắt Q2 DropThrough. Exact coordinates/traversal count còn geometry PROBE; content approval không thay blockout/camera/pickup acceptance.
   + *Sân tập Bù Nhìn (`HV_DummyYard`):* Bãi đất bằng phẳng bố trí các cọc Bù Nhìn rơm độc lập theo [Q3 owner](quests-and-narrative.md#quests-story). **Năm placements đã duyệt: 3 sân chính + 2 khu phụ/ven tuyến đi**, cùng một Bù Nhìn/pool/lifecycle. Số placements giảm contention, không bảo đảm mọi N người có credit; không bắt Q3 chờ hồi sinh hoặc hạ bốn slot khác nhau.
   + *Khu vực Nhập Phái (`HV_ClassHall` / Điện Nhập Phái):* Khu vực riêng biệt cho hai phái với functional zoning rõ ràng; vị trí tả/hữu/Tây là đề xuất blockout tham khảo (tọa độ chính xác OPEN). Mentor Phong Du (Kiếm) và Mentor Diệp Lam (Cung) được bố trí bình đẳng, dễ thấy như nhau, khẳng định không đặt Kiếm Sĩ làm lựa chọn mặc định trước Cung Thủ.
 
@@ -147,7 +147,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 7. **Cơ chế chuyển tiếp bản đồ:**
    - `EdgeExit`: Vùng mép bản đồ thông thường có mũi tên chỉ hướng và tên vùng đích; nhân vật đi chạm vào vùng này bằng di chuyển thủ công sẽ tự động chuyển map, không cần bấm phím tương tác và không dựng vòm cổng dịch chuyển. Điểm xuất hiện ở map đích luôn nằm phía trong mép, bên ngoài vùng trigger trả về để chống hiện tượng giật chuyển map liên tục (ping-pong transition).
    - `SpecialGate`: admission/state validation riêng (Huyền Môn đọc committed restoration flags và Q11Completed access; cần PrimaryAction cuối hay tự phản ứng OPEN; Lôi Đài cần giao kèo thách đấu).
-   - `SafeAnchor`: Mỗi map có một tọa độ an toàn cố định. Khi mất kết nối hoặc máy chủ khởi động lại, người chơi sẽ xuất hiện tại SafeAnchor của map đó.
+   - `SafeAnchor`: Farm/combat map có một tọa độ khôi phục cố định; Vân Khê/Học Viện có anchor fallback an toàn. Short-resume còn trong reconnect grace giữ actor và vị trí runtime, không teleport về anchor. Khi tạo phiên mới, khôi phục theo [Online & Persistence](../02-technical/online-and-persistence.md#profile-authority): farm/combat dùng SafeAnchor của checkpoint MapId; Vân Khê/Học Viện có thể dùng exact checkpoint coordinate hợp lệ, sai thì fallback anchor. Lôi Đài không là recovery map, dùng checkpoint pre-Arena; MapId invalid fallback Vân Khê theo owner, không hồi HP/MP miễn phí.
 
 ---
 

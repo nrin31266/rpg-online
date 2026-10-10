@@ -69,7 +69,7 @@ Mỗi bậc có hai mẫu vũ khí mang tên riêng theo phái, cùng ATK/giá n
 | Nhẫn | MP / ACC, không nhân Crit | +4 chính xác | +0,5 điểm % chí mạng |
 | Dây chuyền | MP / EVA | +10 linh lực | +4 né tránh |
 
-Rarity Common 1 / Uncommon 1,08 / Rare 1,16 / Epic 1,25 nhân primary list trước enhance; Chí mạng gốc của Kiếm/Nhẫn và tốc chạy Giày không nhân. Weapon / Armor / Pants visual, Boots / Ring / Necklace stat / icon. Full 3 sets chỉ benchmark, không yêu cầu player đổi đồng loạt.
+Rarity Common 1 / Uncommon 1,08 / Rare 1,16 / Epic 1,25 nhân primary list trước enhance; Chí mạng gốc của Kiếm/Nhẫn và tốc chạy Giày không nhân. Weapon / Armor / Pants có character visual binding theo [Art owner](../03-art/art-and-visual-production.md#character-visual-binding); gameplay slot và item names giữ nguyên. Boots / Ring / Necklace chỉ đổi stat / icon. Full 3 sets chỉ benchmark, không yêu cầu player đổi đồng loạt.
 
 **Một bảng cường hóa chung cho sáu ô.** Bậc I dùng +0..+4, bậc II +0..+6, bậc III +0..+8; không thể thử bước vượt trần của bậc. Xác suất/chi phí dưới đây là BASELINE để kiểm trong game. Thất bại giữ cấp, vẫn tiêu Vàng và Tinh Thạch; không tụt cấp. Tinh Hoa là lợi ích cố định, thấy trước trong tooltip kể cả khi còn khóa; mở tại +4 và +8, không quay ngẫu nhiên. Cùng cấp + dùng cùng hệ số ở mọi bậc; bậc chỉ đổi chỉ số gốc và trần.
 
@@ -217,9 +217,9 @@ Với cược 1.000 mỗi người: pot 2.000; thắng nhận 1.800, phí 200; h
 
 <a id="quick-items"></a>
 
-QuickHP và QuickMP chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Q6 dùng Bình Linh Lực I đã phát trước bình khác để không kẹt hướng dẫn. Food dùng bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. QuickHP/QuickMP chỉ dùng bình, không chọn skill.
+QuickHP và QuickMP chọn bình **bậc thấp nhất hiện có, đủ cấp dùng và đủ hồi phần HP/MP đang thiếu**; nếu không bình nào đủ bù, dùng bậc cao nhất hợp lệ. Game Server kiểm túi, cấp, số lượng và hồi chiêu; đầy HP/MP hoặc đã chết thì từ chối, không tiêu bình. Khi [onboarding Bình MP](quests-and-narrative.md#mp-potion-onboarding) Armed và chưa Completed, QuickMP ưu tiên Bình Linh Lực I dự trữ Q6 nếu còn hợp lệ trong túi; bất kỳ Bình MP accepted hợp lệ đều hoàn tutorial, không bắt buộc reserved instance. Sau Completed dùng rule chọn bậc chung. Thuốc dự trữ chỉ grant một lần, tutorial không chặn Q6/turn-in/map unlock. Food dùng bậc cao nhất hợp lệ; Food mới thay hiệu ứng cũ và đặt lại thời hạn 10 phút, không cộng dồn. QuickHP/QuickMP chỉ dùng bình, không chọn skill.
 
-Q6 hiển thị glyph QuickMP theo binding probe. PrimaryAction dispatch theo ActiveFocus hiện tại, không active combat focus và loot selection song song; input/menu thuộc Runtime. [Approach không kích hoạt EdgeExit](combat-and-character.md#pending-cast).
+Hint onboarding hiển thị glyph QuickMP theo binding thực khi thiếu MP; Food hồi đầy thì đợi lần thiếu tiếp theo, không pause Food hoặc fake consume. PrimaryAction dispatch theo ActiveFocus hiện tại, không active combat focus và loot selection song song; input/menu thuộc Runtime. [Approach không kích hoạt EdgeExit](combat-and-character.md#pending-cast).
 
 ## Food state và Potion feedback
 
@@ -233,7 +233,7 @@ Mỗi natural Linh life dùng một death budget theo profile; quest không forc
 
 ## A03 — quyết định liên quan
 
-**A03 Boots** — Giữ stat-only: không cost world; bỏ: phương án lịch sử đã SUPERSEDED, đổi economy/balance; footwear slot có visual thật: thêm layer · Giữ stat-only P0, LowerBody chứa footwear mỹ thuật · Kiểm đủ sáu ô, icon và evaluator HP/MP; không mở lại phương án bỏ Boots
+**A03 Boots** — Giữ stat-only: không cost world; bỏ: phương án lịch sử đã SUPERSEDED, đổi economy/balance; footwear slot có visual thật: thêm layer · Giữ stat-only P0; footwear mỹ thuật theo [Lower Visual Set của Art](../03-art/art-and-visual-production.md#character-visual-binding), không bind theo Boots item · Kiểm đủ sáu ô, icon và evaluator HP/MP; không mở lại phương án bỏ Boots
 
 **A03** — GEAR-01 / BAL-01 / LOOT-01 · BASELINE giữ sáu slots/Boots stat-only theo design owner. Đề xuất bỏ Boots là LEGACY/SUPERSEDED bởi yêu cầu giữ sáu ô. Thêm world visual riêng không thuộc P0; giữ stat-only, không mở lại số slot.
 

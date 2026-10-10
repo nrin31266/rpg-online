@@ -176,3 +176,17 @@ Anchor S0 giữ để link cũ tới đúng owner; estimate side-only/full-outfi
 **Công =** tạo template mới + sửa từng variant + export/slice + socket/order/import + QA + rework; dùng giờ đo từng nhóm, không `armor×pants×weapons×26`. PoseKey có thể R cùng sprite trong nhiều ô; một render slice tăng setup/QA dù không là thiết kế mới. Chuẩn hip/neck/shoulder/hand contact và family grip chung tránh tổ hợp; áo tay rộng/tà dài chỉ thêm correction nơi cần. Đổi Kiếm I→II hay Cung I→II không redraw áo/quần. Manifest khai báo mọi exception, không tự giả overlay reuse 100%.
 
 13 gear world modules =4 Sword +3 Bow +3 Armor +3 Lower; +2 fallback outfit =15, Body/Head và shadow là base/presentation riêng. Không cộng thành tổng raster khóa mới hoặc promote ví dụ minh họa thành cách diễn giải 26 đã duyệt.
+
+<a id="legacy-normal-mob-frame-scenarios"></a>
+
+## Normal mob frame scenarios — SUPERSEDED 2026-10-11
+
+Snapshot nguyên văn rationale trước correction map/mob/VFX; các số Attack4/Death3–4/Idle2 và projectile speeds dưới đây chỉ truy vết. [Art owner hiện hành](../03-art/art-and-visual-production.md#mob-visual) dùng low-raster readability probe, không production budget cũ. Bảng 105 hình giữ ở phần lịch sử đã có phía trên; không nhân palette outcomes thành effort hiện tại.
+
+Lý do bốn ô attack: nhận thế/aim → windup silhouette → hit/release → recovery. Ba ô vẫn được nếu aim đọc từ facing/hold; hai ô dễ mất báo trước, nhất là ranged. Thêm frame chỉ làm chuyển động mượt, không tăng attack rate. Wolf cần stride/lunge đọc hơn Nấm; Stone bốn move đủ tạo sức nặng; Ong không cần bộ đi bộ hoặc melee không có gameplay. Wing bốn pose có thể loop nhanh hơn thân (probe 12–16 FPS), nhưng release đọc bằng thân/dấu phát đạn, không theo nhịp cánh.
+
+Nấm Death ba ô: xẹp→đổ→bẹp. Sói bốn: gục đầu→khuỵu→đổ→nằm; bớt một chuyển vẫn có thể pass. Đạo Tặc/Cổ Vệ bốn cho trọng lượng thân người/giáp; Thạch bốn cho nứt→rụng→sụp→tàn, không debris physics. Ong bốn cho mất wing→rơi presentation→chạm/rụng→tàn; không bắt chước corpse Sói nằm giữa không khí. Hit một hình chỉ dùng lúc rảnh; flash/impact cho mọi action ở các mục liên quan.
+
+Nếu chọn Hybrid thì cần **tư thế đánh xa**, dù dùng cùng Linh Đạn: Đạo Tặc phóng/ném, Thạch tụ/phóng mảnh linh lực, Cổ Vệ đưa vũ khí/ấn phát. Đây là gesture candidate, không ba họ projectile mới. Đạn dùng chung, chỉnh tint/scale/trail; tốc 5/4/6 và Ong 5,5 u/s là tham số hình ảnh giữ từ mốc cũ, không quyết clock damage. Chốt capability và pose cần thật trước production; không tự thêm ranged cho Sói hoặc quái melee phía sau để cân Cung.
+
+Idle 2 thay4 giảm công vì nhịp thở ít quan trọng hơn windup/release; không thêm flourish không phục vụ hành vi P0.

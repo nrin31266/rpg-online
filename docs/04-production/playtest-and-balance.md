@@ -32,9 +32,9 @@ Luật ngoài domain thuộc owner trong [documentation map](../README.md); evid
 | Combat | Basic Tân Lữ trước class; ba active tích lũy + hai nội tại / class, manual Lv 5 / 10 / 17, CD riêng/common lock; 1–3 chỉ select, PrimaryAction (combat branch) tạo one-shot approach/cast, giữ không RepeatOnHold; chết giữ valid focus/HUD; primary eligibility / propagation / maxTargets / falloff; snapshot / proximity / explosion không double-hit; Evade / Crit; Bỏng / Băng Hàn đúng target branch, post-thaw protection target-wide |
 | World | Năm farm maps, ba support zones; SpawnGroup độc lập, HomeRegion/WalkRegion/Return/respawn; mật độ re-author, solid trực giao/one-way cấu trúc, không slope/climb; đúng bảy fixed-level identities / sáu rigs, natural Linh shared cap/rate theo World owner; Map Info authoritative, một Boss với telegraph / target / reset / Cuồng Mạch |
 | Story | Q1–Q12 có setup / objectives / turn-in; thiếu level không auto-chain; READY_TO_TURN_IN không auto trả; Q9 không chặn Q10; Q11 complete mới mở vùng; Q12 per character / Main Story Complete; vòng chơi tiếp tục |
-| RPG / art | Food / Potion / Death; túi / kho / shop; 6 ô / 18 dòng / 21 mẫu thường / phẩm chất / giới hạn I+4, II+6, III+8 / chuyển giao cùng bậc hoặc lên bậc kế; modular 64 × 64 / PPU 32 / 26 frames |
+| RPG / art | Food / Potion / Death; túi / kho / shop; 6 ô / 18 dòng / 21 mẫu thường / phẩm chất / giới hạn I+4, II+6, III+8 / chuyển giao cùng bậc hoặc lên bậc kế; modular 64 × 64 / PPU 32 / 26 Logical Timeline Samples |
 | Online | N-player collections; P0 acceptance tối thiểu 2 concurrent players qua LAN; combat / MapExit/SpecialGate / chat / loot MapId validation; co-op; PvP cược 1v1, escrow trước trận, timeout 120 s hòa; Boss contribution 10% và shared pile 90 s |
-| Reliability | Login/character binding qua Spring Boot; PostgreSQL lưu tiến trình, recovery checkpoint và escrow/settlement receipt; reconnect ngắn resume phiên còn sống, phiên đã mất dùng SafeAnchor; hai Client + Game Server + backend + database, demo fixtures và script/build/video fallback |
+| Reliability | Login/character binding qua Spring Boot; PostgreSQL lưu tiến trình, recovery checkpoint và escrow/settlement receipt; reconnect ngắn resume phiên còn sống, phiên mới theo checkpoint policy gồm farm SafeAnchor/safe-map coordinate/pre-Arena; hai Client + Game Server + backend + database, demo fixtures và script/build/video fallback |
 
 Mọi thay đổi tiến trình lưu ngay qua backend, **enhance fail cũng lưu chi phí**; checkpoint MapId/HP/MP theo chu kỳ và chuyển trạng thái quan trọng, không save từng hit hay toàn world. Persistence contract, demo fixtures và acceptance đầy đủ tại Technical.
 
@@ -54,6 +54,8 @@ Mọi thay đổi tiến trình lưu ngay qua backend, **enhance fail cũng lưu
 Nhịp S2 và MP từ design owner hiện hành được thử bằng fixture hẹp riêng nếu chưa mở trong route Q1–Q6; fixture không mở rộng story scope G-L hoặc ký pass fresh route. AUTO sticky, EXPLICIT không swap, Tab dùng local set ổn định; thử target trên không/sau lưng/khác tầng, no-target/no-cost và dead-owner focus HUD. PrimaryAction physical binding và non-combat focus đi qua usability probe, chưa khóa.
 
 G-L còn kiểm terrain trực giao, không climb, natural solid và one-way có support; movement ở tốc độ thường; khu chức năng NPC, Q3 tại Bách Luyện và Q6 mentor route. Glyph phải theo context. EdgeExit/SpecialGate/MapId/checkpoint ordering, supply/full bag/death/retry đi cùng revision. Cần video rig/pivot/socket và giờ art/editor/QA/rework thật. RAM adapter không chứng minh persistence; prototype cũ không pass gate mới.
+
+Q2 dùng content Vải Bọc Chuôi/giá vật dụng đã duyệt; exact geometry chưa pass. Q6 fresh route phải turn-in/mở Trúc Ảnh được khi MP onboarding Armed nhưng chưa Completed. Food hồi đầy sau S1 không ép uống bình hoặc spam cast; contextual hint/accepted use về sau là ca onboarding riêng, không gate quest completion. Transition/replay ở G-L, Dedicated isolation ở G-N và committed flags/consume/crash ở G-D đều theo owner mới; chưa có runtime evidence.
 
 **G-N — Dedicated spike sớm:** Dedicated headless + hai standalone Clients cùng content revision, slice đã đủ ổn. Profile/admission RAM dev và receipt fixtures có thể đo authority/physics/recipients, chưa là final login/save. Không đưa service credential giả vào client. Kiểm sender binding, replay/forged sequence/duplicate connection, map transition, shared kill/quest credit và hai claims tranh một item.
 
@@ -149,7 +151,7 @@ DebugExpMultiplier mặc định1; ×10 chỉ opt-in dev có label, không pacin
 | Quest Q1–Q12 | Q3=4/5placements; Q4=5/tutorial#5; Q5=8; Q8 CollectDấu→Kill1Linh, Q10 CollectVậtChứng, Q11 materialRNG→Lâm→Bách/gate/grant→3placements nhiều map OPEN; Q12=10+Boss10%. Same identity/sameMap/active snapshots; personal rights/bag/consume/placement flags; Q6 bothTalk/Q9optional giữ | Q-F01..12, outcomes/grant/placement/turn-in receipts, full-journey video; CHƯA CHẠY |
 | PvP/chat | Mười stakes, accept exact, hai participants, escrow cả hai hoặc không ai/pre-Arena checkpoint. Countdown/ACTIVE ACK;120s DRAW không so HP;HP0 WIN/disconnect ACTIVE FORFEIT/pre-ACTIVE cancel/hai disconnect cùng tick SYSTEM_ABORT. Food real clock, quota theo design tăng tại realtime acceptance, item durability riêng và Hồi Sinh Phù reject; PvP scale/Slow/chat80charMapId/rate từ design owner | W1000:WIN1800/fee200,DRAW900 mỗi người,abort1000 mỗi người;Journey200 một lần,Q9 không FORFEIT/abort; match/receipt hai Clients |
 | Potion ordering | Realtime acceptance không đợi ACK; replay/crash/outage theo [POT-01](#potion-acceptance) | G-D/G-T: chưa chạy |
-| Art/UI/Dev Mode | Art import theo current26frames/rig/pivot/phase/socket/flip/foreground/overlay, không Climb. Glyph semantic select/Execute/NPC focus/dead-target HP. Dev permission/test storage/labels/reset fresh/clear callbacks life cũ; release không dev, preset không thay fresh journey | Import audit, video tốc độ thường, build config và reset logs |
+| Art/UI/Dev Mode | Art import theo contract 26 Logical Timeline Samples/rig/pivot/phase/socket/flip/foreground/FX overlays, không Climb. Glyph semantic select/Execute/NPC focus/dead-target HP. Dev permission/test storage/labels/reset fresh/clear callbacks life cũ; release không dev, preset không thay fresh journey | Import audit, video tốc độ thường, build config và reset logs |
 
 Đóng gói hướng dẫn PostgreSQL → Spring → Dedicated → hai Clients, seed/reset test có chủ đích và video fallback. Build/packages/content revision, kết quả từng ca và vấn đề OPEN phải rõ. Video fallback không thay acceptance.
 
@@ -280,7 +282,7 @@ Mỗi loại quái có một level cố định. HP/EXP/Gold derive từ design 
 | Player Lv | Map / cụm nên farm | Mob Lv | HP / EXP / Gold | Gear drop / Potion-Food dùng | Lý do chuyển bãi |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Vân Khê | Talk | — | — / I | Q1 nhớ NPC / đường về |
-| 2 | Học Viện | Movement | — | — / I | Q2 mini journey; exact content PROPOSAL |
+| 2 | Học Viện | Movement | — | — / I | Q2 Vải Bọc Chuôi journey đã duyệt; geometry PROBE |
 | 3 | Học Viện → Đồng DS2 | Dummy → Nấm Lv 2 | Dummy 60 / 0 / 0; Nấm 48 / 15 / 7–12 | Mộc + Quần I; supply Áo I / I | Q3 không EXP; Q4 Nấm/loot/equip/sell catch-up Lv 4 |
 | 4 | Đồng DS3–DS6 | Sói Sương Lv 4 | 107 / 22 / 11–18 | I, không Weapon / I | Q5 Food/thuốc + 8 Sói, turn-in catch-up Lv 5 |
 | 5 | Học Viện Q6 → Trúc TA1–3 | Sói Sương Lv 4 | 107 / 22 / 11–18 | I, không Weapon / I | Q6 class/manual; không quay lại Nấm làm tutorial mới |
@@ -472,7 +474,7 @@ Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST
 | BAL-01 / GEAR-01 | Cung+8 sau ClassChosenLevel, exact HP/MP trang bị còn TUNABLE; VIT chung/6slot đã giữ. Kiểm late class/evaluator/rarity/+4/+8/PvP/Boss. |
 | MOBAI-01 / SCOPE-01 | Hybrid count/identity OPEN; grace/Return regen/invuln/speed/targetability, crowd offsets và Home/Walk bounds còn TUNABLE/OPEN. Không khóa 3/1/0 hoặc dùng quái anti-Bow. |
 | SCOPE-01 / PHY-01 | Population/pocket totals từng map còn OPEN; 28/66 là lịch sử; validate nhiều tầng/nhiều group độc lập và quest anchors. Solid trực giao/no natural one-way/no ladder đã LOCKED. |
-| ART-01 / QUEST-03 | NPC tọa độ, camera/tile/module/VFX counts và 26 logical frames giữ LOCKED, exact raster mapping OPEN; roster bảy NPC/quest ownership mới đã xác định. Dev Mode không thay fresh-run Q1–Q12 hai phái. |
+| ART-01 / QUEST-03 | 26 Logical Timeline Samples giữ LOCKED; NPC tọa độ, camera/tile/module/VFX counts và exact raster mapping còn OPEN; roster bảy NPC/quest ownership mới đã xác định. Dev Mode không thay fresh-run Q1–Q12 hai phái. |
 
 
 <a id="keyboard-prototype-review"></a>
@@ -481,7 +483,7 @@ Các dòng đã có baseline không chặn việc bắt đầu code; ca PLAYTEST
 
 Lịch sử build, debug fixtures và kết quả kiểm VS-1 nằm tại [Production history](../90-archive/production-history.md#prototype-runtime-history); chúng không thay thế validation balance hoặc G-L production.
 
-[Art & Visual Production](../03-art/art-and-visual-production.md) sở hữu First Art Probe, file lifecycle, pose/socket minimum schema, asset DoD, visual style sample và provenance. Không chốt nghĩa 26 frame, technique/socket/camera hoặc sản xuất full catalog. Các bảng mô phỏng/accounting giữ để đối chiếu, không chuyển thành acceptance mới.
+[Art & Visual Production](../03-art/art-and-visual-production.md) sở hữu First Art Probe, file lifecycle, pose/socket minimum schema, asset DoD, visual style sample và provenance. Không thay contract 26 Logical Timeline Samples, technique/socket/camera hoặc sản xuất full catalog. Các bảng mô phỏng/accounting giữ để đối chiếu, không chuyển thành acceptance mới.
 
 <a id="prototype-feedback-review"></a>
 
@@ -489,7 +491,7 @@ Lịch sử build, debug fixtures và kết quả kiểm VS-1 nằm tại [Produ
 
 Luật và counts Q1–Q12 ở [Quests & Narrative](../01-design/quests-and-narrative.md#quests-story); input/pending ở [Combat & Character](../01-design/combat-and-character.md#focus-input). Các quyết định F01–F08 và review theo phiên đã chuyển nguyên văn sang CHANGELOG, mục `single-behavior-history-3`, nay tra tại [commit lưu trữ](../90-archive/production-history.md#prototype-source-retired). Giữ các alias trên để tra evidence cũ, không giữ luật gameplay trùng tại Playtest & Balance.
 
-26 logical frames LOCKED; exact raster mapping/technique/camera/file count OPEN; LoS/Hybrid/Return/airborneS2-S3 giữ OPEN. Input/NPC/terrain/cadence/HP-MP đọc theo design owner; bảng lịch sử giữ số và nhãn để truy vết, không nghiệm thu runtime.
+26 Logical Timeline Samples LOCKED; exact raster mapping/technique/camera/file count OPEN; LoS/Hybrid/Return/airborneS2-S3 giữ OPEN. Input/NPC/terrain/cadence/HP-MP đọc theo design owner; bảng lịch sử giữ số và nhãn để truy vết, không nghiệm thu runtime.
 
 
 <a id="art-validation"></a>
@@ -506,10 +508,10 @@ Luật và counts Q1–Q12 ở [Quests & Narrative](../01-design/quests-and-narr
 - Sau base và G-L mới: P07 contention, P12 Dedicated. RAM pass không thay backend ACK/terminal-pending ở P06/P12.
 - Sau core gate: full Bow bands/profile/P03, Boss/P14, thác/full gear và stress full content. Bảng dưới giữ toàn TARGET, không buộc chạy hết trước slice.
 
-**Asset Definition of Done — áp cho module nhập vào probe:**
+**Asset Definition of Done — áp cho Visual Sets/Pose Fragments và assets nhập vào probe:**
 
 - [ ] Canvas/PPU/pivot/mốc chân đúng; alpha/palette sạch, không crop lệch cell hoặc bleed.
-- [ ] Master Pose/schema revision và PoseKey/ref/duration có manifest; Head/Upper/Lower ghép đúng cổ/eo/hip, không gap/da thiếu/tay hoặc outline kép.
+- [ ] Master Pose Schema revision và sample→PoseKey→Pose Fragment/raster mapping có manifest, duration thuộc timeline; Head/Upper/Lower ghép đúng cổ/eo/hip, không gap/da thiếu/tay hoặc outline kép.
 - [ ] Hai hướng đúng grip/socket/front-back; không mirror text/physics hoặc mirror hai lần.
 - [ ] Import/slice/platform/atlas refs đúng; gear swap runtime giữ phase, Run không trượt chân.
 - [ ] Camera thực đọc silhouette/cue/UI; AnimationEvent/visual collision không gây damage.
@@ -521,12 +523,12 @@ Luật và counts Q1–Q12 ở [Quests & Narrative](../01-design/quests-and-narr
 
 | Nhóm kiểm | Coverage tối thiểu / kết quả cần ghi |
 | --- | --- |
-| Alignment / mix | DefaultUpper+DefaultLower, ArmorA+DefaultLower, DefaultUpper+PantsA, ArmorA+PantsA, ArmorA+PantsB, ArmorB+PantsA; cùng Head/Hair. Không hở cổ/eo/hip, không mất da/tay hoặc duplicate silhouette. Thiếu variant B thì coverage chưa đủ |
+| Alignment / mix | Default Upper Set + Default Lower Set; Upper A + Default Lower Set; Default Upper Set + Lower A; Upper A + Lower A; Upper A + Lower B; Upper B + Lower A; Upper B + Lower B; cùng Head Visual Set. A/B là Visual Set fixtures bind theo [Art probe](../03-art/art-and-visual-production.md#first-art-probe), không gameplay slots. Kiểm neck/waist seam, hip alignment, hand/arm overlap, không mất da/tay hoặc duplicate silhouette; thiếu B thì coverage chưa đủ |
 | Transition | Idle→Run, Run→Jump, Jump→Fall, Idle/Run→Attack và repeated S2; parts/anchors/order cùng sample, không trượt gear/nhảy pivot/reset phase. Air policy đúng configuration đang probe, không mở S2/S3 air |
-| Weapon / facing | Sword và Bow dùng cùng Master Pose system và proportions; Back→Hand→Back, grip/nock và correction ở Left/Right. Không double weapon/đảo sai tay/bao; asymmetry được kê trong manifest |
-| Asset roles / reuse | UI icons không là actor fragments; tắt skill VFX vẫn ghép equipment đúng. Manifest phân biệt 26 logical coverage với unique/reused raster, offsets/socket-only, corrections/render slices; thiếu pose có diagnostic/fallback đã kiểm |
-| Swap / revision / lifecycle | Swap/unequip một phần tại phase gameplay cho phép; refs/sockets/order không lẫn revisions. Load A trễ sau equip B/unequip, death/map/reset/pool reuse hoặc preview mới không ghi đè state mới. Action weapon snapshot giữ; local fixture không thay P12 network validation |
-| Sorting / import | Hai actor overlap, wide sleeve/hem/hair với bow/hand, telegraph/foreground; import/crop/atlas không đổi pivot/anchors hoặc bleed. Ghi chosen method, renderer setup và profile/clock/visual revision, không hứa fixed draw calls |
+| Weapon / facing | Sword và Bow dùng cùng Master Pose Schema và proportions; một Weapon Visual Set chuyển Stowed/Back→Active/Grip→Stowed/Back, grip/nock và correction ở Left/Right. Không double weapon/đảo sai tay/bao; asymmetry được kê trong manifest |
+| Asset roles / reuse | UI icons không là actor fragments; tắt skill VFX vẫn ghép equipment đúng. Manifest phân biệt 26 Logical Timeline Samples coverage với unique/reused raster, sample→PoseKey→Pose Fragment mapping, offsets/socket-only, corrections/Render Slices; thiếu required mapping có diagnostic/fallback đã kiểm |
+| Swap / revision / lifecycle | Armor swap/unequip chỉ đổi Upper Visual Set/default; Pants chỉ đổi Lower Visual Set/default tại phase gameplay cho phép. Current timeline sample/PoseKeys/action không restart hoặc đổi do equip; channels không liên quan không reset. Refs/sockets/order không lẫn revisions. Load A trễ sau equip B/unequip, death/map/reset/pool reuse hoặc preview mới không ghi đè state mới. Action weapon snapshot giữ; local fixture không thay P12 network validation |
+| Sorting / import | Hai actor overlap, wide sleeves, long robe edge, hair overlap và bow front hand/weapon grip, telegraph/foreground; import/crop/atlas không đổi pivot/anchors hoặc bleed. Ghi chosen method, renderer setup và profile/clock/visual revision, không hứa fixed draw calls |
 
 P15 chỉ chốt measured raster/reuse/effort sau coverage trên; ghi pose/combination chưa thử, asset pass/fail và giờ QA/rework, không gọi một outfit vừa khít là mọi tổ hợp PASS.
 
@@ -534,21 +536,31 @@ DoD là chất lượng asset probe. “Có PNG” hoặc “build chạy” ch�
 
 | Ca | Nội dung phải thử | Dấu hiệu đủ để ra quyết định |
 | --- | --- | --- |
-| P01 Modular player | Early subset theo [Art probe](../03-art/art-and-visual-production.md#first-art-probe): 3/4 Idle Left/Right/side Run/Jump/Fall, action/recovery, carry, player shadow, default/Áo I/Quần I và variant B nhỏ để swap visual sets. Full default +I/II/III/mix-band/unequip ở phase rộng | Không hở thân/grip sai/nhảy pivot/jitter; thử stop ngay/delay, focus-only/repeated S2; shadow hide gear và reset đúng life. Manifest unique/reuse/socket/VFX/optional, kiểm26 logical samples và unique raster mapping và delta 3/4-facing/class/airborne |
+| P01 Modular player | Early subset theo [Art probe](../03-art/art-and-visual-production.md#first-art-probe): 3/4 Idle Left/Right/side Run/Jump/Fall, action/recovery, carry, player shadow, default/Áo I/Quần I và variant B nhỏ để swap visual sets. Full default +I/II/III/mix-band/unequip ở phase rộng | Không hở thân/grip sai/nhảy pivot/jitter; thử stop ngay/delay, focus-only/repeated S2; shadow hide gear và reset đúng life. Manifest unique/reuse/socket/VFX/optional, kiểm 26 Logical Timeline Samples và unique raster mapping và delta 3/4-facing/class/airborne |
 | P02 Hai Sword cùng action | Mộc và Huyền Ấn dùng cùng track Attack; hai Kiếm class khác band dùng cùng Skill; thử swap giữa action hợp lệ | Đúng cây ở cả Back/Hand/release, không duplicate/ghost hoặc sprite Common baked; socket/góc raster đủ; visual snapshot không morph sai; không cấp skill class cho Tân Lữ chỉ để test Mộc |
 | P03 Bow | Ít nhất hai band rest/draw/release/Skill, S1 và triple | Back silhouette/canvas đọc được, tay/string/arrow nock khớp; spawn đúng timeline, ba tên một cast; quyết có partial-draw thêm và logical hit/visual timing contract |
 | P04 Multi-target | Primary-proximity Kiếm3/5, Hàn1+4, spreadA/B/C–A/B/A–A/A/A, no-target/invalid; C1/C2/LoS A/B | Impact cùng phase resolve của profile, spread ba tên một cast, không chain giả; không double status/impact/projectile |
-| P05 Hit không stun | Mỗi rig bị hit Idle/Move/Windup/Attack/Ranged; Freeze trước/sau release; lethal | Main action không restart/hit trễ vì flash; CC server cancel unresolved đúng life; resolved result bất biến, visual travel không gameplay callback, Death thắng stale Hit |
-| P06 Death/corpse | Ground/Ong/Boss; chết ở ledge, late viewer, ACK chậm/retry, normal respawn 25 s | Corpse không target/collider/AI, loot đứng được, timer từ death không từ clip/ACK, đời mới không nhận effect cũ |
-| P07 Dummy online | Q3 bốn kills/năm placements3+2, repeated respawned slot; Q6 thiếu MP/full-MP reject, không spam S1; hai Lv3, Lv3+20, 3–4 requesters | Không mandatory wait/unique slots, HP60/timer25s/credit≥20% đúng life; một Dummy identity; đo contention trước đổi timer |
-| P08 Terrain room | Bốn grammar: đồi bậc solid, khối đá/hốc/khe, công trình/cầu và one-way có support; decor cùng chất liệu | Người chưa biết collider đoán đúng; không slope/climb/natural one-way/floating bars; drop một actor không làm người kia rơi |
-| P09 Công trình | Hai surface/routes, HomeRegion/WalkRegion, spawn/Ong/chase/leash/Return/Kiếm/Cung; Hybrid chỉ fixture khi cần | Không stuck/spawn trên không/perch spam vĩnh viễn; ground quay ở mép, không jump/drop; kite hợp lệ; mask LoS A/B còn probe |
+| P05 Hit không stun | Early Nấm + Sói low-raster presentation theo protocol dưới; full mỗi rig Idle/Move/Windup/Attack/Ranged sau gates; Freeze trước/sau release, lethal | Main action không restart/hit trễ vì flash; anticipation/facing/impact đọc đúng clock, không gameplay state phụ thuộc clip; CC server cancel unresolved đúng life, resolved result bất biến, Death thắng stale Hit |
+| P06 Death/corpse | Early Nấm + Sói, rồi Ground/Ong/Boss theo gates; chết ở ledge, late viewer, ACK chậm/retry, normal respawn 25 s | Death khác bug despawn, reuse+fade được nếu đọc tốt; corpse không target/collider/AI, loot đứng được, timer từ death không từ clip/ACK, đời mới không nhận effect cũ |
+| P07 Dummy online | Q3 bốn kills/năm placements3+2, repeated respawned slot; Q6 S1→Food refill/full-MP reject nhưng vẫn turn-in, không spam; contextual thiếu MP/use riêng; hai Lv3, Lv3+20, 3–4 requesters | Không mandatory wait/unique slots, HP60/timer25s/credit≥20% đúng life; một Dummy identity; onboarding không block Q6, đo contention trước đổi timer |
+| P08 Terrain room | Editor/Tile Palette representative room → Client/Local → Dedicated tại G-N theo protocol dưới; bốn grammar/decor đúng role | MapId/revision/surfaces/anchors không lệch; người chưa biết collider đoán đúng; cosmetic replacement không đổi geometry, không slope/climb/natural one-way/floating bars; drop một actor không làm người kia rơi |
+| P09 Công trình | Cùng source P08: surfaces/routes, SpawnSlots/HomeRegion/WalkRegion, NPC/exits/required landmarks; Ong/chase/leash/Return/Kiếm/Cung, Hybrid chỉ fixture khi cần | Round-trip regions/markers đúng, validator tìm lỗi seed; ground không stuck/spawn trên không/jump/drop/perch spam; flying ở vùng hợp lệ, kite hợp lệ; LoS A/B còn probe |
 | P10 Nước | Puddle base/front, thác seam, actor dưới nước/đi trên cầu, cả facing | Front chỉ che chân, không telegraph; bridge không splash, không thay physics; quyết sprite/particle reuse |
 | P11 UI kit | Inventory/Storage/Shop cùng kit, sáu RPG views, text Việt; Select→Execute, pending đổi selection, Q1 khu NPC/Q3 Bách/Q6 mentor | Select không cast/cost/approach, S2 selected/execution cue rõ; modal không lọt input, glyph không khóa proposal key; rarity/band/+level và error khác RNG fail |
-| P12 Online presentation | Hai Client Dedicated tối thiểu; thêm 4+, RTT 0/100/200 ms/jitter/loss; player chết khi người khác đánh target | Thử anticipation A11 nếu chọn; một effect/result, HP focus hợp lệ tiếp tục cập nhật, same-slot respawn xóa life cũ, map/reconnect không replay reward |
+| P12 Online presentation | Hai Client Dedicated tối thiểu; thêm 4+, RTT 0/100/200 ms/jitter/loss; player chết khi người khác đánh target; presentation-independence fixture dưới | Thử anticipation A11 nếu chọn; một effect/result, HP focus hợp lệ tiếp tục cập nhật, same-slot respawn xóa life cũ, map/reconnect không replay reward; disable/replace visual không đổi authority outcome |
 | P13 Combat/balance | Intervals/timing control; Lv 5/10/17, MP zero-INT/cân bằng, TTK solo/cụm và PvP Food/quota | Ghi số Novice/S1/S2/S3 casts, thời gian chờ MP, proc/TTK/visual travel; đổi một nhóm số mỗi lượt, chạy lại model sau khi timeline thay |
 | P14 Boss/camera | Telegraph 0,5/1,0/1,2 s, ba landing zones, Cuồng dưới 30%, Slow, nhiều VFX/người | Telegraph không bị che/cắt hoặc time-stretch, đọc/né bằng movement hiện có; camera/zoom đọc được range |
 | P15 Chi phí slice | Một outfit family, Kiếm/Cung, mob theo capability được chọn và room/UI nhập hoàn chỉnh | Kê ảnh mới/reuse/variant/setup và giờ thật; tính lại công, Hybrid chỉ khi chọn; không nhân frame count chưa kiểm |
+
+<a id="map-mob-vfx-validation"></a>
+
+**P08/P09 map authoring round-trip — CHƯA CHẠY:** dựng một representative farm room bằng [Editor source/markers](../02-technical/gameplay-runtime.md#map-authoring-pipeline), Tile Palette Ground + structural OneWay + simple background/decor, SafeAnchor, exits, SpawnSlots/Home/WalkRegions và approved landmarks/NPC markers cần thiết. Validate, refresh derived data nếu dùng bake; so source → Client/Local runtime → Dedicated runtime: same MapId/revision, solid/one-way surfaces/collision, SafeAnchor, exits/destinations, slots, regions, required landmarks. Local evidence ở Pha R/G-B/G-L; Dedicated + ≥2 client mới chứng minh phần G-N, không gọi round-trip hoàn thành từ local-only. Arena dùng Match spawn theo owner, không áp farm SafeAnchor.
+
+Thay visual tile/decor cùng logical contract và tắt background/ambient: geometry/markers/route không đổi ngoài semantic edit chủ động. Seed từng lỗi validator theo Runtime rồi lưu diagnostic tới object/ID: duplicates, invalid ground/flying slot/group/region/MobDefinition, unsafe anchor, missing exit/NPC/approved quest landmark, unwanted collider, natural OneWay/structural cue, Boss exclusion, stale bake. Cue/readability cần người xem camera, không chỉ auto-validator pass. Q2 item/source/route đã duyệt, geometry/bindings phải validate; Q11 targets/maps/order/endpoint chưa duyệt ghi unresolved, không tự chọn để test xanh. Scenario farm room không chứng minh toàn tám map hoặc quest route.
+
+**P05/P06 low-raster mob — CHƯA CHẠY:** Nấm Linh + Sói dùng minimal [Mob Visual Definitions](../02-technical/gameplay-runtime.md#mob-visual-definition), body-raster target khởi điểm ở [Art](../03-art/art-and-visual-production.md#mob-visual). Kiểm Idle rõ, Move không quá trượt/cứng, anticipation/attack dễ nhận, hit feedback/impact đúng clock, Death khác bug despawn, facing đúng và no gameplay state phụ thuộc clip. Thử Linh overlay bằng Sói Trúc Ảnh Lv8 fixture reuse wolf body, giữ gameplay modifier hiện hành; Nấm Lv2/Sói Sương Lv4 không được natural Linh. Kê unique/reused rasters và giờ QA; acceptance **không phải ≤8 PNG**. Thiếu readability thì ghi đúng pose/feedback cần thêm, không tăng mọi state theo template cố định. Ong/Boss/full roster tiếp tục phase sau, Boss không áp normal budget.
+
+**P04/P12 presentation independence — CHƯA CHẠY, architecture acceptance riêng art quality:** replay cùng canonical gameplay/definition revision, seed/RNG stream và accepted intent/clock fixture; lần lượt disable rồi replace projectile sprite, main/impact/status/ambient VFX. So authoritative target set/IDs/lives/hit indices, damage/status results, range eligibility/CD, death và loot payload/receipts: phải tương đương; không lấy UUID/time khởi chạy ngẫu nhiên làm outcome difference. Seed/harness/setup phải kiểm soát randomness và scheduling, không so hai lượt farm tự do. Local kiểm boundary trước; Dedicated P12 ở G-N kiểm authority artifact/network lifecycle. Visual disabled pass không chứng minh art readable; cùng casts cần review hình/clock riêng khi bật lại.
 
 Ghi build/Editor/packages, camera scale, máy và seed/fixture; một ca chạy mượt chưa chứng minh capacity. Pose khó đọc thì sửa art/timing hình ảnh; đổi hit/spawn/CD/collider/loot position/timer phải đi đúng owner và kiểm lại ca phụ thuộc. Các phép thử không tự khóa số đề xuất trong file. Dev Mode phục vụ test nhanh, không là UI production hoặc evidence fresh-run; route canonical Q1–Q12 vẫn thật theo design owner/Technical/Roadmap.
 
@@ -627,7 +639,7 @@ Seed hoặc script tạm trong /tmp không phải reproducible evidence dài h�
 
 ## Consolidation acceptance mới — toàn bộ CHƯA CHẠY runtime
 
-Lượt consolidation 2026-10-09 chỉ chạy docs/link/scope validation. Source/test names và DERIVED tables không pass runtime gate. [Slice plan](roadmap.md#consolidation-slices) chọn tests theo phase; Stable counts Q3/Q4/Q5/Q12 và MobIdentity giữ; Q8/Q10 normal quotas/Q11 ordinal flow SUPERSEDED; RNG outcomes thay generic ordinals, Q2/schema/TTL/26 mapping và bounds/LoS giữ PROPOSAL/TUNABLE/OPEN tại owner.
+Lượt consolidation 2026-10-09 chỉ chạy docs/link/scope validation. Source/test names và DERIVED tables không pass runtime gate. [Slice plan](roadmap.md#consolidation-slices) chọn tests theo phase; Stable counts Q3/Q4/Q5/Q12 và MobIdentity giữ; Q8/Q10 normal quotas/Q11 ordinal flow SUPERSEDED; RNG outcomes thay generic ordinals. Q2 content/Q6 non-blocking onboarding được duyệt 2026-10-11; Q2 geometry/schema/TTL/26-sample→PoseKey/raster mapping và bounds/LoS còn PROPOSAL/TUNABLE/OPEN tại owner.
 
 | Probe | Setup/kết quả phải quan sát | Gate |
 | --- | --- | --- |
@@ -638,9 +650,9 @@ Lượt consolidation 2026-10-09 chỉ chạy docs/link/scope validation. Source
 | Full bag/net turn-in | Compatible claim vẫn fit ở 60/60; nếu không fit giữ Pending. Consume tạo chỗ cho reward; thiếu net capacity giữ toàn inputs/state, không partial | G-L/D |
 | Reconnect/crash/replay | Crash trước/sau death/claim/turn-in commit; lost ACK/receipt query; old lease/generation, map/death/TTL/new session, N eligible/outsider; không duplicate grant/pile | G-N network; G-D real DB |
 | Approved counts / identity credit | Matrix Q-F01..12; farm đúng identity ở group khác/map-of-quest khác khi player-mob sameMap. Wrong identity/reused rig/variant/special fail đúng predicate. Không whitelist DS/TA/XN/HT cho standard kill. Counts4/5/8/10+Boss giữ; Q8 Collect→Kill1Linh/Q10Collect/Q11restoration direction. Novice sustain và 2/3/4/>5 requesters contention/20%/ground readability | C0/G-L rồi QUEST-03/G-C/T; fixtures không pass route |
-| Q2 journey | Approved placed-item definition; reason/destination/return rõ, fixed-jump terrain, Drop optional; full bag/TTL retry/consume thật; nối Q3/Q6 | G-L; Q2 content approval |
-| Q6/NPC context | Both-talk mọi thứ tự, class/mentor/grant atomic; selected/unselected mentor biết class sau Q6, không off-class manual; Tẩy Mạch ở Mộc An | G-L Sword/G-C Cung/G-D receipts |
-| Facing/26/shadow | Stop giữ Left/Right, Idle 3/4 đọc mặt/áo; Run side, Jump/Fall riêng, class upper action; socket/mirror/asymmetry; 26 giữ/mapping OPEN; current player death, mob death giữ | P01/P03/G-L/N; A01/A02/A12 |
+| Q2 journey | Vải Bọc Chuôi tại HV_Q2_SupplyRack đã duyệt; reason/destination/return rõ, fixed-jump terrain, Drop optional; full bag/TTL retry/consume thật; nối Q3/Q6 | G-B binding/blockout, G-L route |
+| Q6/NPC context | Both-talk mọi thứ tự, class/mentor/grant/Arm atomic; selected/unselected mentor biết class sau Q6, không off-class manual. Turn-in không đợi MP use; Armed/Completed riêng, accepted MP consume+Complete một receipt; Tẩy Mạch ở Mộc An | G-L Sword/onboarding, G-C Cung/G-D receipts |
+| Facing/26 samples/shadow | Stop giữ Left/Right, Idle 3/4 đọc mặt/áo; Run side, Jump/Fall riêng, class upper action; socket/mirror/asymmetry; 26 samples giữ/mapping PoseKey/raster OPEN; current player death, mob death giữ | P01/P03/G-L/N; A01/A02/A12 |
 
 Archive virtual/front/variable-jump wording vẫn là historical evidence, không sửa source/CHANGELOG hoặc dùng tests cũ nghiệm thu luật mới. Các bảng timing lịch sử không được tái dùng cho pacing counts mới; chưa có fresh-run hoặc simulation mới sau recovery. G-T vẫn cần fresh Q1–Q12 từng phái và ≥2 clients/backend thật.
 
@@ -674,17 +686,19 @@ L = direction/values hiện hành; B = executor recommendation; O = policy/numer
 | Ca | Setup / expected theo matrix quest owner |
 | --- | --- |
 | Q-F01 | Q1 ba NPC khu dược/rèn/kho theo thứ tự; Intro/Accept/return/action receipt, replay không thưởng hai lần |
-| Q-F02 | Q2 draft journey có purpose/placed-item/return; fixed Jump, optional Drop; full bag/TTL/re-offer/net consume. Chờ duyệt exact content, không production PASS |
+| Q-F02 | Q2 canonical Vải Bọc Chuôi/item_q2_grip_wrap tại HV_Q2_SupplyRack → personal ground/Pickup → Lâm Bá consume1/reward atomic; purpose/return rõ, fixed Jump/optional Drop. Full bag/TTL/re-offer/fall/reconnect/replay không duplicate; content approved, geometry/route CHƯA CHẠY |
 | Q-F03 | Q3 bốn qualifying life kills, năm slots3+2; kill lại respawned slot tính, không chờ bắt buộc/unique ID. Lv3+20 contribution, no loot/EXP |
 | Q-F04 | Nấm5 từ bãi bất kỳ, gồm DS1/DS7/DS8; áo+sample entitlement một lần #5 baseline; wrong identity/step no credit, full bag/TTL/reconnect giữ payload; equip áo rồi Sell sample đúng Bách atomic |
 | Q-F05 | Food/supply receipt một lần, SóiSương8 cả bãi Trúc khi sameMap; HP full reject không consume, không bắt potion vào lúc đầy |
-| Q-F06 | Both-talk hai thứ tự, Sword/Bow, manual unequip/class/C/mentor commit; unselected mentor Talk và đúng manual. Food đầy MP sau cast: thuốc còn, Used chưa credit, không spam; proposal reschedule chưa áp dụng |
+| Q-F06 | Both-talk hai thứ tự, Sword/Bow, manual unequip/class/C/mentor/Arm commit; weapon/points/learn/S1 core và reserved supply một lần, unselected mentor Talk/đúng manual. Food đầy MP sau cast: full-MP use reject giữ thuốc, onboarding chưa Complete nhưng vẫn Ready/turn-in/Trúc Ảnh. Không spam/pause Food/fake consume; contextual thiếu MP thật→accepted MP use Complete riêng, kể cả sau Q6Completed |
 | Q-F07 | Ring0→1 hoặc owned≥1; thiếu mới grant, equip binding/preview/cost/RNG+receipt; full bag/reconnect không duplicate |
 | Q-F08 | Collect Dấu RNG: success/fail/no eligible không tạo sai right; baselineN2 TUNABLE, không normalKillquota; owned đủ → riêng Kill1SóiTrúcLinh≥20%. Natural shared, no private/force; BrokenSeal lore, no filler. One death không credit future group. Fullbag/TTL/reconnect/durable outcome; Q8-01 contention |
 | Q-F09 | Q9 optional khi Q10 active; genuine WIN/LOSE/DRAW tính, FORFEIT/ABORT không; escrow/outage/replay đúng policy |
 | Q-F10 | Collect VậtChứng RNG baselineN3 TUNABLE từ ĐoạtMạch đúng identity kể cả BV/XN sameMap; khôngKillquota/groupwhitelist, ChiselMarks/SealScar lore. Outcome success/fail dedup; physical pickup→turn-in consume/reward atomic, sourceMap/fullbag/TTL/reconnect |
 | Q-F11 | MaterialRNG Thạch→Lâm→Bách; gate before deterministic3fragment grant theo OPEN fixture labels; fullbag/batch retry no duplicate. Three distinct placements trên nhiều map accessible trướcQ11; consume corresponding fragment+durableflag atomic, replay/reconnect; gate reads flags, no mobfragment/oldquota/bag3. Completion/level/maps/order còn OPEN, fixture không author production hoặc pass content |
 | Q-F12 | Guard10 bất kỳ bãi same identity; specific Boss một life≥10%, corpse trong area tính/return-disconnect fail; shared15min/no quest spawn/no normal trong BossArea; một death receipt và một turn-in reward |
+
+**MP Potion onboarding bổ sung Q-F06 — CHƯA CHẠY:** Armed/chưa Completed không phụ thuộc active QuestId/group, không ảnh hưởng turn-in hoặc map unlock. Ca cần giữ: Food refill trước use rồi thiếu MP lần sau; bất kỳ MP Potion hợp lệ accepted đều Complete, HP Potion/full/dead/CD/quota reject không Complete; accepted/replay/lost ACK không heal/consume/Complete hai lần; Complete cùng consume transaction, rollback/reconciliation không sinh trạng thái Complete bền giả. Q6 completion/map/death/resume/new session giữ flags và reserved grant receipt, không regrant hay reset hint đã Complete; hai character có state riêng. G-L/G-N kiểm transitions/ownership, G-D mới chứng minh crash/reload durability theo POT-01. Không dùng thấp MP preset để thay fresh Q6 video.
 
 ### NPC/Shop regression — CHƯA CHẠY
 
@@ -696,7 +710,9 @@ Yên chỉ Food/HP/MP và healing thường; Bách gear/stone/GeneralSell/Enhanc
 
 Đếm **stack/outcome**, không item units: model cũ Normal E=0.30+0.04+0.08+0.051=**0.471** regular outcomes/death; P(any)=1−0.70×0.96×0.92×0.949=**0.41329024**. Linh E=1 material stack+1stone+0.365gear=**2.365**, material quantitymean1.5 cho **2.865 units/death**. Không dùng tỷ lệ này làm active weights. Gold/EXP không nằm phép đếm; quest/tutorial/Boss tách riêng.
 
-Model mới variant v: E(outcomes)=q_v≤1, E(quantity category c)=q_v×w_vc×E(Q_vc), Σw=1 conditional success; E(sell value)=q_v×Σ(w_vc×E(Q_vc×unitValue_vc)). Gear rarity conditional riêng. q_L>q_N và rarity tốt hơn chưa chứng minh Linh totalvalue premium nếu category/quantityweights sai. Không thể giữ E_L2.365 stacks dưới cap1; phải tune targets có evidence. q/rates/weights/quantities **TUNABLE**, không đề xuất numbers mới.
+Model mới variant v: E(outcomes)=q_v≤1, E(quantity category c)=q_v×w_vc×E(Q_vc), Σw=1 conditional success; E(sell value)=q_v×Σ(w_vc×E(Q_vc×unitValue_vc)). Gear rarity conditional riêng. q_L>q_N và rarity tốt hơn chưa chứng minh Linh totalvalue premium nếu category/quantityweights sai. Không thể giữ E_L2.365 stacks dưới cap1; phải tune targets có evidence. q/rates/weights/quantities **TUNABLE**, chưa có production lock.
+
+**Đầu vào đề nghị cho `loot-v0-probe`, chưa là profile data đã triển khai hoặc rates production:** q_N≈0,40 lấy old P(any)≈0,413 làm control tương đối; thử q_L≈0,85–1,00, giữ cap một outcome và chuyển premium sang quantity/rarity/quality. Normal category weights có thể khởi điểm từ tỷ lệ old rates đã normalize, không chạy lại independent rolls hoặc cố giữ old Linh item count. Khi tạo profile phải pin một bộ số cụ thể, category/quantity/rarity/source rules, seed và revision; logs tách profile đó khỏi production defaults. Model đủ implement với data fixture; profile/playtest còn là việc implementation tiếp theo, không blocker đóng phase docs.
 
 So trước/sau material units/hr, potion usable tier/hr, stone/hr (enhance/transfer sink), gear/rarity frequency, sell income/netFoodPotionGold, bag/storage distinct occupancy và Linh/Normal premium. Density/life throughput/level eligibility/claim expiry cùng model, không nhân per-player budget. Stone8%/640kill/Gold-perkill tables trước đây là HISTORICAL; shop800/enhance costs giữ, chưa chứng minh affordability revision mới. Boss EV và source/price arithmetic không đổi; không rerun balance bằng model cũ gọi pass.
 
@@ -725,4 +741,4 @@ Collect iid eligible deaths: E(kills)=N/p, Var=N(1−p)/p²; player eligibility/
 | MI01 | Spawn/terminaldeath/despawn/Linh0→1→0 counts, ordinaryincludesLinhsubset, dormantincluded/Bossseparate, no rendercount |5/world/G-N|
 | MI02 | Initial/dueadmission/reconnect snapshot; late/duplicate/gap/outoforder revision; mapchange clearsoldpanel, oldmapgenerationignore; unknownpendingcue/no coords |5/8/G-N|
 
-Logs phải có focus type/id/gen/press/typed command/reject/maprevision, server state trước-sau và receipt; video usability không thay DB evidence, automation không pass cảm giác. Art cue/quest overlay/compactrequirements và 26logical giữLOCKED cần manual review.
+Logs phải có focus type/id/gen/press/typed command/reject/maprevision, server state trước-sau và receipt; video usability không thay DB evidence, automation không pass cảm giác. Art cue/quest overlay/compact requirements và mapping PoseKey/raster cần manual review; 26 Logical Timeline Samples giữ LOCKED, exact mapping vẫn OPEN.
