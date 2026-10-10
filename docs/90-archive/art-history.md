@@ -136,3 +136,43 @@ Các khối dưới được MOVE đầy đủ trong cùng file; phần chính g
 ## Export path của probe cũ
 
 **HISTORICAL export path:** `ArtSource/Probes/Sword01/` → `prototypes/VS1_EndToEnd/Assets/_Prototype/VS1_EndToEnd/ArtProbe/Sword01/` từng là đề xuất. Giữ để tra lịch sử, VS-1 đã được xóa khỏi checkout; đường dẫn này không dùng để chạy probe revision mới; migration này không tạo/chạy sandbox hoặc asset.
+
+
+<a id="legacy-player-body-overlay-accounting"></a>
+
+## Player accounting trước correction Master Pose — SUPERSEDED 2026-10-10
+
+Snapshot nguyên văn dưới đây từng tách Body và Armor thành hai nhóm công/raster runtime. Mô hình đó đã được thay bằng Master Pose authoring/schema và UpperBody/LowerBody hoàn chỉnh theo pose. Các số 23/92/52, delta +5/+10 và Body layer chỉ để truy vết; không dùng làm manifest, renderer layout hay asset budget hiện hành. [Art owner](../03-art/art-and-visual-production.md#master-pose) giữ mô hình mới; [accounting](../03-art/art-and-visual-production.md#player-s0) chỉ chốt raster sau probe.
+
+Anchor S0 giữ để link cũ tới đúng owner; estimate side-only/full-outfit death cũ không còn là budget hướng mới. **U** = hình mới khi silhouette đổi; **R** = spriteRef dùng lại; **S** = socket/offset/order, không ảnh mới; **V** = VFX-only; **O** = optional. Số U chỉ là giả định để đo, không số frame đã duyệt. Body trong bảng là phần thân/tay; Head reuse theo góc; Idle 3/4 tới full side cần art khi silhouette đổi.
+
+| State | Body | Armor/Upper | Lower/Pants | Weapon |
+| --- | --- | --- | --- | --- |
+| Idle 3/4 Left/Right | U 1–2 mẫu Right, R/hold/mirror; corrections Left khi cần | U 1–2/thiết kế; cùng pose key | U 1/thiết kế nếu stance hợp, mirror | S Back/Hand hold; carry U khi canonical không đọc |
+| Combat neutral — O | R recovery trước; U chỉ nếu thiếu posture | R/U đúng upper | R stance | S Hand; không Front Idle mới |
+| Run | U/R 3–6 upper key poses | U/R theo tay/vai thật đổi | U 6 leg poses, R loop | S theo Back/Hand; không 6 cây mới |
+| Jump | U/R 1–2 | U/R tương thích vai/hông | U/R 1–2 | S theo pose |
+| Fall | U/R 1–2 | U/R, có thể giữ Jump nếu shape hợp | U/R 1–2 | S theo pose |
+| Land — O | R Jump/Run, U chỉ nếu thiếu dấu chạm | R trước, U exception khi cần | R trước; optional U phản lực | S, không action delay |
+| Sword Attack/Skill | Kịch bản 3+4 key poses của profile, dedup R nếu hợp; không trần raster | U theo tay áo/thân, R neutral/recovery hợp | R locomotion/stance; U exception có lý do | S Hand + U góc sửa khi cần; trail V |
+| Bow Attack/Skill | Kịch bản 3+4 key poses; draw/nock thường U khác Sword; không trần raster | U sleeve/draw, R recovery hợp | R stance chung; U Bow exception nếu trọng tâm khác | U rest/draw/recoil + S string/nock/grip; trail V |
+| Hit | U/R 1–2 khi rảnh; V flash khi action | U/R đi cùng body, không ngắt action | R stance/locomotion, U nếu recoil chân cần | S follow hoặc hide theo phase |
+| Player Death Transition | R Hit/Jump/Fall, S pop/fall offset | R cùng transition, không death outfit mới | R cùng transition | Hide trước shadow, không nhân gear death |
+| Shared Shadow Death Form | Visual chung U, Body/Head hidden | Hidden | Hidden | Hidden; blink V/eyes overlay |
+
+**Ví dụ minh họa để báo công, không manifest:** upper common `b=11` (Idle 3/4: 2 + Run4 + Jump2 + Fall1 + Hit2); hai class có 14 ô action, giả định `c=2` hình neutral/recovery thực sự chung → `b+14−c=23` upper artwork templates. Sharing action `c=0..4` còn PROBE; với cùng b thì 21–25, riêng draw/swing active không ép reuse. Lower `13` = Idle 3/4: 1 + Run6 + Jump2 + Fall2 + Hit1 + action stance1 dùng chung hai class, không corpse. Giả định lower action stance dùng được cả Sword/Bow phải kiểm, Land/Bow stance thêm thì mỗi pose +1/thiết kế. b và các nhóm cũng có thể dedup thêm hoặc cần redraw; số này không đổi tám state/26 ô.
+
+| Module | Effort theo giả định trên / outcomes nếu xuất PNG riêng | Rủi ro cần đo |
+| --- | --- | --- |
+| Body | 23 template ở kịch bản b/c trên | Air/move-opposite-action làm sai hông hoặc cần upper pose mới |
+| Armor | Một default + ba bands dùng cả hai class: 23 template, 3 × 23 sửa variant →92 outcomes | Không sáu bộ class. Tay rộng/tà dài có thể cần redraw, render slice và sửa occlusion theo pose; không coi recolor là đủ |
+| Lower | 13 template +3 × 13 sửa variant →52 outcomes | Land + Bow stance riêng, nếu mỗi thứ thêm 1 thì +2 × 4=8 outcomes; không nhân toàn lower theo class |
+| Head/Hair | Kê góc3/4/side/cúi đầu thật, R nhiều ô + S offset | Không ép một ảnh đầu vào mọi góc; bất đối xứng có thể cần correction trái |
+| Sword/Bow/Arrow | Hand estimate hiện có 13–25 +1 tên chung; carry thêm 0–1 hình/visual →0–7 | Carry0 chỉ khi canonical/transform đọc tốt; bao rỗng optional thêm tối đa4 hình Sword và QA, chưa mặc định |
+| Shadow | Một bóng + eyes overlay dùng chung là mẫu 2 ảnh; composite blink là option khác | Không mỗi outfit/class một death sheet; shape/blink count sau sample |
+
+**Facing delta:** ví dụ Front Idle+15 outcomes của revision trước đã SUPERSEDED, không cộng vào budget này. 3/4 Idle→side Run/action có thể cần upper/head/socket corrections, đặc biệt asymmetry Left; ghi delta theo part/sample thật, không mặc định hai full sheets. Combat neutral optional thêm đúng pose cần; mỗi upper thêm 1 cho Body + bốn Armor là+5 outcomes, lower thêm 1 cho bốn variants là+4. Với c=0 thay c=2, upper+2→+10 outcomes, Lower không đổi. Đây là scenario, không claim tiết kiệm công hay đã giải interpretation 26.
+
+**Công =** tạo template mới + sửa từng variant + export/slice + socket/order/import + QA + rework; dùng giờ đo từng nhóm, không `armor×pants×weapons×26`. PoseKey có thể R cùng sprite trong nhiều ô; một render slice tăng setup/QA dù không là thiết kế mới. Chuẩn hip/neck/shoulder/hand contact và family grip chung tránh tổ hợp; áo tay rộng/tà dài chỉ thêm correction nơi cần. Đổi Kiếm I→II hay Cung I→II không redraw áo/quần. Manifest khai báo mọi exception, không tự giả overlay reuse 100%.
+
+13 gear world modules =4 Sword +3 Bow +3 Armor +3 Lower; +2 fallback outfit =15, Body/Head và shadow là base/presentation riêng. Không cộng thành tổng raster khóa mới hoặc promote ví dụ minh họa thành cách diễn giải 26 đã duyệt.

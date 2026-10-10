@@ -502,24 +502,39 @@ Luật và counts Q1–Q12 ở [Quests & Narrative](../01-design/quests-and-narr
 
 **Ưu tiên kiểm:**
 
-- Trước base: P01 minimal player 3/4 Idle Left/Right/side/carry/shadow và swap overlay nhỏ; P02 Kiếm/default/I với S1/S2 A/B và P03 minimal Cung S1/S2/socket/draw-release ngang ưu tiên, P05 Nấm/Sói, P06 ground, P07 solo Q3/Q6, P08 room, P09 geometry nhỏ, P11 kit và P15 công thực tế. P04 primary-proximity/S3/Spread/Hàn dùng fixture hẹp trong C0 trước credit quest thật/full VFX.
+- Trước base: P01 minimal player 3/4 Idle Left/Right/side/carry/shadow và swap visual sets nhỏ; P02 Kiếm/default/I với S1/S2 A/B và P03 minimal Cung S1/S2/socket/draw-release ngang ưu tiên, P05 Nấm/Sói, P06 ground, P07 solo Q3/Q6, P08 room, P09 geometry nhỏ, P11 kit và P15 công thực tế. P04 primary-proximity/S3/Spread/Hàn dùng fixture hẹp trong C0 trước credit quest thật/full VFX.
 - Sau base và G-L mới: P07 contention, P12 Dedicated. RAM pass không thay backend ACK/terminal-pending ở P06/P12.
 - Sau core gate: full Bow bands/profile/P03, Boss/P14, thác/full gear và stress full content. Bảng dưới giữ toàn TARGET, không buộc chạy hết trước slice.
 
 **Asset Definition of Done — áp cho module nhập vào probe:**
 
 - [ ] Canvas/PPU/pivot/mốc chân đúng; alpha/palette sạch, không crop lệch cell hoặc bleed.
-- [ ] PoseKey/ref/duration có manifest; các layer khớp, không hở Body/Armor/Lower.
+- [ ] Master Pose/schema revision và PoseKey/ref/duration có manifest; Head/Upper/Lower ghép đúng cổ/eo/hip, không gap/da thiếu/tay hoặc outline kép.
 - [ ] Hai hướng đúng grip/socket/front-back; không mirror text/physics hoặc mirror hai lần.
 - [ ] Import/slice/platform/atlas refs đúng; gear swap runtime giữ phase, Run không trượt chân.
 - [ ] Camera thực đọc silhouette/cue/UI; AnimationEvent/visual collision không gây damage.
 - [ ] Source/export/meta/revision/provenance đầy đủ; ghi pass/fail, công sửa và output bị loại.
 
+<a id="modular-character-acceptance"></a>
+
+**P01/P02/P03 — modular composition acceptance, toàn bộ CHƯA CHẠY:** setup/authoring theo [Art owner](../03-art/art-and-visual-production.md#first-art-probe); validation không tự chọn raster budget hoặc kỹ thuật Unity.
+
+| Nhóm kiểm | Coverage tối thiểu / kết quả cần ghi |
+| --- | --- |
+| Alignment / mix | DefaultUpper+DefaultLower, ArmorA+DefaultLower, DefaultUpper+PantsA, ArmorA+PantsA, ArmorA+PantsB, ArmorB+PantsA; cùng Head/Hair. Không hở cổ/eo/hip, không mất da/tay hoặc duplicate silhouette. Thiếu variant B thì coverage chưa đủ |
+| Transition | Idle→Run, Run→Jump, Jump→Fall, Idle/Run→Attack và repeated S2; parts/anchors/order cùng sample, không trượt gear/nhảy pivot/reset phase. Air policy đúng configuration đang probe, không mở S2/S3 air |
+| Weapon / facing | Sword và Bow dùng cùng Master Pose system và proportions; Back→Hand→Back, grip/nock và correction ở Left/Right. Không double weapon/đảo sai tay/bao; asymmetry được kê trong manifest |
+| Asset roles / reuse | UI icons không là actor fragments; tắt skill VFX vẫn ghép equipment đúng. Manifest phân biệt 26 logical coverage với unique/reused raster, offsets/socket-only, corrections/render slices; thiếu pose có diagnostic/fallback đã kiểm |
+| Swap / revision / lifecycle | Swap/unequip một phần tại phase gameplay cho phép; refs/sockets/order không lẫn revisions. Load A trễ sau equip B/unequip, death/map/reset/pool reuse hoặc preview mới không ghi đè state mới. Action weapon snapshot giữ; local fixture không thay P12 network validation |
+| Sorting / import | Hai actor overlap, wide sleeve/hem/hair với bow/hand, telegraph/foreground; import/crop/atlas không đổi pivot/anchors hoặc bleed. Ghi chosen method, renderer setup và profile/clock/visual revision, không hứa fixed draw calls |
+
+P15 chỉ chốt measured raster/reuse/effort sau coverage trên; ghi pose/combination chưa thử, asset pass/fail và giờ QA/rework, không gọi một outfit vừa khít là mọi tổ hợp PASS.
+
 DoD là chất lượng asset probe. “Có PNG” hoặc “build chạy” chưa nghiệm thu art/UX toàn game.
 
 | Ca | Nội dung phải thử | Dấu hiệu đủ để ra quyết định |
 | --- | --- | --- |
-| P01 Modular player | Early subset theo [Art probe](../03-art/art-and-visual-production.md#first-art-probe): 3/4 Idle Left/Right/side Run/Jump/Fall, action/recovery, carry, player shadow, một overlay swap nhỏ. Full default +I/II/III/mix-band/unequip ở phase rộng | Không hở thân/grip sai/nhảy pivot/jitter; thử stop ngay/delay, focus-only/repeated S2; shadow hide gear và reset đúng life. Manifest unique/reuse/socket/VFX/optional, kiểm26 logical samples và unique raster mapping và delta 3/4-facing/class/airborne |
+| P01 Modular player | Early subset theo [Art probe](../03-art/art-and-visual-production.md#first-art-probe): 3/4 Idle Left/Right/side Run/Jump/Fall, action/recovery, carry, player shadow, default/Áo I/Quần I và variant B nhỏ để swap visual sets. Full default +I/II/III/mix-band/unequip ở phase rộng | Không hở thân/grip sai/nhảy pivot/jitter; thử stop ngay/delay, focus-only/repeated S2; shadow hide gear và reset đúng life. Manifest unique/reuse/socket/VFX/optional, kiểm26 logical samples và unique raster mapping và delta 3/4-facing/class/airborne |
 | P02 Hai Sword cùng action | Mộc và Huyền Ấn dùng cùng track Attack; hai Kiếm class khác band dùng cùng Skill; thử swap giữa action hợp lệ | Đúng cây ở cả Back/Hand/release, không duplicate/ghost hoặc sprite Common baked; socket/góc raster đủ; visual snapshot không morph sai; không cấp skill class cho Tân Lữ chỉ để test Mộc |
 | P03 Bow | Ít nhất hai band rest/draw/release/Skill, S1 và triple | Back silhouette/canvas đọc được, tay/string/arrow nock khớp; spawn đúng timeline, ba tên một cast; quyết có partial-draw thêm và logical hit/visual timing contract |
 | P04 Multi-target | Primary-proximity Kiếm3/5, Hàn1+4, spreadA/B/C–A/B/A–A/A/A, no-target/invalid; C1/C2/LoS A/B | Impact cùng phase resolve của profile, spread ba tên một cast, không chain giả; không double status/impact/projectile |
@@ -577,7 +592,7 @@ Mỗi hồ sơ cần ghi revision/build, phái, trạng thái khởi đầu, bin
 
 ## Early minimal Kiếm và Cung — trước production rộng
 
-**Chưa chạy.** Minimal player 3/4 Idle Left/Right/side/carry/shadow và overlay swap theo [Art owner](../03-art/art-and-visual-production.md#first-art-probe), trước khi vẽ đủ ba bands; P01 local fixture không thay P12 duplicate/late/stale/reconnect/death authority evidence mạng. Dùng cùng scene scale/movement/collider và fixture revision cho hai phái. Kiếm: movement/select/Execute/S1 + **S2 A/B ngang ưu tiên Cung S2**, primary-proximity3, S3 fixture và socket/timing. Cung: movement/select/Execute/S1 + S2 Spread hiện hành, range/focus/kite và bow socket/draw-release.
+**Chưa chạy.** Minimal player 3/4 Idle Left/Right/side/carry/shadow và swap pose-indexed visual sets theo [Art owner](../03-art/art-and-visual-production.md#first-art-probe), trước khi vẽ đủ ba bands; P01 local fixture không thay P12 duplicate/late/stale/reconnect/death authority evidence mạng. Dùng cùng scene scale/movement/collider và fixture revision cho hai phái. Kiếm: movement/select/Execute/S1 + **S2 A/B ngang ưu tiên Cung S2**, primary-proximity3, S3 fixture và socket/timing. Cung: movement/select/Execute/S1 + S2 Spread hiện hành, range/focus/kite và bow socket/draw-release.
 
 Đo acceleration/deceleration, jump/coyote/buffer, air policy, target switch và pending, animation khớp action clock, MP sustain/Food. Chạy 1/3/4 targets, có damage **gây và nhận**, no-Food/expiry/gear-lag và quay đầu/đổi tầng/Return. S2/S3 air permission giữ OPEN, ghi rõ thử policy nào. Capture build/revision, bindings, fixture, logs và video tốc độ thường; người thật review rollover/feel/usability. Automation không pass cảm giác tay.
 

@@ -36,7 +36,7 @@ docs/
 | [Items & Economy](01-design/items-and-economy.md) | Gear/Food/Potion, inventory/shop/loot, Gold/Journey và PvP stake economy |
 | [Gameplay Runtime](02-technical/gameplay-runtime.md) | Architecture/authority/Local → Dedicated; PrimaryAction/ActiveFocus/input/UI; clock/combat/quest/physics/map/presentation implementation |
 | [Online & Persistence](02-technical/online-and-persistence.md) | Auth/lease/reconnect/checkpoint, transactions/receipts, durability/outage/escrow |
-| [Art & Visual Production](03-art/art-and-visual-production.md) | Perspective/rig/pose/socket, visual language, map Bible/UI, workflow/accounting |
+| [Art & Visual Production](03-art/art-and-visual-production.md) | Master Pose/visual-part authoring/composition, perspective/rig/pose/socket, visual language, map Bible/UI, workflow/accounting |
 | [Roadmap](04-production/roadmap.md) | CURRENT/TARGET/DEFERRED, phase/gate, phụ thuộc, lịch quản lý và readiness |
 | [Playtest & Balance](04-production/playtest-and-balance.md) | Evidence/fixtures/probes/KPI, harness requirements và fresh-run protocol |
 
@@ -92,7 +92,7 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Potion gameplay/resource rule (WHAT) | [Items](01-design/items-and-economy.md#consumables-death) |
 | Potion realtime application ordering (HOW) | [Runtime](02-technical/gameplay-runtime.md#potion-ordering) |
 | Potion durability/crash/reconnect (HOW) | [Online](02-technical/online-and-persistence.md#potion-durability) |
-| Perspective/26 logical-frame mapping/socket/accounting | [Art](03-art/art-and-visual-production.md) |
+| Master Pose / modular parts / 26 logical mapping / socket / accounting | [Art](03-art/art-and-visual-production.md#master-pose), [runtime integration](02-technical/gameplay-runtime.md#art-contract), [probe acceptance](04-production/playtest-and-balance.md#modular-character-acceptance) |
 | Early Kiếm/Cung và production readiness | [Roadmap](04-production/roadmap.md), [protocol](04-production/playtest-and-balance.md#early-two-class-probe) |
 | Old tables/prototype history | [Design history](90-archive/design-history.md), [Art history](90-archive/art-history.md), [Production history](90-archive/production-history.md) |
 
@@ -101,6 +101,10 @@ Evidence trái design phải thành finding để owner quyết định, không 
 | Thuật ngữ | Nghĩa dùng trong docs |
 | --- | --- |
 | Authority | Thành phần có quyền quyết định một loại state/result |
+| Master Pose Template / Schema | Reference authoring và contract dữ liệu pose/anchors dùng chung; không body render layer |
+| Pose-indexed visual set | Head/Hair, Upper/Armor, Lower/Pants hoặc Weapon được chọn/căn theo logical pose; default Upper/Lower dùng khi unequip |
+| Logical pose / raster | Mẫu trên timeline / ảnh pixel xuất; 26 logical poses LOCKED không đồng nghĩa 26 unique rasters mỗi item |
+| UI icon / character visual | Hai asset roles riêng: biểu diễn item trong UI / fragments ghép actor trong world |
 | Snapshot | Bản chụp bất biến của data tại một thời điểm |
 | Commit / rollback | Ghi thành công toàn transaction / hoàn tác transaction thất bại |
 | Idempotent | Retry cùng ID không tạo effect/reward/consume lần nữa |

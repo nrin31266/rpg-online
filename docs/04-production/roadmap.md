@@ -122,7 +122,7 @@ Hạng mục độc lập trong G-C/F/P có thể làm song song sau gate phụ 
 
 ## Giao việc cho art probe
 
-Pha R/P15 dùng [Art workflow và phép đo output/giờ](../03-art/art-and-visual-production.md#art-tool-workflow); task tuân [Runtime discipline](../02-technical/gameplay-runtime.md#architecture-discipline). Chỉ mở production theo gate bên dưới.
+Pha R phải review [Master Pose modular probe](../03-art/art-and-visual-production.md#first-art-probe) và [P01/P02/P03 acceptance](playtest-and-balance.md#modular-character-acceptance) trước chốt raster budget; P15 đo công thực, không chỉ review một outfit. Pha R/P15 dùng [Art workflow và phép đo output/giờ](../03-art/art-and-visual-production.md#art-tool-workflow); task tuân [Runtime discipline](../02-technical/gameplay-runtime.md#architecture-discipline). Chỉ mở production theo gate bên dưới.
 
 <a id="production-release"></a>
 
@@ -324,17 +324,17 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **Dependencies:** Pha R minimal KiếmS2 A/B và CungS2 ngang ưu tiên, Slice2 movement/shared rig + **C0 actual target/result contract trước full VFX**; G-N và A01/A02/A12 trước nhân families.
 - **Actual reference:** `CombatController.Facing/TryStart`, `SliceHost.FixedUpdate/RenderPlayer`, `GeometricRig.Pose`, `SliceHud.DrawEquipment`; dead-gray outfit/Idle torso+weapon rotation là gap prototype.
 - **New contracts:** Left/Right, Idle3/4, class upper poses/clock/keys/parts/sockets/carry; Right default/immutable action facing/life; SkillPresentationProfile main/impact/status/SuppressDefaultMainWeaponVfx/local-remote LOD theo Art, không per-skill system mới.
-- **Minimal implementation:** một outfit/overlay và Kiếm/Cung probe; không full catalog.
-- **Migration:** Front Idle priority SUPERSEDED, giữ tám states/count 26; A01 timeline/raster OPEN, không ép 33/23-template estimate thành budget hay mass rename assets.
+- **Minimal implementation:** tích hợp Master Pose và default/Áo I/Quần I + fixture variants nhỏ đã qua [Art probe](../03-art/art-and-visual-production.md#first-art-probe); Kiếm/Cung cùng pose system, không full catalog.
+- **Migration:** Front Idle priority SUPERSEDED, giữ tám states/count 26; A01 timeline/raster OPEN, không dùng estimate Body/Armor lịch sử làm budget hoặc mass rename assets.
 - **Server:** expose authoritative action/facing/terminal phase theo presentation spike; không gameplay damage/AnimationEvent/facing DB mới.
 - **Client:** Idle giữ hướng, Run side hơn, Jump/Fall riêng 2+2, swing/draw upper thật; Back/Hand một representation, player pop/fall/shadow hide parts; NPC authored độc lập.
 - **Persistence:** dùng existing gear/class/terminal/checkpoint contracts; lost session Right baseline khi chưa saved-facing requirement.
 - **Dev Mode:** Left/Right stop, air/opposite action, swap/unequip/S2, duplicate death/late viewer/revive/life reset, fixture labels rõ.
 - **Unit tests:** phase/facing/carry dedup/life-reset/pose mapping invariants; không test chỉ mirror PNG implementation.
-- **Integration tests:** Unity import/pivot/socket/timing/overlay mix; late/stale shadow đúng, Hit không restart clock; sprite không là damage collision.
+- **Integration tests:** Unity import/pivot/socket/timing/pose-indexed part mix và visual revision; late/stale shadow đúng, Hit không restart clock; sprite không là damage collision.
 - **Multiplayer tests:** remote clients, old-life action/late join/MapId/dead focus HP updates; PNG local không chứng minh network truth.
 - **Manual acceptance:** Idle 3/4/action side dễ đọc; hand grip/hip/armor/weapon align hai hướng, không chỉ xoay weapon; camera/font ở scale thật.
-- **DoD:** minimal Kiếm/Cung evidence, manifest, effort hours/% usable; A01 mapping/reuse trong26 logical frames được kiểm, không fake asset PASS; physics/mob death giữ.
+- **DoD:** [modular acceptance](playtest-and-balance.md#modular-character-acceptance) và minimal Kiếm/Cung evidence, manifest, effort hours/% usable; A01 mapping/reuse trong26 logical frames được kiểm, không fake asset PASS; physics/mob death giữ.
 - **Rollback risk:** presentation revision reset callbacks cũ, không rollback Inventory/class.
 
 <a id="first-coding-slice"></a>
