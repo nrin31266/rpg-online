@@ -1,4 +1,6 @@
 # Relative to the Assets directory of any Unity project.
 Assets/**/Art/**
 Assets/**/Fonts/**
+# Unity's Lit 2D template embeds its preview texture in this source asset.
+apps/client-unity/Assets/Settings/Lit2DSceneTemplate.scenetemplate
 # Explicit exemptions apply only to size, never forbidden extensions.
