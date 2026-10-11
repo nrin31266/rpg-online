@@ -1,0 +1,196 @@
+{
+  "scope": "Numerical probe only, not manual/G-L/G-N acceptance",
+  "editor": "6000.5.9f1",
+  "dt": 0.0199999921,
+  "movementValues": {
+    "moveSpeed": 5.0,
+    "jumpForce": 7.0,
+    "fallGravityMultiplier": 2.5,
+    "holdThreshold": 0.14,
+    "stage2Window": 0.26,
+    "doubleTapWindow": 0.22,
+    "stage2VelocityFraction": 0.18
+  },
+  "cameraValues": {
+    "verticalOffset": 0.8,
+    "verticalSmoothTime": 0.2,
+    "upperSoftZone": 1.85,
+    "lowerSoftZone": 2.3,
+    "upwardLookAhead": 0.08,
+    "downwardLookAhead": 0.06,
+    "maxLookAhead": 0.35,
+    "upwardSmoothTime": 0.18,
+    "downwardSmoothTime": 0.28,
+    "safeViewMargin": 0.5,
+    "pixelsPerUnit": 32.0,
+    "quantizeToWorldPixel": false
+  },
+  "failures": 0,
+  "results": [
+    {
+      "id": "JUMP-01",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "tap",
+        "height": 2.42788029,
+        "extensions": 0,
+        "landings": 1,
+        "extensionTime": -1.0,
+        "extensionContribution": 0.0,
+        "immediateExtension": false,
+        "fallingPressRejected": false
+      }
+    },
+    {
+      "id": "CAM-01",
+      "numerical": "PASS",
+      "evidence": {
+        "cameraDrift": 0.00252735615
+      }
+    },
+    {
+      "id": "JUMP-02",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "hold",
+        "height": 3.193429,
+        "extensions": 1,
+        "landings": 1,
+        "extensionTime": 0.159999937,
+        "extensionContribution": 1.26000023,
+        "immediateExtension": false,
+        "fallingPressRejected": false
+      }
+    },
+    {
+      "id": "CAM-02",
+      "numerical": "PASS",
+      "evidence": {
+        "revealedWhileAscending": true,
+        "cameraDrift": 0.581609964,
+        "fixture": "same-level landing; pre-apex reveal only, destination readability needs manual staircase"
+      }
+    },
+    {
+      "id": "JUMP-03",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "double",
+        "height": 3.193429,
+        "extensions": 1,
+        "landings": 1,
+        "extensionTime": 0.159999937,
+        "extensionContribution": 1.26000023,
+        "immediateExtension": false,
+        "fallingPressRejected": false
+      }
+    },
+    {
+      "id": "JUMP-04",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "slow",
+        "height": 2.42788029,
+        "extensions": 0,
+        "landings": 1,
+        "extensionTime": -1.0,
+        "extensionContribution": 0.0,
+        "immediateExtension": false,
+        "fallingPressRejected": false
+      }
+    },
+    {
+      "id": "JUMP-05",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "falling",
+        "height": 2.42788029,
+        "extensions": 0,
+        "landings": 1,
+        "extensionTime": -1.0,
+        "extensionContribution": 0.0,
+        "immediateExtension": false,
+        "fallingPressRejected": true
+      }
+    },
+    {
+      "id": "JUMP-06",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "hold+tap",
+        "height": 3.193429,
+        "extensions": 1,
+        "landings": 1,
+        "extensionTime": 0.159999937,
+        "extensionContribution": 1.26000023,
+        "immediateExtension": false,
+        "fallingPressRejected": false
+      }
+    },
+    {
+      "id": "JUMP-07",
+      "numerical": "PASS",
+      "evidence": {
+        "route": "reset",
+        "height": 3.193429,
+        "extensions": 2,
+        "landings": 2,
+        "extensionTime": 0.159999937,
+        "extensionContribution": 1.26000023,
+        "immediateExtension": false,
+        "fallingPressRejected": false
+      }
+    },
+    {
+      "id": "CAM-03",
+      "numerical": "PASS",
+      "evidence": {
+        "preLandingFollow": true,
+        "landed": true,
+        "largestDistance": 4.50000048,
+        "safe": 4.5
+      }
+    },
+    {
+      "id": "CAM-04",
+      "numerical": "PASS",
+      "evidence": {
+        "allTransitionsBeforeLanding": true,
+        "fixture": "synthetic four-leg staircase trajectory; manual collision/route/feel remains pending"
+      }
+    },
+    {
+      "id": "CAM-05-grid-only",
+      "numerical": "PASS",
+      "evidence": {
+        "gridAligned": true,
+        "acceptance": "MANUAL_PENDING: no animated-art shimmer review; default quantization remains off"
+      }
+    }
+  ],
+  "recordedAt": "2026-10-12T01:32:22.686438+07:00",
+  "sourceSha256": {
+    "apps/client-unity/Assets/_Sandbox/Scripts/PlayerTestMovement.cs": "769be0804fce05d9da3061212376062a1c2870aa98d28ec664071a1a2c21683b",
+    "apps/client-unity/Assets/_Sandbox/Scripts/CameraFollowTest.cs": "8af81d6e9ada9beb7f8abbf7459ecaaa6d1644e9af51b62057a0c507401f2fbb",
+    "tools/probes/movement_camera_probe.cs": "efad2a1ae1be89bdf3deee075ec38dda4f19b371c09e344cc39ede569987c22c"
+  },
+  "fixtureNotes": [
+    "Reflected ProcessJumpInput press/held booleans, not physical keyboard input.",
+    "Real isolated PhysicsScene2D and BoxCollider2D floor named GroundTilemap; not authored Tilemap or real map topology.",
+    "Disabled movement/camera Update driven explicitly; real contact callbacks and fixed dt.",
+    "CAM-04 is a synthetic staircase trajectory; CAM-05 checks an optional pixel grid, not animated shimmer.",
+    "Camera half height 5u for this run. Source jumpForce default remains the pre-existing 12; live scene serialized value is 7."
+  ],
+  "finalSceneReadback": {
+    "scene": "ArtLab",
+    "playing": true,
+    "cameraHalfHeight": 5,
+    "pixelPerfectReferenceResolution": [
+      360,
+      220
+    ],
+    "assetsPPU": 32,
+    "sceneSha256": "c65aed874e101a541bda1f292418e76401ff01646aa313a5808362fc0e413ba7",
+    "note": "Readback only; no visual shimmer acceptance. Scene saved during pass without agent save call; initial reference resolution was 384x215."
+  }
+}

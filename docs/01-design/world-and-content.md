@@ -75,7 +75,7 @@ Thế giới gồm **8 logical map roots** (Vân Khê, Học Viện, Lôi Đài 
 #### Học Viện — Huấn luyện nhập môn & Điện Nhập Phái
 - **Vai trò:** Khu vực bán an toàn dành riêng cho tập luyện kỹ năng cơ bản, thử nghiệm di chuyển và nghi thức chọn phái (Q2, Q3, Q6).
 - **Phân khu 3 khu vực cốt lõi:**
-  + *Tuyến Q2 (`HV_ObstacleCourse`):* checklist bắt buộc Jump→Drop cũ SUPERSEDED. Giữ stable `HV_Entrance`, `HV_JumpLedge`, `HV_DropLanding`; [Quest owner](quests-and-narrative.md#q2-journey) đã duyệt lấy Vải Bọc Chuôi tại `HV_Q2_SupplyRack`, tự nhặt rồi trả Lâm Bá. Route dùng bậc solid và jump cố định, return rõ; one-way kết cấu là optional route, không bắt Q2 DropThrough. Exact coordinates/traversal count còn geometry PROBE; content approval không thay blockout/camera/pickup acceptance.
+  + *Tuyến Q2 (`HV_ObstacleCourse`):* checklist bắt buộc Jump→Drop cũ SUPERSEDED. Giữ stable `HV_Entrance`, `HV_JumpLedge`, `HV_DropLanding`; [Quest owner](quests-and-narrative.md#q2-journey) đã duyệt lấy Vải Bọc Chuôi tại `HV_Q2_SupplyRack`, tự nhặt rồi trả Lâm Bá. Route dùng bậc solid và [Stage-1/optional Stage-2 jump](combat-and-character.md#movement-direction), return rõ; one-way kết cấu là optional route, không bắt Q2 DropThrough. Exact coordinates/traversal count còn geometry PROBE; content approval không thay blockout/camera/pickup acceptance.
   + *Sân tập Bù Nhìn (`HV_DummyYard`):* Bãi đất bằng phẳng bố trí các cọc Bù Nhìn rơm độc lập theo [Q3 owner](quests-and-narrative.md#quests-story). **Năm placements đã duyệt: 3 sân chính + 2 khu phụ/ven tuyến đi**, cùng một Bù Nhìn/pool/lifecycle. Số placements giảm contention, không bảo đảm mọi N người có credit; không bắt Q3 chờ hồi sinh hoặc hạ bốn slot khác nhau.
   + *Khu vực Nhập Phái (`HV_ClassHall` / Điện Nhập Phái):* Khu vực riêng biệt cho hai phái với functional zoning rõ ràng; vị trí tả/hữu/Tây là đề xuất blockout tham khảo (tọa độ chính xác OPEN). Mentor Phong Du (Kiếm) và Mentor Diệp Lam (Cung) được bố trí bình đẳng, dễ thấy như nhau, khẳng định không đặt Kiếm Sĩ làm lựa chọn mặc định trước Cung Thủ.
 
@@ -370,7 +370,7 @@ Candidate manifests ở trên giữ stable groups/slots và budgets, **không ph
 | Tutorial placement | Authoring contract | Kiểm cần làm |
 | --- | --- | --- |
 | Ba Bù Nhìn sân chính | Một loại training actor, ba điểm trên mặt sân HV_DummyYard | Nằm ngoài NPC/exit/path; đủ gap body/HP/impact và route nhặt nếu applicable |
-| Hai Bù Nhìn khu phụ | Cùng loại, hai điểm ven tuyến Học Viện hợp lý, tìm được từ yard | Waypoint nhìn được, fixed Jump tới được cho Q3/Q6, không khóa class/cửa chưa mở |
+| Hai Bù Nhìn khu phụ | Cùng loại, hai điểm ven tuyến Học Viện hợp lý, tìm được từ yard | Waypoint nhìn được, two-stage Jump tới được cho Q3/Q6 theo movement owner, không khóa class/cửa chưa mở |
 
 Học Viện an toàn với player: Bù Nhìn không attack/reward, không tạo combat hazard; safe checkpoint vẫn theo Online. Tuyến Q3 đi qua yard rồi mở thêm khu phụ giúp solo có≥4 targets ban đầu, không yêu cầu chờ timer. Contention nhiều người vẫn đo wait/credit; không chỉ suy5 placements là fairness proof.
 

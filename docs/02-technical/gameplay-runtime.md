@@ -436,13 +436,25 @@ Client không count renderer/interest set; dormant mobs vẫn trong authoritativ
 
 <a id="movement-feel"></a>
 
-**Normal Jump fixed height — direction đã xác nhận; feel TUNABLE:** gameplay dùng phím mũi tên. Mỗi accepted press khởi tạo cùng launch profile, không cutoff vận tốc hoặc đổi upward gravity khi nhả/giữ Jump. Coyote tính từ support cuối; buffer có hạn và consume một lần, một press tối đa một jump. Grounded kiểm chân/support/chiều chuyển động, không sprite bounds. Launch velocity/gravity/fall gravity/landing và acceleration/deceleration ground/air vẫn TUNABLE, deterministic theo authority fixed tick. Collision trần có thể chặn apex; test tap/hold phải cùng setup/no obstruction. Tốc ngang dùng MoveSpeed gồm AGI/Giày/Slow/nước, không suy Giày/AGI thay jump height.
+**Two-stage Jump integration — semantic owner:** đọc [Movement direction](../01-design/combat-and-character.md#movement-direction); Runtime không định nghĩa một gameplay rule song song. Input adapter phải giữ press edge, held continuity và release để resolver phân biệt base start với extension request. Production xử lý trên authority fixed tick, không dựa render FPS; exact input/message representation vẫn PROBE. Grounded dùng chân/support/chiều chuyển động, không sprite bounds. MoveSpeed gồm AGI/Giày/Slow/nước không suy thành jump height.
 
-Tuning tốc rơi không đổi pose clock. Duration/force chưa khóa; dùng authority clock/fixed physics, không phụ thuộc render FPS. Coyote/buffer không tạo double jump; dọn state khi death/map/UI/Freeze theo lifecycle.
+Mỗi accepted Stage-1 start mở một jump instance với start clock và extension-consumed flag; extension thuộc đúng actor/life/generation/MapId/jump instance. Coyote tính từ support cuối và chỉ cho start Stage 1; buffer có hạn, consume một lần để queue Stage 1 trước landing, không queue Stage 2 sau window/falling. Hold threshold tính từ accepted Stage-1 start và cần continuous hold đủ lâu, tránh buffered/held input extend ngay frame start. Second press không có short double-tap timeout: authority kiểm upward velocity/ascent margin; window đóng vĩnh viễn trong current jump khi gần apex, không mở lại do bounce. Landing reset extension; death/map/session/UI/Freeze cleanup theo lifecycle, không cho stale press/held state tạo air reset. Exact coyote/buffer durations chưa khóa.
+
+Velocity implementation có thể dùng modest additive contribution; không set Y về full base launch khi extend. Fall-gravity experiment và ceiling collision giữ độc lập input route; presenter không set gravity hoặc restart physics khi reuse Jump pose. Client gửi intent/edge/held state cần thiết; Dedicated validate phase/window/one-shot bằng authority clock/identity, reject stale/replay, không trust client-provided boost/apex. Schema/replication và latency behavior phải probe ở G-N, không suy Unity cross-machine lockstep từ sandbox.
+
+**Sandbox scope:** PlayerTestMovement dùng legacy Input với current Both profile, GroundTilemap name/contact-normal check, fall multiplier hiện hành; chưa có production coyote/buffer/DropThrough resolver. Giữ seam nhỏ cho input/physics probe, không dựng production MovementController hoặc migration New Input System trong lượt này.
+
+Tuning tốc rơi không đổi pose clock. Duration/force chưa khóa; production dùng authority clock/fixed physics. Physics Stage 2 reuse Jump presentation nếu thích hợp, không bắt thêm animation state hoặc logical samples.
 
 DropThrough trên solid không có tác dụng và không chặn Jump. Trên one-way, Jump+Drop cùng frame thì Drop thắng, consume pending jump/coyote để không bật ngược. Chỉ bỏ collision actor–support hiện tại rồi restore; giữ Drop không xuyên sàn tiếp theo, cần press mới. Probe nhấn nhanh/giữ phím, jump sớm/muộn ở mép, tường/trần/landing, drop nhiều tầng, air cast, AGI/Slow và render 30/60/120 FPS. Review thủ công ở tốc độ thường quyết cảm giác; automation kiểm invariant.
 
 Physics2D sở hữu collision/grounded/triggers/drop pairs của player/world; combat geometry riêng. Không thêm slope/climb state hoặc khóa movement để sửa lỗi art.
+
+<a id="camera-vertical-probe"></a>
+
+**Camera integration — OPEN / CAMERA PROBE:** thực hiện [design camera acceptance](../01-design/combat-and-character.md#movement-camera) từ owner-local authority root/current player Y và vertical velocity, không visual jump/death offsets. Upper/lower soft zones và modest look-ahead tính target Y khi airborne; landing chỉ settle. CameraFollowTest là probe nhỏ với SmoothDamp/asymmetric thresholds và safe-view catch; không yêu cầu Cinemachine trong sandbox. Production Cinemachine/client ownership, map confiner/transition và death anchor hiện hành giữ nguyên. Exact smooth times/zones/look-ahead/technique cần evidence, không design locks.
+
+Pixel Perfect compatibility: kiểm smoothing/interpolation ở representative resolution/PPU32. Optional world-pixel quantization trên final camera position chỉ là A/B probe nếu shimmer/jitter; không snap physics/server root. [JUMP/CAM acceptance và probe record](../04-production/playtest-and-balance.md#movement-camera-acceptance) tách numerical invariants khỏi manual feel/pixel acceptance.
 
 <a id="presentation-data"></a>
 

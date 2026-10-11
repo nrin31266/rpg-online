@@ -165,7 +165,7 @@ Cắt P1/P2 và polish trước: giảm cosmetic variations/shake/sound/phần t
 
 **PLAN/PROPOSAL; chưa code hoặc pass gate.** [Source audit](../90-archive/production-history.md#source-audit-20261009) ghi actual classes/files tại snapshot 2026-10-09; [matrix](../02-technical/gameplay-runtime.md#responsibility-matrix) ghi trách nhiệm đề nghị. Source VS-1 đã bị xóa khỏi checkout; tra commit lưu trữ khi cần đối chiếu, dựng production theo contract mới. Production `game/`/`backend/` chưa tồn tại. Module mới dưới đây là đề xuất boundary, chưa phải filename/class có sẵn; G-B quyết layout nhỏ nhất. Không port nguyên `SliceSession`/`SliceHud`.
 
-**Thứ tự đề nghị:** Inventory → fixed Jump; C0 combat contract sau base/movement và trước real combat death credit; shared UI → Shop → regular ground → personal entitlement → collection objectives → Q2/mentor → presentation integration. Fixed Jump đi trước Q2 để blockout không dựa hold apex. Minimal Kiếm/Cung art probe vẫn làm sớm ở **Pha R**; Slice 9 chỉ tích hợp vào production. Review schema/data cho đủ 12 QuestDefinitions tại G-B; Q2 content đã duyệt, Q11 cần lượt chốt graph riêng trước final authoring, tuyến Q8+ nghiệm thu ở G-C. Fixture local của Slice 6–7 phục vụ Q2/Q4; durability chỉ hoàn thành sau G-N/G-D. Dedicated receiver/replication và Spring commit adapter là các PR nhỏ tại gate tương ứng, không gộp vào PR Inventory.
+**Thứ tự đề nghị:** Inventory → Two-Stage Jump / Drop; C0 combat contract sau base/movement và trước real combat death credit; shared UI → Shop → regular ground → personal entitlement → collection objectives → Q2/mentor → presentation integration. Two-Stage Jump đi trước Q2 để blockout kiểm riêng base traversal và modest extension theo movement owner. Minimal Kiếm/Cung art probe vẫn làm sớm ở **Pha R**; Slice 9 chỉ tích hợp vào production. Review schema/data cho đủ 12 QuestDefinitions tại G-B; Q2 content đã duyệt, Q11 cần lượt chốt graph riêng trước final authoring, tuyến Q8+ nghiệm thu ở G-C. Fixture local của Slice 6–7 phục vụ Q2/Q4; durability chỉ hoàn thành sau G-N/G-D. Dedicated receiver/replication và Spring commit adapter là các PR nhỏ tại gate tương ứng, không gộp vào PR Inventory.
 
 Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo definition revision. Chưa có save production để migrate SQL; mục Migration nói cách xử lý fixture/import nếu được tạo. Không đổi lịch TARGET, không dùng preset thay fresh acceptance.
 
@@ -209,24 +209,24 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 - **DoD:** invariants, receiver/RAM seam, demo độc lập và test logs đạt; chưa tuyên bố Inventory durable.
 - **Rollback risk:** data semantics ảnh hưởng mọi handler; version fixture/definition trước tích hợp Shop/Quest để rollback nhỏ.
 
-### Slice 2 — Fixed normal Jump và per-actor DropThrough
+### Slice 2 — Two-Stage Jump / Drop và camera vertical probe
 
-- **Why now:** Q2/traversal phải được author theo jump profile mới; làm feel sandbox trước production geometry.
-- **Dependencies:** physics/input clock review G-B; không phụ thuộc Shop/entitlement.
-- **Actual reference:** `Runtime/SliceHost.cs` `Update/FixedUpdate/IsGrounded/BuildMap`, `jumpHeld/ExternalJumpHeld`, release clamp vy>4→4 và ignored pairs; `BlockoutLayout.Surfaces`; `InputPhysicsTests.MovementProbeVariableHeightCoyoteAndStandaloneDrop`, `ContinuousRouteTests`, `SliceRouteProbe.releaseJumpAt/JumpObstacle` còn hold-dependent.
-- **New contracts:** một press/profile, coyote/buffer consume một lần; upward gravity không phụ thuộc hold; semantic Jump/Drop riêng, lifecycle của từng ignored support pair.
-- **Minimal implementation:** room có solid step và one-way gỗ có support; kiểm Jump/Drop trước tám map.
-- **Migration:** automation mới bỏ hold/release apex và Q2.dropped như completion predicate; không port natural RearEarth one-way. Retune ledges trước fresh route.
-- **Server:** bỏ release cutoff; forces/fall vẫn TUNABLE. Drop chỉ current standing support pair, restore khi crossing/timeout/death/map/disconnect/destroy; không disable platform toàn cục. Không suy Unity cross-machine lockstep.
-- **Client:** ↑/↓ locked actions dùng cùng intent local/dedicated; velocity/phase chỉ phục vụ visual, không để presenter set gravity; Space/S không thành primary binding mới.
-- **Persistence:** không lưu jump buffer/support pairs/facing DB; clear state khi session/map mới. G-N kiểm sequence/life/correction.
-- **Dev Mode:** standing/falling/coyote/buffer fixtures, log press/tick/grounded/vy/apex/support pairs; không fake quest credit.
-- **Unit tests:** buffer/coyote boundaries, consume một lần, không air double jump; Jump+Drop trên one-way ưu tiên Drop, trên solid ưu tiên Jump.
-- **Integration tests:** Rigidbody thật tap/hold cùng apex/time trong cùng setup; ceiling collision, terminal fall, render FPS; restore ignored pairs khi reset/map/death.
-- **Multiplayer tests:** hai actor trên một sàn, một người Drop không ảnh hưởng người kia; stale/replay không thêm jump; RTT/jitter correction tại G-N.
-- **Manual acceptance:** jump dễ dự đoán, không precision landing; solid không Drop, một press không xuyên sàn kế; exact forces ghi PROBE.
-- **DoD:** fixed profile hoạt động, có physics logs và feel review ở tốc độ chơi bình thường.
-- **Rollback risk:** geometry phụ thuộc launch profile; version room trước Q2, không tune mọi map ngầm.
+- **Why now:** Q2/traversal phải được author theo [movement/camera owner](../01-design/combat-and-character.md#movement-direction); làm feel sandbox trước production geometry.
+- **Dependencies:** physics/input clock review G-B; không phụ thuộc Shop/entitlement; giữ ordering sau Inventory/base và trước Q2/C0 phụ thuộc movement.
+- **Actual reference:** historical `Runtime/SliceHost.cs` `Update/FixedUpdate/IsGrounded/BuildMap`, release clamp và ignored pairs, `BlockoutLayout.Surfaces`, `InputPhysicsTests.MovementProbeVariableHeightCoyoteAndStandaloneDrop`/`ContinuousRouteTests`/`SliceRouteProbe` là PROTOTYPE-ONLY, không acceptance rule mới. Current `PlayerTestMovement.cs`/`CameraFollowTest.cs` trong Unity _Sandbox là probe, chưa production controller.
+- **New contracts:** implementation theo semantic owner; Stage-1 start và shared one-shot extension của đúng jump instance; coyote/buffer chỉ Stage 1; Jump/Drop riêng, lifecycle từng ignored support pair. Camera airborne reveal/long-drop trước landing, normal hop ổn định.
+- **Minimal implementation:** room có solid step và one-way gỗ có support; kiểm Stage1/Stage2/Drop/camera trước tám map; không thêm topology/tooling production.
+- **Migration:** thay acceptance hold/release cũ bằng JUMP-01..07/CAM-01..05; Q2.dropped không completion predicate, không port natural RearEarth one-way. Retune ledges theo hai traversal envelopes trước fresh route.
+- **Server:** không release cutoff hoặc full second launch; forces/fall/hold threshold/ascent margin TUNABLE. Authority validate start/extension sequence/life/jump clock/one-shot, không trust client boost; latency schema OPEN tại G-N. Drop chỉ current standing support pair, restore crossing/timeout/death/map/disconnect/destroy, không disable platform toàn cục.
+- **Client:** ↑/↓ locked actions; legacy Both sandbox không là New Input System production migration. Velocity/phase phục vụ visual/camera, presenter không set gravity; Space/S không primary bindings.
+- **Persistence:** không lưu jump-instance/extension/buffer/support pairs/facing DB; clear state khi session/map mới. G-N kiểm sequence/life/correction.
+- **Dev Mode:** log press/held/release/start tick/current jump/extension count/grounded/vy/apex/camera Y/support pairs; không fake quest credit.
+- **Unit tests:** hold threshold/ascent-margin boundaries và shared one-shot; coyote/buffer chỉ base start; Jump+Drop trên one-way ưu tiên Drop, trên solid ưu tiên Jump.
+- **Integration tests:** Rigidbody thật single tap/short hold/deliberate hold/relaxed second press/near-apex press/falling/one-shot/landing reset; ceiling collision, terminal fall, render FPS; camera short hop/high ascent/long drop/staircase/Pixel Perfect. [Acceptance matrix](playtest-and-balance.md#movement-camera-acceptance) ghi exact probe values/evidence, không compile-only PASS.
+- **Multiplayer tests:** hai actor trên một sàn, một Drop không ảnh hưởng người kia; stale/replay không thêm start/extension; RTT/jitter correction tại G-N.
+- **Manual acceptance:** Stage1 đủ small traversal, Stage2 modest extension cùng jump; camera reveal trước landing, không bob/shimmer; solid không Drop, giữ phím không chain sàn. Exact forces/timing/camera constants PROBE.
+- **DoD:** semantic invariants + physics logs + manual feel/camera/pixel review ở tốc độ chơi bình thường; sandbox numerical pass không production G-L/G-N acceptance.
+- **Rollback risk:** geometry phụ thuộc hai envelopes; version room trước Q2, không tune mọi map ngầm.
 
 ### Slice 3 — Shared ItemGrid/ItemDetails và selection theo context
 
@@ -365,7 +365,7 @@ Mỗi slice phải có demo hẹp chạy độc lập, logs và rollback theo de
 
 ## Một coding slice nên làm đầu tiên
 
-**Chọn Slice 1: production Inventory domain nhỏ + RAM command/receipt seam, 60 slots và compatible stack.** Đây không chỉ đổi 30→60 trong prototype. Nó mở net capacity/quantity/ownership/revision cho Shop/Pickup/TurnIn và test full bag độc lập, chưa cần chốt Q11 graph/schema/26-sample→PoseKey/raster mapping. G-B boundary review cùng Pha R prerequisites đi trước; deliverable đầu là harness chạy Add/Merge/Reject/Replay với logs/invariants và label RAM fixture. Fixed Jump tiếp theo trước Q2 authoring; C0 sau movement/base review và trước Slice5–7 actual kills hoặc full VFX. Không để Inventory slice thành chốt ngầm combat bounds. Đối chiếu VS-1 qua lịch sử Git khi cần; không gộp UI/DB/quests/network trong PR đầu.
+**Chọn Slice 1: production Inventory domain nhỏ + RAM command/receipt seam, 60 slots và compatible stack.** Đây không chỉ đổi 30→60 trong prototype. Nó mở net capacity/quantity/ownership/revision cho Shop/Pickup/TurnIn và test full bag độc lập, chưa cần chốt Q11 graph/schema/26-sample→PoseKey/raster mapping. G-B boundary review cùng Pha R prerequisites đi trước; deliverable đầu là harness chạy Add/Merge/Reject/Replay với logs/invariants và label RAM fixture. Two-Stage Jump / Drop tiếp theo trước Q2 authoring; C0 sau movement/base review và trước Slice5–7 actual kills hoặc full VFX. Không để Inventory slice thành chốt ngầm combat bounds. Đối chiếu VS-1 qua lịch sử Git khi cần; không gộp UI/DB/quests/network trong PR đầu.
 
 <a id="map-info-work-package"></a>
 

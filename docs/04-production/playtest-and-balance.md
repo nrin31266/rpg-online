@@ -637,7 +637,7 @@ Seed hoặc script tạm trong /tmp không phải reproducible evidence dài h�
 
 <a id="consolidation-acceptance"></a>
 
-## Consolidation acceptance mới — toàn bộ CHƯA CHẠY runtime
+## Consolidation acceptance — production gates chưa nghiệm thu
 
 Lượt consolidation 2026-10-09 chỉ chạy docs/link/scope validation. Source/test names và DERIVED tables không pass runtime gate. [Slice plan](roadmap.md#consolidation-slices) chọn tests theo phase; Stable counts Q3/Q4/Q5/Q12 và MobIdentity giữ; Q8/Q10 normal quotas/Q11 ordinal flow SUPERSEDED; RNG outcomes thay generic ordinals. Q2 content/Q6 non-blocking onboarding được duyệt 2026-10-11; Q2 geometry/schema/TTL/26-sample→PoseKey/raster mapping và bounds/LoS còn PROPOSAL/TUNABLE/OPEN tại owner.
 
@@ -645,16 +645,43 @@ Lượt consolidation 2026-10-09 chỉ chạy docs/link/scope validation. Source
 | --- | --- | --- |
 | Inventory 60/stack | Reject món distinct thứ 61; full bag compatible merge; wrong binding/unique gear; numeric bound/checked cost/tampered quantity/split IDs; không reserve quest | G-B/L; G-D API/DB parity |
 | Shared Shop UI | Catalog Buy/toàn bag Sell, disabled bound+reason, quantity/total, keyboard/mouse cùng command; viewport/focus 60 ô, Q4 sample Sell đúng Bách/step | P11/G-L; G-N snapshots |
-| Fixed Jump/Drop | Cùng setup không ceiling: tap/hold cùng apex; coyote/buffer/no double jump/Jump+Drop priority; hai actor một sàn, một Drop; restore death/map/disconnect; không natural one-way | PHY-01/G-L/N |
+| Two-Stage Jump / Drop / Camera | [JUMP-01..07/CAM-01..05](#movement-camera-acceptance); coyote/buffer chỉ Stage1, shared one-shot/no air jump; Jump+Drop priority; hai actor một sàn, một Drop; restore death/map/disconnect; không natural one-way | PHY-01/G-L/N; local numerical probe không thay manual/network |
 | Physical collection | Q8/Q10/Q11 material/restored grants Pending không possession; owner-only visual/RPC ACL; finite TTL/sourceMap re-offer không kill lại; compatible merge nhưng Q11 ba identities riêng | G-L fixture; G-C route/G-D durability |
 | Full bag/net turn-in | Compatible claim vẫn fit ở 60/60; nếu không fit giữ Pending. Consume tạo chỗ cho reward; thiếu net capacity giữ toàn inputs/state, không partial | G-L/D |
 | Reconnect/crash/replay | Crash trước/sau death/claim/turn-in commit; lost ACK/receipt query; old lease/generation, map/death/TTL/new session, N eligible/outsider; không duplicate grant/pile | G-N network; G-D real DB |
 | Approved counts / identity credit | Matrix Q-F01..12; farm đúng identity ở group khác/map-of-quest khác khi player-mob sameMap. Wrong identity/reused rig/variant/special fail đúng predicate. Không whitelist DS/TA/XN/HT cho standard kill. Counts4/5/8/10+Boss giữ; Q8 Collect→Kill1Linh/Q10Collect/Q11restoration direction. Novice sustain và 2/3/4/>5 requesters contention/20%/ground readability | C0/G-L rồi QUEST-03/G-C/T; fixtures không pass route |
-| Q2 journey | Vải Bọc Chuôi tại HV_Q2_SupplyRack đã duyệt; reason/destination/return rõ, fixed-jump terrain, Drop optional; full bag/TTL retry/consume thật; nối Q3/Q6 | G-B binding/blockout, G-L route |
+| Q2 journey | Vải Bọc Chuôi tại HV_Q2_SupplyRack đã duyệt; reason/destination/return rõ, Stage-1/optional Stage-2 traversal, Drop optional; full bag/TTL retry/consume thật; nối Q3/Q6 | G-B binding/blockout, G-L route |
 | Q6/NPC context | Both-talk mọi thứ tự, class/mentor/grant/Arm atomic; selected/unselected mentor biết class sau Q6, không off-class manual. Turn-in không đợi MP use; Armed/Completed riêng, accepted MP consume+Complete một receipt; Tẩy Mạch ở Mộc An | G-L Sword/onboarding, G-C Cung/G-D receipts |
 | Facing/26 samples/shadow | Stop giữ Left/Right, Idle 3/4 đọc mặt/áo; Run side, Jump/Fall riêng, class upper action; socket/mirror/asymmetry; 26 samples giữ/mapping PoseKey/raster OPEN; current player death, mob death giữ | P01/P03/G-L/N; A01/A02/A12 |
 
-Archive virtual/front/variable-jump wording vẫn là historical evidence, không sửa source/CHANGELOG hoặc dùng tests cũ nghiệm thu luật mới. Các bảng timing lịch sử không được tái dùng cho pacing counts mới; chưa có fresh-run hoặc simulation mới sau recovery. G-T vẫn cần fresh Q1–Q12 từng phái và ≥2 clients/backend thật.
+Archive virtual/front/old-jump wording vẫn là historical evidence, không sửa source/CHANGELOG hoặc dùng tests cũ nghiệm thu luật mới. Các bảng timing lịch sử không được tái dùng cho pacing counts mới; movement/camera numerical probe bên dưới không nghiệm thu production route. G-T vẫn cần fresh Q1–Q12 từng phái và ≥2 clients/backend thật.
+
+<a id="movement-camera-acceptance"></a>
+
+## Two-stage Jump / Camera acceptance — PHY-01
+
+Semantic owner: [Movement](../01-design/combat-and-character.md#movement-direction) và [Camera](../01-design/combat-and-character.md#movement-camera); integration/lifecycle theo [Runtime](../02-technical/gameplay-runtime.md#movement-feel). Record revision/Editor/packages/input profile, press/held/release times, current jump instance/consumed count, vy/apex/camera Y và exact tuning values. Không gọi PASS chỉ vì compile. Numerical fixture không thay keyboard/feel, real staircase destination readability, animated-art pixel QA hoặc network authority acceptance.
+
+| Case | Thao tác và acceptance | Evidence/status của sandbox probe |
+| --- | --- | --- |
+| JUMP-01 — Single tap | Tap ↑ nhanh: chỉ Stage1; apex baseline reproducible trong cùng setup/no ceiling; giữ sau landing không auto jump | Resolver + Physics2D fixture; manual keyboard/feel pending |
+| JUMP-02 — Hold extension | Giữ có chủ ý liên tục qua threshold dài hơn, không frame đầu hoặc một lần giữ hơi lâu: một modest extension; apex cao hơn Stage1, không full second jump | Đếm extension và đo boost/apex; timings là probe |
+| JUMP-03 — Relaxed second press | Tap/release rồi nhấn lần hai khi còn ascent margin, kể cả chậm hơn timeout cũ: cùng policy với hold, không cộng hai lần | So ở cùng trigger tick; thời điểm boost khác có thể tạo apex hơi khác, không yêu cầu mọi hold/tap timing cùng apex |
+| JUMP-04 — Near-apex second press | Second press khi đã sát apex/window đóng: không Stage2; press chậm nhưng còn đi lên rõ vẫn được Stage2 | Physics fixture so với Stage1 baseline; thêm boundary cases ở production |
+| JUMP-05 — Press while falling | ↑ lúc falling: không air jump hoặc extension, không reset vy/jump life | Physics fixture kiểm vy trước/sau press |
+| JUMP-06 — Hold + second tap | Hold đã consume Stage2, release/second tap khi còn ascent margin: không boost lần ba | Count một extension và so hold-only apex |
+| JUMP-07 — Landing reset | Landing rồi jump mới: extension một lần lại hợp lệ; holding không tự tạo start | Hai jumps/hai landings/hai consumed transitions |
+| JUMP-08 — Short hold | Giữ ↑ khoảng0.25s rồi thả: chỉ Stage1, không extension vô ý | So với single-tap baseline; physical keyboard/feel pending |
+| JUMP-09 — Closed window stays closed | Sát apex đóng window; sau đó velocity dương lại do bounce/external force vẫn không mở lại extension | Resolver boundary/latched-window fixture |
+| CAM-01 — Normal short jump | Short Stage1 hop: Y gần ổn định, không bob khó chịu; X follow liên tục | Numerical Y drift; motion/feel review pending |
+| CAM-02 — High ascent | Stage2 tiến lên tầng cao: camera reveal/move up BEFORE landing, destination/platform đọc được | Numerical reveal khi còn ascending; real higher-platform destination/manual pending |
+| CAM-03 — Long fall | Bắt đầu follow xuống trước landing và trước khi player mất khỏi safe view; không follow từng pixel ngay lúc rơi | Real Physics2D long-drop fixture; view margin invariant |
+| CAM-04 — Multi-level staircase | Thấp → giữa → cao và ngược lại; vertical transition bắt đầu khi airborne, không đợi landing | Synthetic four-leg trajectory dùng real camera; collision/staircase route/feel manual pending |
+| CAM-05 — Pixel stability | Representative resolution/PPU32, chạy/nhảy với sprite/tile thật: không obvious shimmer/jitter do subpixel camera | Optional quantization grid invariant chỉ numerical; animated visual acceptance **CHƯA CHẠY**, snapping mặc định off |
+
+**Latest probe values — không production-lock:** scene ArtLab dùng base launch 6.85 u/s, gravity −9.81 u/s² với base gravityScale1, fall multiplier2.5; hold threshold0.40s, ascent cutoff upward velocity0.50u/s (ở gravity hiện tại khoảng0.05s trước apex), không short double-tap timeout, additive contribution28% base velocity (=1.918 u/s ở scene này). Camera offset0.8u, upper/lower zones1.85/2.3u, up/down look-ahead0.08/0.06s capped0.35u, up/down smoothing0.18/0.28s, landing smoothing0.2s, safe margin0.5u; PPU32, optional final-position quantization off. Actual observed trigger tick có thể sau threshold do fixed/render sampling. Những số này thuộc probe record, không thành design constants.
+
+**Execution và giới hạn:** [Probe record 2026-10-12](movement-camera-probe-2026-10-12.md) giữ initial run/stale-reference audit và ghi follow-up theo feedback feel. Kết quả initial early-window run không nghiệm thu contract relaxed-ascent mới; xem follow-up evidence trong record. Sandbox chưa coyote/buffer/DropThrough implementation; giữ acceptance của production: coyote/buffer chỉ Stage1, Drop priority/restore per actor, extension identity và stale/replay validation ở G-N. Ceiling, render30/60/120 FPS, actual physical keys, representative resolution/Pixel Perfect shimmer, real map staircase và ≥2 clients/backend phải chạy trước nghiệm thu tương ứng.
 
 
 <a id="recovery-combat-acceptance"></a>
@@ -686,7 +713,7 @@ L = direction/values hiện hành; B = executor recommendation; O = policy/numer
 | Ca | Setup / expected theo matrix quest owner |
 | --- | --- |
 | Q-F01 | Q1 ba NPC khu dược/rèn/kho theo thứ tự; Intro/Accept/return/action receipt, replay không thưởng hai lần |
-| Q-F02 | Q2 canonical Vải Bọc Chuôi/item_q2_grip_wrap tại HV_Q2_SupplyRack → personal ground/Pickup → Lâm Bá consume1/reward atomic; purpose/return rõ, fixed Jump/optional Drop. Full bag/TTL/re-offer/fall/reconnect/replay không duplicate; content approved, geometry/route CHƯA CHẠY |
+| Q-F02 | Q2 canonical Vải Bọc Chuôi/item_q2_grip_wrap tại HV_Q2_SupplyRack → personal ground/Pickup → Lâm Bá consume1/reward atomic; purpose/return rõ, Two-Stage Jump/optional Drop. Full bag/TTL/re-offer/fall/reconnect/replay không duplicate; content approved, geometry/route CHƯA CHẠY |
 | Q-F03 | Q3 bốn qualifying life kills, năm slots3+2; kill lại respawned slot tính, không chờ bắt buộc/unique ID. Lv3+20 contribution, no loot/EXP |
 | Q-F04 | Nấm5 từ bãi bất kỳ, gồm DS1/DS7/DS8; áo+sample entitlement một lần #5 baseline; wrong identity/step no credit, full bag/TTL/reconnect giữ payload; equip áo rồi Sell sample đúng Bách atomic |
 | Q-F05 | Food/supply receipt một lần, SóiSương8 cả bãi Trúc khi sameMap; HP full reject không consume, không bắt potion vào lúc đầy |

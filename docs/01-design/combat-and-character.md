@@ -289,7 +289,7 @@ Luồng màn hình P0: Boot/Main Menu → Login tài khoản được cấp → 
 
 **Menu bằng bàn phím:** PrimaryAction trên NPC mở root context với action phù hợp được chọn sẵn (nhận/trả quest trước, rồi service). Trong modal: Navigate chọn ô/action, Tab/Shift+Tab đổi lựa chọn/view; Confirm xác nhận; Esc đóng. Move/Jump/DropThrough/SelectSkillSlot/PrimaryAction không lọt thành gameplay khi UI giữ focus. Enter chỉ mở/submit chat khi không có modal khác; Tab ở modal là UI navigation; ở world dùng [CycleTarget](#focus-input). Inventory/equip/learn, shop buy/sell, character/skill tab, rương và revive đều có focus rõ, text/action disabled reason và cùng command validation cho chuột/bàn phím. Không yêu cầu click để hoàn tất quest. Đổi mục tiêu và vòng đời focus theo [các mục liên quan](#focus-input); menu không nhận world CycleTarget.
 
-**Gate cảm giác di chuyển:** thử khoảng cho nhảy ngay sau khi rời mép (coyote time), nhớ input nhảy ngay trước khi chạm đất (jump buffer), normal Jump độ cao cố định cho mỗi accepted press, không đổi apex bằng hold/release, tăng/giảm tốc trên đất và tốc rơi. Các số là PROTOTYPE, chưa khóa trước khi có collider/tỷ lệ/map/mẫu art. Không thêm double-jump/dash. Drop không hưởng coyote để nhảy bật ngược lên sàn; authority và client phải dùng cùng semantics. Xem contract/probe Technical.
+**Gate cảm giác di chuyển:** kiểm Stage 1 tap ngắn và Stage 2 extension theo [semantic owner](#movement-direction), coyote chỉ cho start Stage 1, buffer Stage 1 trước landing, tăng/giảm tốc ground/air và tốc rơi. Exact timings/forces là PROBE/TUNABLE trước collider/tỷ lệ/map/mẫu art và playtest. Drop không hưởng coyote để nhảy bật ngược lên sàn; authority và client dùng cùng semantics. [Runtime](../02-technical/gameplay-runtime.md#movement-feel) sở hữu triển khai/lifecycle; không thêm double jump/dash.
 
 Target HUD tối giản: marker + mini HP trong world; tên/level/current-max HP/bar trên màn hình, bind đúng focus ID/generation/MapId. Player chết vẫn quan sát HP target hợp lệ, kể cả HP đổi do người khác đánh; death không tự ẩn/xóa focus. Không thêm portrait/element/rarity/generic buff panel.
 
@@ -350,7 +350,26 @@ Build không branch cap; không Skill Rank. Movement semantics giữ no ladder/c
 
 ## Movement direction đã xác nhận
 
-**LOCKED direction:** Normal Jump dùng một accepted press và một jump profile độ cao cố định; hold/release không đổi upward velocity/gravity/apex. Coyote/buffer, launch velocity, gravity/fall gravity/terminal speed và landing feel là TUNABLE; trần/tường có thể chặn quỹ đạo, không hứa mọi jump đạt apex qua collider. Không double/charged jump/dash. [Runtime](../02-technical/gameplay-runtime.md#movement-feel) sở hữu triển khai và lifecycle.
+**USER-APPROVED supersession 2026-10-12 — Two-stage jump / Jump extension:** một grounded jump có optional Stage-2 extension một lần. Theo feedback feel tiếp theo của chủ dự án, Stage 2 được kích hoạt bằng giữ có chủ ý qua threshold dài hơn hoặc nhấn ↑ lần hai khi vẫn đi lên rõ, chưa sát apex; không yêu cầu double tap nhanh; đây là extension của CÙNG cú nhảy, không phải second airborne jump. Quyết định này thay contract jump trước; exact timing/force vẫn PROBE/TUNABLE.
+
+Conceptual state: `Grounded → Stage1Ascending → optional Stage2ExtendedAscending → Falling → Grounded`; bỏ qua Stage 2 nếu không có trigger hợp lệ.
+
+- **Stage 1:** accepted UpPressed khi grounded bắt đầu base jump; một tap ngắn luôn đủ. Coyote có thể cho phép START Stage 1 sau support cuối; buffer có thể queue Stage 1 trước landing. Hai concept giữ nguyên, duration TUNABLE.
+- **Trigger A — Hold:** giữ ↑ liên tục từ accepted Stage-1 start qua một minimum hold threshold đủ dài để một lần giữ hơi lâu vẫn dễ tạo jump thấp; exact duration PROBE. Không extend frame đầu chỉ vì key held. Release sớm loại hold route; nếu không có second tap hợp lệ thì chỉ Stage 1, không release-cutoff apex.
+- **Trigger B — Second press during ascent:** tap/release rồi UpPressed lần hai trong đúng current jump instance, khi actor vẫn đi lên rõ và chưa sát apex. Không có double-tap timeout ngắn; press chậm hơn vẫn hợp lệ nếu còn ascent margin.
+- **Shared one-shot:** cả hai route consume CÙNG Stage-2 extension. Hold đã trigger thì second tap không cộng thêm; second tap đã trigger thì giữ tiếp không cộng thêm. Stage 2 thêm một đoạn cao vừa phải, không reset Y velocity thành full base jump, không restart jump life.
+- **Validity:** chỉ còn ascent margin, chưa vào vùng sát apex. Extension window đóng khi upward velocity xuống ngưỡng gần apex và không mở lại trong cùng jump life. Falling, window đã đóng, ceiling chặn ascent hoặc coyote/buffer của jump khác không mở Stage 2; không air jump/air reset. Landing reset consumed state cho jump tiếp theo. Không auto jump, infinite hold scaling hoặc continuous variable-force curve.
+- **Tuning gate:** Stage 1 đủ normal small traversal; Stage 2 cho thêm một khúc rõ nhưng modest để lên platform cao hơn một chút. Launch/extension velocity, hold threshold/ascent margin, gravity/fall/terminal speed, coyote/buffer và landing feel đều TUNABLE. Trần/tường có thể chặn quỹ đạo; chưa hứa mọi jump đạt apex qua collider. Không double jump/charged jump/dash. [Runtime](../02-technical/gameplay-runtime.md#movement-feel) sở hữu implementation và authority lifecycle.
+
+<a id="movement-camera"></a>
+
+### Camera vertical direction — acceptance, exact implementation OPEN
+
+X follow liên tục theo baseline. Normal short Stage-1 hop giữ Y phần lớn ổn định để không bob. Khi actor ascending rõ và vượt upper soft zone hoặc trajectory cần reveal tầng cao, camera bắt đầu dịch lên **trước landing**; Stage 2 có thể reveal sớm hơn khi actor thật sự vào không gian cao hơn. Khi falling/downward traversal, dùng lower soft zone/asymmetric threshold để không theo từng pixel ngay từ lúc rơi; long fall phải theo xuống trước landing và trước khi actor mất khỏi safe view. Landing chỉ settle/recenter, không phải trigger đầu tiên của vertical transition.
+
+Target Y dùng player position + vertical velocity + upper/lower soft zones + modest look-ahead. Upward reveal tương đối sớm; downward follow chậm hơn một chút, có safety catch cho long/fast fall. Không dùng giant symmetric dead zone tới gần mép màn hình. SmoothDamp, thresholds/look-ahead/damping, safe-view margin và exact technique đều **OPEN / CAMERA PROBE**, không canonicalize constants.
+
+**Pixel Perfect compatibility là acceptance concern:** giữ PPU32; nếu smoothing gây shimmer/jitter thì thử world-pixel quantization hoặc final positioning tương thích Pixel Perfect, kiểm bằng motion ở representative resolution trước khi chọn. Không snap physics/authority positions hoặc lock một snapping hack từ prompt này. Physics stages không đổi [Jump/Fall logical timeline samples](../03-art/art-and-visual-production.md#player-facing).
 
 Player có **hai logical facing Left/Right**; dừng sau movement giữ hướng vừa đi. Idle 3/4 nhẹ, Run nghiêng side hơn, Jump/Fall có silhouette side khác nhau, action gần full side với upper pose đúng Kiếm/Cung. Action facing đã snapshot không bị input mới sửa giữa release. [Art](../03-art/art-and-visual-production.md#player-facing) sở hữu mapping/raster; không thêm bốn hướng hoặc camera depth. Default Right deterministic khi chưa có saved-facing requirement là BASELINE, không thêm field DB.
 

@@ -193,7 +193,7 @@ Personal restoration/access không globally mở gate cho character khác. Exact
 
 **Definition-ready content:** `ItemDefinitionId = item_q2_grip_wrap`, display Vải Bọc Chuôi; `placed-objectId = HV_Q2_SupplyRack` ở Học Viện; binding `(character,Q2,delivery)`, quantity 1, quest-bound theo Items owner. IDs là tên nội bộ được chọn cho implementation, không yêu cầu user lock riêng; không tuyên bố asset/scene đã tồn tại. Giữ `HV_Entrance`, `HV_JumpLedge`, `HV_DropLanding` stable.
 
-Ordered groups `Visit/Interact(HV_Q2_SupplyRack)` → `ItemRequirement(character,Q2,delivery,quantity1)` → `TurnIn(Lâm Bá,consume delivery1)`. Validator alive/sameMap/range/active group tạo tối đa một right/quest epoch; repeat re-offer Pending, không direct bag. Full bag/TTL/reconnect giữ right cùng payload; possession từ Inventory committed và net turn-in atomic. G-B kiểm binding/definition; blockout fixed Jump/camera/ground pickup/return phải thử trước nhân geometry production. Nội dung đã duyệt không tự chứng minh G-L pass.
+Ordered groups `Visit/Interact(HV_Q2_SupplyRack)` → `ItemRequirement(character,Q2,delivery,quantity1)` → `TurnIn(Lâm Bá,consume delivery1)`. Validator alive/sameMap/range/active group tạo tối đa một right/quest epoch; repeat re-offer Pending, không direct bag. Full bag/TTL/reconnect giữ right cùng payload; possession từ Inventory committed và net turn-in atomic. G-B kiểm binding/definition; blockout Stage-1/optional Stage-2 Jump/camera/ground pickup/return phải thử trước nhân geometry production. Nội dung đã duyệt không tự chứng minh G-L pass.
 
 <a id="q6-mp-tutorial--recovery-hiện-hành-và-proposal-dời-thời-điểm"></a>
 <a id="mp-potion-onboarding"></a>
